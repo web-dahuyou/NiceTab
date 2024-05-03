@@ -1,0 +1,89 @@
+html, body, body div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, figure, footer, header, menu, nav, section, time, mark, audio, video, details, summary {margin: 0; padding: 0; border: 0; font-size: 100%; font-weight: normal; vertical-align: baseline; background: transparent;}
+
+main, article, aside, figure, footer, header, nav, section, details, summary {display: block;}
+
+html {box-sizing: border-box;}
+
+*, *:before, *:after {box-sizing: inherit;}
+
+img {max-width: 100%;}
+
+ul {list-style: none;} /* we'll restore bullets as needed for content */
+
+blockquote, q {quotes: none;}
+
+blockquote:before, blockquote:after, q:before, q:after {content: ''; content: none;}
+
+a {margin: 0; padding: 0; font-size: 100%; vertical-align: baseline; background: transparent;}
+
+del {text-decoration: line-through;}
+
+abbr[title], dfn[title] {border-bottom: 1px dotted #000; cursor: help;}
+
+table {border-collapse: separate; border-spacing: 0; text-align: left;}
+th {font-weight: bold; vertical-align: bottom;}
+td {font-weight: normal; vertical-align: top;}
+td img {vertical-align: top;}
+
+hr {display: block; height: 1px; border: 0; border-top: 1px solid #999; margin: 1rem 0; padding: 0;}
+
+input, select {vertical-align: middle;}
+
+pre {white-space: pre-line;}
+
+input[type="radio"] {vertical-align: text-bottom;}
+input[type="checkbox"] {vertical-align: bottom;}
+
+small {font-size: .8rem;}
+
+strong {font-weight: bold;}
+
+sub, sup {font-size: .8rem; line-height: 0; position: relative;}
+sup {top: -0.5rem;}
+sub {bottom: -0.25rem;}
+
+pre, code, kbd, samp {font-family: monospace, sans-serif;}
+
+label, input[type=button], input[type=submit], input[type=file], button {cursor: pointer;}
+
+button, input, select, textarea {margin: 0;}
+
+ins {background-color: var(--highlight-color); color: #000; text-decoration: none;}
+mark {background-color: var(--highlight-color); color: #000; font-style: italic; font-weight: bold;}
+
+blockquote {padding: 2rem; border-left: 1px solid #333;}
+
+.clearfix:after {content: ""; display: table; clear: both;} /* https://css-tricks.com/snippets/css/clear-fix/ */
+
+h1, h2, h3, h4, h5, h6 {text-wrap: balance}
+
+p {text-wrap: pretty;}
+
+@media (prefers-reduced-motion: no-preference) {
+	:has(:target) {
+		scroll-behavior: smooth;
+	}
+}
+
+/* ———— END THE GENERIC RESETS ———— */
+
+:root {
+	--font-system: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; /* https://css-tricks.com/snippets/css/system-font-stack */
+	--text-color: #333;
+	--featured-color: #03f;
+	--featured-color-hover: #69f;
+	--highlight-color: #fcd700;
+}
+
+body {font-size: 16px; font-family: var(--font-system); color: var(--text-color);}
+
+a {color: var(--featured-color);}
+a:hover {color: var(--featured-color-hover);}
+
+@media screen and (max-width: 480px) {
+
+}
+
+@media print {
+
+}
