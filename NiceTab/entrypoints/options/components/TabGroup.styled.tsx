@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import {
   StyledEllipsis,
-  StyledActionIconBtn,
 } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS } from '~/entrypoints/common/constants';
 

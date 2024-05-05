@@ -33,5 +33,11 @@ export interface TagItem {
   tagName: string;
   groupList: GroupItem[];
 }
+// 分类、标签组、标签页统计信息
+export interface CountInfo {
+  tagCount: number;
+  groupCount: number;
+  tabCount: number;
+}
 
 export default { name: 'Nice-Tab-types' }

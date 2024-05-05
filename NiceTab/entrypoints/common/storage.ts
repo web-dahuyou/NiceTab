@@ -1,6 +1,6 @@
 import { Key } from 'react';
 import dayjs from 'dayjs';
-import type { SettingsProps, TagItem, GroupItem, TabItem } from '../types';
+import type { SettingsProps, TagItem, GroupItem, TabItem, CountInfo } from '../types';
 import { ENUM_SETTINGS_PROPS } from './constants';
 import { getRandomId } from './utils';
 
@@ -38,30 +38,54 @@ class SettingsUtils {
 // tab列表工具类 (tag: 分类， tabGroup: 标签组， tab: 标签页)
 class TabListUtils {
   tagList: TagItem[] = [];
+  countInfo: CountInfo = {
+    tagCount: 0,
+    groupCount: 0,
+    tabCount: 0,
+  };
   /* 分类相关方法 */
   getInitialTag(): TagItem {
     return {
       tagId: getRandomId(),
-      tagName: '未命名分类',
-      groupList: [this.getInitialTabGroup()],
+      tagName: '默认分类',
+      groupList: [],
     }
   }
   async getTagList() {
     const tagList = await storage.getItem<TagItem[]>('local:tabList');
     this.tagList = tagList || [this.getInitialTag()];
     if (!tagList) {
-      this.setTagList(this.tagList);
+      await this.setTagList(this.tagList);
     }
+    this.setCountInfo();
     return this.tagList;
   }
   async setTagList(list?: TagItem[]) {
     this.tagList = list || [this.getInitialTag()];
+    this.setCountInfo();
     await storage.setItem('local:tabList', this.tagList);
+  }
+  setCountInfo() {
+    let tagCount = 0, groupCount = 0, tabCount = 0;
+    this.tagList.forEach(tag => {
+      tagCount += 1;
+      tag?.groupList?.forEach(group => {
+        groupCount += 1;
+        group?.tabList?.forEach(tab => {
+          tabCount += 1;
+        });
+      })
+    });
+    this.countInfo = {
+      tagCount,
+      groupCount,
+      tabCount,
+    }
   }
   async addTag(tag?: TagItem) {
     await this.getTagList();
     const newTag = Object.assign(this.getInitialTag(), tag || {});
-    this.setTagList([newTag, ...this.tagList]);
+    await this.setTagList([newTag, ...this.tagList]);
   }
   async updateTag(tagId: Key, tag: Partial<TagItem>) {
     await this.getTagList();
@@ -73,19 +97,19 @@ class TabListUtils {
       }
     });
 
-    this.setTagList(tagList);
+    await this.setTagList(tagList);
   }
   async removeTag(tagId: Key) {
     await this.getTagList();
     const tagList = this.tagList.filter(item => item.tagId !== tagId);
-    this.setTagList(tagList);
+    await this.setTagList(tagList);
   }
 
   /* 标签组相关方法 */
   getInitialTabGroup(): GroupItem {
     return {
       groupId: getRandomId(),
-      groupName: '未命名标签组',
+      groupName: '默认标签组',
       createTime: dayjs().format('YYYY-MM-DD HH:mm'),
       tabList: []
     };
@@ -105,7 +129,7 @@ class TabListUtils {
         return tag;
       }
     });
-    this.setTagList(tagList);
+    await this.setTagList(tagList);
   }
   async updateTabGroup(tagId: Key, groupId: Key, group: Partial<GroupItem>) {
     await this.getTagList();
@@ -128,7 +152,7 @@ class TabListUtils {
         return tag;
       }
     });
-    this.setTagList(tagList);
+    await this.setTagList(tagList);
   }
   async removeTabGroup(tagId: Key, groupId: Key) {
     await this.getTagList();
@@ -142,33 +166,35 @@ class TabListUtils {
         return tag;
       }
     });
-    this.setTagList(tagList);
+    await this.setTagList(tagList);
   }
 
   /* 标签相关方法 */
   async addTabs(tabs: TabItem[], createNewGroup = false) {
     await this.getTagList();
-    let tag0 = this.tagList[0];
-    const group0 = this.tagList[0]?.groupList?.[0];
-    if (!createNewGroup && group0) {
-      tag0.groupList[0].tabList = [...tabs, ...(group0?.tabList || [])];
-      this.setTagList([tag0, ...this.tagList.slice(1)]);
-      return;
+    let tag0 = this.tagList?.[0];
+    const group = tag0?.groupList?.find(group => !group.isLocked && !group.isStarred);
+    if (!createNewGroup && group) {
+      group.tabList = [...tabs, ...(group?.tabList || [])];
+      await this.setTagList([tag0, ...this.tagList.slice(1)]);
+      return { tagId: tag0.tagId, groupId: group.groupId };
     }
-    // 不存在标签组或者createNewGroup=tue，就创建一个新标签组
+    // 不存在标签组或者createNewGroup=true，就创建一个新标签组
     const newtabGroup = this.getInitialTabGroup();
     newtabGroup.tabList = [...tabs];
 
     if (tag0) {
-      tag0.groupList = createNewGroup ? [newtabGroup, ...tag0.groupList] : [newtabGroup];
-      this.setTagList([tag0, ...this.tagList.slice(1)]);
-      return;
+      const index = tag0.groupList.findIndex(g => !g.isLocked && !g.isStarred);
+      tag0.groupList.splice(index > -1 ? index : tag0.groupList.length, 0, newtabGroup);
+      await this.setTagList([tag0, ...this.tagList.slice(1)]);
+      return { tagId: tag0.tagId, groupId: newtabGroup.groupId };
     }
 
     // 不存在tag分类，就创建一个新的tag
     const tag = this.getInitialTag();
     tag.groupList = [newtabGroup];
-    this.setTagList([tag]);
+    await this.setTagList([tag]);
+    return { tagId: tag.tagId, groupId: newtabGroup.groupId };
   }
 }
 

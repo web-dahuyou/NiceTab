@@ -1,12 +1,13 @@
-import React, { useEffect, useRef } from 'react';
-import { theme } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import { theme, Popconfirm } from 'antd';
 import { LockOutlined, StarOutlined, CloseOutlined } from '@ant-design/icons';
-import { GroupItem, TabItem } from '~/entrypoints/types';
+import { GroupItem } from '~/entrypoints/types';
 import { classNames } from '~/entrypoints/common/utils';
 import { tabListUtils } from '~/entrypoints/common/storage';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS } from '~/entrypoints/common/constants';
+import Comfirm from '~/entrypoints/common/components/Confirm';
 import EditInput from './EditInput';
 import {
   StyledGroupWrapper,
@@ -24,23 +25,41 @@ type TabGroupProps = GroupItem & {
   onRemove: () => void;
   onRestore: () => void;
   onStarredChange?: (isStarred: boolean) => void;
+};
+
+function ConfirmMarkup({
+  onConfirm,
+  children,
+}: {
+  onConfirm: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <Popconfirm
+      title="提醒"
+      description="您确定要删除该标签组吗？"
+      onConfirm={() => onConfirm?.()}
+      okText="确认"
+      cancelText="取消"
+    >
+      {children}
+    </Popconfirm>
+  );
 }
 
-export default function TabGroup(
-  {
-    groupId,
-    groupName,
-    createTime,
-    tabList,
-    isLocked,
-    isStarred,
-    selected,
-    onChange,
-    onRemove,
-    onRestore,
-    onStarredChange
-  }: TabGroupProps
-) {
+export default function TabGroup({
+  groupId,
+  groupName,
+  createTime,
+  tabList,
+  isLocked,
+  isStarred,
+  selected,
+  onChange,
+  onRemove,
+  onRestore,
+  onStarredChange,
+}: TabGroupProps) {
   const { token } = useToken();
   const groupRef = useRef<HTMLDivElement>(null);
 
@@ -58,28 +77,21 @@ export default function TabGroup(
       ref={groupRef}
     >
       <StyledGroupHeader className="group-header">
-        { !isLocked && (
-          <StyledActionIconBtn
-            className="btn-remove"
-            $size="16"
-            $hoverColor={token.colorPrimaryHover}
-            onClick={() => onRemove?.()}
-          >
-            <CloseOutlined />
-          </StyledActionIconBtn>
-        ) }
+        {!isLocked && (
+          <ConfirmMarkup onConfirm={onRemove}>
+            <StyledActionIconBtn
+              className="btn-remove"
+              $size="16"
+              $hoverColor={ENUM_COLORS.red.primary}
+            >
+              <CloseOutlined />
+            </StyledActionIconBtn>
+          </ConfirmMarkup>
+        )}
 
         <div className="group-status-wrapper">
-          { isLocked && (
-            <StyledActionIconBtn $size="16" $hoverColor={token.colorPrimaryHover} onClick={() => onChange?.({ isLocked: !isLocked })}>
-              <LockOutlined />
-            </StyledActionIconBtn>
-          ) }
-          { isStarred && (
-            <StyledActionIconBtn $size="16" $hoverColor={token.colorPrimaryHover} onClick={() => onStarredChange?.(!isStarred)}>
-              <StarOutlined />
-            </StyledActionIconBtn>
-          )}
+          {isLocked && <LockOutlined style={{ fontSize: '18px', color: token.colorPrimaryHover }} />}
+          {isStarred && <StarOutlined style={{ fontSize: '18px', color: token.colorPrimaryHover }} />}
         </div>
 
         <div className="group-name-wrapper">
@@ -91,17 +103,30 @@ export default function TabGroup(
         <div className="group-header-right-part">
           <div className="group-create-time">{createTime}</div>
           <div className="group-action-btns">
-            { !isLocked && <span className="action-btn" onClick={() => onRemove?.()}>删除该组</span> }
-            <span className="action-btn" onClick={() => onRestore?.()}>恢复该组</span>
-            <span className="action-btn" onClick={() => onChange?.({ isLocked: !isLocked })}>{ isLocked ? '取消锁定' : '锁定该组'}</span>
-            <span className="action-btn" onClick={() => onStarredChange?.(!isStarred)}>{ isStarred ? '取消星标' : '星标该组' }</span>
+            {!isLocked && (
+              <ConfirmMarkup onConfirm={onRemove}>
+                <span className="action-btn">删除该组</span>
+              </ConfirmMarkup>
+            )}
+            <span className="action-btn" onClick={() => onRestore?.()}>
+              恢复该组
+            </span>
+            <span
+              className="action-btn"
+              onClick={() => onChange?.({ isLocked: !isLocked })}
+            >
+              {isLocked ? '取消锁定' : '锁定该组'}
+            </span>
+            <span className="action-btn" onClick={() => onStarredChange?.(!isStarred)}>
+              {isStarred ? '取消星标' : '星标该组'}
+            </span>
           </div>
         </div>
       </StyledGroupHeader>
 
       <StyledTabListWrapper className="tab-list-wrapper">
         {tabList.map((tab, index) => (
-          <li className="tab-list-item" key={tab.url}>
+          <li className="tab-list-item" key={index}>
             <StyledActionIconBtn
               className="tab-item-btn btn-remove"
               $size="16"

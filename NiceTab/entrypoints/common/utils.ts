@@ -3,6 +3,31 @@ export function classNames(...classes: Array<string | boolean | undefined | null
   return classes.filter(Boolean).join(' ');
 }
 
+// 拼接url
+export function getUrlWithParams(url: string, params: Record<string, any>): string {
+  const urlObject = new URL(url);
+  const searchParams = new URLSearchParams(urlObject.search);
+  for (const [key, value] of Object.entries(params)) {
+    searchParams.append(key, value);
+  }
+
+  urlObject.search = searchParams.toString();
+  return urlObject.toString();
+}
+
+// 解析url参数
+export function getUrlParams(url?: string): Record<string, string> {
+  const urlObj = new URL(url || window.location.href);
+  const searchParams = new URLSearchParams(urlObj.search);
+  const params: Record<string, string> = {};
+
+  for (const [key, value] of searchParams.entries()) {
+    params[key] = value;
+  }
+
+  return params;
+}
+
 /**
  * @description: 生成随机字符串
  * @param digit 想要生成的随机字符串长度

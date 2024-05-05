@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useState, useRef, useMemo } from 'react'
 import { theme, Tree, Button, Input } from 'antd';
 import { FolderOutlined, AppstoreOutlined, DownOutlined } from '@ant-design/icons';
 import type { TreeDataNode } from 'antd';
-import { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
+import { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
+import { getUrlParams } from '~/entrypoints/common/utils';
 import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
@@ -22,7 +23,6 @@ type TreeDataNodeTag = TreeDataNode & {
   children?: Array<TreeDataNodeTabGroup & { originData?: GroupItem }>;
 };
 type TreeDataNodeUnion = TreeDataNodeTag | TreeDataNodeTabGroup;
-
 
 const { useToken } = theme;
 const { Search } = Input;
@@ -52,16 +52,16 @@ const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
 function Home() {
   const { token } = useToken();
   const contentRef = useRef<HTMLDivElement>(null);
+  const [countInfo, setCountInfo] = useState<CountInfo>();
   const [treeData, setTreeData] = useState([] as TreeDataNodeUnion[]);
   const [selectedTagKey, setSelectedTagKey] = useState<React.Key | undefined>();
-  const [selectedTabGroupKey, setSelectedTabGroupKey] = useState<
-    React.Key | undefined
-  >();
+  const [selectedTabGroupKey, setSelectedTabGroupKey] = useState<React.Key | undefined>();
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
 
   const selectedTag: TreeDataNodeTag = useMemo(() => {
-    const tag = (treeData.find((tag) => tag.type === 'tag' && tag.key === selectedTagKey) || {});
+    const tag =
+      treeData.find((tag) => tag.type === 'tag' && tag.key === selectedTagKey) || {};
     return tag as TreeDataNodeTag;
   }, [treeData, selectedTagKey]);
 
@@ -69,12 +69,18 @@ function Home() {
   const handleTagRemove = useCallback(async () => {
     if (!selectedTagKey) return;
     await tabListUtils.removeTag(selectedTagKey);
-    refreshTreeData();
+    refreshTreeData((treeData) => {
+      const tag = treeData?.[0];
+      handleSelect(treeData, [tag?.key], { node: tag });
+    });
   }, [selectedTagKey]);
   // 创建分类
   const handleTagCreate = useCallback(async () => {
     await tabListUtils.addTag();
-    refreshTreeData();
+    refreshTreeData((treeData) => {
+      const tag = treeData?.[0];
+      handleSelect(treeData, [tag?.key], { node: tag });
+    });
   }, []);
   // 选中节点
   const handleSelect = useCallback(
@@ -105,22 +111,26 @@ function Home() {
     [treeData]
   );
 
-
   // 删除标签组
-  const handleTabGroupRemove = useCallback(async (tag: TreeDataNodeTag, tabGroup: TreeDataNodeTabGroup) => {
-    await tabListUtils.removeTabGroup(tag.key, tabGroup.key);
-    refreshTreeData(
-      (treeData) => {
+  const handleTabGroupRemove = useCallback(
+    async (tag: TreeDataNodeTag, tabGroup: TreeDataNodeTabGroup) => {
+      await tabListUtils.removeTabGroup(tag.key, tabGroup.key);
+      refreshTreeData((treeData) => {
         handleSelect(treeData, [tag.key], { node: tag });
-      }
-    );
-  }, []);
+      });
+    },
+    []
+  );
   // 修改标签组
   const handleTabGroupChange = useCallback(
-    async (tag: TreeDataNodeTag, tabGroup: TreeDataNodeTabGroup, data: Partial<GroupItem>) => {
+    async (
+      tag: TreeDataNodeTag,
+      tabGroup: TreeDataNodeTabGroup,
+      data: Partial<GroupItem>
+    ) => {
       await tabListUtils.updateTabGroup(tag.key, tabGroup.key, data);
-      refreshTreeData(
-        (treeData) => handleSelect(treeData, [tabGroup.key], { node: tabGroup })
+      refreshTreeData((treeData) =>
+        handleSelect(treeData, [tabGroup.key], { node: tabGroup })
       );
     },
     []
@@ -131,48 +141,53 @@ function Home() {
     async (tag: TreeDataNodeTag, tabGroup: TreeDataNodeTabGroup, isStarred: boolean) => {
       const tagList = await tabListUtils.getTagList();
       if (isStarred) {
-        tagList.forEach(t => {
+        tagList.forEach((t) => {
           if (t.tagId === tag.key) {
-            t.groupList = [{ ...tabGroup.originData, isStarred }, ...t.groupList.filter(g => g.groupId !== tabGroup.key)]
+            t.groupList = [
+              { ...tabGroup.originData, isStarred },
+              ...t.groupList.filter((g) => g.groupId !== tabGroup.key),
+            ];
           }
         });
       } else {
-        tagList.forEach(t => {
+        tagList.forEach((t) => {
           if (t.tagId === tag.key) {
-            t.groupList = t.groupList.filter(g => g.groupId !== tabGroup.key);
-            const unStarredIndex = t.groupList.findIndex(g => !g.isStarred);
+            t.groupList = t.groupList.filter((g) => g.groupId !== tabGroup.key);
+            const unStarredIndex = t.groupList.findIndex((g) => !g.isStarred);
             t.groupList.splice(unStarredIndex, 0, { ...tabGroup.originData, isStarred });
           }
         });
       }
 
       await tabListUtils.setTagList(tagList);
-      refreshTreeData(
-        (treeData) => handleSelect(treeData, [tabGroup.key], { node: tabGroup })
+      refreshTreeData((treeData) =>
+        handleSelect(treeData, [tabGroup.key], { node: tabGroup })
       );
     },
     []
   );
   // 恢复标签组
-  const handleTabGroupRestore = useCallback(async (tag: TreeDataNodeTag, tabGroup: TreeDataNodeTabGroup) => {
-    const { DELETE_AFTER_RESTORE } = ENUM_SETTINGS_PROPS;
-    const settings = await settingsUtils.getSettings();
-    tabGroup?.originData?.tabList.forEach(tab => {
-      openNewTab(tab);
-    });
-    if (settings[DELETE_AFTER_RESTORE]) {
-      await tabListUtils.removeTabGroup(tag.key, tabGroup.key);
-      refreshTreeData(
-        (treeData) => handleSelect(treeData, [tag.key], { node: tag })
-      );
-    }
-  }, []);
+  const handleTabGroupRestore = useCallback(
+    async (tag: TreeDataNodeTag, tabGroup: TreeDataNodeTabGroup) => {
+      const { DELETE_AFTER_RESTORE } = ENUM_SETTINGS_PROPS;
+      const settings = await settingsUtils.getSettings();
+      tabGroup?.originData?.tabList.forEach((tab) => {
+        openNewTab(tab);
+      });
+      if (settings[DELETE_AFTER_RESTORE]) {
+        await tabListUtils.removeTabGroup(tag.key, tabGroup.key);
+        refreshTreeData((treeData) => handleSelect(treeData, [tag.key], { node: tag }));
+      }
+    },
+    []
+  );
   // 刷新treeData
   const refreshTreeData = async (callback?: (treeData: TreeDataNodeUnion[]) => void) => {
-    const tagList = await tabListUtils.getTagList();
+    const tagList = tabListUtils.tagList;
     const treeData = getTreeData(tagList);
     setTreeData(treeData);
     // console.log('refresh-treeData', treeData);
+    setCountInfo(tabListUtils.countInfo);
     callback?.(treeData);
   };
   // 初始化
@@ -180,11 +195,19 @@ function Home() {
     const tagList = await tabListUtils.getTagList();
     const treeData = getTreeData(tagList);
     setTreeData(treeData);
+    // console.log('init-treeData', treeData);
+    setCountInfo(tabListUtils.countInfo);
 
-    const defaultTabGroup = treeData?.[0]?.children?.[0];
-    if (defaultTabGroup) {
-      handleSelect(treeData, [defaultTabGroup?.key], { node: defaultTabGroup as TreeDataNodeTabGroup });
-    }
+    const urlParams = getUrlParams(window.location.href);
+
+    const tag =
+      treeData?.find((tag) => tag.type === 'tag' && tag.key === urlParams.tagId) ||
+      treeData?.[0];
+    const tabGroup =
+      tag?.children?.find((g) => g.key === urlParams.groupId) || tag.children?.[0];
+    handleSelect(treeData, [tabGroup ? tabGroup.key : tag.key], {
+      node: tabGroup ? (tabGroup as TreeDataNodeTabGroup) : tag,
+    });
   };
   useEffect(() => {
     init();
@@ -200,22 +223,24 @@ function Home() {
                 type="primary"
                 size="small"
                 shape="round"
-                disabled={selectedTagKey != undefined && !selectedKeys.includes(selectedTagKey)}
+                disabled={
+                  selectedTagKey != undefined && !selectedKeys.includes(selectedTagKey)
+                }
                 onClick={handleTagRemove}
               >
                 删除分类
               </Button>
-              <Button
-                type="primary"
-                size="small"
-                shape="round"
-                onClick={handleTagCreate}
-              >
+              <Button type="primary" size="small" shape="round" onClick={handleTagCreate}>
                 创建分类
               </Button>
             </div>
             <div className="tag-list-title">标签组列表</div>
-            <Search style={{ marginBottom: 8 }} placeholder="Search" />
+            <ul className="count-info">
+              <li>分类：{countInfo?.tagCount}</li>
+              <li>标签组：{countInfo?.groupCount}</li>
+              <li>标签页：{countInfo?.tabCount}</li>
+            </ul>
+            {/* <Search style={{ marginBottom: 8 }} placeholder="Search" /> */}
             <Tree
               draggable
               blockNode
@@ -240,7 +265,9 @@ function Home() {
                   onChange={(data) => handleTabGroupChange(selectedTag, tabGroup, data)}
                   onRemove={() => handleTabGroupRemove(selectedTag, tabGroup)}
                   onRestore={() => handleTabGroupRestore(selectedTag, tabGroup)}
-                  onStarredChange={(isStarred) => handleTabGroupStarredChange(selectedTag, tabGroup, isStarred)}
+                  onStarredChange={(isStarred) =>
+                    handleTabGroupStarredChange(selectedTag, tabGroup, isStarred)
+                  }
                 ></TabGroup>
               )
           )}

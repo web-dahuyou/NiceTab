@@ -24,8 +24,17 @@ export const StyledListWrapper = styled.div<{$primaryColor?: string}>`
         }
       }
       .tag-list-title {
-        padding: 20px 0 10px;
+        padding: 10px 0 4px;
         font-weight: bold;
+      }
+      .count-info {
+        padding: 4px 0 16px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        color: #666;
+        font-size: 12px;
       }
     }
   }
