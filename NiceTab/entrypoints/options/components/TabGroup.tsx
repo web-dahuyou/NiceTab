@@ -90,8 +90,8 @@ export default function TabGroup({
         )}
 
         <div className="group-status-wrapper">
-          {isLocked && <LockOutlined style={{ fontSize: '18px', color: token.colorPrimaryHover }} />}
-          {isStarred && <StarOutlined style={{ fontSize: '18px', color: token.colorPrimaryHover }} />}
+          {isLocked && <LockOutlined style={{ fontSize: '22px', color: token.colorPrimaryHover }} />}
+          {isStarred && <StarOutlined style={{ fontSize: '22px', color: token.colorPrimaryHover }} />}
         </div>
 
         <div className="group-name-wrapper">

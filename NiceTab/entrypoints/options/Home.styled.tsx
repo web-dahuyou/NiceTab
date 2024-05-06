@@ -15,26 +15,26 @@ export const StyledListWrapper = styled.div<{$primaryColor?: string}>`
       top: 100px;
       padding-right: 16px;
       border-right: 1px solid rgba(5, 5, 5, 0.06);
-      .sidebar-action-btns-wrapper {
-        display: flex;
-        justify-content: flex-end;
-        gap: 8px;
-        button {
-          font-size: 12px;
-        }
-      }
       .tag-list-title {
-        padding: 10px 0 4px;
         font-weight: bold;
       }
       .count-info {
-        padding: 4px 0 16px;
+        padding: 8px 0 16px;
         display: flex;
         align-items: center;
         flex-wrap: wrap;
         gap: 8px;
         color: #666;
         font-size: 12px;
+      }
+      .sidebar-action-btns-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 10px;
+        gap: 8px;
+        button {
+          font-size: 12px;
+        }
       }
     }
   }

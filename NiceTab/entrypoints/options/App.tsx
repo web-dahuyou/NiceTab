@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
+import { createHashRouter, RouterProvider, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { Menu } from 'antd';
 import { HomeOutlined, SettingOutlined } from '@ant-design/icons';
 import styled, { css } from 'styled-components';
@@ -58,26 +59,62 @@ const StyledPageContainer = styled.div`
 interface NavProps {
   key: string;
   label: string;
+  path: string;
   icon?: JSX.Element;
   component: JSX.Element;
 }
 
 const navs: NavProps[] = [
-  { key: 'home', label: '首页', icon: <HomeOutlined />, component: <Home /> },
+  { key: 'home', label: '首页', path: '/home', icon: <HomeOutlined />, component: <Home /> },
   {
     key: 'settings',
     label: '设置',
+    path: '/settings',
     icon: <SettingOutlined />,
     component: <Settings />,
   },
 ];
 
-function App() {
-  const [currNav, setCurrNav] = useState<NavProps>(navs[0]);
+const router = createHashRouter([
+  {
+    element: <AppLayout />,
+    children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
+      {
+        path: "/home",
+        element: <Home />,
+      },
+      // {
+      //   path: "/home/:tagId?/:groupId?",
+      //   element: <Home />,
+      // },
+      {
+        path: "/settings",
+        element: <Settings />,
+      },
+    ]
+  },
+]);
+
+function AppLayout() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+
   const onSelect = useCallback(({ key }: { key: NavProps['key'] }) => {
     const nav = navs.find((item) => item.key === key);
-    nav && setCurrNav(nav);
+    if (nav) {
+      nav && navigate(nav.path);
+    }
   }, []);
+
+  useEffect(() => {
+    const nav = navs.find((item) => item.path === location.pathname);
+    setSelectedKeys([nav?.key || 'home']);
+  }, [location.pathname]);
 
   return (
     <StyledPageContainer className="page-container">
@@ -87,13 +124,18 @@ function App() {
           theme="light"
           mode="horizontal"
           defaultSelectedKeys={['home']}
+          selectedKeys={selectedKeys}
           items={navs}
           onSelect={onSelect}
         />
       </div>
-      <div className="main-content">{currNav.component}</div>
+      <div className="main-content">
+        <Outlet></Outlet>
+      </div>
     </StyledPageContainer>
   );
 }
 
-export default App;
+export default function AppRoute() {
+  return <RouterProvider router={router} />
+};

@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState, useRef, useMemo } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { theme, Tree, Button, Input } from 'antd';
 import { FolderOutlined, AppstoreOutlined, DownOutlined } from '@ant-design/icons';
 import type { TreeDataNode } from 'antd';
 import { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
-import { getUrlParams } from '~/entrypoints/common/utils';
 import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
@@ -51,6 +51,8 @@ const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
 
 function Home() {
   const { token } = useToken();
+  // const routeParams = useParams<{ tagId: string; groupId: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const contentRef = useRef<HTMLDivElement>(null);
   const [countInfo, setCountInfo] = useState<CountInfo>();
   const [treeData, setTreeData] = useState([] as TreeDataNodeUnion[]);
@@ -92,12 +94,16 @@ function Home() {
       if (node.type === 'tag') {
         setSelectedTagKey(node.key);
         setSelectedTabGroupKey(node?.children?.[0]?.key);
-        setExpandedKeys([node.key]);
+        setExpandedKeys((keys) => {
+          return [...new Set([...keys, node.key])];
+        });
       } else if (node.type === 'tabGroup') {
         const tag = treeData.find((tag) => tag.key === node.parentKey);
         setSelectedTagKey(tag?.key);
         setSelectedTabGroupKey(node.key);
-        setExpandedKeys([node.parentKey]);
+        setExpandedKeys((keys) => {
+          return [...new Set([...keys, node.parentKey])];
+        });
       }
 
       setSelectedKeys([node.key]);
@@ -107,6 +113,9 @@ function Home() {
   const onSelect = useCallback(
     (selectedKeys: React.Key[], { node }: { node: TreeDataNodeUnion }) => {
       handleSelect(treeData, selectedKeys, { node });
+      if (searchParams.get('tagId') || searchParams.get('groupId')) {
+        setSearchParams({});
+      }
     },
     [treeData]
   );
@@ -198,13 +207,12 @@ function Home() {
     // console.log('init-treeData', treeData);
     setCountInfo(tabListUtils.countInfo);
 
-    const urlParams = getUrlParams(window.location.href);
-
+    // console.log('routeParams', searchParams.get('tagId'), searchParams.get('groupId'));
     const tag =
-      treeData?.find((tag) => tag.type === 'tag' && tag.key === urlParams.tagId) ||
+      treeData?.find((tag) => tag.type === 'tag' && tag.key === searchParams.get('tagId')) ||
       treeData?.[0];
     const tabGroup =
-      tag?.children?.find((g) => g.key === urlParams.groupId) || tag.children?.[0];
+      tag?.children?.find((g) => g.key === searchParams.get('groupId')) || tag.children?.[0];
     handleSelect(treeData, [tabGroup ? tabGroup.key : tag.key], {
       node: tabGroup ? (tabGroup as TreeDataNodeTabGroup) : tag,
     });
@@ -218,6 +226,12 @@ function Home() {
       <StyledListWrapper className="home-wrapper" $primaryColor={token.colorPrimary}>
         <div className="sidebar">
           <div className="sidebar-inner">
+            <div className="tag-list-title">标签组列表</div>
+            <ul className="count-info">
+              <li>分类 ({countInfo?.tagCount})</li>
+              <li>标签组 ({countInfo?.groupCount})</li>
+              <li>标签页 ({countInfo?.tabCount})</li>
+            </ul>
             <div className="sidebar-action-btns-wrapper">
               <Button
                 type="primary"
@@ -234,18 +248,13 @@ function Home() {
                 创建分类
               </Button>
             </div>
-            <div className="tag-list-title">标签组列表</div>
-            <ul className="count-info">
-              <li>分类：{countInfo?.tagCount}</li>
-              <li>标签组：{countInfo?.groupCount}</li>
-              <li>标签页：{countInfo?.tabCount}</li>
-            </ul>
             {/* <Search style={{ marginBottom: 8 }} placeholder="Search" /> */}
             <Tree
-              draggable
+              // draggable
               blockNode
               switcherIcon={<DownOutlined />}
               autoExpandParent
+              defaultExpandAll
               expandedKeys={expandedKeys}
               selectedKeys={selectedKeys}
               treeData={treeData}

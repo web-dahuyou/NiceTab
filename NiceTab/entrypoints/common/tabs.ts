@@ -2,7 +2,7 @@ import { browser, Tabs } from 'wxt/browser';
 import { settingsUtils, tabListUtils } from './storage';
 import type { SettingsProps, TabItem } from '~/entrypoints/types';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
-import { pick, getUrlWithParams } from '~/entrypoints/common/utils';
+import { pick, getUrlWithParams, objectToUrlParams } from '~/entrypoints/common/utils';
 
 const {
   OPEN_ADMIN_TAB_AFTER_SEND_TABS,
@@ -20,34 +20,34 @@ export async function getAdminTabInfo() {
   return { tab, adminTabUrl };
 }
 // 打开管理后台
-export async function openAdminTab(settingsData?: SettingsProps, params?: { tagId: string; groupId: string } ) {
-  const settings = settingsData || await settingsUtils.getSettings();
+export async function openAdminTab(
+  settingsData?: SettingsProps,
+  params?: { tagId: string; groupId: string }
+) {
+  const settings = settingsData || (await settingsUtils.getSettings());
   if (!settings?.[OPEN_ADMIN_TAB_AFTER_SEND_TABS]) return;
-  const highlightedTabs = await browser.tabs.query({ currentWindow: true, highlighted: true });
-  if (highlightedTabs.length) {
-    highlightedTabs.forEach((tab) => browser.tabs.update(tab.id, { highlighted: false, active: false }));
-  }
+  console.log('openAdminTab--params', params)
   // const adminTabUrl = browser.runtime.getURL('/options.html');
   // const [tab] = await browser.tabs.query({ url: `${adminTabUrl}*`, currentWindow: true });
-  const {tab, adminTabUrl} = await getAdminTabInfo();
-  const urlWithParams = getUrlWithParams(adminTabUrl, params || {});
+  const { tab, adminTabUrl } = await getAdminTabInfo();
+  // const urlWithParams = getUrlWithParams(adminTabUrl, params || {}); // url传参形式
+  const paramsStr = objectToUrlParams(params || {});
+  const urlWithParams = `${adminTabUrl}/#/home${paramsStr ? `?${paramsStr}` : ''}`; // url传参形式
+  // 路由传参形式 (动态路由)
+  // const urlWithParams =
+  //   params?.tagId && params?.groupId
+  //     ? `${adminTabUrl}/#/home/${params.tagId}/${params.groupId}`
+  //     : `${adminTabUrl}`;
 
   if (tab?.id) {
-    await browser.tabs.move(tab.id, { index: 0 });
-    browser.tabs.update(tab.id, {
-      highlighted: true,
-      pinned: settings[AUTO_PIN_ADMIN_TAB],
-      url: urlWithParams,
-    });
-    // browser.tabs.reload(tab.id);
-  } else {
-    browser.tabs.create({
-      index: 0,
-      // url: adminTabUrl,
-      url: urlWithParams,
-      pinned: settings[AUTO_PIN_ADMIN_TAB],
-    });
+    browser.tabs.remove(tab.id);
   }
+  browser.tabs.create({
+    index: 0,
+    // url: adminTabUrl,
+    url: urlWithParams,
+    pinned: settings[AUTO_PIN_ADMIN_TAB],
+  });
 }
 // 获取过滤后的标签页
 async function getFilteredTabs(
@@ -69,6 +69,22 @@ async function getFilteredTabs(
     return true;
   });
 }
+// 取消标签页高亮
+async function cancelHighlightTabs(tabs?: Tabs.Tab[]) {
+  if (tabs) {
+    tabs.forEach((tab) => {
+      tab?.highlighted && browser.tabs.update(tab.id, { highlighted: false, active: false });
+    });
+  } else {
+    const highlightedTabs = await browser.tabs.query({ highlighted: true, currentWindow: true });
+    const { tab: adminTab } = await getAdminTabInfo();
+    highlightedTabs.forEach((tab) => {
+      if (adminTab && adminTab.id !== tab.id) {
+        browser.tabs.update(tab.id, { highlighted: false, active: false });
+      }
+    })
+  }
+}
 // 获取全部标签页
 export async function getAllTabs() {
   return await browser.tabs.query({ currentWindow: true });
@@ -86,11 +102,14 @@ async function sendAllTabs() {
 
   const { tagId, groupId } = await tabListUtils.addTabs(
     filteredTabs.map((tab) => pick(tab, ['title', 'url', 'favIconUrl'])),
-    true,
+    true
   );
   openAdminTab(settings, { tagId, groupId });
   if (settings[CLOSE_TABS_AFTER_SEND_TABS]) {
     browser.tabs.remove(filteredTabs.map((t) => t.id as number).filter(Boolean));
+  } else {
+    // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
+    cancelHighlightTabs(filteredTabs);
   }
 }
 async function sendCurrentTab() {
@@ -102,12 +121,17 @@ async function sendCurrentTab() {
 
   if (!tab?.id) return;
   const settings = await settingsUtils.getSettings();
-  const { tagId, groupId } = await tabListUtils.addTabs([pick(tab, ['title', 'url', 'favIconUrl'])]);
+  const { tagId, groupId } = await tabListUtils.addTabs([
+    pick(tab, ['title', 'url', 'favIconUrl']),
+  ]);
   openAdminTab(settings, { tagId, groupId });
   if (settings[CLOSE_TABS_AFTER_SEND_TABS]) {
     if (tab?.id && !tab?.pinned) {
       browser.tabs.remove(tab.id);
     }
+  } else {
+    // 如果发送标签页后打开管理后台，则跳转之后将标签页取消高亮
+    cancelHighlightTabs([tab]);
   }
 }
 async function sendOtherTabs() {
@@ -120,12 +144,14 @@ async function sendOtherTabs() {
   const filteredTabs = await getFilteredTabs(tabs, settings);
   const { tagId, groupId } = await tabListUtils.addTabs(
     filteredTabs.map((tab) => pick(tab, ['title', 'url', 'favIconUrl'])),
-    true,
+    true
   );
   openAdminTab(settings, { tagId, groupId });
   if (settings[CLOSE_TABS_AFTER_SEND_TABS]) {
     browser.tabs.remove(filteredTabs.map((t) => t.id as number).filter(Boolean));
   }
+  // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
+  cancelHighlightTabs();
 }
 async function sendLeftTabs(currTab?: Tabs.Tab) {
   const tabs = await browser.tabs.query({
@@ -143,13 +169,15 @@ async function sendLeftTabs(currTab?: Tabs.Tab) {
   const filteredTabs = await getFilteredTabs(leftTabs, settings);
   const { tagId, groupId } = await tabListUtils.addTabs(
     filteredTabs.map((tab) => pick(tab, ['title', 'url', 'favIconUrl'])),
-    true,
+    true
   );
   openAdminTab(settings, { tagId, groupId });
 
   if (settings[CLOSE_TABS_AFTER_SEND_TABS]) {
     browser.tabs.remove(filteredTabs.map((t) => t.id as number).filter(Boolean));
   }
+  // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
+  cancelHighlightTabs();
 }
 async function sendRightTabs(currTab?: Tabs.Tab) {
   const tabs = await browser.tabs.query({
@@ -167,13 +195,15 @@ async function sendRightTabs(currTab?: Tabs.Tab) {
   const filteredTabs = await getFilteredTabs(rightTabs, settings);
   const { tagId, groupId } = await tabListUtils.addTabs(
     filteredTabs.map((tab) => pick(tab, ['title', 'url', 'favIconUrl'])),
-    true,
+    true
   );
   openAdminTab(settings, { tagId, groupId });
 
   if (settings[CLOSE_TABS_AFTER_SEND_TABS]) {
     browser.tabs.remove(filteredTabs.map((t) => t.id as number).filter(Boolean));
   }
+  // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
+  cancelHighlightTabs();
 }
 
 export function openNewTab(tab: TabItem) {
