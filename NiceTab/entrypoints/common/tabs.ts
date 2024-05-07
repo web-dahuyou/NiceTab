@@ -26,18 +26,10 @@ export async function openAdminTab(
 ) {
   const settings = settingsData || (await settingsUtils.getSettings());
   if (!settings?.[OPEN_ADMIN_TAB_AFTER_SEND_TABS]) return;
-  console.log('openAdminTab--params', params)
-  // const adminTabUrl = browser.runtime.getURL('/options.html');
-  // const [tab] = await browser.tabs.query({ url: `${adminTabUrl}*`, currentWindow: true });
+
   const { tab, adminTabUrl } = await getAdminTabInfo();
-  // const urlWithParams = getUrlWithParams(adminTabUrl, params || {}); // url传参形式
   const paramsStr = objectToUrlParams(params || {});
   const urlWithParams = `${adminTabUrl}/#/home${paramsStr ? `?${paramsStr}` : ''}`; // url传参形式
-  // 路由传参形式 (动态路由)
-  // const urlWithParams =
-  //   params?.tagId && params?.groupId
-  //     ? `${adminTabUrl}/#/home/${params.tagId}/${params.groupId}`
-  //     : `${adminTabUrl}`;
 
   if (tab?.id) {
     browser.tabs.remove(tab.id);

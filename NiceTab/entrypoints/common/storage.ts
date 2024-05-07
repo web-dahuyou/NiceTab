@@ -118,13 +118,9 @@ class TabListUtils {
     await this.getTagList();
     const tagList = this.tagList.map(tag => {
       if (tag.tagId === tagId) {
-        return {
-          ...tag,
-          groupList: [
-            tabGroup || this.getInitialTabGroup(),
-            ...tag.groupList
-          ],
-        }
+        const index = tag.groupList.findIndex(g => !g.isStarred);
+        tag.groupList.splice(index > -1 ? index : tag.groupList.length, 0, tabGroup || this.getInitialTabGroup());
+        return tag;
       } else {
         return tag;
       }
@@ -184,7 +180,7 @@ class TabListUtils {
     newtabGroup.tabList = [...tabs];
 
     if (tag0) {
-      const index = tag0.groupList.findIndex(g => !g.isLocked && !g.isStarred);
+      const index = tag0.groupList.findIndex(g => !g.isStarred);
       tag0.groupList.splice(index > -1 ? index : tag0.groupList.length, 0, newtabGroup);
       await this.setTagList([tag0, ...this.tagList.slice(1)]);
       return { tagId: tag0.tagId, groupId: newtabGroup.groupId };

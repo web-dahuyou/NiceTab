@@ -12,6 +12,11 @@ export const StyledActionIconBtn = styled.i<{
   $color?: string,
   $hoverColor?: string
 }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: ${props => `${+(props.$size || 16) + 2}px`};
+  height: ${props => `${+(props.$size || 16) + 2}px`};
   font-size: ${props => `${props.$size || 14}px`};
   color: ${props => props.$color || '#666'};
   transition: all 0.2s;

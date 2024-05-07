@@ -3,7 +3,7 @@ import { createHashRouter, RouterProvider, Outlet, useNavigate, useLocation } fr
 import { Menu } from 'antd';
 import { HomeOutlined, SettingOutlined } from '@ant-design/icons';
 import styled, { css } from 'styled-components';
-import Home from './Home.tsx';
+import Home from './home/index.tsx';
 import Settings from './Settings.tsx';
 
 import '~/assets/css/reset.css';

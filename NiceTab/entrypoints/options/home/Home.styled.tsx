@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
 
 export const StyledListWrapper = styled.div<{$primaryColor?: string}>`
   position: relative;
@@ -10,7 +11,7 @@ export const StyledListWrapper = styled.div<{$primaryColor?: string}>`
   .sidebar {
     height: calc(100vh - 180px);
     .sidebar-inner {
-      width: 260px;
+      width: 280px;
       position: fixed;
       top: 100px;
       padding-right: 16px;
@@ -41,3 +42,25 @@ export const StyledListWrapper = styled.div<{$primaryColor?: string}>`
 `;
 
 
+export const StyledTreeNodeItem = styled.div`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  .tree-node-title {
+    width: 0;
+    flex: 1;
+    ${StyledEllipsis}
+  }
+  .tree-node-icon-group {
+    display: none;
+  }
+  &:hover {
+    .tree-node-icon-group {
+      display: flex;
+      align-items: center;
+      margin-left: 8px;
+      flex-shrink: 0;
+      gap: 2px;
+    }
+  }
+`;

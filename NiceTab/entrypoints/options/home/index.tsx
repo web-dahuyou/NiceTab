@@ -1,56 +1,26 @@
 import React, { useCallback, useEffect, useState, useRef, useMemo } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { theme, Tree, Button, Input } from 'antd';
-import { FolderOutlined, AppstoreOutlined, DownOutlined } from '@ant-design/icons';
-import type { TreeDataNode } from 'antd';
-import { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
+import { DownOutlined, } from '@ant-design/icons';
+import { TagItem, GroupItem, CountInfo } from '~/entrypoints/types';
 import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
 import { openNewTab } from '~/entrypoints/common/tabs';
-import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
+import { ENUM_SETTINGS_PROPS, ENUM_COLORS } from '~/entrypoints/common/constants';
 import { StyledListWrapper } from './Home.styled';
-import TabGroup from './components/TabGroup';
+import RenderTreeNode from './RenderTreeNode';
+import TabGroup from './TabGroup';
+import {
+  TreeDataNodeTabGroup,
+  TreeDataNodeTag,
+  TreeDataNodeUnion,
+  RenderTreeNodeActionProps,
+} from './types';
+import { getTreeData } from './utils';
 
-type TreeDataNodeTabGroup = TreeDataNode & {
-  type: 'tabGroup';
-  parentKey: string;
-  originData: GroupItem;
-  children?: Array<TreeDataNode & { originData?: TabItem }>;
-};
-type TreeDataNodeTag = TreeDataNode & {
-  type: 'tag';
-  parentKey?: string;
-  originData: TagItem;
-  children?: Array<TreeDataNodeTabGroup & { originData?: GroupItem }>;
-};
-type TreeDataNodeUnion = TreeDataNodeTag | TreeDataNodeTabGroup;
-
-const { useToken } = theme;
 const { Search } = Input;
 
-const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
-  return tagList.map((tag) => ({
-    type: 'tag',
-    key: tag.tagId,
-    title: tag.tagName,
-    icon: <FolderOutlined />,
-    isLeaf: false,
-    originData: { ...tag },
-    children: tag?.groupList?.map((group) => {
-      return {
-        type: 'tabGroup',
-        parentKey: tag.tagId,
-        key: group.groupId,
-        title: group.groupName,
-        icon: <AppstoreOutlined />,
-        isLeaf: true,
-        originData: { ...group },
-      };
-    }),
-  }));
-};
-
 function Home() {
-  const { token } = useToken();
+  const { token } = theme.useToken();
   // const routeParams = useParams<{ tagId: string; groupId: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const contentRef = useRef<HTMLDivElement>(null);
@@ -68,14 +38,17 @@ function Home() {
   }, [treeData, selectedTagKey]);
 
   // 删除分类
-  const handleTagRemove = useCallback(async () => {
-    if (!selectedTagKey) return;
-    await tabListUtils.removeTag(selectedTagKey);
-    refreshTreeData((treeData) => {
-      const tag = treeData?.[0];
-      handleSelect(treeData, [tag?.key], { node: tag });
-    });
-  }, [selectedTagKey]);
+  const handleTagRemove = useCallback(
+    async (tagKey: React.Key) => {
+      if (!tagKey) return;
+      await tabListUtils.removeTag(tagKey);
+      refreshTreeData((treeData) => {
+        const tag = treeData?.[0];
+        handleSelect(treeData, [tag?.key], { node: tag });
+      });
+    },
+    []
+  );
   // 创建分类
   const handleTagCreate = useCallback(async () => {
     await tabListUtils.addTag();
@@ -83,6 +56,48 @@ function Home() {
       const tag = treeData?.[0];
       handleSelect(treeData, [tag?.key], { node: tag });
     });
+  }, []);
+  // 修改分类
+  const handleTagChange = useCallback(
+    async (tag: TreeDataNodeTag, data: Partial<TagItem>) => {
+      await tabListUtils.updateTag(tag.key, data);
+      refreshTreeData();
+    },
+    []
+  );
+
+  // treeNode 节点操作
+  const onTreeNodeAction = useCallback(
+    ({ actionType, node, actionName, data }: RenderTreeNodeActionProps) => {
+      const handlerMap = {
+        tag: {
+          create: () => handleTagCreate(),
+          remove: () => handleTagRemove(node.key),
+          rename: () =>
+            handleTagChange(node as TreeDataNodeTag, (data as Partial<TagItem>) || {}),
+        },
+        tabGroup: {
+          create: () => handleTabGroupCreate(node.key),
+          remove: () => handleTabGroupRemove(node as TreeDataNodeTabGroup),
+          rename: () =>
+            handleTabGroupChange(
+              node as TreeDataNodeTabGroup,
+              (data as Partial<GroupItem>) || {}
+            ),
+        },
+      };
+      const handler = handlerMap[actionType][actionName];
+      handler?.();
+    },
+    []
+  );
+  // 展开、折叠全部
+  const toggleExpand = useCallback((bool: boolean) => {
+    if (bool) {
+      setExpandedKeys(treeData.map(tag => tag.key));
+    } else {
+      setExpandedKeys([]);
+    }
   }, []);
   // 选中节点
   const handleSelect = useCallback(
@@ -105,7 +120,6 @@ function Home() {
           return [...new Set([...keys, node.parentKey])];
         });
       }
-
       setSelectedKeys([node.key]);
     },
     []
@@ -114,7 +128,7 @@ function Home() {
     (selectedKeys: React.Key[], { node }: { node: TreeDataNodeUnion }) => {
       handleSelect(treeData, selectedKeys, { node });
       if (searchParams.get('tagId') || searchParams.get('groupId')) {
-        setSearchParams({});
+        setSearchParams({}, { replace: true });
       }
     },
     [treeData]
@@ -122,22 +136,30 @@ function Home() {
 
   // 删除标签组
   const handleTabGroupRemove = useCallback(
-    async (tag: TreeDataNodeTag, tabGroup: TreeDataNodeTabGroup) => {
-      await tabListUtils.removeTabGroup(tag.key, tabGroup.key);
+    async (tabGroup: TreeDataNodeTabGroup) => {
+      const tagKey = tabGroup.parentKey;
+      if (!tabGroup.key || !tagKey) return;
+      const tag = treeData.find((tag) => tag.key === tagKey) as TreeDataNodeTag;
+      await tabListUtils.removeTabGroup(tagKey, tabGroup.key);
       refreshTreeData((treeData) => {
-        handleSelect(treeData, [tag.key], { node: tag });
+        if (tabGroup.key === selectedTabGroupKey) {
+          handleSelect(treeData, [tagKey], { node: tag });
+        }
       });
     },
-    []
+    [treeData, selectedTabGroupKey]
   );
+  // 创建标签组
+  const handleTabGroupCreate = useCallback(async (tagKey: React.Key) => {
+    await tabListUtils.addTabGroup(tagKey);
+    refreshTreeData();
+  }, []);
   // 修改标签组
   const handleTabGroupChange = useCallback(
-    async (
-      tag: TreeDataNodeTag,
-      tabGroup: TreeDataNodeTabGroup,
-      data: Partial<GroupItem>
-    ) => {
-      await tabListUtils.updateTabGroup(tag.key, tabGroup.key, data);
+    async (tabGroup: TreeDataNodeTabGroup, data: Partial<GroupItem>) => {
+      const tagKey = tabGroup.parentKey;
+      if (!tabGroup.key || !tagKey) return;
+      await tabListUtils.updateTabGroup(tagKey, tabGroup.key, data);
       refreshTreeData((treeData) =>
         handleSelect(treeData, [tabGroup.key], { node: tabGroup })
       );
@@ -147,7 +169,9 @@ function Home() {
 
   // 标签组星标状态切换（需要调整排序）
   const handleTabGroupStarredChange = useCallback(
-    async (tag: TreeDataNodeTag, tabGroup: TreeDataNodeTabGroup, isStarred: boolean) => {
+    async (tabGroup: TreeDataNodeTabGroup, isStarred: boolean) => {
+      const tagKey = tabGroup.parentKey;
+      const tag = treeData.find((tag) => tag.key === tagKey) as TreeDataNodeTag;
       const tagList = await tabListUtils.getTagList();
       if (isStarred) {
         tagList.forEach((t) => {
@@ -173,11 +197,13 @@ function Home() {
         handleSelect(treeData, [tabGroup.key], { node: tabGroup })
       );
     },
-    []
+    [treeData]
   );
   // 恢复标签组
   const handleTabGroupRestore = useCallback(
-    async (tag: TreeDataNodeTag, tabGroup: TreeDataNodeTabGroup) => {
+    async (tabGroup: TreeDataNodeTabGroup) => {
+      const tagKey = tabGroup.parentKey;
+      const tag = treeData.find((tag) => tag.key === tagKey) as TreeDataNodeTag;
       const { DELETE_AFTER_RESTORE } = ENUM_SETTINGS_PROPS;
       const settings = await settingsUtils.getSettings();
       tabGroup?.originData?.tabList.forEach((tab) => {
@@ -188,14 +214,14 @@ function Home() {
         refreshTreeData((treeData) => handleSelect(treeData, [tag.key], { node: tag }));
       }
     },
-    []
+    [treeData]
   );
   // 刷新treeData
   const refreshTreeData = async (callback?: (treeData: TreeDataNodeUnion[]) => void) => {
     const tagList = tabListUtils.tagList;
     const treeData = getTreeData(tagList);
     setTreeData(treeData);
-    // console.log('refresh-treeData', treeData);
+    console.log('refresh-treeData', treeData);
     setCountInfo(tabListUtils.countInfo);
     callback?.(treeData);
   };
@@ -204,15 +230,18 @@ function Home() {
     const tagList = await tabListUtils.getTagList();
     const treeData = getTreeData(tagList);
     setTreeData(treeData);
-    // console.log('init-treeData', treeData);
+    console.log('init-treeData', treeData);
     setCountInfo(tabListUtils.countInfo);
+    setExpandedKeys(treeData.map(tag => tag.key));
 
     // console.log('routeParams', searchParams.get('tagId'), searchParams.get('groupId'));
     const tag =
-      treeData?.find((tag) => tag.type === 'tag' && tag.key === searchParams.get('tagId')) ||
-      treeData?.[0];
+      treeData?.find(
+        (tag) => tag.type === 'tag' && tag.key === searchParams.get('tagId')
+      ) || treeData?.[0];
     const tabGroup =
-      tag?.children?.find((g) => g.key === searchParams.get('groupId')) || tag.children?.[0];
+      tag?.children?.find((g) => g.key === searchParams.get('groupId')) ||
+      tag.children?.[0];
     handleSelect(treeData, [tabGroup ? tabGroup.key : tag.key], {
       node: tabGroup ? (tabGroup as TreeDataNodeTabGroup) : tag,
     });
@@ -233,16 +262,11 @@ function Home() {
               <li>标签页 ({countInfo?.tabCount})</li>
             </ul>
             <div className="sidebar-action-btns-wrapper">
-              <Button
-                type="primary"
-                size="small"
-                shape="round"
-                disabled={
-                  selectedTagKey != undefined && !selectedKeys.includes(selectedTagKey)
-                }
-                onClick={handleTagRemove}
-              >
-                删除分类
+              <Button type="primary" size="small" shape="round" onClick={() => toggleExpand(true)}>
+                展开全部
+              </Button>
+              <Button type="primary" size="small" shape="round" onClick={() => toggleExpand(false)}>
+                折叠全部
               </Button>
               <Button type="primary" size="small" shape="round" onClick={handleTagCreate}>
                 创建分类
@@ -258,6 +282,9 @@ function Home() {
               expandedKeys={expandedKeys}
               selectedKeys={selectedKeys}
               treeData={treeData}
+              titleRender={(node) => (
+                <RenderTreeNode node={node} onAction={onTreeNodeAction}></RenderTreeNode>
+              )}
               onExpand={(expandedKeys) => setExpandedKeys(expandedKeys)}
               onSelect={onSelect}
             />
@@ -271,11 +298,11 @@ function Home() {
                   key={tabGroup.key}
                   selected={tabGroup.key === selectedTabGroupKey}
                   {...tabGroup.originData}
-                  onChange={(data) => handleTabGroupChange(selectedTag, tabGroup, data)}
-                  onRemove={() => handleTabGroupRemove(selectedTag, tabGroup)}
-                  onRestore={() => handleTabGroupRestore(selectedTag, tabGroup)}
+                  onChange={(data) => handleTabGroupChange(tabGroup, data)}
+                  onRemove={() => handleTabGroupRemove(tabGroup)}
+                  onRestore={() => handleTabGroupRestore(tabGroup)}
                   onStarredChange={(isStarred) =>
-                    handleTabGroupStarredChange(selectedTag, tabGroup, isStarred)
+                    handleTabGroupStarredChange(tabGroup, isStarred)
                   }
                 ></TabGroup>
               )

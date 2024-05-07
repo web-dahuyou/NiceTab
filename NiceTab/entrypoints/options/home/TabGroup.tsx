@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { theme, Popconfirm } from 'antd';
+import React, { useEffect, useRef } from 'react';
+import { theme } from 'antd';
 import { LockOutlined, StarOutlined, CloseOutlined } from '@ant-design/icons';
 import { GroupItem } from '~/entrypoints/types';
 import { classNames } from '~/entrypoints/common/utils';
@@ -7,8 +7,8 @@ import { tabListUtils } from '~/entrypoints/common/storage';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS } from '~/entrypoints/common/constants';
-import Comfirm from '~/entrypoints/common/components/Confirm';
-import EditInput from './EditInput';
+import Confirm from '~/entrypoints/common/components/Confirm';
+import EditInput from '../components/EditInput';
 import {
   StyledGroupWrapper,
   StyledGroupHeader,
@@ -16,8 +16,6 @@ import {
   StyledTabTitle,
   StyledTabItemFavicon,
 } from './TabGroup.styled';
-
-const { useToken } = theme;
 
 type TabGroupProps = GroupItem & {
   selected?: boolean;
@@ -35,15 +33,13 @@ function ConfirmMarkup({
   children: React.ReactNode;
 }) {
   return (
-    <Popconfirm
-      title="提醒"
+    <Confirm
+      title="删除提醒"
       description="您确定要删除该标签组吗？"
       onConfirm={() => onConfirm?.()}
-      okText="确认"
-      cancelText="取消"
     >
       {children}
-    </Popconfirm>
+    </Confirm>
   );
 }
 
@@ -60,7 +56,7 @@ export default function TabGroup({
   onRestore,
   onStarredChange,
 }: TabGroupProps) {
-  const { token } = useToken();
+  const { token } = theme.useToken();
   const groupRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -82,6 +78,7 @@ export default function TabGroup({
             <StyledActionIconBtn
               className="btn-remove"
               $size="16"
+              title="删除"
               $hoverColor={ENUM_COLORS.red.primary}
             >
               <CloseOutlined />
@@ -97,7 +94,11 @@ export default function TabGroup({
         <div className="group-name-wrapper">
           <EditInput
             value={groupName || '未命名'}
-            onValueChange={(value) => onChange?.({ groupName: value })}
+            maxLength={18}
+            maxWidth={160}
+            fontSize={20}
+            iconSize={16}
+            onValueChange={(value) => onChange?.({ groupName: value || '未命名' })}
           ></EditInput>
         </div>
         <div className="group-header-right-part">
@@ -130,6 +131,7 @@ export default function TabGroup({
             <StyledActionIconBtn
               className="tab-item-btn btn-remove"
               $size="16"
+              title="删除"
               $hoverColor={ENUM_COLORS.red.primary}
               onClick={() =>
                 onChange?.({ tabList: tabList.filter((t, i) => i !== index) })

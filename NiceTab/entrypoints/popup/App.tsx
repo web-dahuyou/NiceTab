@@ -8,11 +8,8 @@ import './App.css';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { StyledList, StyledFavIcon } from './App.styled';
 
-
-const { useToken } = theme;
-
 function App() {
-  const { token } = useToken();
+  const { token } = theme.useToken();
   const [tabs, setTabs] = useState<Tabs.Tab[]>([]);
 
   const handleItemClick = useCallback((index: number) => {

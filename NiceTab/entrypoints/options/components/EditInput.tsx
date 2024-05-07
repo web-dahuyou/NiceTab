@@ -8,13 +8,13 @@ import {
   StyledActionIconBtn,
 } from '~/entrypoints/common/style/Common.styled';
 
-const StyledWrapper = styled.div`
+const StyledWrapper = styled.div<{$maxWidth?: string | number, $fontSize?: string | number}>`
   display: flex;
   align-items: center;
-  max-width: 170px;
+  max-width: ${props => props.$maxWidth ? `${props.$maxWidth}px` : '100%'};
   gap: 4px;
   .text-readonly {
-    font-size: 20px;
+    font-size: ${props => props.$fontSize || 14}px;
     color: #666;
     ${StyledEllipsis}
   }
@@ -23,16 +23,23 @@ const StyledWrapper = styled.div`
   }
 `;
 
-const { useToken } = theme;
+type CustomStyleProps = {
+  maxWidth?: string | number;
+  fontSize?: string | number;
+  iconSize?: string | number;
+}
 
 export default function EditInput({
   type = 'text',
   value,
   maxLength,
+  maxWidth,
+  fontSize = 14,
+  iconSize = 16,
   onValueChange,
   ...otherProps
-}: InputProps & { value: string; onValueChange: (value?: string) => void; }) {
-  const { token } = useToken();
+}: InputProps & CustomStyleProps & { value: string; onValueChange: (value?: string) => void; }) {
+  const { token } = theme.useToken();
   const inputRef = useRef<InputRef>(null);
   const [innerValue, setInnerValue] = useState(value);
   const [isEditing, setIsEditing] = useState(false);
@@ -58,8 +65,11 @@ export default function EditInput({
     }, 10);
   };
 
+  useEffect(() => {
+    setInnerValue(value);
+  }, [value]);
   return (
-    <StyledWrapper className="edit-input-wrapper">
+    <StyledWrapper className="edit-input-wrapper" $maxWidth={maxWidth} $fontSize={fontSize}>
       {isEditing ? (
         <Input
           ref={inputRef}
@@ -77,7 +87,7 @@ export default function EditInput({
         <>
           <span className="text-readonly">{innerValue}</span>
           <StyledActionIconBtn
-            $size="16"
+            $size={iconSize}
             $hoverColor={token.colorPrimaryHover}
             onClick={handleClick}
           >
