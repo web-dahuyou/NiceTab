@@ -1,14 +1,6 @@
 
-import { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
-import { TreeDataNodeTabGroup, TreeDataNodeTag, TreeDataNodeUnion, RenderTreeNodeActionProps, RenderTreeNodeProps } from './types';
-import {
-  FolderOutlined,
-  AppstoreOutlined,
-  DownOutlined,
-  CloseOutlined,
-  PlusOutlined,
-  EditOutlined
-} from '@ant-design/icons';
+import { TagItem } from '~/entrypoints/types';
+import { TreeDataNodeUnion } from './types';
 
 // 生成treeData
 export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
@@ -16,7 +8,6 @@ export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
     type: 'tag',
     key: tag.tagId,
     title: tag.tagName,
-    icon: <FolderOutlined />,
     isLeaf: false,
     originData: { ...tag },
     children: tag?.groupList?.map((group) => {
@@ -25,7 +16,6 @@ export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
         parentKey: tag.tagId,
         key: group.groupId,
         title: group.groupName,
-        icon: <AppstoreOutlined />,
         isLeaf: true,
         originData: { ...group },
       };

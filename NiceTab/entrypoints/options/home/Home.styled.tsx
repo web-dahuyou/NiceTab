@@ -51,16 +51,20 @@ export const StyledTreeNodeItem = styled.div`
     flex: 1;
     ${StyledEllipsis}
   }
+
   .tree-node-icon-group {
-    display: none;
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
+    flex-shrink: 0;
+    gap: 2px;
+    visibility: hidden;
+    pointer-eventes: none;
   }
   &:hover {
     .tree-node-icon-group {
-      display: flex;
-      align-items: center;
-      margin-left: 8px;
-      flex-shrink: 0;
-      gap: 2px;
+      visibility: visible;
+      pointer-eventes: unset;
     }
   }
 `;

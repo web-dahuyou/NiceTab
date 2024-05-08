@@ -32,6 +32,8 @@ export interface TagItem {
   tagId: string;
   tagName: string;
   groupList: GroupItem[];
+  isLocked?: boolean;
+  isStarred?: boolean;
 }
 // 分类、标签组、标签页统计信息
 export interface CountInfo {
