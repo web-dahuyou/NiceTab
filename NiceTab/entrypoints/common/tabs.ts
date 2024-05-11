@@ -20,6 +20,18 @@ export async function getAdminTabInfo() {
   return { tab, adminTabUrl };
 }
 // 打开管理后台
+export async function openAdminRoutePage(route: { path: string, query?: Record<string, string> }) {
+  const paramsStr = objectToUrlParams(route?.query || {});
+  const { tab, adminTabUrl } = await getAdminTabInfo();
+  if (tab?.id) {
+    browser.tabs.remove(tab.id);
+  }
+  browser.tabs.create({
+    index: 0,
+    url: `${adminTabUrl}/#${route.path || '/home'}${paramsStr ? `?${paramsStr}` : ''}`,
+  });
+}
+// 打开管理后台
 export async function openAdminTab(
   settingsData?: SettingsProps,
   params?: { tagId: string; groupId: string }
@@ -203,7 +215,10 @@ export function openNewTab(tab: TabItem) {
 }
 
 export default {
+  getAdminTabInfo,
+  openAdminRoutePage,
   openAdminTab,
+  getFilteredTabs,
   getAllTabs,
   sendAllTabs,
   sendCurrentTab,

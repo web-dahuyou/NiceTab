@@ -1,7 +1,7 @@
 import { Key } from 'react';
 import dayjs from 'dayjs';
-import type { SettingsProps, TagItem, GroupItem, TabItem, CountInfo } from '../types';
-import { ENUM_SETTINGS_PROPS } from './constants';
+import type { SettingsProps, TagItem, GroupItem, TabItem, CountInfo, ThemeProps } from '../types';
+import { ENUM_COLORS, ENUM_SETTINGS_PROPS } from './constants';
 import { getRandomId, omit } from './utils';
 
 const {
@@ -218,8 +218,26 @@ class TabListUtils {
   }
 }
 
+class ThemeUtils {
+  defaultTheme = {
+    colorPrimary: ENUM_COLORS.primary
+  };
+  themeData = this.defaultTheme;
+  async getThemeData() {
+    const theme = await storage.getItem<ThemeProps>('local:theme');
+    return theme || this.defaultTheme;
+  }
+  async setThemeData(theme: Partial<ThemeProps>) {
+    const themeData = await this.getThemeData();
+    this.themeData = { ...themeData, ...theme };
+    await storage.setItem('local:theme', this.themeData);
+    return this.themeData;
+  }
+}
+
 export const settingsUtils = new SettingsUtils();
 export const tabListUtils = new TabListUtils();
+export const themeUtils = new ThemeUtils();
 
 // 监听storage变化
 export default function initStorageListener(callback: (settings: SettingsProps) => void) {

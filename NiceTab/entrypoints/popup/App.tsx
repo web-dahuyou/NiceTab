@@ -1,18 +1,36 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useContext, useCallback, useEffect, useState } from 'react';
 import { browser, Tabs } from 'wxt/browser';
-import { theme } from 'antd';
-import { CloseCircleOutlined, PushpinOutlined } from '@ant-design/icons';
-import { classNames } from '~/entrypoints/common/utils';
+import { theme, Space, Button } from 'antd';
+import { CloseCircleOutlined, HomeOutlined, SettingOutlined, ImportOutlined } from '@ant-design/icons';
+import { classNames, sendBrowserMessage } from '~/entrypoints/common/utils';
 import '~/assets/css/reset.css';
 import './App.css';
+import { ThemeContext } from '~/entrypoints/common/hooks';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
-import { StyledList, StyledFavIcon } from './App.styled';
+import { StyledContainer, StyledList, StyledFavIcon } from './App.styled';
+import { ENUM_COLORS } from '~/entrypoints/common/constants';
+
+const colors = Object.entries(ENUM_COLORS).map(([key, color]) => {
+  return { key, color: typeof color === 'string' ? color : color.primary || color[6] };
+});
+
+// 快捷按钮
+const quickActionBtns = [
+  { path: '/home', label: '查看列表', icon: <HomeOutlined />, onClick: () => browser.tabs.create({ url: '/home' }) },
+  { path: '/settings', label: '查看设置', icon: <SettingOutlined /> },
+  { path: '/import-export', label: '导入导出', icon: <ImportOutlined /> },
+]
 
 function App() {
-  const { token } = theme.useToken();
+  const themeContext = useContext(ThemeContext);
   const [tabs, setTabs] = useState<Tabs.Tab[]>([]);
 
-  const handleItemClick = useCallback((index: number) => {
+  const handleThemeChange = (item: { key: string; color: string }) => {
+    const themeData = { colorPrimary: item.color };
+    themeContext.setThemeData(themeData);
+    sendBrowserMessage('setPrimaryColor', themeData);
+  }
+  const handleTabItemClick = useCallback((index: number) => {
     browser.tabs.highlight({ tabs: index });
   }, []);
 
@@ -33,28 +51,52 @@ function App() {
   }, []);
 
   return (
-    <StyledList className="tab-list" $primaryColor={token.colorPrimary}>
-      {tabs.map((tab, index) => (
-        <li
-          key={tab.id}
-          className={classNames('tab-item', tab.active && 'active')}
-          title={tab.title}
-          onClick={() => handleItemClick(index)}
-        >
-          {tab.favIconUrl && (
-            <StyledFavIcon className="tab-item-icon" $icon={tab.favIconUrl} />
-          )}
-          <span className="tab-item-title">{tab.title}</span>
-          <StyledActionIconBtn
-            className="action-icon-btn"
-            $hoverColor="red"
-            onClick={(event) => handleDelete(event, tab)}
+    <StyledContainer className="popup-container">
+      <div className="block quick-actions">
+        { quickActionBtns.map((item) => (
+          <Button type="primary" size="small" shape="round" icon={item.icon}>
+            { item.label }
+          </Button>
+        ))}
+      </div>
+      <div className="block theme-colors">
+        <span className="block-title">切换主题：</span>
+        <Space>
+          {colors.map((item) => (
+            <div
+              className="theme-color-item"
+              key={item.key}
+              style={{ background: item.color }}
+              onClick={() => handleThemeChange(item)}
+            ></div>
+          ))}
+        </Space>
+      </div>
+
+      <div className="tab-list-title">打开的标签页：</div>
+      <StyledList className="tab-list" $primaryColor={themeContext.colorPrimary}>
+        {tabs.map((tab, index) => (
+          <li
+            key={tab.id}
+            className={classNames('tab-item', tab.active && 'active')}
+            title={tab.title}
+            onClick={() => handleTabItemClick(index)}
           >
-            <CloseCircleOutlined />
-          </StyledActionIconBtn>
-        </li>
-      ))}
-    </StyledList>
+            {tab.favIconUrl && (
+              <StyledFavIcon className="tab-item-icon" $icon={tab.favIconUrl} />
+            )}
+            <span className="tab-item-title">{tab.title}</span>
+            <StyledActionIconBtn
+              className="action-icon-btn"
+              $hoverColor="red"
+              onClick={(event) => handleDelete(event, tab)}
+            >
+              <CloseCircleOutlined />
+            </StyledActionIconBtn>
+          </li>
+        ))}
+      </StyledList>
+    </StyledContainer>
   );
 }
 

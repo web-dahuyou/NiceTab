@@ -3,8 +3,41 @@ import styled, { css } from 'styled-components';
 import { ENUM_COLORS } from '~/entrypoints/common/constants';
 import { StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
 
+export const StyledContainer = styled.div`
+  min-width: 420px;
+  max-width: 520px;
+  .block {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #0505050f;
+    gap: 8px;
+    button { font-size: 12px; }
+    &.theme-colors {
+      display: flex;
+      align-items: center;
+      .block-title {
+        color: #000;
+        font-size: 14px;
+        font-weight: bold;
+      }
+      .theme-color-item {
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+    }
+  }
+  .tab-list-title {
+    padding: 12px;
+    color: #000;
+    font-size: 14px;
+    font-weight: bold;
+  }
+`;
+
 export const StyledList = styled.div<{$primaryColor?: string}>`
-  min-width: 240px;
   max-height: 500px;
   overflow-y: auto;
   .tab-item {

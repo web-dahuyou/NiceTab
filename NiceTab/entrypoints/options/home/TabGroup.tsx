@@ -58,7 +58,7 @@ export default function TabGroup({
         $bgColor={selected ? token.colorPrimaryBg : ''}
         ref={groupRef}
       >
-        <StyledGroupHeader className="group-header">
+        <StyledGroupHeader className="group-header" $primaryColor={token.colorPrimary}>
           {!isLocked && (
             <StyledActionIconBtn
               className="btn-remove"
@@ -128,7 +128,7 @@ export default function TabGroup({
                   $bgUrl={tab.favIconUrl}
                 />
               )}
-              <StyledTabTitle>
+              <StyledTabTitle $primaryColor={token.colorPrimary}>
                 <span className="tab-title" onClick={() => openNewTab(tab)}>
                   {tab.title}
                 </span>

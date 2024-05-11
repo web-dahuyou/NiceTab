@@ -42,4 +42,9 @@ export interface CountInfo {
   tabCount: number;
 }
 
+// 主题相关
+export interface ThemeProps {
+  colorPrimary: string;
+}
+
 export default { name: 'Nice-Tab-types' }

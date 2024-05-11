@@ -89,6 +89,11 @@ export function omit(
   }, {});
 }
 
+// 发送消息
+export function sendBrowserMessage(msgType: string, data: Record<string, any>) {
+  browser.runtime.sendMessage({ msgType, data });
+}
+
 export default {
   classNames,
   getRandomId,
@@ -96,4 +101,5 @@ export default {
   getUrlParams,
   pick,
   omit,
+  sendBrowserMessage
 };

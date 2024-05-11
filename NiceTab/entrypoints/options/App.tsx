@@ -25,6 +25,7 @@ const StyledPageContainer = styled.div`
     align-items: center;
     height: 60px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    background: #fff;
     .logo {
       width: 100px;
       height: 100%;
