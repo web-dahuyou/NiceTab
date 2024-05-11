@@ -6,8 +6,8 @@ export const StyledListWrapper = styled.div<{$primaryColor?: string}>`
   width: 100%;
   min-height: 400px;
   display: grid;
-  grid-template-columns: 260px auto;
-  grid-column-gap: 24px;
+  grid-template-columns: 280px auto;
+  grid-column-gap: 16px;
   .sidebar {
     height: calc(100vh - 180px);
     .sidebar-inner {
@@ -30,9 +30,16 @@ export const StyledListWrapper = styled.div<{$primaryColor?: string}>`
       }
       .sidebar-action-btns-wrapper {
         display: flex;
+        align-items: center;
         justify-content: flex-end;
         margin-bottom: 10px;
         gap: 8px;
+        button {
+          font-size: 12px;
+        }
+      }
+      .no-data {
+        padding: 16px 0;
         button {
           font-size: 12px;
         }

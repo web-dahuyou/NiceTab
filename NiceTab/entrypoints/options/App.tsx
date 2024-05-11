@@ -1,10 +1,12 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { createHashRouter, RouterProvider, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { Menu } from 'antd';
-import { HomeOutlined, SettingOutlined } from '@ant-design/icons';
+import { HomeOutlined, SettingOutlined, ImportOutlined } from '@ant-design/icons';
 import styled, { css } from 'styled-components';
+import { pick } from '~/entrypoints/common/utils';
 import Home from './home/index.tsx';
 import Settings from './Settings.tsx';
+import ImportExport from './importExport/index.tsx';
 
 import '~/assets/css/reset.css';
 import './style.css';
@@ -26,6 +28,9 @@ const StyledPageContainer = styled.div`
     .logo {
       width: 100px;
       height: 100%;
+    }
+    .navbar-menu {
+      flex: 1;
     }
   }
   .main-content {
@@ -61,17 +66,24 @@ interface NavProps {
   label: string;
   path: string;
   icon?: JSX.Element;
-  component: JSX.Element;
+  element: JSX.Element;
 }
 
 const navs: NavProps[] = [
-  { key: 'home', label: '首页', path: '/home', icon: <HomeOutlined />, component: <Home /> },
+  { key: 'home', label: '列表', path: '/home', icon: <HomeOutlined />, element: <Home /> },
   {
     key: 'settings',
     label: '设置',
     path: '/settings',
     icon: <SettingOutlined />,
-    component: <Settings />,
+    element: <Settings />,
+  },
+  {
+    key: 'import-export',
+    label: '导入/导出',
+    path: '/import-export',
+    icon: <ImportOutlined />,
+    element: <ImportExport />,
   },
 ];
 
@@ -83,19 +95,8 @@ const router = createHashRouter([
         path: "/",
         element: <Home />,
       },
-      {
-        path: "/home",
-        element: <Home />,
-      },
-      // {
-      //   path: "/home/:tagId?/:groupId?",
-      //   element: <Home />,
-      // },
-      {
-        path: "/settings",
-        element: <Settings />,
-      },
-    ]
+      ...navs.map((item) => pick(item, ['path', 'element']))
+    ],
   },
 ]);
 
@@ -121,6 +122,7 @@ function AppLayout() {
       <div className="header-navbar">
         <div className="logo"></div>
         <Menu
+          className="navbar-menu"
           theme="light"
           mode="horizontal"
           defaultSelectedKeys={['home']}

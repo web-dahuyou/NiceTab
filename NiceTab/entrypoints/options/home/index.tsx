@@ -1,11 +1,13 @@
 import React, { useCallback, useEffect, useState, useRef, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { theme, Tree, Button, Input } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
+import { theme, Tree, Button, Dropdown, Empty } from 'antd';
+import type { MenuProps } from 'antd';
+import { DownOutlined, MoreOutlined, ClearOutlined } from '@ant-design/icons';
 import { TagItem, GroupItem, CountInfo } from '~/entrypoints/types';
 import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import { ENUM_SETTINGS_PROPS, ENUM_COLORS } from '~/entrypoints/common/constants';
+import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { StyledListWrapper } from './Home.styled';
 import RenderTreeNode from './RenderTreeNode';
 import TabGroup from './TabGroup';
@@ -16,8 +18,6 @@ import {
   RenderTreeNodeActionProps,
 } from './types';
 import { getTreeData } from './utils';
-
-// const { Search } = Input;
 
 function Home() {
   const { token } = theme.useToken();
@@ -36,12 +36,27 @@ function Home() {
     return tag as TreeDataNodeTag;
   }, [treeData, selectedTagKey]);
 
+  const moreItems: MenuProps['items'] = [
+    {
+      key: 'clear',
+      label: <span onClick={() => handleMoreItemClick('clear')}>清空全部</span>,
+      icon: <ClearOutlined />
+    }
+  ]
+  // 点击更多选项
+  const handleMoreItemClick = async (action: string) => {
+    if (action === 'clear') {
+      await tabListUtils.setTagList([]);
+      refreshTreeData();
+    }
+  }
   // 删除分类
   const handleTagRemove = useCallback(async (tagKey: React.Key, currSelectedTagKey?: React.Key) => {
     if (!tagKey) return;
     await tabListUtils.removeTag(tagKey);
     refreshTreeData((treeData) => {
       const tag0 = treeData?.[0];
+      if (!tag0) return;
       if (currSelectedTagKey && currSelectedTagKey === tagKey) {
         handleSelect(treeData, [tag0?.key], { node: tag0 });
       } else {
@@ -272,7 +287,8 @@ function Home() {
       ) || treeData?.[0];
     const tabGroup =
       tag?.children?.find((g) => g.key === searchParams.get('groupId')) ||
-      tag.children?.[0];
+      tag?.children?.[0];
+    if (!tag) return;
     handleSelect(treeData, [tabGroup ? tabGroup.key : tag.key], {
       node: tabGroup ? (tabGroup as TreeDataNodeTabGroup) : tag,
     });
@@ -311,23 +327,42 @@ function Home() {
             <Button type="primary" size="small" shape="round" onClick={handleTagCreate}>
               创建分类
             </Button>
+            <Dropdown menu={{ items: moreItems }} placement="bottomLeft">
+              <StyledActionIconBtn
+                className="btn-more"
+                $size="20"
+                title="更多"
+              >
+                <MoreOutlined />
+              </StyledActionIconBtn>
+            </Dropdown>
           </div>
-          {/* <Search style={{ marginBottom: 8 }} placeholder="Search" /> */}
-          <Tree
-            // draggable
-            blockNode
-            switcherIcon={<DownOutlined />}
-            autoExpandParent
-            defaultExpandAll
-            expandedKeys={expandedKeys}
-            selectedKeys={selectedKeys}
-            treeData={treeData}
-            titleRender={(node) => (
-              <RenderTreeNode node={node} onAction={onTreeNodeAction}></RenderTreeNode>
-            )}
-            onExpand={(expandedKeys) => setExpandedKeys(expandedKeys)}
-            onSelect={onSelect}
-          />
+          {/* <Input.Search style={{ marginBottom: 8 }} placeholder="Search" /> */}
+          { treeData?.length > 0 ? (
+            <Tree
+              // draggable
+              blockNode
+              switcherIcon={<DownOutlined />}
+              autoExpandParent
+              defaultExpandAll
+              expandedKeys={expandedKeys}
+              selectedKeys={selectedKeys}
+              treeData={treeData}
+              titleRender={(node) => (
+                <RenderTreeNode node={node} onAction={onTreeNodeAction}></RenderTreeNode>
+              )}
+              onExpand={(expandedKeys) => setExpandedKeys(expandedKeys)}
+              onSelect={onSelect}
+            />
+          ) : (
+            <div className="no-data">
+              <Empty description="暂无分类">
+                <Button type="primary" size="small" shape="round" onClick={handleTagCreate}>
+                  创建分类
+                </Button>
+              </Empty>
+            </div>
+          ) }
         </div>
       </div>
       <div className="content" ref={contentRef}>

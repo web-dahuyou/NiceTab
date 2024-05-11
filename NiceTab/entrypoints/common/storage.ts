@@ -2,7 +2,7 @@ import { Key } from 'react';
 import dayjs from 'dayjs';
 import type { SettingsProps, TagItem, GroupItem, TabItem, CountInfo } from '../types';
 import { ENUM_SETTINGS_PROPS } from './constants';
-import { getRandomId } from './utils';
+import { getRandomId, omit } from './utils';
 
 const {
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
@@ -191,6 +191,30 @@ class TabListUtils {
     tag.groupList = [newtabGroup];
     await this.setTagList([tag]);
     return { tagId: tag.tagId, groupId: newtabGroup.groupId };
+  }
+
+  // 导入
+  async importTags(tags: TagItem[]) {
+    const tagList = await this.getTagList();
+    const needOverride = !tagList.length || (tagList.length == 1 && !tagList?.[0].groupList?.length);
+    if (needOverride) {
+      await this.setTagList(tags);
+    } else {
+      await this.setTagList([...tags, ...tagList]);
+    }
+  }
+  // 导出
+  async exportTags(): Promise<Partial<TagItem>[]> {
+    const tagList = await this.getTagList();
+    let exportTagList = tagList.map(tag => {
+      return omit({
+        ...tag,
+        groupList: tag?.groupList?.map(g => {
+          return omit(g, ['groupId'])
+        }) || []
+      }, ['tagId'])
+    });
+    return exportTagList;
   }
 }
 

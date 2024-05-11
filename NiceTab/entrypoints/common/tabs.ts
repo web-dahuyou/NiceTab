@@ -2,7 +2,7 @@ import { browser, Tabs } from 'wxt/browser';
 import { settingsUtils, tabListUtils } from './storage';
 import type { SettingsProps, TabItem } from '~/entrypoints/types';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
-import { pick, getUrlWithParams, objectToUrlParams } from '~/entrypoints/common/utils';
+import { pick, objectToUrlParams } from '~/entrypoints/common/utils';
 
 const {
   OPEN_ADMIN_TAB_AFTER_SEND_TABS,

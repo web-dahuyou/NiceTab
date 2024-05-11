@@ -4,7 +4,7 @@ export function classNames(...classes: Array<string | boolean | undefined | null
 }
 
 // 拼接url
-export function getUrlWithParams(url: string, params: Record<string, any> = {}): string {
+export function handleUrlWidthParams(url: string, params: Record<string, any> = {}): string {
   const urlObject = new URL(url);
   const searchParams = new URLSearchParams(urlObject.search);
   for (const [key, value] of Object.entries(params)) {
@@ -92,6 +92,8 @@ export function omit(
 export default {
   classNames,
   getRandomId,
+  handleUrlWidthParams,
+  getUrlParams,
   pick,
   omit,
 };

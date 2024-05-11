@@ -15,7 +15,6 @@ const {
   DELETE_AFTER_RESTORE,
 } = ENUM_SETTINGS_PROPS;
 
-const StyledWrapper = styled.div``;
 
 export default function Settings() {
   const [messageApi, contextHolder] = message.useMessage();
@@ -41,7 +40,7 @@ export default function Settings() {
   return <>
     { contextHolder }
     { visible && (
-      <StyledWrapper className="settings-wrapper">
+      <div className="settings-wrapper">
         <Form
           form={form}
           name="settings"
@@ -110,7 +109,7 @@ export default function Settings() {
             </Button>
           </Form.Item>
         </Form>
-      </StyledWrapper>
+      </div>
     )}
   </>
 }
