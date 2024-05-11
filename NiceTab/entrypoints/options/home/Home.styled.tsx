@@ -12,14 +12,19 @@ export const StyledListWrapper = styled.div<{$primaryColor?: string}>`
     height: calc(100vh - 180px);
     .sidebar-inner {
       width: 280px;
+      height: calc(100vh - 180px);
+      display: flex;
+      flex-direction: column;
       position: fixed;
       top: 100px;
-      padding-right: 16px;
+      padding-right: 4px;
       border-right: 1px solid rgba(5, 5, 5, 0.06);
       .tag-list-title {
+        flex-shrink: 0;
         font-weight: bold;
       }
       .count-info {
+        flex-shrink: 0;
         padding: 8px 0 16px;
         display: flex;
         align-items: center;
@@ -29,6 +34,7 @@ export const StyledListWrapper = styled.div<{$primaryColor?: string}>`
         font-size: 12px;
       }
       .sidebar-action-btns-wrapper {
+        flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: flex-end;
@@ -38,10 +44,15 @@ export const StyledListWrapper = styled.div<{$primaryColor?: string}>`
           font-size: 12px;
         }
       }
-      .no-data {
-        padding: 16px 0;
-        button {
-          font-size: 12px;
+      .sidebar-tree-wrapper {
+        flex: 1;
+        height: 0;
+        overflow: auto;
+        .no-data {
+          padding: 16px 0;
+          button {
+            font-size: 12px;
+          }
         }
       }
     }
@@ -75,3 +86,7 @@ export const StyledTreeNodeItem = styled.div`
     }
   }
 `;
+
+export default {
+  name: 'option-home-styled',
+}

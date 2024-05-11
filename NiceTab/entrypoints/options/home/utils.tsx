@@ -23,3 +23,6 @@ export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
   }));
 };
 
+export default {
+  getTreeData
+}

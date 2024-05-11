@@ -1,7 +1,12 @@
 import React, { useContext, useCallback, useEffect, useState } from 'react';
 import { browser, Tabs } from 'wxt/browser';
 import { theme, Space, Button } from 'antd';
-import { CloseCircleOutlined, HomeOutlined, SettingOutlined, ImportOutlined } from '@ant-design/icons';
+import {
+  CloseCircleOutlined,
+  HomeOutlined,
+  SettingOutlined,
+  ImportOutlined,
+} from '@ant-design/icons';
 import { classNames, sendBrowserMessage } from '~/entrypoints/common/utils';
 import '~/assets/css/reset.css';
 import './App.css';
@@ -14,14 +19,32 @@ const colors = Object.entries(ENUM_COLORS).map(([key, color]) => {
   return { key, color: typeof color === 'string' ? color : color.primary || color[6] };
 });
 
+function handleQuickAction(route: { path: string; query?: Record<string, any> }) {
+  sendBrowserMessage('openAdminRoutePage', route);
+}
 // 快捷按钮
 const quickActionBtns = [
-  { path: '/home', label: '查看列表', icon: <HomeOutlined />, onClick: () => browser.tabs.create({ url: '/home' }) },
-  { path: '/settings', label: '查看设置', icon: <SettingOutlined /> },
-  { path: '/import-export', label: '导入导出', icon: <ImportOutlined /> },
-]
+  {
+    path: '/home',
+    label: '查看列表',
+    icon: <HomeOutlined />,
+    onClick: () => handleQuickAction({ path: '/home' }),
+  },
+  {
+    path: '/settings',
+    label: '查看设置',
+    icon: <SettingOutlined />,
+    onClick: () => handleQuickAction({ path: '/settings' }),
+  },
+  {
+    path: '/import-export',
+    label: '导入导出',
+    icon: <ImportOutlined />,
+    onClick: () => handleQuickAction({ path: '/import-export' }),
+  },
+];
 
-function App() {
+export default function App() {
   const themeContext = useContext(ThemeContext);
   const [tabs, setTabs] = useState<Tabs.Tab[]>([]);
 
@@ -29,7 +52,7 @@ function App() {
     const themeData = { colorPrimary: item.color };
     themeContext.setThemeData(themeData);
     sendBrowserMessage('setPrimaryColor', themeData);
-  }
+  };
   const handleTabItemClick = useCallback((index: number) => {
     browser.tabs.highlight({ tabs: index });
   }, []);
@@ -53,9 +76,15 @@ function App() {
   return (
     <StyledContainer className="popup-container">
       <div className="block quick-actions">
-        { quickActionBtns.map((item) => (
-          <Button type="primary" size="small" shape="round" icon={item.icon}>
-            { item.label }
+        {quickActionBtns.map((item) => (
+          <Button
+            type="primary"
+            size="small"
+            shape="round"
+            icon={item.icon}
+            onClick={item.onClick}
+          >
+            {item.label}
           </Button>
         ))}
       </div>
@@ -99,5 +128,3 @@ function App() {
     </StyledContainer>
   );
 }
-
-export default App;

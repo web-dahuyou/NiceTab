@@ -13,5 +13,6 @@ export const formatTypeOptions: FormatTypeOptionItem[] = [
 
 
 export default {
-  initialValues
+  initialValues,
+  formatTypeOptions
 }

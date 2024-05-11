@@ -15,5 +15,5 @@ export type FormatTypeOptionItem = {
 }
 
 export default {
-  name: 'importExport-types',
+  name: 'import-export-types',
 }

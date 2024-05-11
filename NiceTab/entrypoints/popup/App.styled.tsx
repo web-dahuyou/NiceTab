@@ -78,3 +78,7 @@ export const StyledFavIcon = styled.i<{ $icon?: string }>`
   margin-right: 8px;
   background: url(${(props) => props.$icon}) center / 100% 100% no-repeat;
 `;
+
+export default {
+  name: 'popup-app-styled',
+}

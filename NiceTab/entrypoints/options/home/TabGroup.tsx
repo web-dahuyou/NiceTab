@@ -46,7 +46,9 @@ export default function TabGroup({
 
   useEffect(() => {
     if (selected && groupRef.current) {
-      groupRef.current.scrollIntoView({ behavior: 'smooth' });
+      // console.log('groupRef.current', groupRef.current)
+      const offsetTop = groupRef.current.offsetTop;
+      window.scrollTo({ top: offsetTop - 100, behavior: 'instant' });
     }
   }, [selected]);
 

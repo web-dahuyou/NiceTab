@@ -19,7 +19,7 @@ import {
 } from './types';
 import { getTreeData } from './utils';
 
-function Home() {
+export default function Home() {
   const { token } = theme.useToken();
   const [searchParams, setSearchParams] = useSearchParams();
   const contentRef = useRef<HTMLDivElement>(null);
@@ -338,31 +338,33 @@ function Home() {
             </Dropdown>
           </div>
           {/* <Input.Search style={{ marginBottom: 8 }} placeholder="Search" /> */}
-          { treeData?.length > 0 ? (
-            <Tree
-              // draggable
-              blockNode
-              switcherIcon={<DownOutlined />}
-              autoExpandParent
-              defaultExpandAll
-              expandedKeys={expandedKeys}
-              selectedKeys={selectedKeys}
-              treeData={treeData}
-              titleRender={(node) => (
-                <RenderTreeNode node={node} onAction={onTreeNodeAction}></RenderTreeNode>
-              )}
-              onExpand={(expandedKeys) => setExpandedKeys(expandedKeys)}
-              onSelect={onSelect}
-            />
-          ) : (
-            <div className="no-data">
-              <Empty description="暂无分类">
-                <Button type="primary" size="small" shape="round" onClick={handleTagCreate}>
-                  创建分类
-                </Button>
-              </Empty>
-            </div>
-          ) }
+          <div className="sidebar-tree-wrapper">
+            { treeData?.length > 0 ? (
+              <Tree
+                // draggable
+                blockNode
+                switcherIcon={<DownOutlined />}
+                autoExpandParent
+                defaultExpandAll
+                expandedKeys={expandedKeys}
+                selectedKeys={selectedKeys}
+                treeData={treeData}
+                titleRender={(node) => (
+                  <RenderTreeNode node={node} onAction={onTreeNodeAction}></RenderTreeNode>
+                )}
+                onExpand={(expandedKeys) => setExpandedKeys(expandedKeys)}
+                onSelect={onSelect}
+              />
+            ) : (
+              <div className="no-data">
+                <Empty description="暂无分类">
+                  <Button type="primary" size="small" shape="round" onClick={handleTagCreate}>
+                    创建分类
+                  </Button>
+                </Empty>
+              </div>
+            ) }
+          </div>
         </div>
       </div>
       <div className="content" ref={contentRef}>
@@ -389,4 +391,3 @@ function Home() {
   );
 }
 
-export default Home;

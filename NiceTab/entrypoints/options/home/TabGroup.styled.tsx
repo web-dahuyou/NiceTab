@@ -87,3 +87,7 @@ export const StyledTabTitle = styled.a<{ $primaryColor?: string }>`
     }
   }
 `;
+
+export default {
+  name: 'option-tab-group-styled',
+}
