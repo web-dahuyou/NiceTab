@@ -31,7 +31,6 @@ export default function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) 
     });
   };
 
-
   const handleRemove = () => {
     onAction?.({ actionType: node.type, node, actionName: 'remove' });
     setModalVisible(false);
@@ -42,6 +41,7 @@ export default function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) 
   return (
     <>
       <StyledTreeNodeItem className="tree-node-item">
+        <span style={{ marginRight: '4px' }}>{ node.icon }</span>
         <span className="tree-node-title">
           <EditInput
             value={(node.title as string) || '未命名'}

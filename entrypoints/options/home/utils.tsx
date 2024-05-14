@@ -1,4 +1,5 @@
 
+import { TagOutlined, ProductOutlined } from '@ant-design/icons';
 import { TagItem } from '~/entrypoints/types';
 import { TreeDataNodeUnion } from './types';
 
@@ -9,6 +10,7 @@ export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
     key: tag.tagId,
     title: tag.tagName,
     isLeaf: false,
+    icon: <TagOutlined />,
     originData: { ...tag },
     children: tag?.groupList?.map((group) => {
       return {
@@ -17,6 +19,7 @@ export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
         key: group.groupId,
         title: group.groupName,
         isLeaf: true,
+        icon: <ProductOutlined />,
         originData: { ...group },
       };
     }),
