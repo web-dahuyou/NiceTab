@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { theme, Modal } from 'antd';
 import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import { ENUM_COLORS } from '~/entrypoints/common/constants';
@@ -12,6 +12,11 @@ export default function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) 
   const { token } = theme.useToken();
   const [modalVisible, setModalVisible] = useState(false);
   const removeDesc = `您确定要删除该${node.type === 'tag' ? '分类' : '标签组'}吗？`;
+  // 是否锁定
+  const isLocked = useMemo(() => {
+    return !!node?.originData?.isLocked;
+  }, [node]);
+
   const onRemoveClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setModalVisible(true);
@@ -40,6 +45,7 @@ export default function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) 
     e.stopPropagation();
     setModalVisible(false);
   };
+
   return (
     <>
       <StyledTreeNodeItem className="tree-node-item">
@@ -66,15 +72,17 @@ export default function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) 
               <PlusOutlined />
             </StyledActionIconBtn>
           )}
-          <StyledActionIconBtn
-            className="btn-remove"
-            $size="14"
-            title="删除"
-            $hoverColor={ENUM_COLORS.red.primary}
-            onClick={(e) => onRemoveClick?.(e)}
-          >
-            <CloseOutlined />
-          </StyledActionIconBtn>
+          { !isLocked && (
+            <StyledActionIconBtn
+              className="btn-remove"
+              $size="14"
+              title="删除"
+              $hoverColor={ENUM_COLORS.red.primary}
+              onClick={(e) => onRemoveClick?.(e)}
+            >
+              <CloseOutlined />
+            </StyledActionIconBtn>
+          ) }
         </span>
       </StyledTreeNodeItem>
 

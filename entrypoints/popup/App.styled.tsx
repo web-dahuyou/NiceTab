@@ -37,7 +37,7 @@ export const StyledContainer = styled.div`
   }
 `;
 
-export const StyledList = styled.div<{$primaryColor?: string}>`
+export const StyledList = styled.div<{$primaryColor?: string; $bgColor?: string}>`
   max-height: 500px;
   overflow-y: auto;
   .tab-item {
@@ -47,7 +47,7 @@ export const StyledList = styled.div<{$primaryColor?: string}>`
     padding: 6px 10px;
     cursor: pointer;
     &:hover {
-      background: rgba(0, 0, 0, 0.1);
+      background: ${props => props.$bgColor || 'rgba(0, 0, 0, 0.1)'};
     }
     &.active:before {
       content: "";

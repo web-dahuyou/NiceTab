@@ -130,7 +130,7 @@ export default function DndComponent<IncomeData extends DragData>({
           setClosestEdge(null);
         },
         onDrop({ location, source }) {
-          console.log('dropTargetForElements--onDrop');
+          // console.log('dropTargetForElements--onDrop');
           setClosestEdge(null);
 
           const target = location.current.dropTargets[0];

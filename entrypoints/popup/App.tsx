@@ -2,7 +2,7 @@ import React, { useContext, useCallback, useEffect, useState } from 'react';
 import { browser, Tabs } from 'wxt/browser';
 import { theme, Space, Button } from 'antd';
 import {
-  CloseCircleOutlined,
+  CloseOutlined,
   HomeOutlined,
   SettingOutlined,
   ImportOutlined,
@@ -45,6 +45,7 @@ const quickActionBtns = [
 ];
 
 export default function App() {
+  const { token } = theme.useToken();
   const themeContext = useContext(ThemeContext);
   const [tabs, setTabs] = useState<Tabs.Tab[]>([]);
 
@@ -103,7 +104,7 @@ export default function App() {
       </div>
 
       <div className="tab-list-title">打开的标签页：</div>
-      <StyledList className="tab-list" $primaryColor={themeContext.colorPrimary}>
+      <StyledList className="tab-list" $primaryColor={token.colorPrimary} $bgColor={token.colorPrimaryBg}>
         {tabs.map((tab, index) => (
           <li
             key={tab.id}
@@ -120,7 +121,7 @@ export default function App() {
               $hoverColor="red"
               onClick={(event) => handleDelete(event, tab)}
             >
-              <CloseCircleOutlined />
+              <CloseOutlined />
             </StyledActionIconBtn>
           </li>
         ))}

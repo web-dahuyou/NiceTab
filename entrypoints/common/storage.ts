@@ -97,15 +97,13 @@ class TabListUtils {
     await this.setTagList([newTag, ...this.tagList]);
   }
   async updateTag(tagId: Key, tag: Partial<TagItem>) {
-    await this.getTagList();
-    const tagList = this.tagList.map((item) => {
-      if (item.tagId === tagId) {
-        return { ...item, ...tag };
-      } else {
-        return item;
+    const tagList = await this.getTagList();
+    for (let t of tagList) {
+      if (t.tagId === tagId) {
+        Object.assign(t, tag);
+        break;
       }
-    });
-
+    }
     await this.setTagList(tagList);
   }
   async removeTag(tagId: Key) {
@@ -124,8 +122,8 @@ class TabListUtils {
     };
   }
   async addTabGroup(tagId: Key, tabGroup?: GroupItem) {
-    await this.getTagList();
-    const tagList = this.tagList.map((tag) => {
+    const tagList = await this.getTagList();
+    for (let tag of tagList) {
       if (tag.tagId === tagId) {
         const index = tag.groupList.findIndex((g) => !g.isStarred);
         tag.groupList.splice(
@@ -133,48 +131,34 @@ class TabListUtils {
           0,
           tabGroup || this.getInitialTabGroup()
         );
-        return tag;
-      } else {
-        return tag;
+        break;
       }
-    });
+    }
     await this.setTagList(tagList);
   }
   async updateTabGroup(tagId: Key, groupId: Key, group: Partial<GroupItem>) {
-    await this.getTagList();
-    const tagList = this.tagList.map((tag) => {
+    const tagList = await this.getTagList();
+    for (let tag of tagList) {
       if (tag.tagId === tagId) {
-        return {
-          ...tag,
-          groupList: tag.groupList.map((g) => {
-            if (g.groupId === groupId) {
-              return {
-                ...g,
-                ...group,
-              };
-            } else {
-              return g;
-            }
-          }),
-        };
-      } else {
-        return tag;
+        for (let g of tag.groupList) {
+          if (g.groupId === groupId) {
+            Object.assign(g, group);
+            break;
+          }
+        }
+        break;
       }
-    });
+    }
     await this.setTagList(tagList);
   }
   async removeTabGroup(tagId: Key, groupId: Key) {
-    await this.getTagList();
-    const tagList = this.tagList.map((tag) => {
+    const tagList = await this.getTagList();
+    for (let tag of tagList) {
       if (tag.tagId === tagId) {
-        return {
-          ...tag,
-          groupList: tag.groupList.filter((g) => g.groupId !== groupId),
-        };
-      } else {
-        return tag;
+        tag.groupList = tag.groupList.filter((g) => g.groupId !== groupId);
+        break;
       }
-    });
+    }
     await this.setTagList(tagList);
   }
 
@@ -212,8 +196,6 @@ class TabListUtils {
     sourceIndex: number,
     targetIndex: number
   ) {
-    console.log('onTabDrop--sourceGroupId', sourceGroupId);
-    console.log('onTabDrop--targetGroupId', targetGroupId);
     const tagList = await this.getTagList();
     if (sourceGroupId === targetGroupId) {
       const moveDirection = sourceIndex > targetIndex ? 'up' : 'down';
