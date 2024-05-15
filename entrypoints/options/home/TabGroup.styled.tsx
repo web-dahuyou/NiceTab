@@ -52,7 +52,7 @@ export const StyledGroupHeader = styled.div<{ $primaryColor?: string }>`
   }
 `;
 
-export const StyledTabListWrapper = styled.ul<{ $primaryColor?: string }>`
+export const StyledTabListWrapper = styled.div<{ $primaryColor?: string }>`
   margin-top: 8px;
   padding-left: 20px;
   .tab-list-item {

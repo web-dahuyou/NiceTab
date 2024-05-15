@@ -27,3 +27,20 @@ export type RenderTreeNodeProps = {
   node: TreeDataNodeUnion;
   onAction?: (props: RenderTreeNodeActionProps) => void;
 };
+// 拖拽tab数据
+export type DndTabItemProps = TabItem & {
+  groupId: string;
+  index: number;
+  dndKey: symbol
+};
+export type DndTabItemOnDropCallback = ({
+  sourceData,
+  targetData,
+  sourceIndex,
+  targetIndex,
+}: {
+  sourceData: DndTabItemProps;
+  targetData: DndTabItemProps;
+  sourceIndex: number;
+  targetIndex: number;
+}) => void;

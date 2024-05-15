@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { theme, Modal } from 'antd';
 import { LockOutlined, StarOutlined, CloseOutlined } from '@ant-design/icons';
 import { GroupItem } from '~/entrypoints/types';
@@ -13,6 +13,8 @@ import {
   StyledTabTitle,
   StyledTabItemFavicon,
 } from './TabGroup.styled';
+import DndComponent from '@/entrypoints/common/components/DndComponent';
+import { DndTabItemProps, DndTabItemOnDropCallback } from './types';
 
 type TabGroupProps = GroupItem & {
   selected?: boolean;
@@ -20,7 +22,10 @@ type TabGroupProps = GroupItem & {
   onRemove: () => void;
   onRestore: () => void;
   onStarredChange?: (isStarred: boolean) => void;
+  onDrop?: DndTabItemOnDropCallback;
 };
+
+const dndKey = Symbol('dnd-tab-item');
 
 export default function TabGroup({
   groupId,
@@ -34,6 +39,7 @@ export default function TabGroup({
   onRemove,
   onRestore,
   onStarredChange,
+  onDrop,
 }: TabGroupProps) {
   const { token } = theme.useToken();
   const groupRef = useRef<HTMLDivElement>(null);
@@ -42,7 +48,7 @@ export default function TabGroup({
   const handleRemove = () => {
     setModalVisible(false);
     onRemove?.();
-  }
+  };
 
   useEffect(() => {
     if (selected && groupRef.current) {
@@ -74,8 +80,16 @@ export default function TabGroup({
           )}
 
           <div className="group-status-wrapper">
-            {isLocked && <LockOutlined style={{ fontSize: '22px', color: token.colorPrimaryHover }} />}
-            {isStarred && <StarOutlined style={{ fontSize: '22px', color: token.colorPrimaryHover }} />}
+            {isLocked && (
+              <LockOutlined
+                style={{ fontSize: '22px', color: token.colorPrimaryHover }}
+              />
+            )}
+            {isStarred && (
+              <StarOutlined
+                style={{ fontSize: '22px', color: token.colorPrimaryHover }}
+              />
+            )}
           </div>
 
           <div className="group-name-wrapper">
@@ -92,7 +106,9 @@ export default function TabGroup({
             <div className="group-create-time">{createTime}</div>
             <div className="group-action-btns">
               {!isLocked && (
-                <span className="action-btn" onClick={() => setModalVisible(true)}>删除该组</span>
+                <span className="action-btn" onClick={() => setModalVisible(true)}>
+                  删除该组
+                </span>
               )}
               <span className="action-btn" onClick={() => onRestore?.()}>
                 恢复该组
@@ -112,30 +128,38 @@ export default function TabGroup({
 
         <StyledTabListWrapper className="tab-list-wrapper">
           {tabList.map((tab, index) => (
-            <li className="tab-list-item" key={index}>
-              <StyledActionIconBtn
-                className="tab-item-btn btn-remove"
-                $size="16"
-                title="删除"
-                $hoverColor={ENUM_COLORS.red.primary}
-                onClick={() =>
-                  onChange?.({ tabList: tabList.filter((t, i) => i !== index) })
-                }
-              >
-                <CloseOutlined />
-              </StyledActionIconBtn>
-              {tab.favIconUrl && (
-                <StyledTabItemFavicon
-                  className="tab-item-favicon"
-                  $bgUrl={tab.favIconUrl}
-                />
-              )}
-              <StyledTabTitle $primaryColor={token.colorPrimary}>
-                <span className="tab-title" onClick={() => openNewTab(tab)}>
-                  {tab.title}
-                </span>
-              </StyledTabTitle>
-            </li>
+            <DndComponent<DndTabItemProps>
+              canDrag
+              key={index}
+              data={{ ...tab, index, groupId, dndKey }}
+              dndKey={dndKey}
+              onDrop={onDrop}
+            >
+              <div className="tab-list-item" key={index}>
+                <StyledActionIconBtn
+                  className="tab-item-btn btn-remove"
+                  $size="16"
+                  title="删除"
+                  $hoverColor={ENUM_COLORS.red.primary}
+                  onClick={() =>
+                    onChange?.({ tabList: tabList.filter((t, i) => i !== index) })
+                  }
+                >
+                  <CloseOutlined />
+                </StyledActionIconBtn>
+                {tab.favIconUrl && (
+                  <StyledTabItemFavicon
+                    className="tab-item-favicon"
+                    $bgUrl={tab.favIconUrl}
+                  />
+                )}
+                <StyledTabTitle $primaryColor={token.colorPrimary}>
+                  <span className="tab-title" onClick={() => openNewTab(tab)}>
+                    {tab.title}
+                  </span>
+                </StyledTabTitle>
+              </div>
+            </DndComponent>
           ))}
         </StyledTabListWrapper>
       </StyledGroupWrapper>

@@ -77,11 +77,14 @@ export default function ImportExport() {
       messageApi.error('复制失败');
     }
   }
-  // 导出NiceTab文件
-  const handleDownload = (content: string) => {
-    const now = dayjs().format('YYYY-MM-DD_HH:mm:ss');
-    saveAs(new Blob([content], { type: 'application/json;charset=utf-8' }), `nice-tab-export_${now}.json`);
-  }
+  // 导出文件
+  const handleDownload = useCallback(() => {
+    const now = dayjs().format('YYYY-MM-DD_HHmmss');
+    const ext = exportFormatType == 1 ? 'json' : 'txt';
+    const fileType = exportFormatType == 1 ? 'application/json' : 'text/plain';
+    const fileName = `export_${exportFormatType == 1 ? 'nice-tab' : 'one-tab'}_${now}.${ext}`;
+    saveAs(new Blob([exportContent], { type: `${fileType};charset=utf-8` }), fileName);
+  }, [exportFormatType, exportContent]);
 
   useEffect(() => {
     getExportContent();
@@ -158,10 +161,10 @@ export default function ImportExport() {
           </Form.Item>
           <Form.Item>
             <Space size={12} align="center">
-              <CopyToClipboard value={exportContent} onCopy={handleCopy}>
+              <CopyToClipboard text={exportContent} onCopy={handleCopy}>
                 <Button type="primary">复制到剪贴板</Button>
               </CopyToClipboard>
-              <Button type="primary" onClick={() => handleDownload(exportContent)}>导出到本地</Button>
+              <Button type="primary" onClick={handleDownload}>导出到本地</Button>
             </Space>
           </Form.Item>
         </Form>

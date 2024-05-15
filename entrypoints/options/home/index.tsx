@@ -16,6 +16,7 @@ import {
   TreeDataNodeTag,
   TreeDataNodeUnion,
   RenderTreeNodeActionProps,
+  DndTabItemOnDropCallback
 } from './types';
 import { getTreeData } from './utils';
 
@@ -50,37 +51,6 @@ export default function Home() {
       refreshTreeData();
     }
   }
-  // 删除分类
-  const handleTagRemove = useCallback(async (tagKey: React.Key, currSelectedTagKey?: React.Key) => {
-    if (!tagKey) return;
-    await tabListUtils.removeTag(tagKey);
-    refreshTreeData((treeData) => {
-      const tag0 = treeData?.[0];
-      if (!tag0) return;
-      if (currSelectedTagKey && currSelectedTagKey === tagKey) {
-        handleSelect(treeData, [tag0?.key], { node: tag0 });
-      } else {
-        const tag = treeData?.find((tag) => tag.key === currSelectedTagKey) || tag0;
-        handleSelect(treeData, [tag.key], { node: tag });
-      }
-    });
-  }, []);
-  // 创建分类
-  const handleTagCreate = useCallback(async () => {
-    await tabListUtils.addTag();
-    refreshTreeData((treeData) => {
-      const tag = treeData?.[0];
-      handleSelect(treeData, [tag?.key], { node: tag });
-    });
-  }, []);
-  // 修改分类
-  const handleTagChange = useCallback(
-    async (tag: TreeDataNodeTag, data: Partial<TagItem>) => {
-      await tabListUtils.updateTag(tag.key, data);
-      refreshTreeData();
-    },
-    []
-  );
 
   // treeNode 节点操作
   const onTreeNodeAction = useCallback(
@@ -155,6 +125,40 @@ export default function Home() {
     [treeData]
   );
 
+
+
+  // 删除分类
+  const handleTagRemove = useCallback(async (tagKey: React.Key, currSelectedTagKey?: React.Key) => {
+    if (!tagKey) return;
+    await tabListUtils.removeTag(tagKey);
+    refreshTreeData((treeData) => {
+      const tag0 = treeData?.[0];
+      if (!tag0) return;
+      if (currSelectedTagKey && currSelectedTagKey === tagKey) {
+        handleSelect(treeData, [tag0?.key], { node: tag0 });
+      } else {
+        const tag = treeData?.find((tag) => tag.key === currSelectedTagKey) || tag0;
+        handleSelect(treeData, [tag.key], { node: tag });
+      }
+    });
+  }, []);
+  // 创建分类
+  const handleTagCreate = useCallback(async () => {
+    await tabListUtils.addTag();
+    refreshTreeData((treeData) => {
+      const tag = treeData?.[0];
+      handleSelect(treeData, [tag?.key], { node: tag });
+    });
+  }, []);
+  // 修改分类
+  const handleTagChange = useCallback(
+    async (tag: TreeDataNodeTag, data: Partial<TagItem>) => {
+      await tabListUtils.updateTag(tag.key, data);
+      refreshTreeData();
+    },
+    []
+  );
+
   // 删除标签组
   const handleTabGroupRemove = useCallback(
     async (
@@ -206,9 +210,7 @@ export default function Home() {
       const tagKey = tabGroup.parentKey;
       if (!tabGroup.key || !tagKey) return;
       await tabListUtils.updateTabGroup(tagKey, tabGroup.key, data);
-      refreshTreeData((treeData) =>
-        handleSelect(treeData, [tabGroup.key], { node: tabGroup })
-      );
+      refreshTreeData();
     },
     []
   );
@@ -262,6 +264,13 @@ export default function Home() {
     },
     [treeData]
   );
+
+  // 拖拽标签页逻辑
+  const handleTabItemDrop: DndTabItemOnDropCallback = async ({ sourceData, targetData, sourceIndex, targetIndex }) => {
+    await tabListUtils.onTabDrop(sourceData.groupId, targetData.groupId, sourceIndex, targetIndex);
+    refreshTreeData();
+  };
+
   // 刷新treeData
   const refreshTreeData = async (callback?: (treeData: TreeDataNodeUnion[]) => void) => {
     const tagList = tabListUtils.tagList;
@@ -383,6 +392,7 @@ export default function Home() {
                 onStarredChange={(isStarred) =>
                   handleTabGroupStarredChange(tabGroup, isStarred)
                 }
+                onDrop={handleTabItemDrop}
               ></TabGroup>
             )
         )}

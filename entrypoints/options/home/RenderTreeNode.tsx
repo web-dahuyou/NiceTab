@@ -31,11 +31,13 @@ export default function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) 
     });
   };
 
-  const handleRemove = () => {
+  const handleRemove = (e: React.MouseEvent) => {
+    e.stopPropagation();
     onAction?.({ actionType: node.type, node, actionName: 'remove' });
     setModalVisible(false);
   };
-  const handleModalCancel = () => {
+  const handleModalCancel = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setModalVisible(false);
   };
   return (

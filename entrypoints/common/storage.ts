@@ -1,6 +1,13 @@
 import { Key } from 'react';
 import dayjs from 'dayjs';
-import type { SettingsProps, TagItem, GroupItem, TabItem, CountInfo, ThemeProps } from '../types';
+import type {
+  SettingsProps,
+  TagItem,
+  GroupItem,
+  TabItem,
+  CountInfo,
+  ThemeProps,
+} from '../types';
 import { ENUM_COLORS, ENUM_SETTINGS_PROPS } from './constants';
 import { getRandomId, omit } from './utils';
 
@@ -49,7 +56,7 @@ class TabListUtils {
       tagId: getRandomId(),
       tagName: '默认分类',
       groupList: [],
-    }
+    };
   }
   async getTagList() {
     const tagList = await storage.getItem<TagItem[]>('local:tabList');
@@ -66,21 +73,23 @@ class TabListUtils {
     await storage.setItem('local:tabList', this.tagList);
   }
   setCountInfo() {
-    let tagCount = 0, groupCount = 0, tabCount = 0;
-    this.tagList.forEach(tag => {
+    let tagCount = 0,
+      groupCount = 0,
+      tabCount = 0;
+    this.tagList.forEach((tag) => {
       tagCount += 1;
-      tag?.groupList?.forEach(group => {
+      tag?.groupList?.forEach((group) => {
         groupCount += 1;
-        group?.tabList?.forEach(tab => {
+        group?.tabList?.forEach((tab) => {
           tabCount += 1;
         });
-      })
+      });
     });
     this.countInfo = {
       tagCount,
       groupCount,
       tabCount,
-    }
+    };
   }
   async addTag(tag?: TagItem) {
     await this.getTagList();
@@ -89,9 +98,9 @@ class TabListUtils {
   }
   async updateTag(tagId: Key, tag: Partial<TagItem>) {
     await this.getTagList();
-    const tagList = this.tagList.map(item => {
+    const tagList = this.tagList.map((item) => {
       if (item.tagId === tagId) {
-        return {...item, ...tag};
+        return { ...item, ...tag };
       } else {
         return item;
       }
@@ -101,7 +110,7 @@ class TabListUtils {
   }
   async removeTag(tagId: Key) {
     await this.getTagList();
-    const tagList = this.tagList.filter(item => item.tagId !== tagId);
+    const tagList = this.tagList.filter((item) => item.tagId !== tagId);
     await this.setTagList(tagList);
   }
 
@@ -111,15 +120,19 @@ class TabListUtils {
       groupId: getRandomId(),
       groupName: '默认标签组',
       createTime: dayjs().format('YYYY-MM-DD HH:mm'),
-      tabList: []
+      tabList: [],
     };
   }
   async addTabGroup(tagId: Key, tabGroup?: GroupItem) {
     await this.getTagList();
-    const tagList = this.tagList.map(tag => {
+    const tagList = this.tagList.map((tag) => {
       if (tag.tagId === tagId) {
-        const index = tag.groupList.findIndex(g => !g.isStarred);
-        tag.groupList.splice(index > -1 ? index : tag.groupList.length, 0, tabGroup || this.getInitialTabGroup());
+        const index = tag.groupList.findIndex((g) => !g.isStarred);
+        tag.groupList.splice(
+          index > -1 ? index : tag.groupList.length,
+          0,
+          tabGroup || this.getInitialTabGroup()
+        );
         return tag;
       } else {
         return tag;
@@ -129,21 +142,21 @@ class TabListUtils {
   }
   async updateTabGroup(tagId: Key, groupId: Key, group: Partial<GroupItem>) {
     await this.getTagList();
-    const tagList = this.tagList.map(tag => {
+    const tagList = this.tagList.map((tag) => {
       if (tag.tagId === tagId) {
         return {
           ...tag,
-          groupList: tag.groupList.map(g => {
+          groupList: tag.groupList.map((g) => {
             if (g.groupId === groupId) {
               return {
                 ...g,
-                ...group
-              }
+                ...group,
+              };
             } else {
               return g;
             }
-          })
-        }
+          }),
+        };
       } else {
         return tag;
       }
@@ -152,12 +165,12 @@ class TabListUtils {
   }
   async removeTabGroup(tagId: Key, groupId: Key) {
     await this.getTagList();
-    const tagList = this.tagList.map(tag => {
+    const tagList = this.tagList.map((tag) => {
       if (tag.tagId === tagId) {
         return {
           ...tag,
-          groupList: tag.groupList.filter(g => g.groupId !== groupId)
-        }
+          groupList: tag.groupList.filter((g) => g.groupId !== groupId),
+        };
       } else {
         return tag;
       }
@@ -169,7 +182,7 @@ class TabListUtils {
   async addTabs(tabs: TabItem[], createNewGroup = false) {
     await this.getTagList();
     let tag0 = this.tagList?.[0];
-    const group = tag0?.groupList?.find(group => !group.isLocked && !group.isStarred);
+    const group = tag0?.groupList?.find((group) => !group.isLocked && !group.isStarred);
     if (!createNewGroup && group) {
       group.tabList = [...tabs, ...(group?.tabList || [])];
       await this.setTagList([tag0, ...this.tagList.slice(1)]);
@@ -180,7 +193,7 @@ class TabListUtils {
     newtabGroup.tabList = [...tabs];
 
     if (tag0) {
-      const index = tag0.groupList.findIndex(g => !g.isStarred);
+      const index = tag0.groupList.findIndex((g) => !g.isStarred);
       tag0.groupList.splice(index > -1 ? index : tag0.groupList.length, 0, newtabGroup);
       await this.setTagList([tag0, ...this.tagList.slice(1)]);
       return { tagId: tag0.tagId, groupId: newtabGroup.groupId };
@@ -192,11 +205,65 @@ class TabListUtils {
     await this.setTagList([tag]);
     return { tagId: tag.tagId, groupId: newtabGroup.groupId };
   }
+  // tab标签页拖拽
+  async onTabDrop(
+    sourceGroupId: Key,
+    targetGroupId: Key,
+    sourceIndex: number,
+    targetIndex: number
+  ) {
+    console.log('onTabDrop--sourceGroupId', sourceGroupId);
+    console.log('onTabDrop--targetGroupId', targetGroupId);
+    const tagList = await this.getTagList();
+    if (sourceGroupId === targetGroupId) {
+      const moveDirection = sourceIndex > targetIndex ? 'up' : 'down';
+      for (let tag of tagList) {
+        let isDone = false;
+        for (let group of tag.groupList) {
+          if (group.groupId === sourceGroupId) {
+            const tmp = group.tabList[sourceIndex];
+            if (moveDirection === 'up') {
+              group.tabList.splice(sourceIndex, 1);
+              group.tabList.splice(targetIndex, 0, tmp);
+            } else {
+              group.tabList.splice(targetIndex, 0, tmp);
+              group.tabList.splice(sourceIndex, 1);
+            }
+
+            isDone = true;
+            break;
+          }
+        }
+        if (isDone) break;
+      }
+    } else {
+      for (let tag of tagList) {
+        let tmp = null,
+          sourceGroupIndex = 0,
+          targetGroupIndex = tag.groupList.length - 1;
+
+        for (let gIndex = 0; gIndex < tag.groupList.length; gIndex++) {
+          const group = tag.groupList[gIndex];
+          if (group.groupId === sourceGroupId) {
+            tmp = group.tabList?.[sourceIndex];
+            sourceGroupIndex = gIndex;
+            group.tabList.splice(sourceIndex, 1);
+          } else if (group.groupId === targetGroupId) {
+            targetGroupIndex = gIndex;
+          }
+        }
+        tmp && tag.groupList?.[targetGroupIndex]?.tabList?.splice(targetIndex, 0, tmp);
+      }
+    }
+
+    await this.setTagList(tagList);
+  }
 
   // 导入
   async importTags(tags: TagItem[]) {
     const tagList = await this.getTagList();
-    const needOverride = !tagList.length || (tagList.length == 1 && !tagList?.[0].groupList?.length);
+    const needOverride =
+      !tagList.length || (tagList.length == 1 && !tagList?.[0].groupList?.length);
     if (needOverride) {
       await this.setTagList(tags);
     } else {
@@ -206,13 +273,20 @@ class TabListUtils {
   // 导出
   async exportTags(): Promise<Partial<TagItem>[]> {
     const tagList = await this.getTagList();
-    let exportTagList = tagList.map(tag => {
-      return omit({
-        ...tag,
-        groupList: tag?.groupList?.map(g => {
-          return omit(g, ['groupId'])
-        }) || []
-      }, ['tagId'])
+    let exportTagList = tagList.map((tag) => {
+      return omit(
+        {
+          ...tag,
+          groupList:
+            tag?.groupList?.map((g) => {
+              return omit(
+                { ...g, tabList: g?.tabList?.map((tab) => omit(tab, ['tabId'])) || [] },
+                ['groupId']
+              );
+            }) || [],
+        },
+        ['tagId']
+      );
     });
     return exportTagList;
   }
@@ -220,7 +294,7 @@ class TabListUtils {
 
 class ThemeUtils {
   defaultTheme = {
-    colorPrimary: ENUM_COLORS.primary
+    colorPrimary: ENUM_COLORS.primary,
   };
   themeData = this.defaultTheme;
   async getThemeData() {

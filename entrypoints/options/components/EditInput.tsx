@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { theme, Input } from 'antd';
 import type { InputProps, InputRef } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
@@ -37,8 +37,9 @@ export default function EditInput({
   fontSize = 14,
   iconSize = 16,
   onValueChange,
+  stopPropagation = true,
   ...otherProps
-}: InputProps & CustomStyleProps & { value: string; onValueChange: (value?: string) => void; }) {
+}: InputProps & CustomStyleProps & { value: string; onValueChange: (value?: string) => void; stopPropagation?: boolean }) {
   const { token } = theme.useToken();
   const inputRef = useRef<InputRef>(null);
   const [innerValue, setInnerValue] = useState(value);
@@ -58,7 +59,8 @@ export default function EditInput({
     onValueChange?.(newValue);
     setIsEditing(false);
   }
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    stopPropagation && e.stopPropagation();
     setIsEditing(true);
     setTimeout(() => {
       inputRef?.current?.focus();
