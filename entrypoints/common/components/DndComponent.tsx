@@ -19,7 +19,7 @@ const StyledDndWrapper = styled.div`
   opacity: 1;
   --ds-border-selected: ${ENUM_COLORS.primary};
   &.dragging {
-    opacity: 0.5;
+    opacity: 0.4;
   }
 `;
 
@@ -107,6 +107,7 @@ export default function DndComponent<IncomeData extends DragData>({
 
           const closestEdge = extractClosestEdge(self.data);
           // console.log('dropTargetForElements--self', self.data)
+          // console.log('dropTargetForElements--source', source.data)
           // console.log('dropTargetForElements--closestEdge', closestEdge)
           const sourceIndex = +(source?.data?.index || 0);
 
@@ -124,10 +125,17 @@ export default function DndComponent<IncomeData extends DragData>({
             return;
           }
 
+          if (self?.data?.isEmpty) {
+            setClosestEdge('top');
+            return;
+          }
+
           setClosestEdge(closestEdge);
         },
         onDragLeave() {
-          setClosestEdge(null);
+          setTimeout(() => {
+            setClosestEdge(null);
+          }, 30);
         },
         onDrop({ location, source }) {
           // console.log('dropTargetForElements--onDrop');
@@ -164,7 +172,7 @@ export default function DndComponent<IncomeData extends DragData>({
   return (
     <StyledDndWrapper ref={ref} className={isDragging ? 'dragging' : ''}>
       {children}
-      {closestEdge && <DropIndicator edge={closestEdge} gap="1px" />}
+      {closestEdge && <DropIndicator edge={closestEdge} gap="0px" />}
     </StyledDndWrapper>
   );
 }

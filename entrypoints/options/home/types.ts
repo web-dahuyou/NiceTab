@@ -31,7 +31,8 @@ export type RenderTreeNodeProps = {
 export type DndTabItemProps = TabItem & {
   groupId: string;
   index: number;
-  dndKey: symbol
+  dndKey: symbol;
+  isEmpty?: boolean; // 空标签组，默认设置一个空标签，便于拖拽
 };
 export type DndTabItemOnDropCallback = ({
   sourceData,

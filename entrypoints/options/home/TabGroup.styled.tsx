@@ -31,6 +31,14 @@ export const StyledGroupHeader = styled.div<{ $primaryColor?: string }>`
   }
   .group-header-right-part {
     flex: 1;
+    group-info {
+      display: flex;
+      align-items: center;
+    }
+    .tab-count {
+      margin-right: 8px;
+      font-size: 14px;
+    }
     .group-create-time {
       font-size: 12px;
       color: #999;
@@ -56,10 +64,11 @@ export const StyledTabListWrapper = styled.div<{ $primaryColor?: string }>`
   margin-top: 8px;
   padding-left: 20px;
   .tab-list-item {
+    position: relative;
     display: flex;
     align-items: center;
     width: 100%;
-    padding: 2px 0;
+    height: 24px;
     .tab-item-btn {
       margin-right: 8px;
     }

@@ -70,7 +70,7 @@ class TabListUtils {
   async setTagList(list?: TagItem[]) {
     this.tagList = list || [this.getInitialTag()];
     this.setCountInfo();
-    await storage.setItem('local:tabList', this.tagList);
+    storage.setItem('local:tabList', this.tagList);
   }
   setCountInfo() {
     let tagCount = 0,
@@ -92,9 +92,10 @@ class TabListUtils {
     };
   }
   async addTag(tag?: TagItem) {
-    await this.getTagList();
+    const tagList = await this.getTagList();
     const newTag = Object.assign(this.getInitialTag(), tag || {});
-    await this.setTagList([newTag, ...this.tagList]);
+    await this.setTagList([newTag, ...tagList]);
+    return newTag;
   }
   async updateTag(tagId: Key, tag: Partial<TagItem>) {
     const tagList = await this.getTagList();
@@ -123,18 +124,20 @@ class TabListUtils {
   }
   async addTabGroup(tagId: Key, tabGroup?: GroupItem) {
     const tagList = await this.getTagList();
+    const newGroup = Object.assign(this.getInitialTabGroup(), tabGroup);
     for (let tag of tagList) {
       if (tag.tagId === tagId) {
         const index = tag.groupList.findIndex((g) => !g.isStarred);
         tag.groupList.splice(
           index > -1 ? index : tag.groupList.length,
           0,
-          tabGroup || this.getInitialTabGroup()
+          newGroup
         );
         break;
       }
     }
     await this.setTagList(tagList);
+    return { tagId, tabGroup: newGroup };
   }
   async updateTabGroup(tagId: Key, groupId: Key, group: Partial<GroupItem>) {
     const tagList = await this.getTagList();
@@ -159,6 +162,36 @@ class TabListUtils {
         break;
       }
     }
+    await this.setTagList(tagList);
+  }
+  // 切换标签组星标状态
+  async toggleTabGroupStarred(tagId: Key, groupId: Key, isStarred: boolean) {
+    const tagList = await this.getTagList();
+    for (let tag of tagList) {
+      if (tag.tagId === tagId) {
+        let gIndex = 0, group = tag.groupList?.[0];
+        for (let index = 0; index < tag.groupList.length; index++) {
+          const g = tag.groupList?.[index];
+          if (g?.groupId === groupId) {
+            g.isStarred = isStarred;
+            gIndex = index;
+            group = {...g};
+            break;
+          }
+        }
+
+        tag.groupList.splice(gIndex, 1);
+
+        if (isStarred) {
+          tag.groupList.unshift(group);
+        } else {
+          const unstarredIndex = tag.groupList.findIndex((g) => !g.isStarred);
+          tag.groupList.splice(unstarredIndex > -1 ? unstarredIndex : tag.groupList.length, 0, group);
+        }
+        break;
+      }
+    }
+
     await this.setTagList(tagList);
   }
 
