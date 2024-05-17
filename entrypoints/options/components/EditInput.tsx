@@ -87,7 +87,7 @@ export default function EditInput({
         />
       ) : (
         <>
-          <span className="text-readonly">{innerValue}</span>
+          <span className="text-readonly" title={innerValue}>{innerValue}</span>
           <StyledActionIconBtn
             $size={iconSize}
             $hoverColor={token.colorPrimaryHover}

@@ -16,6 +16,7 @@ import { getTreeData } from './utils';
 export function useTreeData() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [countInfo, setCountInfo] = useState<CountInfo>();
+  const [tagList, setTagList] = useState<TagItem[]>([]);
   const [treeData, setTreeData] = useState([] as TreeDataNodeUnion[]);
   const [selectedTagKey, setSelectedTagKey] = useState<React.Key | undefined>();
   const [selectedTabGroupKey, setSelectedTabGroupKey] = useState<React.Key | undefined>();
@@ -248,6 +249,7 @@ export function useTreeData() {
   // 刷新treeData
   const refreshTreeData = async (callback?: (treeData: TreeDataNodeUnion[]) => void) => {
     const tagList = tabListUtils.tagList;
+    setTagList(tagList);
     const treeData = getTreeData(tagList);
     setTreeData(treeData);
     // console.log('refresh-treeData', treeData);
@@ -257,6 +259,7 @@ export function useTreeData() {
   // 初始化
   const init = async () => {
     const tagList = await tabListUtils.getTagList();
+    setTagList(tagList);
     const treeData = getTreeData(tagList);
     setTreeData(treeData);
     // console.log('init-treeData', treeData);
@@ -283,6 +286,7 @@ export function useTreeData() {
   return {
     searchParams,
     countInfo,
+    tagList,
     treeData,
     selectedTagKey,
     selectedTabGroupKey,

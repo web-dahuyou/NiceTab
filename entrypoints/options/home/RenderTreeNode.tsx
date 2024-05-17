@@ -52,7 +52,7 @@ export default function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) 
         <span style={{ marginRight: '4px' }}>{ node.icon }</span>
         <span className="tree-node-title">
           <EditInput
-            value={(node.title as string) || '未命名'}
+            value={node.title || '未命名'}
             maxLength={18}
             fontSize={14}
             iconSize={14}

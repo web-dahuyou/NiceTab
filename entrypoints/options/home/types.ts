@@ -4,6 +4,7 @@ import { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
 export type TreeDataNodeTabGroup = TreeDataNode & {
   type: 'tabGroup';
   parentKey: string;
+  title: string;
   icon?: React.ReactNode;
   originData: GroupItem;
   children?: Array<TreeDataNode & { originData?: TabItem }>;
@@ -11,9 +12,10 @@ export type TreeDataNodeTabGroup = TreeDataNode & {
 export type TreeDataNodeTag = TreeDataNode & {
   type: 'tag';
   parentKey?: string;
+  title: string;
   icon?: React.ReactNode;
   originData: TagItem;
-  children?: Array<TreeDataNodeTabGroup & { originData?: GroupItem }>;
+  children?: Array<TreeDataNodeTabGroup>;
 };
 export type TreeDataNodeUnion = TreeDataNodeTag | TreeDataNodeTabGroup;
 
