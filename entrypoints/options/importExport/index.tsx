@@ -6,7 +6,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { saveAs } from 'file-saver';
 import dayjs from 'dayjs';
 import { tabListUtils } from '~/entrypoints/common/storage';
-import { initialValues, formatTypeOptions } from './constants';
+import { initialValues, formatTypeOptions, importModeOptions } from './constants';
 import { extContentImporter, extContentExporter } from './utils';
 
 
@@ -29,6 +29,7 @@ export default function ImportExport() {
   const [messageApi, contextHolder] = message.useMessage();
   const [exportContent, setExportContent] = useState('');
   const [formatType, setFormatType] = useState(1);
+  const [importMode, setImportMode] = useState('append');
   const [exportFormatType, setExportFormatType] = useState(1);
 
   // 导入操作
@@ -38,7 +39,7 @@ export default function ImportExport() {
     const funcName = formatOption?.funcName || 'niceTab';
     try {
       const tagList = extContentImporter?.[funcName]?.(importContent);
-      await tabListUtils.importTags(tagList);
+      await tabListUtils.importTags(tagList, importMode);
       getExportContent();
       messageApi.success('导入成功');
       form.setFieldValue('importContent', '');
@@ -110,6 +111,15 @@ export default function ImportExport() {
           <Form.Item label="选择导入格式：" name="formatType">
             <Radio.Group onChange={(e) => setFormatType(e.target.value) }>
               {formatTypeOptions.map((item) => (
+                <Radio value={item.type} key={item.type}>
+                  {item.label}
+                </Radio>
+              ))}
+            </Radio.Group>
+          </Form.Item>
+          <Form.Item label="选择导入模式：" name="importMode">
+            <Radio.Group onChange={(e) => setImportMode(e.target.value) }>
+              {importModeOptions.map((item) => (
                 <Radio value={item.type} key={item.type}>
                   {item.label}
                 </Radio>

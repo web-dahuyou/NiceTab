@@ -21,7 +21,10 @@ export const StyledListWrapper = styled.div<{$primaryColor?: string}>`
       border-right: 1px solid rgba(5, 5, 5, 0.06);
       .tag-list-title {
         flex-shrink: 0;
+        display: flex;
+        align-items: center;
         font-weight: bold;
+        gap: 8px;
       }
       .count-info {
         flex-shrink: 0;

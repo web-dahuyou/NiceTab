@@ -132,7 +132,7 @@ export default function TabGroup({
         <StyledTabListWrapper className="tab-list-wrapper">
           { tabList.length === 0 ? (
             <DndComponent<DndTabItemProps>
-              canDrag
+              canDrag={false}
               key={0}
               data={{ index: 0, groupId, dndKey, isEmpty: true }}
               dndKey={dndKey}
@@ -143,7 +143,7 @@ export default function TabGroup({
           ) : (
             tabList.map((tab, index) => (
               <DndComponent<DndTabItemProps>
-                canDrag
+                canDrag={!isLocked}
                 key={index}
                 data={{ ...tab, index, groupId, dndKey }}
                 dndKey={dndKey}

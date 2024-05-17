@@ -59,7 +59,6 @@ export default function DndComponent<IncomeData extends DragData>({
   const [isDragging, setIsDragging] = useState(false);
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
 
-  if (!canDrag) return children;
   const getDragData = useCallback(() => {
     return { ...data };
   }, [data]);
@@ -72,6 +71,9 @@ export default function DndComponent<IncomeData extends DragData>({
     return combine(
       draggable({
         element,
+        canDrag() {
+          return canDrag;
+        },
         getInitialData(): IncomeData {
           return getDragData();
         },

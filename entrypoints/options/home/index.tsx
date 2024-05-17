@@ -1,17 +1,14 @@
 import { useState, useMemo, useCallback } from 'react';
-import { theme, Tree, Button, Input, Dropdown, Empty } from 'antd';
+import { theme, Flex, Tree, Button, Input, Dropdown, Drawer, Empty } from 'antd';
 import type { MenuProps } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
-import { DownOutlined, MoreOutlined, ClearOutlined } from '@ant-design/icons';
+import { DownOutlined, MoreOutlined, ClearOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { StyledListWrapper } from './Home.styled';
 import RenderTreeNode from './RenderTreeNode';
 import TabGroup from './TabGroup';
 import { TagItem, GroupItem } from '@/entrypoints/types';
-import {
-  TreeDataNodeTag,
-  TreeDataNodeTabGroup,
-} from './types';
+import { TreeDataNodeTag, TreeDataNodeTabGroup } from './types';
 import { useTreeData } from './hooks';
 import { getTreeData } from './utils';
 
@@ -43,13 +40,14 @@ export default function Home() {
     handleTabItemDrop,
   } = useTreeData();
 
+  const [helpDrawerVisible, setHelpDrawerVisible] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>('');
   const moreItems: MenuProps['items'] = [
     {
       key: 'clear',
       label: <span onClick={() => handleMoreItemClick('clear')}>清空全部</span>,
-      icon: <ClearOutlined />
-    }
+      icon: <ClearOutlined />,
+    },
   ];
 
   const onSearch: SearchProps['onSearch'] = (value) => {
@@ -84,101 +82,125 @@ export default function Home() {
   }, [tagList, searchValue]);
 
   return (
-    <StyledListWrapper className="home-wrapper" $primaryColor={token.colorPrimary}>
-      <div className="sidebar">
-        <div className="sidebar-inner">
-          <div className="tag-list-title">标签组列表</div>
-          <ul className="count-info">
-            <li>分类 ({countInfo?.tagCount})</li>
-            <li>标签组 ({countInfo?.groupCount})</li>
-            <li>标签页 ({countInfo?.tabCount})</li>
-          </ul>
-          {/* 顶部操作按钮组 */}
-          <div className="sidebar-action-btns-wrapper">
-            <Button
-              type="primary"
-              size="small"
-              shape="round"
-              onClick={() => toggleExpand(true)}
-            >
-              展开全部
-            </Button>
-            <Button
-              type="primary"
-              size="small"
-              shape="round"
-              onClick={() => toggleExpand(false)}
-            >
-              折叠全部
-            </Button>
-            <Button type="primary" size="small" shape="round" onClick={handleTagCreate}>
-              创建分类
-            </Button>
-            <Dropdown menu={{ items: moreItems }} placement="bottomLeft">
-              <StyledActionIconBtn
-                className="btn-more"
-                $size="20"
-                title="更多"
-              >
-                <MoreOutlined />
+    <>
+      <StyledListWrapper className="home-wrapper" $primaryColor={token.colorPrimary}>
+        <div className="sidebar">
+          <div className="sidebar-inner">
+            <div className="tag-list-title">
+              标签组列表
+              <StyledActionIconBtn className="btn-help" title="帮助信息" onClick={() => setHelpDrawerVisible(true)}>
+                <QuestionCircleOutlined />
               </StyledActionIconBtn>
-            </Dropdown>
-          </div>
-          {/* 列表搜索框 */}
-          <Input.Search style={{ marginBottom: 8 }} placeholder="搜索分类 / 标签组" allowClear onSearch={onSearch} />
-          {/* 标签组列表 */}
-          <div className="sidebar-tree-wrapper">
-            { searchTreeData?.length > 0 ? (
-              <Tree
-                // draggable
-                blockNode
-                switcherIcon={<DownOutlined />}
-                autoExpandParent
-                defaultExpandAll
-                expandedKeys={expandedKeys}
-                selectedKeys={selectedKeys}
-                treeData={searchTreeData}
-                titleRender={(node) => (
-                  <RenderTreeNode node={node} onAction={onTreeNodeAction}></RenderTreeNode>
-                )}
-                onExpand={(expandedKeys) => setExpandedKeys(expandedKeys)}
-                onSelect={onSelect}
-              />
-            ) : (
-              <div className="no-data">
-                <Empty description="暂无分类">
-                  <Button type="primary" size="small" shape="round" onClick={handleTagCreate}>
-                    创建分类
-                  </Button>
-                </Empty>
-              </div>
-            ) }
+            </div>
+            <ul className="count-info">
+              <li>分类 ({countInfo?.tagCount})</li>
+              <li>标签组 ({countInfo?.groupCount})</li>
+              <li>标签页 ({countInfo?.tabCount})</li>
+            </ul>
+            {/* 顶部操作按钮组 */}
+            <div className="sidebar-action-btns-wrapper">
+              <Button
+                type="primary"
+                size="small"
+                onClick={() => toggleExpand(true)}
+              >
+                展开全部
+              </Button>
+              <Button
+                type="primary"
+                size="small"
+                onClick={() => toggleExpand(false)}
+              >
+                折叠全部
+              </Button>
+              <Button type="primary" size="small" onClick={handleTagCreate}>
+                创建分类
+              </Button>
+              <Dropdown menu={{ items: moreItems }} placement="bottomLeft">
+                <StyledActionIconBtn className="btn-more" $size="20" title="更多">
+                  <MoreOutlined />
+                </StyledActionIconBtn>
+              </Dropdown>
+            </div>
+            {/* 列表搜索框 */}
+            <Input.Search
+              style={{ marginBottom: 8 }}
+              placeholder="搜索分类 / 标签组"
+              allowClear
+              onSearch={onSearch}
+            />
+            {/* 标签组列表 */}
+            <div className="sidebar-tree-wrapper">
+              {searchTreeData?.length > 0 ? (
+                <Tree
+                  // draggable
+                  blockNode
+                  switcherIcon={<DownOutlined />}
+                  autoExpandParent
+                  defaultExpandAll
+                  expandedKeys={expandedKeys}
+                  selectedKeys={selectedKeys}
+                  treeData={searchTreeData}
+                  titleRender={(node) => (
+                    <RenderTreeNode
+                      node={node}
+                      onAction={onTreeNodeAction}
+                    ></RenderTreeNode>
+                  )}
+                  onExpand={(expandedKeys) => setExpandedKeys(expandedKeys)}
+                  onSelect={onSelect}
+                />
+              ) : (
+                <div className="no-data">
+                  <Empty description="暂无分类">
+                    <Button
+                      type="primary"
+                      size="small"
+                      onClick={handleTagCreate}
+                    >
+                      创建分类
+                    </Button>
+                  </Empty>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-      {/* 单个标签组（标签列表） */}
-      <div className="content">
-        {selectedTag?.children?.map(
-          (tabGroup: TreeDataNodeTabGroup) =>
-            tabGroup?.originData && (
-              <TabGroup
-                key={tabGroup.key}
-                selected={tabGroup.key === selectedTabGroupKey}
-                {...tabGroup.originData}
-                onChange={(data) => handleTabGroupChange(tabGroup, data)}
-                onRemove={() =>
-                  handleTabGroupRemove(tabGroup, selectedTagKey, selectedTabGroupKey)
-                }
-                onRestore={() => handleTabGroupRestore(tabGroup)}
-                onStarredChange={(isStarred) =>
-                  handleTabGroupStarredChange(tabGroup, isStarred)
-                }
-                onDrop={handleTabItemDrop}
-              ></TabGroup>
-            )
-        )}
-      </div>
-    </StyledListWrapper>
+        {/* 单个标签组（标签列表） */}
+        <div className="content">
+          {selectedTag?.children?.map(
+            (tabGroup: TreeDataNodeTabGroup) =>
+              tabGroup?.originData && (
+                <TabGroup
+                  key={tabGroup.key}
+                  selected={tabGroup.key === selectedTabGroupKey}
+                  {...tabGroup.originData}
+                  onChange={(data) => handleTabGroupChange(tabGroup, data)}
+                  onRemove={() =>
+                    handleTabGroupRemove(tabGroup, selectedTagKey, selectedTabGroupKey)
+                  }
+                  onRestore={() => handleTabGroupRestore(tabGroup)}
+                  onStarredChange={(isStarred) =>
+                    handleTabGroupStarredChange(tabGroup, isStarred)
+                  }
+                  onDrop={handleTabItemDrop}
+                ></TabGroup>
+              )
+          )}
+        </div>
+      </StyledListWrapper>
+      {/* 帮助信息弹层 */}
+      <Drawer
+        title="帮助信息"
+        open={helpDrawerVisible}
+        onClose={() => setHelpDrawerVisible(false)}
+        width={500}
+      >
+        <Flex vertical gap="8px">
+          <p>1、左侧列表一次菜单表示分类，二级菜单表示标签组，右侧面板展示的是当前选中分类中的所有标签组以及标签组中标签页。左侧列表支持分类和标签组的搜索。</p>
+          <p>2、标签组锁定后，该标签组以及组内的标签页，将禁止删除和移出，但可以将其他标签组的标签页移入。如果想要删除或拖动，可先解锁标签组。</p>
+        </Flex>
+      </Drawer>
+    </>
   );
 }
-

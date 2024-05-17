@@ -81,7 +81,6 @@ export default function App() {
           <Button
             type="primary"
             size="small"
-            shape="round"
             icon={item.icon}
             onClick={item.onClick}
           >

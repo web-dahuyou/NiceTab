@@ -8,9 +8,12 @@ export type ExtContentExporterProps = {
   [key in ExtContentParserFuncName]: (content: Partial<TagItem>[]) => string
 };
 
-export type FormatTypeOptionItem = {
+export type BaseOptionItem = {
   type: number | string;
   label: string;
+  disabled?: boolean;
+}
+export type FormatTypeOptionItem = BaseOptionItem & {
   funcName: ExtContentParserFuncName;
 }
 

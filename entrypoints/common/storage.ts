@@ -128,11 +128,7 @@ class TabListUtils {
     for (let tag of tagList) {
       if (tag.tagId === tagId) {
         const index = tag.groupList.findIndex((g) => !g.isStarred);
-        tag.groupList.splice(
-          index > -1 ? index : tag.groupList.length,
-          0,
-          newGroup
-        );
+        tag.groupList.splice(index > -1 ? index : tag.groupList.length, 0, newGroup);
         break;
       }
     }
@@ -169,13 +165,14 @@ class TabListUtils {
     const tagList = await this.getTagList();
     for (let tag of tagList) {
       if (tag.tagId === tagId) {
-        let gIndex = 0, group = tag.groupList?.[0];
+        let gIndex = 0,
+          group = tag.groupList?.[0];
         for (let index = 0; index < tag.groupList.length; index++) {
           const g = tag.groupList?.[index];
           if (g?.groupId === groupId) {
             g.isStarred = isStarred;
             gIndex = index;
-            group = {...g};
+            group = { ...g };
             break;
           }
         }
@@ -186,7 +183,11 @@ class TabListUtils {
           tag.groupList.unshift(group);
         } else {
           const unstarredIndex = tag.groupList.findIndex((g) => !g.isStarred);
-          tag.groupList.splice(unstarredIndex > -1 ? unstarredIndex : tag.groupList.length, 0, group);
+          tag.groupList.splice(
+            unstarredIndex > -1 ? unstarredIndex : tag.groupList.length,
+            0,
+            group
+          );
         }
         break;
       }
@@ -275,10 +276,12 @@ class TabListUtils {
   }
 
   // 导入
-  async importTags(tags: TagItem[]) {
+  async importTags(tags: TagItem[], importMode = 'append') {
     const tagList = await this.getTagList();
     const needOverride =
-      !tagList.length || (tagList.length == 1 && !tagList?.[0].groupList?.length);
+      importMode === 'override' ||
+      !tagList.length ||
+      (tagList.length == 1 && !tagList?.[0].groupList?.length);
     if (needOverride) {
       await this.setTagList(tags);
     } else {
