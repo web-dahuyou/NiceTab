@@ -14,6 +14,7 @@ import {
   StyledTabItemFavicon,
 } from './TabGroup.styled';
 import DndComponent from '@/entrypoints/common/components/DndComponent';
+import DropComponent from '@/entrypoints/common/components/DropComponent';
 import { DndTabItemProps, DndTabItemOnDropCallback } from './types';
 
 type TabGroupProps = GroupItem & {
@@ -129,19 +130,9 @@ export default function TabGroup({
           </div>
         </StyledGroupHeader>
 
-        <StyledTabListWrapper className="tab-list-wrapper">
-          { tabList.length === 0 ? (
-            <DndComponent<DndTabItemProps>
-              canDrag={false}
-              key={0}
-              data={{ index: 0, groupId, dndKey, isEmpty: true }}
-              dndKey={dndKey}
-              onDrop={onDrop}
-            >
-              <div className="tab-list-item-empty" style={{height: '16px'}}></div>
-            </DndComponent>
-          ) : (
-            tabList.map((tab, index) => (
+        <DropComponent data={{index: 0, groupId, allowKeys: tabList?.length > 0 ? [] : [dndKey]}} onDrop={onDrop}>
+          <StyledTabListWrapper className="tab-list-wrapper">
+            {tabList.map((tab, index) => (
               <DndComponent<DndTabItemProps>
                 canDrag={!isLocked}
                 key={index}
@@ -176,9 +167,9 @@ export default function TabGroup({
                   </StyledTabTitle>
                 </div>
               </DndComponent>
-            ))
-          ) }
-        </StyledTabListWrapper>
+            ))}
+          </StyledTabListWrapper>
+        </DropComponent>
       </StyledGroupWrapper>
 
       {modalVisible && (

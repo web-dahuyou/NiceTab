@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { theme, Flex, Tree, Button, Input, Dropdown, Drawer, Empty } from 'antd';
-import type { MenuProps } from 'antd';
+import type { MenuProps, TreeProps } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
 import { DownOutlined, MoreOutlined, ClearOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
@@ -8,7 +8,7 @@ import { StyledListWrapper } from './Home.styled';
 import RenderTreeNode from './RenderTreeNode';
 import TabGroup from './TabGroup';
 import { TagItem, GroupItem } from '@/entrypoints/types';
-import { TreeDataNodeTag, TreeDataNodeTabGroup } from './types';
+import { TreeDataNodeTag, TreeDataNodeTabGroup, TreeDataNodeUnion, } from './types';
 import { useTreeData } from './hooks';
 import { getTreeData } from './utils';
 
@@ -37,6 +37,7 @@ export default function Home() {
     handleTabGroupChange,
     handleTabGroupStarredChange,
     handleTabGroupRestore,
+    handleTreeNodeDrop,
     handleTabItemDrop,
   } = useTreeData();
 
@@ -80,6 +81,19 @@ export default function Home() {
     }, []) || [];
     return getTreeData(searchTagList);
   }, [tagList, searchValue]);
+
+  const checkAllowDrop: TreeProps<TreeDataNodeUnion>['allowDrop'] = ({ dragNode, dropNode, dropPosition }) => {
+    // console.log('checkAllowDrop--dragNode', dragNode)
+    // console.log('checkAllowDrop--dropNode', dropNode)
+    // console.log('checkAllowDrop--dropPosition', dropPosition)
+
+    // dropPosition = 0 时表示，拖放到目标 node 的子集
+    // dropPosition = 1 时表示，拖放到目标 node 的同级之后
+    // dropPosition = -1 时表示，拖放到目标 node 的同级之前
+    return (dragNode.type === 'tabGroup' && dropNode.type === 'tabGroup')
+      || (dragNode.type === 'tag' && dropNode.type === 'tag' && dropPosition !== 0)
+      || (dragNode.type === 'tabGroup' && dropNode.type === 'tag' && dropPosition >= 0);
+  }
 
   return (
     <>
@@ -134,6 +148,8 @@ export default function Home() {
               {searchTreeData?.length > 0 ? (
                 <Tree
                   // draggable
+                  draggable={{ icon: false, nodeDraggable: () => true }}
+                  allowDrop={checkAllowDrop}
                   blockNode
                   switcherIcon={<DownOutlined />}
                   autoExpandParent
@@ -149,6 +165,7 @@ export default function Home() {
                   )}
                   onExpand={(expandedKeys) => setExpandedKeys(expandedKeys)}
                   onSelect={onSelect}
+                  onDrop={handleTreeNodeDrop}
                 />
               ) : (
                 <div className="no-data">
@@ -197,8 +214,9 @@ export default function Home() {
         width={500}
       >
         <Flex vertical gap="8px">
-          <p>1、左侧列表一次菜单表示分类，二级菜单表示标签组，右侧面板展示的是当前选中分类中的所有标签组以及标签组中标签页。左侧列表支持分类和标签组的搜索。</p>
-          <p>2、标签组锁定后，该标签组以及组内的标签页，将禁止删除和移出，但可以将其他标签组的标签页移入。如果想要删除或拖动，可先解锁标签组。</p>
+          <p>1、左侧列表一级菜单表示分类，二级菜单表示标签组，右侧面板展示的是当前选中分类中的所有标签组以及标签组中标签页；左侧列表支持分类和标签组的搜索。</p>
+          <p>2、标签组锁定后可以移动，该标签组以及组内的标签页，将禁止删除和移出，但可以将其他标签组的标签页移入该标签组；如果想要删除或移出，可先解锁该标签组。</p>
+          <p>3、标签组星标后将在当前分类中置顶，移动其他标签组到星标状态的标签组之前，将自动被星标；移动星标状态的标签组到非星标的标签组之后，将自动解除星标状态。</p>
         </Flex>
       </Drawer>
     </>

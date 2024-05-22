@@ -40,19 +40,9 @@ const StyledPageContainer = styled.div`
     padding: 100px 32px 60px;
     margin: 0 auto;
   }
-  @media screen and (min-width: 576px) and (max-width: 767px) {
+  @media screen and (max-width: 1199px) {
     .main-content {
-      width: 100%;
-    }
-  }
-  @media screen and (min-width: 768px) and (max-width: 991px) {
-    .main-content {
-      max-width: 800px;
-    }
-  }
-  @media screen and (min-width: 992px) and (max-width: 1199px) {
-    .main-content {
-      max-width: 900px;
+      max-width: 100%;
     }
   }
   @media screen and (min-width: 1200px) {

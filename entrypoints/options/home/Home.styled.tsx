@@ -50,6 +50,7 @@ export const StyledListWrapper = styled.div<{$primaryColor?: string}>`
       .sidebar-tree-wrapper {
         flex: 1;
         height: 0;
+        padding: 10px 0;
         overflow: auto;
         .no-data {
           padding: 16px 0;

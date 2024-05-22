@@ -26,7 +26,7 @@ const StyledDndWrapper = styled.div`
 // 拖拽数据类型
 type DragData = Record<string | symbol, any> & {
   index: number;
-  dndKey: symbol;
+  dndKey?: symbol;
   groupId?: string;
 };
 

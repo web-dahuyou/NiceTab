@@ -61,6 +61,7 @@ export const StyledGroupHeader = styled.div<{ $primaryColor?: string }>`
 `;
 
 export const StyledTabListWrapper = styled.div<{ $primaryColor?: string }>`
+  min-height: 20px;
   margin-top: 8px;
   padding-left: 20px;
   .tab-list-item {

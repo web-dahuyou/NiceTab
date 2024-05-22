@@ -42,8 +42,8 @@ export type DndTabItemOnDropCallback = ({
   sourceIndex,
   targetIndex,
 }: {
-  sourceData: DndTabItemProps;
-  targetData: DndTabItemProps;
+  sourceData: Pick<DndTabItemProps, 'groupId' | 'index'>;
+  targetData: Pick<DndTabItemProps, 'groupId' | 'index'>;
   sourceIndex: number;
   targetIndex: number;
 }) => void;

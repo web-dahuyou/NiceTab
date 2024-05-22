@@ -112,6 +112,21 @@ class TabListUtils {
     const tagList = this.tagList.filter((item) => item.tagId !== tagId);
     await this.setTagList(tagList);
   }
+  // 分类拖拽
+  async onTagDrop(sourceIndex: number, targetIndex: number) {
+    const moveDirection = sourceIndex > targetIndex ? 'up' : 'down';
+    const tagList = await this.getTagList();
+    let tmp = tagList[sourceIndex];
+    if (moveDirection === 'up') {
+      tagList?.splice(sourceIndex, 1);
+      tagList?.splice(targetIndex, 0, tmp);
+    } else {
+      tagList?.splice(targetIndex, 0, tmp);
+      tagList?.splice(sourceIndex, 1);
+    }
+
+    await this.setTagList(tagList);
+  }
 
   /* 标签组相关方法 */
   getInitialTabGroup(): GroupItem {
@@ -195,6 +210,65 @@ class TabListUtils {
 
     await this.setTagList(tagList);
   }
+  // 标签组拖拽
+  async onTabGroupDrop(
+    sourceTagId: Key,
+    targetTagId: Key,
+    sourceIndex: number,
+    targetIndex: number
+  ) {
+    const tagList = await this.getTagList();
+    if (sourceTagId === targetTagId) {
+      const moveDirection = sourceIndex > targetIndex ? 'up' : 'down';
+      for (let tag of tagList) {
+        if (tag.tagId === sourceTagId) {
+          const tmp = tag.groupList?.[sourceIndex];
+          if (!tmp) break;
+          if (moveDirection === 'up') {
+            const targetGroup = tag.groupList?.[targetIndex];
+            if (targetGroup.isStarred) {
+              tmp.isStarred = true;
+            }
+            tag.groupList?.splice(sourceIndex, 1);
+            tag.groupList?.splice(targetIndex, 0, tmp);
+          } else {
+            const prevTargetGroup = tag.groupList?.[targetIndex - 1];
+            if (!prevTargetGroup?.isStarred) {
+              tmp.isStarred = false;
+            }
+            tag.groupList?.splice(targetIndex, 0, tmp);
+            tag.groupList?.splice(sourceIndex, 1);
+          }
+        }
+      }
+    } else {
+      let tmp = null,
+        sourceTagIndex = 0,
+        targetTagIndex = tagList.length - 1;
+
+      for (let tIndex = 0; tIndex < tagList.length; tIndex++) {
+        const tag = tagList[tIndex];
+        if (tag.tagId === sourceTagId) {
+          tmp = tag?.groupList?.[sourceIndex];
+          sourceTagIndex = tIndex;
+          tag?.groupList?.splice(sourceIndex, 1);
+        } else if (tag.tagId === targetTagId) {
+          targetTagIndex = tIndex;
+        }
+      }
+      const prevTargetGroup = tagList?.[targetTagIndex]?.groupList?.[targetIndex - 1];
+      const targetGroup = tagList?.[targetTagIndex]?.groupList?.[targetIndex];
+      if (tmp?.isStarred && targetIndex > 0 && !prevTargetGroup?.isStarred) {
+        tmp.isStarred = false;
+      }
+      if (tmp && targetGroup?.isStarred) {
+        tmp.isStarred = true;
+      }
+      tmp && tagList?.[targetTagIndex]?.groupList?.splice(targetIndex, 0, tmp);
+    }
+
+    await this.setTagList(tagList);
+  }
 
   /* 标签相关方法 */
   async addTabs(tabs: TabItem[], createNewGroup = false) {
@@ -237,7 +311,7 @@ class TabListUtils {
         let isDone = false;
         for (let group of tag.groupList) {
           if (group.groupId === sourceGroupId) {
-            const tmp = group.tabList[sourceIndex];
+            const tmp = group.tabList?.[sourceIndex];
             if (moveDirection === 'up') {
               group.tabList.splice(sourceIndex, 1);
               group.tabList.splice(targetIndex, 0, tmp);

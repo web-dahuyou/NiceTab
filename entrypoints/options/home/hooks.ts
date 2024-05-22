@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import type { TreeProps, TreeNodeProps } from 'antd';
 import { TagItem, GroupItem, CountInfo } from '~/entrypoints/types';
 import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
 import { openNewTab } from '~/entrypoints/common/tabs';
@@ -240,6 +241,50 @@ export function useTreeData() {
     [treeData]
   );
 
+
+  // 拖拽
+  const handleTreeNodeDrop: TreeProps<TreeDataNodeUnion>['onDrop'] = async ({ dragNode, dropPosition, node }) => {
+    // console.log('onDrop-dragNode', dragNode)
+    // console.log('onDrop-dropPosition', dropPosition)
+    // console.log('onDrop-info-node', node)
+    const dragIndex = Number(dragNode.pos.split('-').slice(-1));
+    const dropPosIndex = Number(node.pos.split('-').slice(-1));
+    const position = dropPosition - dropPosIndex;
+
+    // position = 0 时表示，拖放到目标 node 的子集
+    // position = 1 时表示，拖放到目标 node 的同级之后
+    // position = -1 时表示，拖放到一级node节点最前面
+    let dropIndex = position === 0 ? dropPosition + 1 : (position === 1 ? dropPosition : 0);
+    if (dragNode.type === 'tabGroup' && node.type === 'tabGroup') {
+      await tabListUtils.onTabGroupDrop(dragNode.parentKey, node.parentKey, dragIndex, dropIndex);
+    } else if (dragNode.type === 'tag' && node.type === 'tag') {
+      await tabListUtils.onTagDrop(dragIndex, dropIndex);
+    } else if (dragNode.type === 'tabGroup' && node.type === 'tag') {
+      dropIndex =  position === 0 ? 0 : node?.children?.length || 0;
+      await tabListUtils.onTabGroupDrop(dragNode.parentKey, node.key, dragIndex, dropIndex);
+    }
+
+    refreshTreeData((treeData) => {
+      let node = dragNode;
+      if (dragNode.type === 'tag') {
+        node = (treeData.find((t) => t.key === dragNode.key) ) as typeof dragNode & TreeDataNodeTag;
+      } else if (dragNode.type === 'tabGroup') {
+        for (let tag of treeData) {
+          let hasFound = false;
+          for (let group of tag?.children || []) {
+            if (group.key === dragNode.key) {
+              node = group as typeof dragNode & TreeDataNodeTabGroup;
+              hasFound = true;
+              break;
+            }
+          }
+          if (hasFound) break;
+        }
+      }
+      handleSelect(treeData, [node.key], { node });
+    });
+  };
+
   // 拖拽标签页逻辑
   const handleTabItemDrop: DndTabItemOnDropCallback = async ({ sourceData, targetData, sourceIndex, targetIndex }) => {
     await tabListUtils.onTabDrop(sourceData.groupId, targetData.groupId, sourceIndex, targetIndex);
@@ -308,6 +353,7 @@ export function useTreeData() {
     handleTabGroupChange,
     handleTabGroupStarredChange,
     handleTabGroupRestore,
+    handleTreeNodeDrop,
     handleTabItemDrop,
   }
 }
