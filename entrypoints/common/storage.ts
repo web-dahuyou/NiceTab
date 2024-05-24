@@ -28,7 +28,7 @@ class SettingsUtils {
     [CLOSE_TABS_AFTER_SEND_TABS]: true, // 发送标签页后是否关闭标签页
     [AUTO_PIN_ADMIN_TAB]: true, // 是否固定管理后台
     [ALLOW_SEND_PINNED_TAB]: false, // 是否发送固定标签页
-    [DELETE_AFTER_RESTORE]: true, // 恢复标签页/标签组时是否从列表中删除
+    [DELETE_AFTER_RESTORE]: false, // 恢复标签页/标签组时是否从列表中删除
   };
   async setSettings(settings: SettingsProps) {
     return await storage.setItem('local:settings', settings || this.initialSettings);
@@ -54,7 +54,7 @@ class TabListUtils {
   getInitialTag(): TagItem {
     return {
       tagId: getRandomId(),
-      tagName: '默认分类',
+      tagName: '分类-未命名',
       groupList: [],
     };
   }
@@ -132,7 +132,7 @@ class TabListUtils {
   getInitialTabGroup(): GroupItem {
     return {
       groupId: getRandomId(),
-      groupName: '默认标签组',
+      groupName: '标签组-未命名',
       createTime: dayjs().format('YYYY-MM-DD HH:mm'),
       tabList: [],
     };
@@ -273,16 +273,17 @@ class TabListUtils {
   /* 标签相关方法 */
   async addTabs(tabs: TabItem[], createNewGroup = false) {
     await this.getTagList();
+    const newTabs = tabs.map(tab => ({ ...tab, tabId: getRandomId() }));
     let tag0 = this.tagList?.[0];
     const group = tag0?.groupList?.find((group) => !group.isLocked && !group.isStarred);
     if (!createNewGroup && group) {
-      group.tabList = [...tabs, ...(group?.tabList || [])];
+      group.tabList = [...newTabs, ...(group?.tabList || [])];
       await this.setTagList([tag0, ...this.tagList.slice(1)]);
       return { tagId: tag0.tagId, groupId: group.groupId };
     }
     // 不存在标签组或者createNewGroup=true，就创建一个新标签组
     const newtabGroup = this.getInitialTabGroup();
-    newtabGroup.tabList = [...tabs];
+    newtabGroup.tabList = newTabs;
 
     if (tag0) {
       const index = tag0.groupList.findIndex((g) => !g.isStarred);
@@ -296,6 +297,21 @@ class TabListUtils {
     tag.groupList = [newtabGroup];
     await this.setTagList([tag]);
     return { tagId: tag.tagId, groupId: newtabGroup.groupId };
+  }
+  // 删除标签页
+  async removeTabs(groupId: Key, tabIds: Key[]) {
+    const tagList = await this.getTagList();
+    for (let tag of tagList) {
+      for (let group of tag.groupList) {
+        if (group.groupId === groupId) {
+          group.tabList = group.tabList?.filter((tab) => !tab?.tabId || !tabIds.includes(tab?.tabId));
+          break;
+        }
+      }
+      break;
+    }
+
+    await this.setTagList(tagList);
   }
   // tab标签页拖拽
   async onTabDrop(

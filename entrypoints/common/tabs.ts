@@ -2,7 +2,7 @@ import { browser, Tabs } from 'wxt/browser';
 import { settingsUtils, tabListUtils } from './storage';
 import type { SettingsProps, TabItem } from '~/entrypoints/types';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
-import { pick, objectToUrlParams } from '~/entrypoints/common/utils';
+import { pick, objectToUrlParams, sendBrowserMessage, getRandomId } from '~/entrypoints/common/utils';
 
 const {
   OPEN_ADMIN_TAB_AFTER_SEND_TABS,
@@ -20,16 +20,33 @@ export async function getAdminTabInfo() {
   return { tab, adminTabUrl };
 }
 // 打开管理后台
-export async function openAdminRoutePage(route: { path: string, query?: Record<string, string> }) {
-  const paramsStr = objectToUrlParams(route?.query || {});
+export async function openAdminRoutePage(route: { path: string, query?: Record<string, string> }, needOpen = true) {
+  const paramsStr = objectToUrlParams(Object.assign(route?.query || {}, { randomId: getRandomId(6) }));
+  const settings = await settingsUtils.getSettings();
   const { tab, adminTabUrl } = await getAdminTabInfo();
-  if (tab?.id) {
-    browser.tabs.remove(tab.id);
+  const urlWithParams = `${adminTabUrl}/#${route.path || '/home'}${paramsStr ? `?${paramsStr}` : ''}`;
+
+  // 如果发送标签页后不需要打开管理后台页面，则刷新管理后台页
+  if (!needOpen && tab?.id) {
+    browser.tabs.update(tab.id, { url: urlWithParams });
+    return;
   }
-  browser.tabs.create({
-    index: 0,
-    url: `${adminTabUrl}/#${route.path || '/home'}${paramsStr ? `?${paramsStr}` : ''}`,
-  });
+
+  if (tab?.id) {
+    await browser.tabs.move(tab.id, { index: 0 });
+    await browser.tabs.update(tab.id, {
+      highlighted: true,
+      pinned: settings[AUTO_PIN_ADMIN_TAB],
+      url: urlWithParams,
+    });
+    // browser.tabs.reload(tab.id); // 这个方法会清空路由参数，切记
+  } else {
+    browser.tabs.create({
+      index: 0,
+      url: urlWithParams,
+      pinned: settings[AUTO_PIN_ADMIN_TAB],
+    });
+  }
 }
 // 打开管理后台
 export async function openAdminTab(
@@ -37,21 +54,17 @@ export async function openAdminTab(
   params?: { tagId: string; groupId: string }
 ) {
   const settings = settingsData || (await settingsUtils.getSettings());
-  if (!settings?.[OPEN_ADMIN_TAB_AFTER_SEND_TABS]) return;
-
-  const { tab, adminTabUrl } = await getAdminTabInfo();
-  const paramsStr = objectToUrlParams(params || {});
-  const urlWithParams = `${adminTabUrl}/#/home${paramsStr ? `?${paramsStr}` : ''}`; // url传参形式
-
-  if (tab?.id) {
-    browser.tabs.remove(tab.id);
+  const openAdminTabAfterSendTabs = settings[OPEN_ADMIN_TAB_AFTER_SEND_TABS];
+  openAdminRoutePage({ path: '/home', query: params }, openAdminTabAfterSendTabs);
+  if (!openAdminTabAfterSendTabs) {
+    // 如果设置了 发送标签页后不打开管理后台，则可以发送通知提醒
+    // browser.notifications.create(undefined, {
+    //   type: 'basic',
+    //   title: '标签页发送成功',
+    //   message: '标签页已发送到管理后台，可在管理后台查看',
+    //   iconUrl: browser.runtime.getURL('/icon/logo.png'),
+    // });
   }
-  browser.tabs.create({
-    index: 0,
-    // url: adminTabUrl,
-    url: urlWithParams,
-    pinned: settings[AUTO_PIN_ADMIN_TAB],
-  });
 }
 // 获取过滤后的标签页
 async function getFilteredTabs(
@@ -75,6 +88,7 @@ async function getFilteredTabs(
 }
 // 取消标签页高亮
 async function cancelHighlightTabs(tabs?: Tabs.Tab[]) {
+  await new Promise(res => setTimeout(res, 50));
   if (tabs) {
     tabs.forEach((tab) => {
       tab?.highlighted && browser.tabs.update(tab.id, { highlighted: false, active: false });

@@ -14,6 +14,7 @@ export type SettingsProps = {
 // 管理后台-tab列表页相关
 // 标签信息
 export interface TabItem {
+  tabId?: string;
   title?: string;
   url?: string;
   favIconUrl?: string;

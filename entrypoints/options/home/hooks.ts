@@ -24,6 +24,14 @@ export function useTreeData() {
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
 
+  const urlParams = useMemo(() => {
+    const params: Record<string, string> = {};
+    for (let [key, value] of searchParams.entries()) {
+      params[key] = value;
+    }
+    return params;
+  }, [searchParams]);
+
   const selectedTag: TreeDataNodeTag = useMemo(() => {
     const tag =
       treeData.find((tag) => tag.type === 'tag' && tag.key === selectedTagKey) || {};
@@ -104,7 +112,7 @@ export function useTreeData() {
   const onSelect = useCallback(
     (selectedKeys: React.Key[], { node }: { node: TreeDataNodeUnion }) => {
       handleSelect(treeData, selectedKeys, { node });
-      if (searchParams.get('tagId') || searchParams.get('groupId')) {
+      if (urlParams.tagId || urlParams.groupId) {
         setSearchParams({}, { replace: true });
       }
     },
@@ -311,25 +319,29 @@ export function useTreeData() {
     setCountInfo(tabListUtils.countInfo);
     setExpandedKeys(treeData.map((tag) => tag.key));
 
-    // console.log('routeParams', searchParams.get('tagId'), searchParams.get('groupId'));
     const tag =
       treeData?.find(
-        (tag) => tag.type === 'tag' && tag.key === searchParams.get('tagId')
+        (tag) => tag.type === 'tag' && tag.key === urlParams.tagId
       ) || treeData?.[0];
     const tabGroup =
-      tag?.children?.find((g) => g.key === searchParams.get('groupId')) ||
+      tag?.children?.find((g) => g.key === urlParams.groupId) ||
       tag?.children?.[0];
     if (!tag) return;
     handleSelect(treeData, [tabGroup ? tabGroup.key : tag.key], {
       node: tabGroup ? (tabGroup as TreeDataNodeTabGroup) : tag,
     });
   };
+
+  useEffect(() => {
+    console.log('urlParams--change', urlParams)
+    init();
+  }, [urlParams]);
   useEffect(() => {
     init();
   }, []);
 
   return {
-    searchParams,
+    urlParams,
     countInfo,
     tagList,
     treeData,

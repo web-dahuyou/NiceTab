@@ -79,10 +79,11 @@ export default function Settings() {
           <Form.Item<SettingsProps>
             label="发送标签页时-是否打开NiceTab管理后台："
             name={OPEN_ADMIN_TAB_AFTER_SEND_TABS}
+            style={{ display: 'none' }}
           >
             <Radio.Group>
-              <Radio value={false}> 不要自动打开NiceTab管理后台 </Radio>
-              <Radio value={true}> 自动打开NiceTab管理后台 </Radio>
+              <Radio value={false}> 不自动打开NiceTab管理后台（发送系统通知） </Radio>
+              <Radio value={true}> 自动打开NiceTab管理后台（推荐） </Radio>
             </Radio.Group>
           </Form.Item>
           <Form.Item<SettingsProps>
