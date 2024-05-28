@@ -4,7 +4,7 @@ import tabUtils from '~/entrypoints/common/tabs';
 import { TAB_EVENTS } from '~/entrypoints/common/constants';
 import { settingsUtils } from './storage';
 
-const { ALLOW_SEND_PINNED_TAB } = ENUM_SETTINGS_PROPS;
+const { ALLOW_SEND_PINNED_TABS } = ENUM_SETTINGS_PROPS;
 
 const menus: Menus.CreateCreatePropertiesType[] = [
   { id: ENUM_ACTION_NAME.SEND_ALL_TABS, title: '发送全部标签页', contexts: ['all'] },
@@ -36,7 +36,7 @@ async function handleContextMenusUpdate() {
   const filteredTabs = await tabUtils.getFilteredTabs(tabs, settings);
 
   browser.contextMenus.update(ENUM_ACTION_NAME.SEND_CURRENT_TAB, {
-    enabled: !!currTab?.id && !(currTab?.pinned && !settings[ALLOW_SEND_PINNED_TAB]),
+    enabled: !!currTab?.id && !(currTab?.pinned && !settings[ALLOW_SEND_PINNED_TABS]),
   });
   browser.contextMenus.update(ENUM_ACTION_NAME.SEND_OTHER_TABS, {
     enabled: !!currTab?.id,

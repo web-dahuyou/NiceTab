@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { ConfigProvider } from 'antd';
+import { IntlProvider } from 'react-intl';
 import { ENUM_COLORS } from '../constants';
-import { ThemeContext } from '~/entrypoints/common/hooks';
-import type { ThemeProps } from '~/entrypoints/types';
+import { GlobalContext, useAntdLocale, useCustomLocale } from '~/entrypoints/common/hooks';
+import type { ThemeProps, LanguageTypes } from '~/entrypoints/types';
 import { themeUtils } from '~/entrypoints/common/storage';
 
 export default function Root({ children }: { children: React.ReactNode }) {
+  const { locale: localeAntd, changeLocale: changeLocaleAntd } = useAntdLocale();
+  const { locale: localeCustom, changeLocale: changeLocaleCustom, messages } = useCustomLocale();
   const [hasReady, setHasReady] = useState(false);
   const [primaryColor, setPrimaryColor] = useState(ENUM_COLORS.primary);
 
+  const handleLocaleChange = async (languange?: LanguageTypes) => {
+    changeLocaleAntd(languange);
+    changeLocaleCustom(languange);
+  }
   const handleThemeChange = async (themeData: Partial<ThemeProps>) => {
     const theme = await themeUtils.setThemeData(themeData);
     setPrimaryColor(theme.colorPrimary);
@@ -37,19 +44,26 @@ export default function Root({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <ConfigProvider
-      theme={{
-        token: {
-          colorPrimary: primaryColor || ENUM_COLORS.primary,
-          colorBgContainer: '#fff',
-        },
-      }}
-    >
-      <ThemeContext.Provider
-        value={{ colorPrimary: primaryColor, setThemeData: handleThemeChange }}
+    <IntlProvider locale={localeCustom} messages={messages}>
+      <ConfigProvider
+        locale={localeAntd}
+        theme={{
+          token: {
+            colorPrimary: primaryColor || ENUM_COLORS.primary,
+            colorBgContainer: '#fff',
+          },
+        }}
       >
-        { hasReady && children }
-      </ThemeContext.Provider>
-    </ConfigProvider>
+        <GlobalContext.Provider
+          value={{
+            colorPrimary: primaryColor,
+            setThemeData: handleThemeChange,
+            setLocale: handleLocaleChange
+          }}
+        >
+          { hasReady && children }
+        </GlobalContext.Provider>
+      </ConfigProvider>
+    </IntlProvider>
   );
 }

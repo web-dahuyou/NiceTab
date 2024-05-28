@@ -1,15 +1,15 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useMemo } from 'react';
 import { createHashRouter, RouterProvider, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { Menu } from 'antd';
 import { HomeOutlined, SettingOutlined, ImportOutlined } from '@ant-design/icons';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { pick } from '~/entrypoints/common/utils';
+import '~/assets/css/reset.css';
+import './style.css';
+import { useIntlUtls } from '~/entrypoints/common/hooks';
 import Home from './home/index.tsx';
 import Settings from './Settings.tsx';
 import ImportExport from './importExport/index.tsx';
-
-import '~/assets/css/reset.css';
-import './style.css';
 
 const StyledPageContainer = styled.div`
   background: #fff;
@@ -60,18 +60,18 @@ interface NavProps {
   element: JSX.Element;
 }
 
-const navs: NavProps[] = [
-  { key: 'home', label: '列表', path: '/home', icon: <HomeOutlined />, element: <Home /> },
+const navsTemplate: NavProps[] = [
+  { key: 'home', label: 'common.list', path: '/home', icon: <HomeOutlined />, element: <Home /> },
   {
     key: 'settings',
-    label: '设置',
+    label: 'common.settings',
     path: '/settings',
     icon: <SettingOutlined />,
     element: <Settings />,
   },
   {
     key: 'import-export',
-    label: '导入/导出',
+    label: 'common.importExport',
     path: '/import-export',
     icon: <ImportOutlined />,
     element: <ImportExport />,
@@ -86,7 +86,7 @@ const router = createHashRouter([
         path: "/",
         element: <Home />,
       },
-      ...navs.map((item) => pick(item, ['path', 'element']))
+      ...navsTemplate.map((item) => pick(item, ['path', 'element']))
     ],
   },
 ]);
@@ -95,6 +95,12 @@ function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+  const { $t } = useIntlUtls();
+  const navs = useMemo(() => {
+    return navsTemplate.map(item => {
+      return { ...item, label: $t({ id: item.label }) };
+    });
+  }, [$t]);
 
   const onSelect = useCallback(({ key }: { key: NavProps['key'] }) => {
     const nav = navs.find((item) => item.key === key);

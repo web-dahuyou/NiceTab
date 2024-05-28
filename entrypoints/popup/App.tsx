@@ -10,7 +10,7 @@ import {
 import { classNames, sendBrowserMessage } from '~/entrypoints/common/utils';
 import '~/assets/css/reset.css';
 import './App.css';
-import { ThemeContext } from '~/entrypoints/common/hooks';
+import { GlobalContext } from '~/entrypoints/common/hooks';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { StyledContainer, StyledList, StyledFavIcon } from './App.styled';
 import { ENUM_COLORS } from '~/entrypoints/common/constants';
@@ -46,12 +46,12 @@ const quickActionBtns = [
 
 export default function App() {
   const { token } = theme.useToken();
-  const themeContext = useContext(ThemeContext);
+  const NiceGlobalContext = useContext(GlobalContext);
   const [tabs, setTabs] = useState<Tabs.Tab[]>([]);
 
   const handleThemeChange = (item: { key: string; color: string }) => {
     const themeData = { colorPrimary: item.color };
-    themeContext.setThemeData(themeData);
+    NiceGlobalContext.setThemeData(themeData);
     sendBrowserMessage('setPrimaryColor', themeData);
   };
   const handleTabItemClick = useCallback((index: number) => {

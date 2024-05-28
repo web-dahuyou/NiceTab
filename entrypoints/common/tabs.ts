@@ -8,7 +8,7 @@ const {
   OPEN_ADMIN_TAB_AFTER_SEND_TABS,
   CLOSE_TABS_AFTER_SEND_TABS,
   AUTO_PIN_ADMIN_TAB,
-  ALLOW_SEND_PINNED_TAB,
+  ALLOW_SEND_PINNED_TABS,
 } = ENUM_SETTINGS_PROPS;
 
 const matchUrls: string[] = ['https://*/*', 'http://*/*', 'chrome://*/*', 'file://*/*'];
@@ -77,7 +77,7 @@ async function getFilteredTabs(
     if (!tab?.id) return false;
     if (adminTab && adminTab.id === tab.id) return false;
     // 如果设置不允许发送固定标签页，则过滤掉固定标签页
-    if (tab.pinned && !settings[ALLOW_SEND_PINNED_TAB]) {
+    if (tab.pinned && !settings[ALLOW_SEND_PINNED_TABS]) {
       return false;
     }
     if (validator) {

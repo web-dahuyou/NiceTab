@@ -177,8 +177,6 @@ export default function TabGroup({
           title="删除提醒"
           width={400}
           open={modalVisible}
-          okText="确认"
-          cancelText="取消"
           onOk={handleRemove}
           onCancel={() => setModalVisible(false)}
         >

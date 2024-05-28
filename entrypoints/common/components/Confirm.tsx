@@ -19,8 +19,8 @@ export default function Confirm({
       description={description}
       onConfirm={() => onConfirm?.()}
       onCancel={() => onCancel?.()}
-      okText={okText || '确认'}
-      cancelText={cancelText || '取消'}
+      okText={okText || 'ok'}
+      cancelText={cancelText || 'cancel'}
     >
       {children}
     </Popconfirm>

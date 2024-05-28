@@ -2,6 +2,10 @@
 export function classNames(...classes: Array<string | boolean | undefined | null>) {
   return classes.filter(Boolean).join(' ');
 }
+// 首字母转大写
+export const capitalize = (str: string): string => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
 // 拼接url
 export function handleUrlWidthParams(url: string, params: Record<string, any> = {}): string {

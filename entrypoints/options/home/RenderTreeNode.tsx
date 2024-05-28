@@ -91,8 +91,6 @@ export default function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) 
           title="删除提醒"
           width={400}
           open={modalVisible}
-          okText="确认"
-          cancelText="取消"
           onOk={handleRemove}
           onCancel={handleModalCancel}
         >
