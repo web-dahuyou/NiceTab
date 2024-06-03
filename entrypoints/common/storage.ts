@@ -56,7 +56,7 @@ class TabListUtils {
   getInitialTag(): TagItem {
     return {
       tagId: getRandomId(),
-      tagName: '分类-未命名',
+      tagName: 'Unnamed Tag',
       groupList: [],
     };
   }
@@ -134,7 +134,7 @@ class TabListUtils {
   getInitialTabGroup(): GroupItem {
     return {
       groupId: getRandomId(),
-      groupName: '标签组-未命名',
+      groupName: 'Unnamed Group',
       createTime: dayjs().format('YYYY-MM-DD HH:mm'),
       tabList: [],
     };

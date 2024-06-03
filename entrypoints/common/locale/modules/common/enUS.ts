@@ -15,4 +15,11 @@ export default {
   'common.ok': 'OK',
   'common.confirm': 'Confirm',
   'common.cancel': 'Cancel',
+  'common.more': 'More',
+  'common.delete': 'Delete',
+  'common.remove': 'Remove',
+  'common.edit': 'Edit',
+  'common.view': 'View',
+  'common.theme': 'Theme',
+  'common.openedTabs': 'Opened Tabs',
 }

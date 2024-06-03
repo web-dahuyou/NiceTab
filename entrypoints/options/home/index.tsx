@@ -1,19 +1,21 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { theme, Flex, Tree, Button, Input, Dropdown, Drawer, Empty } from 'antd';
 import type { MenuProps, TreeProps } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
 import { DownOutlined, MoreOutlined, ClearOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { useIntlUtls } from '~/entrypoints/common/hooks';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { StyledListWrapper } from './Home.styled';
 import RenderTreeNode from './RenderTreeNode';
 import TabGroup from './TabGroup';
 import { TagItem, GroupItem } from '@/entrypoints/types';
-import { TreeDataNodeTag, TreeDataNodeTabGroup, TreeDataNodeUnion, } from './types';
+import { TreeDataNodeTabGroup, TreeDataNodeUnion, } from './types';
 import { useTreeData } from './hooks';
 import { getTreeData } from './utils';
 
 export default function Home() {
   const { token } = theme.useToken();
+  const { $fmt } = useIntlUtls();
   const {
     countInfo,
     tagList,
@@ -46,7 +48,7 @@ export default function Home() {
   const moreItems: MenuProps['items'] = [
     {
       key: 'clear',
-      label: <span onClick={() => handleMoreItemClick('clear')}>清空全部</span>,
+      label: <span onClick={() => handleMoreItemClick('clear')}>{$fmt('home.clearAll')}</span>,
       icon: <ClearOutlined />,
     },
   ];
@@ -101,15 +103,15 @@ export default function Home() {
         <div className="sidebar">
           <div className="sidebar-inner">
             <div className="tag-list-title">
-              标签组列表
+              {$fmt('home.tabGroupList')}
               <StyledActionIconBtn className="btn-help" title="帮助信息" onClick={() => setHelpDrawerVisible(true)}>
                 <QuestionCircleOutlined />
               </StyledActionIconBtn>
             </div>
             <ul className="count-info">
-              <li>分类 ({countInfo?.tagCount})</li>
-              <li>标签组 ({countInfo?.groupCount})</li>
-              <li>标签页 ({countInfo?.tabCount})</li>
+              <li>{$fmt('home.tag')} ({countInfo?.tagCount})</li>
+              <li>{$fmt('home.tabGroup')} ({countInfo?.groupCount})</li>
+              <li>{$fmt('home.tab')} ({countInfo?.tabCount})</li>
             </ul>
             {/* 顶部操作按钮组 */}
             <div className="sidebar-action-btns-wrapper">
@@ -118,17 +120,17 @@ export default function Home() {
                 size="small"
                 onClick={() => toggleExpand(true)}
               >
-                展开全部
+                {$fmt('home.expandAll')}
               </Button>
               <Button
                 type="primary"
                 size="small"
                 onClick={() => toggleExpand(false)}
               >
-                折叠全部
+                {$fmt('home.collapseAll')}
               </Button>
               <Button type="primary" size="small" onClick={handleTagCreate}>
-                创建分类
+                {$fmt('home.addTag')}
               </Button>
               <Dropdown menu={{ items: moreItems }} placement="bottomLeft">
                 <StyledActionIconBtn className="btn-more" $size="20" title="更多">
@@ -139,7 +141,7 @@ export default function Home() {
             {/* 列表搜索框 */}
             <Input.Search
               style={{ marginBottom: 8 }}
-              placeholder="搜索分类 / 标签组"
+              placeholder={$fmt('home.searchTagAndGroup')}
               allowClear
               onSearch={onSearch}
             />
@@ -169,13 +171,13 @@ export default function Home() {
                 />
               ) : (
                 <div className="no-data">
-                  <Empty description="暂无分类">
+                  <Empty description={$fmt('home.emptyTip')}>
                     <Button
                       type="primary"
                       size="small"
                       onClick={handleTagCreate}
                     >
-                      创建分类
+                      {$fmt('home.addTag')}
                     </Button>
                   </Empty>
                 </div>
@@ -208,7 +210,7 @@ export default function Home() {
       </StyledListWrapper>
       {/* 帮助信息弹层 */}
       <Drawer
-        title="帮助信息"
+        title={$fmt('home.helpInfo')}
         open={helpDrawerVisible}
         onClose={() => setHelpDrawerVisible(false)}
         width={500}

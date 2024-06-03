@@ -1,15 +1,18 @@
-import React, { useCallback, useState, useEffect, useMemo } from 'react';
+import React, { useContext, useCallback, useState, useEffect, useMemo } from 'react';
 import { createHashRouter, RouterProvider, Outlet, useNavigate, useLocation } from "react-router-dom";
-import { Menu } from 'antd';
-import { HomeOutlined, SettingOutlined, ImportOutlined } from '@ant-design/icons';
+import { Menu, Dropdown } from 'antd';
+import { HomeOutlined, SettingOutlined, ImportOutlined, TranslationOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import { pick } from '~/entrypoints/common/utils';
 import '~/assets/css/reset.css';
 import './style.css';
-import { useIntlUtls } from '~/entrypoints/common/hooks';
+import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks';
+import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import Home from './home/index.tsx';
 import Settings from './Settings.tsx';
 import ImportExport from './importExport/index.tsx';
+import type { LanguageTypes } from '~/entrypoints/types';
+import { LANGUANGE_OPTIONS } from '~/entrypoints/common/constants.ts';
 
 const StyledPageContainer = styled.div`
   background: #fff;
@@ -32,6 +35,9 @@ const StyledPageContainer = styled.div`
     }
     .navbar-menu {
       flex: 1;
+    }
+    .menu-right {
+      padding: 0 24px;
     }
   }
   .main-content {
@@ -94,19 +100,26 @@ const router = createHashRouter([
 function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const NiceGlobalContext = useContext(GlobalContext);
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
-  const { $t } = useIntlUtls();
+  const { $fmt, locale } = useIntlUtls();
   const navs = useMemo(() => {
     return navsTemplate.map(item => {
-      return { ...item, label: $t({ id: item.label }) };
+      return { ...item, label: $fmt(item.label) };
     });
-  }, [$t]);
+  }, [$fmt]);
 
+  // 导航菜单
   const onSelect = useCallback(({ key }: { key: NavProps['key'] }) => {
     const nav = navs.find((item) => item.key === key);
     if (nav) {
       nav && navigate(nav.path);
     }
+  }, []);
+  // 切换语言
+  const handleLocaleChange = useCallback(({ key }: {key: string}) => {
+    const option = LANGUANGE_OPTIONS.find(item => item.key === key) || { locale: 'zh-CN' };
+    NiceGlobalContext.setLocale(option.locale);
   }, []);
 
   useEffect(() => {
@@ -127,6 +140,13 @@ function AppLayout() {
           items={navs}
           onSelect={onSelect}
         />
+        <div className="menu-right">
+          <Dropdown menu={{ items: LANGUANGE_OPTIONS, selectedKeys: [locale], onClick: handleLocaleChange }} placement="bottomRight">
+            <StyledActionIconBtn $size={18}>
+              <TranslationOutlined />
+            </StyledActionIconBtn>
+          </Dropdown>
+        </div>
       </div>
       <div className="main-content">
         <Outlet></Outlet>

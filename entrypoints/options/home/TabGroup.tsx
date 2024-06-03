@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { theme, Modal } from 'antd';
+import { theme, Modal, Space, Divider } from 'antd';
 import { LockOutlined, StarOutlined, CloseOutlined } from '@ant-design/icons';
 import { GroupItem } from '~/entrypoints/types';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS } from '~/entrypoints/common/constants';
+import { useIntlUtls } from '~/entrypoints/common/hooks';
 import EditInput from '../components/EditInput';
 import {
   StyledGroupWrapper,
@@ -43,6 +44,7 @@ export default function TabGroup({
   onDrop,
 }: TabGroupProps) {
   const { token } = theme.useToken();
+  const { $fmt } = useIntlUtls();
   const groupRef = useRef<HTMLDivElement>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -72,7 +74,7 @@ export default function TabGroup({
             <StyledActionIconBtn
               className="btn-remove"
               $size="16"
-              title="删除"
+              title={$fmt('common.remove')}
               $hoverColor={ENUM_COLORS.red.primary}
               onClick={() => setModalVisible(true)}
             >
@@ -95,38 +97,39 @@ export default function TabGroup({
 
           <div className="group-name-wrapper">
             <EditInput
-              value={groupName || '未命名'}
+              value={groupName || 'Unnamed'}
               maxLength={18}
               maxWidth={160}
               fontSize={20}
               iconSize={16}
-              onValueChange={(value) => onChange?.({ groupName: value || '未命名' })}
+              onValueChange={(value) => onChange?.({ groupName: value || 'Unnamed' })}
             ></EditInput>
           </div>
           <div className="group-header-right-part">
             <div className="group-info">
-              <span className="tab-count">{tabList?.length || 0}个标签页</span>
+              {/* <span className="tab-count">{tabList?.length || 0}个标签页</span> */}
+              <span className="tab-count">{$fmt({ id: 'home.tab.count', values: {count: tabList?.length || 0}})}</span>
               <span className="group-create-time">{createTime}</span>
             </div>
-            <div className="group-action-btns">
+            <Space className="group-action-btns" size={0} split={<Divider type="vertical" style={{ background: token.colorBorder }} />}>
               {!isLocked && (
                 <span className="action-btn" onClick={() => setModalVisible(true)}>
-                  删除该组
+                  {$fmt('home.tabGroup.remove')}
                 </span>
               )}
               <span className="action-btn" onClick={() => onRestore?.()}>
-                恢复该组
+              {$fmt('home.tabGroup.restore')}
               </span>
               <span
                 className="action-btn"
                 onClick={() => onChange?.({ isLocked: !isLocked })}
               >
-                {isLocked ? '取消锁定' : '锁定该组'}
+                {$fmt(isLocked ? 'home.tabGroup.unlock' : 'home.tabGroup.lock')}
               </span>
               <span className="action-btn" onClick={() => onStarredChange?.(!isStarred)}>
-                {isStarred ? '取消星标' : '星标该组'}
+                {$fmt(isStarred ? 'home.tabGroup.unstar' : 'home.tabGroup.star')}
               </span>
-            </div>
+            </Space>
           </div>
         </StyledGroupHeader>
 
@@ -145,7 +148,7 @@ export default function TabGroup({
                     <StyledActionIconBtn
                       className="tab-item-btn btn-remove"
                       $size="16"
-                      title="删除"
+                      title={$fmt('common.remove')}
                       $hoverColor={ENUM_COLORS.red.primary}
                       onClick={() =>
                         onChange?.({ tabList: tabList.filter((t, i) => i !== index) })
@@ -161,7 +164,7 @@ export default function TabGroup({
                     />
                   )}
                   <StyledTabTitle $primaryColor={token.colorPrimary}>
-                    <span className="tab-title" onClick={() => openNewTab(tab)}>
+                    <span className="tab-title" title={tab.title} onClick={() => openNewTab(tab)}>
                       {tab.title}
                     </span>
                   </StyledTabTitle>
@@ -174,13 +177,13 @@ export default function TabGroup({
 
       {modalVisible && (
         <Modal
-          title="删除提醒"
+          title={$fmt('home.removeTitle')}
           width={400}
           open={modalVisible}
           onOk={handleRemove}
           onCancel={() => setModalVisible(false)}
         >
-          <div>您确定要删除该标签组吗？</div>
+          <div>{$fmt({ id: 'home.removeDesc', values: { type: $fmt(`home.tabGroup`) }})}</div>
         </Modal>
       )}
     </>

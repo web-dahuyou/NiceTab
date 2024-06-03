@@ -36,7 +36,7 @@ export async function openAdminRoutePage(route: { path: string, query?: Record<s
     await browser.tabs.move(tab.id, { index: 0 });
     await browser.tabs.update(tab.id, {
       highlighted: true,
-      pinned: settings[AUTO_PIN_ADMIN_TAB],
+      pinned: !!settings[AUTO_PIN_ADMIN_TAB],
       url: urlWithParams,
     });
     // browser.tabs.reload(tab.id); // 这个方法会清空路由参数，切记
@@ -44,7 +44,7 @@ export async function openAdminRoutePage(route: { path: string, query?: Record<s
     browser.tabs.create({
       index: 0,
       url: urlWithParams,
-      pinned: settings[AUTO_PIN_ADMIN_TAB],
+      pinned: !!settings[AUTO_PIN_ADMIN_TAB],
     });
   }
 }
@@ -54,7 +54,7 @@ export async function openAdminTab(
   params?: { tagId: string; groupId: string }
 ) {
   const settings = settingsData || (await settingsUtils.getSettings());
-  const openAdminTabAfterSendTabs = settings[OPEN_ADMIN_TAB_AFTER_SEND_TABS];
+  const openAdminTabAfterSendTabs = settings[OPEN_ADMIN_TAB_AFTER_SEND_TABS] as boolean;
   openAdminRoutePage({ path: '/home', query: params }, openAdminTabAfterSendTabs);
   if (!openAdminTabAfterSendTabs) {
     // 如果设置了 发送标签页后不打开管理后台，则可以发送通知提醒

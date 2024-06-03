@@ -1,6 +1,6 @@
 import { Tabs } from 'wxt/browser';
 import { cyan, volcano, orange, blue, red, green, yellow, lime } from '@ant-design/colors';
-import type { SettingsProps, TabEvents } from '~/entrypoints/types';
+import type { LanguageTypes, SettingsProps, TabEvents } from '~/entrypoints/types';
 
 export const ENUM_COLORS = {
   primary: cyan.primary || cyan[6],
@@ -47,8 +47,15 @@ export const TAB_EVENTS: Array<keyof Pick<Tabs.Static, TabEvents>> = [
   'onHighlighted',
 ];
 
+// 语言选项
+export const LANGUANGE_OPTIONS: Array<{key: LanguageTypes, locale: LanguageTypes, label: string}> = [
+  { key: 'zh-CN', locale: 'zh-CN', label: '简体中文' },
+  { key: 'en-US', locale: 'en-US', label: 'English' },
+];
+
 export default {
   ENUM_ACTION_NAME,
   ENUM_SETTINGS_PROPS,
   TAB_EVENTS,
+  LANGUANGE_OPTIONS
 };

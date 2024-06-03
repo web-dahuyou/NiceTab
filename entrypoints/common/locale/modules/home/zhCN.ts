@@ -1,0 +1,26 @@
+export default {
+  'home.tag': '分类',
+  'home.tabGroup': '标签组',
+  'home.tab': '标签页',
+  'home.tabGroupList': '标签组列表',
+  'home.expandAll': '展开全部',
+  'home.collapseAll': '折叠全部',
+  'home.addTag': '创建分类',
+  'home.clearAll': '清空全部',
+  'home.emptyTip': '暂无分类',
+  'home.searchTagAndGroup': '搜索分类/标签组',
+  'home.addTabGroup': '创建标签组',
+  'home.helpInfo': '帮助信息',
+  'home.removeTitle': '删除提醒',
+  'home.removeDesc': '您确定要删除该{type}吗？',
+
+  'home.tabGroup.add': '创建标签组',
+  'home.tabGroup.remove': '删除该组',
+  'home.tabGroup.restore': '恢复该组',
+  'home.tabGroup.lock': '锁定该组',
+  'home.tabGroup.unlock': '取消锁定',
+  'home.tabGroup.star': '星标该组',
+  'home.tabGroup.unstar': '取消星标',
+
+  'home.tab.count': '{count}个标签页',
+}

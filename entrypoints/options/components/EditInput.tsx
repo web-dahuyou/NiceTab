@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { theme, Input } from 'antd';
 import type { InputProps, InputRef } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
+import { useIntlUtls } from '~/entrypoints/common/hooks';
 import styled from 'styled-components';
 import {
   StyledEllipsis,
@@ -41,6 +42,7 @@ export default function EditInput({
   ...otherProps
 }: InputProps & CustomStyleProps & { value: string; onValueChange: (value?: string) => void; stopPropagation?: boolean }) {
   const { token } = theme.useToken();
+  const { $fmt } = useIntlUtls();
   const inputRef = useRef<InputRef>(null);
   const [innerValue, setInnerValue] = useState(value);
   const [isEditing, setIsEditing] = useState(false);
@@ -91,6 +93,7 @@ export default function EditInput({
           <StyledActionIconBtn
             $size={iconSize}
             $hoverColor={token.colorPrimaryHover}
+            title={$fmt('common.edit')}
             onClick={handleClick}
           >
             <EditOutlined />

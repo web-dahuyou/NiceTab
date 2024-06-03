@@ -1,7 +1,7 @@
 export default {
   'settings.language': '语言{mark}',
-  'settings.language.ChineseSimplified': '简体中文',
-  'settings.language.English': '英文',
+  // 'settings.language.ChineseSimplified': '简体中文',
+  // 'settings.language.English': '英文',
   'settings.openAdminTabAfterBrowserLaunch': '启动浏览器时是否自动打开NiceTab管理后台{mark}',
   'settings.openAdminTabAfterBrowserLaunch.yes': '自动打开NiceTab管理后台（推荐）',
   'settings.openAdminTabAfterBrowserLaunch.no': '不自动打开NiceTab管理后台',

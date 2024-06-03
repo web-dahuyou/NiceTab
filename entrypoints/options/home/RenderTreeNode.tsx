@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { theme, Modal } from 'antd';
 import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
+import { useIntlUtls } from '~/entrypoints/common/hooks';
 import { ENUM_COLORS } from '~/entrypoints/common/constants';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { StyledTreeNodeItem } from './Home.styled';
@@ -10,8 +11,9 @@ import EditInput from '../components/EditInput';
 // 渲染 treeNode 节点
 export default function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
   const { token } = theme.useToken();
+  const { $fmt } = useIntlUtls();
   const [modalVisible, setModalVisible] = useState(false);
-  const removeDesc = `您确定要删除该${node.type === 'tag' ? '分类' : '标签组'}吗？`;
+  const removeDesc = $fmt({ id: 'home.removeDesc', values: { type: $fmt(`home.${node.type || 'tag'}`) }});
   // 是否锁定
   const isLocked = useMemo(() => {
     return !!node?.originData?.isLocked;
@@ -32,7 +34,7 @@ export default function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) 
       actionType: node.type,
       node,
       actionName: 'rename',
-      data: { [fieldKey]: value || '未命名' },
+      data: { [fieldKey]: value || 'Unnamed' },
     });
   };
 
@@ -52,7 +54,7 @@ export default function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) 
         <span style={{ marginRight: '4px' }}>{ node.icon }</span>
         <span className="tree-node-title">
           <EditInput
-            value={node.title || '未命名'}
+            value={node.title || 'Unnamed'}
             maxLength={18}
             fontSize={14}
             iconSize={14}
@@ -65,7 +67,7 @@ export default function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) 
             <StyledActionIconBtn
               className="btn-add"
               $size="14"
-              title="创建标签组"
+              title={$fmt('home.addTabGroup')}
               $hoverColor={token.colorPrimaryHover}
               onClick={(e) => handleGroupCreate?.(e)}
             >
@@ -76,7 +78,7 @@ export default function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) 
             <StyledActionIconBtn
               className="btn-remove"
               $size="14"
-              title="删除"
+              title={$fmt('common.remove')}
               $hoverColor={ENUM_COLORS.red.primary}
               onClick={(e) => onRemoveClick?.(e)}
             >
@@ -88,7 +90,7 @@ export default function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) 
 
       {modalVisible && (
         <Modal
-          title="删除提醒"
+          title={$fmt('home.removeTitle')}
           width={400}
           open={modalVisible}
           onOk={handleRemove}

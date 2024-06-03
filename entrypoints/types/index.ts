@@ -1,6 +1,10 @@
 
+import { MessageDescriptor } from 'react-intl';
+
 // 语言
 export type LanguageTypes = 'zh-CN' | 'en-US';
+// react-intl formatMessage 参数
+export type IntlForamtMessageParams = MessageDescriptor & { values?: Record<string, any>, opts?: Record<string, any> };
 
 // 主题相关
 export interface ThemeProps {

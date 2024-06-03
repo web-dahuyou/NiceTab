@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import { ENUM_COLORS } from '~/entrypoints/common/constants';
 import { StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
 
-export const StyledContainer = styled.div`
+export const StyledContainer = styled.div<{ $primaryColor?: string }>`
   min-width: 420px;
   max-width: 520px;
   .block {
@@ -12,15 +12,26 @@ export const StyledContainer = styled.div`
     padding: 12px;
     border-bottom: 1px solid #0505050f;
     gap: 8px;
+    .block-title {
+      color: #000;
+      font-size: 14px;
+      font-weight: bold;
+    }
     button { font-size: 12px; }
+    &.quick-actions {
+      .action-btn {
+        display: inline-flex;
+        font-size: 12px;
+        color: #333;
+        cursor: pointer;
+        &:hover {
+          color: ${(props) => props.$primaryColor || ENUM_COLORS.primary};
+        }
+      }
+    }
     &.theme-colors {
       display: flex;
       align-items: center;
-      .block-title {
-        color: #000;
-        font-size: 14px;
-        font-weight: bold;
-      }
       .theme-color-item {
         width: 24px;
         height: 24px;

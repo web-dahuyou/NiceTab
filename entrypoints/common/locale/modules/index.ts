@@ -1,10 +1,12 @@
 import { LanguageTypes } from '~/entrypoints/types';
 import common from './common';
+import home from './home';
 import settings from './settings';
 import importExport from './importExport';
 
 const getLocales = (language: LanguageTypes) => {
   return {
+    ...home[language],
     ...common[language],
     ...settings[language],
     ...importExport[language],

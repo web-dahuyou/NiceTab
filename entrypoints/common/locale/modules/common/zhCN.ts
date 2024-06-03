@@ -15,4 +15,11 @@ export default {
   'common.ok': '确定',
   'common.confirm': '确认',
   'common.cancel': '取消',
+  'common.more': '更多',
+  'common.delete': '删除',
+  'common.remove': '删除',
+  'common.edit': '编辑',
+  'common.view': '查看',
+  'common.theme': '主题',
+  'common.openedTabs': '打开的标签页',
 }

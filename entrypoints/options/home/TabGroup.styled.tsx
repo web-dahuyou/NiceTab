@@ -44,9 +44,6 @@ export const StyledGroupHeader = styled.div<{ $primaryColor?: string }>`
       color: #999;
     }
     .group-action-btns {
-      display: flex;
-      align-items: center;
-      gap: 4px;
       .action-btn {
         display: inline-flex;
         font-size: 12px;

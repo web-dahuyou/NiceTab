@@ -1,7 +1,11 @@
 import { createContext, useState, useEffect, useMemo } from 'react';
-import { useIntl, MessageDescriptor } from 'react-intl';
+import { useIntl } from 'react-intl';
 import { antdMap, customMap } from '~/entrypoints/common/locale';
-import type { ThemeProps, LanguageTypes } from '~/entrypoints/types';
+import type {
+  ThemeProps,
+  LanguageTypes,
+  IntlForamtMessageParams,
+} from '~/entrypoints/types';
 import { settingsUtils, themeUtils } from '~/entrypoints/common/storage';
 import { capitalize } from '~/entrypoints/common/utils';
 import { ENUM_COLORS } from './constants';
@@ -52,7 +56,10 @@ export function useAntdLocale() {
 // custom locale
 export function useCustomLocale() {
   const [locale, setLocale] = useState<LanguageTypes>(defaultLanguage);
-  const messages = useMemo(() => customMap[locale] || customMap[defaultLanguage], [locale]);
+  const messages = useMemo(
+    () => customMap[locale] || customMap[defaultLanguage],
+    [locale]
+  );
 
   const changeLocale = async (language: LanguageTypes = defaultLanguage) => {
     const settings = await settingsUtils.getSettings();
@@ -67,21 +74,26 @@ export function useCustomLocale() {
   }, []);
   return { messages, locale, changeLocale };
 }
+
 // react-intl message hooks
 export function useIntlUtls() {
   const intl = useIntl();
   const $fmt = (
-    {
-      descriptor,
-      values,
-      opts,
-    }: {
-      descriptor: MessageDescriptor;
-      values: Record<string, any>;
-      opts?: Record<string, any>;
-    },
+    idOrFormatMsg: string | IntlForamtMessageParams,
     options?: Record<string, any>
   ) => {
+    const {
+      id,
+      defaultMessage = '',
+      description = '',
+      values = undefined,
+      opts = undefined,
+    } = typeof idOrFormatMsg === 'string'
+      ? { id: idOrFormatMsg }
+      : idOrFormatMsg;
+
+    const descriptor = { id, defaultMessage, description };
+
     let message = intl.formatMessage(descriptor, values, opts);
     if (options?.capitalize) {
       message = capitalize(message);

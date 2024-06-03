@@ -28,7 +28,7 @@ type CustomImportProps = {
 export default function ImportExport() {
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
-  const { $t } = useIntlUtls();
+  const { $fmt } = useIntlUtls();
   const [exportContent, setExportContent] = useState('');
   const [formatType, setFormatType] = useState(1);
   const [importMode, setImportMode] = useState('append');
@@ -43,10 +43,10 @@ export default function ImportExport() {
       const tagList = extContentImporter?.[funcName]?.(importContent);
       await tabListUtils.importTags(tagList, importMode);
       getExportContent();
-      messageApi.success($t({ id: 'importExport.importSuccess' }));
+      messageApi.success($fmt('importExport.importSuccess'));
       form.setFieldValue('importContent', '');
     } catch {
-      messageApi.error($t({ id: 'importExport.importFailed' }));
+      messageApi.error($fmt('importExport.importFailed'));
     }
   };
   // 选择文件导入
@@ -75,9 +75,9 @@ export default function ImportExport() {
   // 复制到剪切板
   const handleCopy = (text: string, result: boolean) => {
     if (result) {
-      messageApi.success($t({ id: 'importExport.CopySuccess' }));
+      messageApi.success($fmt('importExport.CopySuccess'));
     } else {
-      messageApi.error($t({ id: 'importExport.CopyFailed' }));
+      messageApi.error($fmt('importExport.CopyFailed'));
     }
   }
   // 导出文件
@@ -101,7 +101,7 @@ export default function ImportExport() {
     <>
       {contextHolder}
       <StyledWrapper>
-        <Divider>{$t({ id: 'importExport.moduleTitle' }, {action: 'import'})}</Divider>
+        <Divider>{$fmt({ id: 'importExport.moduleTitle', values: {action: 'import'}})}</Divider>
         <Form
           form={form}
           name="imports"
@@ -110,25 +110,25 @@ export default function ImportExport() {
           onFinish={handleImport}
           autoComplete="off"
         >
-          <Form.Item label={$t({ id: 'importExport.formatType'}, {action: 'import'})} name="formatType">
+          <Form.Item label={$fmt({ id: 'importExport.formatType', values: {action: 'import'}})} name="formatType">
             <Radio.Group onChange={(e) => setFormatType(e.target.value) }>
               {formatTypeOptions.map((item) => (
                 <Radio value={item.type} key={item.type}>
-                  {$t({ id: 'importExport.formatType.optionLabel'}, {label: item.label})}
+                  {$fmt({ id: 'importExport.formatType.optionLabel', values: {label: item.label}})}
                 </Radio>
               ))}
             </Radio.Group>
           </Form.Item>
-          <Form.Item label={$t({ id: 'importExport.importMode'})} name="importMode">
+          <Form.Item label={$fmt('importExport.importMode')} name="importMode">
             <Radio.Group onChange={(e) => setImportMode(e.target.value) }>
               {importModeOptions.map((item) => (
                 <Radio value={item.type} key={item.type}>
-                  {$t({ id: 'importExport.importMode.optionLabel'}, {label: item.label})}
+                  {$fmt({ id: 'importExport.importMode.optionLabel', values: {label: item.label}})}
                 </Radio>
               ))}
             </Radio.Group>
           </Form.Item>
-          <Form.Item label={$t({ id: 'importExport.importContent'})} name="importContent">
+          <Form.Item label={$fmt('importExport.importContent')} name="importContent">
             <Input.TextArea
               autoSize={{ minRows: 8, maxRows: 16 }}
             />
@@ -136,11 +136,11 @@ export default function ImportExport() {
           <Form.Item>
             <Space size={12} align="center">
               <Button type="primary" htmlType="submit">
-                {$t({ id: 'importExport.importFromText'})}
+                {$fmt('importExport.importFromText')}
               </Button>
               { +formatType === 1 && (
                 <Upload accept=".json" showUploadList={false} beforeUpload={handleSelectFile}>
-                  <Button type="primary"> {$t({ id: 'importExport.importFromFile'})} </Button>
+                  <Button type="primary"> {$fmt('importExport.importFromFile')} </Button>
                 </Upload>
               ) }
             </Space>
@@ -148,13 +148,13 @@ export default function ImportExport() {
         </Form>
 
         {/* 导出模块 */}
-        <Divider>{$t({ id: 'importExport.moduleTitle' }, {action: 'export'})}</Divider>
+        <Divider>{$fmt({ id: 'importExport.moduleTitle', values: {action: 'export'}})}</Divider>
         <Form
           name="exports"
           layout="vertical"
           autoComplete="off"
         >
-          <Form.Item label={$t({ id: 'importExport.formatType' }, {action: 'export'})}>
+          <Form.Item label={$fmt({ id: 'importExport.formatType', values: {action: 'export'}})}>
             <Radio.Group value={exportFormatType} onChange={(e) => setExportFormatType(e.target.value) }>
               {formatTypeOptions.map((item) => (
                 <Radio value={item.type} key={item.type}>
@@ -163,7 +163,7 @@ export default function ImportExport() {
               ))}
             </Radio.Group>
           </Form.Item>
-          <Form.Item label={$t({ id: 'importExport.exportContent' })}>
+          <Form.Item label={$fmt('importExport.exportContent')}>
             <Input.TextArea
               readOnly
               autoSize={{ minRows: 6, maxRows: 16 }}
@@ -174,9 +174,9 @@ export default function ImportExport() {
           <Form.Item>
             <Space size={12} align="center">
               <CopyToClipboard text={exportContent} onCopy={handleCopy}>
-                <Button type="primary">{$t({ id: 'importExport.copy' })}</Button>
+                <Button type="primary">{$fmt('importExport.copy')}</Button>
               </CopyToClipboard>
-              <Button type="primary" onClick={handleDownload}>{$t({ id: 'importExport.exportToFile' })}</Button>
+              <Button type="primary" onClick={handleDownload}>{$fmt('importExport.exportToFile')}</Button>
             </Space>
           </Form.Item>
         </Form>
