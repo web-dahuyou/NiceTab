@@ -11,13 +11,11 @@ import { classNames, sendBrowserMessage } from '~/entrypoints/common/utils';
 import '~/assets/css/reset.css';
 import './App.css';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks';
-import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
+import { StyledActionIconBtn, StyledColorItem } from '~/entrypoints/common/style/Common.styled';
 import { StyledContainer, StyledList, StyledFavIcon } from './App.styled';
-import { ENUM_COLORS } from '~/entrypoints/common/constants';
+import { THEME_COLORS } from '~/entrypoints/common/constants';
+import { ColorItem } from '~/entrypoints/types';
 
-const colors = Object.entries(ENUM_COLORS).map(([key, color]) => {
-  return { key, color: typeof color === 'string' ? color : color.primary || color[6] };
-});
 
 function handleQuickAction(route: { path: string; query?: Record<string, any> }) {
   sendBrowserMessage('openAdminRoutePage', route);
@@ -26,7 +24,7 @@ function handleQuickAction(route: { path: string; query?: Record<string, any> })
 export default function App() {
   const { token } = theme.useToken();
   const NiceGlobalContext = useContext(GlobalContext);
-  const { $fmt } = useIntlUtls();
+  const { $fmt, locale } = useIntlUtls();
   const [tabs, setTabs] = useState<Tabs.Tab[]>([]);
 
   // 快捷按钮
@@ -50,8 +48,8 @@ export default function App() {
       onClick: () => handleQuickAction({ path: '/import-export' }),
     },
   ];
-
-  const handleThemeChange = (item: { key: string; color: string }) => {
+  // 切换主题
+  const handleThemeChange = (item: ColorItem) => {
     const themeData = { colorPrimary: item.color };
     NiceGlobalContext.setThemeData(themeData);
     sendBrowserMessage('setPrimaryColor', themeData);
@@ -89,13 +87,16 @@ export default function App() {
       <div className="block theme-colors">
         <span className="block-title">{$fmt('common.theme')}：</span>
         <Space>
-          {colors.map((item) => (
-            <div
-              className="theme-color-item"
+          {THEME_COLORS.map((item) => (
+            <StyledColorItem
+              className={classNames(
+                "theme-color-item",
+                item?.color?.toLowerCase() === token?.colorPrimary?.toLowerCase() && 'active'
+              )}
               key={item.key}
               style={{ background: item.color }}
               onClick={() => handleThemeChange(item)}
-            ></div>
+            ></StyledColorItem>
           ))}
         </Space>
       </div>

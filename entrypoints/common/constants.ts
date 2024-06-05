@@ -1,5 +1,15 @@
 import { Tabs } from 'wxt/browser';
-import { cyan, volcano, orange, blue, red, green, yellow, lime } from '@ant-design/colors';
+import {
+  cyan,
+  volcano,
+  orange,
+  blue,
+  red,
+  green,
+  purple,
+  magenta,
+  gold,
+} from '@ant-design/colors';
 import type { LanguageTypes, SettingsProps, TabEvents } from '~/entrypoints/types';
 
 export const ENUM_COLORS = {
@@ -10,9 +20,16 @@ export const ENUM_COLORS = {
   blue,
   red,
   green,
-  yellow,
-  lime,
+  purple,
+  magenta,
+  gold,
 };
+// 主题列表（供切换选择）
+export const THEME_COLORS = Object.entries(ENUM_COLORS)
+  .filter(([key]) => key !== 'primary')
+  .map(([key, color]) => {
+    return { key, color: typeof color === 'string' ? color : color.primary || color[6] };
+  });
 
 // action 名称枚举
 export const ENUM_ACTION_NAME = {
@@ -48,14 +65,20 @@ export const TAB_EVENTS: Array<keyof Pick<Tabs.Static, TabEvents>> = [
 ];
 
 // 语言选项
-export const LANGUANGE_OPTIONS: Array<{key: LanguageTypes, locale: LanguageTypes, label: string}> = [
+export const LANGUANGE_OPTIONS: Array<{
+  key: LanguageTypes;
+  locale: LanguageTypes;
+  label: string;
+}> = [
   { key: 'zh-CN', locale: 'zh-CN', label: '简体中文' },
   { key: 'en-US', locale: 'en-US', label: 'English' },
 ];
 
 export default {
+  ENUM_COLORS,
+  THEME_COLORS,
   ENUM_ACTION_NAME,
   ENUM_SETTINGS_PROPS,
   TAB_EVENTS,
-  LANGUANGE_OPTIONS
+  LANGUANGE_OPTIONS,
 };

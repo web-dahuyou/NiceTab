@@ -32,12 +32,6 @@ export const StyledContainer = styled.div<{ $primaryColor?: string }>`
     &.theme-colors {
       display: flex;
       align-items: center;
-      .theme-color-item {
-        width: 24px;
-        height: 24px;
-        border-radius: 4px;
-        cursor: pointer;
-      }
     }
   }
   .tab-list-title {

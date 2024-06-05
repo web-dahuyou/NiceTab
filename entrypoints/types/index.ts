@@ -10,6 +10,11 @@ export type IntlForamtMessageParams = MessageDescriptor & { values?: Record<stri
 export interface ThemeProps {
   colorPrimary: string;
 }
+// toggle theme color block item
+export interface ColorItem {
+  key: string;
+  color: string;
+}
 
 // 标签页事件
 export type TabEvents = 'onActivated' | 'onAttached' | 'onCreated' | 'onDetached' | 'onMoved' | 'onRemoved' | 'onReplaced' | 'onUpdated' | 'onHighlighted';

@@ -22,4 +22,5 @@ export default {
   'common.view': 'View',
   'common.theme': 'Theme',
   'common.openedTabs': 'Opened Tabs',
+  'common.language': 'Language',
 }

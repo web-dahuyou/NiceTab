@@ -22,4 +22,5 @@ export default {
   'common.view': '查看',
   'common.theme': '主题',
   'common.openedTabs': '打开的标签页',
+  'common.language': '语言',
 }

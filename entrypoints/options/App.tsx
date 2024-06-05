@@ -1,18 +1,61 @@
-import React, { useContext, useCallback, useState, useEffect, useMemo } from 'react';
-import { createHashRouter, RouterProvider, Outlet, useNavigate, useLocation } from "react-router-dom";
-import { Menu, Dropdown } from 'antd';
-import { HomeOutlined, SettingOutlined, ImportOutlined, TranslationOutlined } from '@ant-design/icons';
+import { useContext, useCallback, useState, useEffect, useMemo } from 'react';
+import {
+  createHashRouter,
+  RouterProvider,
+  Outlet,
+  useNavigate,
+  useLocation,
+} from 'react-router-dom';
+import { theme, Menu, Dropdown, Flex, Space, Tooltip } from 'antd';
+import {
+  HomeOutlined,
+  SettingOutlined,
+  ImportOutlined,
+  TranslationOutlined,
+} from '@ant-design/icons';
 import styled from 'styled-components';
-import { pick } from '~/entrypoints/common/utils';
+import { classNames, pick, sendBrowserMessage } from '~/entrypoints/common/utils';
 import '~/assets/css/reset.css';
 import './style.css';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks';
-import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
+import { StyledActionIconBtn, StyledColorItem } from '~/entrypoints/common/style/Common.styled';
 import Home from './home/index.tsx';
 import Settings from './Settings.tsx';
 import ImportExport from './importExport/index.tsx';
-import type { LanguageTypes } from '~/entrypoints/types';
-import { LANGUANGE_OPTIONS } from '~/entrypoints/common/constants.ts';
+import { LANGUANGE_OPTIONS, THEME_COLORS } from '~/entrypoints/common/constants';
+import { ColorItem } from '~/entrypoints/types';
+import themeIcon from '/icon/theme.svg';
+
+// const StyledColorList = styled.div`
+//   display: flex;
+//   gap: 12px;
+// `;
+
+// 主题色分组
+function ColorListMarkup({
+  list,
+  onItemClick,
+}: {
+  list: ColorItem[];
+  onItemClick?: (item: ColorItem) => void;
+}) {
+  const { token } = theme.useToken();
+  return (
+    <Flex className="color-list" wrap="wrap" gap={12}>
+      {list.map((item) => (
+        <StyledColorItem
+          className={classNames(
+            "color-item",
+            item?.color?.toLowerCase() === token?.colorPrimary?.toLowerCase() && 'active'
+          )}
+          key={item.key}
+          style={{ background: item.color }}
+          onClick={() => onItemClick?.(item)}
+        ></StyledColorItem>
+      ))}
+    </Flex>
+  );
+}
 
 const StyledPageContainer = styled.div`
   background: #fff;
@@ -32,11 +75,14 @@ const StyledPageContainer = styled.div`
     .logo {
       width: 100px;
       height: 100%;
+      background: url('/icon/logo.png') no-repeat center / 30px 30px;
     }
     .navbar-menu {
       flex: 1;
     }
     .menu-right {
+      display: flex;
+      align-items: center;
       padding: 0 24px;
     }
   }
@@ -67,7 +113,13 @@ interface NavProps {
 }
 
 const navsTemplate: NavProps[] = [
-  { key: 'home', label: 'common.list', path: '/home', icon: <HomeOutlined />, element: <Home /> },
+  {
+    key: 'home',
+    label: 'common.list',
+    path: '/home',
+    icon: <HomeOutlined />,
+    element: <Home />,
+  },
   {
     key: 'settings',
     label: 'common.settings',
@@ -89,10 +141,10 @@ const router = createHashRouter([
     element: <AppLayout />,
     children: [
       {
-        path: "/",
+        path: '/',
         element: <Home />,
       },
-      ...navsTemplate.map((item) => pick(item, ['path', 'element']))
+      ...navsTemplate.map((item) => pick(item, ['path', 'element'])),
     ],
   },
 ]);
@@ -104,7 +156,7 @@ function AppLayout() {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const { $fmt, locale } = useIntlUtls();
   const navs = useMemo(() => {
-    return navsTemplate.map(item => {
+    return navsTemplate.map((item) => {
       return { ...item, label: $fmt(item.label) };
     });
   }, [$fmt]);
@@ -116,9 +168,17 @@ function AppLayout() {
       nav && navigate(nav.path);
     }
   }, []);
+  // 切换主题
+  const handleThemeChange = (item: ColorItem) => {
+    const themeData = { colorPrimary: item.color };
+    NiceGlobalContext.setThemeData(themeData);
+    sendBrowserMessage('setPrimaryColor', themeData);
+  };
   // 切换语言
-  const handleLocaleChange = useCallback(({ key }: {key: string}) => {
-    const option = LANGUANGE_OPTIONS.find(item => item.key === key) || { locale: 'zh-CN' };
+  const handleLocaleChange = useCallback(({ key }: { key: string }) => {
+    const option = LANGUANGE_OPTIONS.find((item) => item.key === key) || {
+      locale: 'zh-CN',
+    };
     NiceGlobalContext.setLocale(option.locale);
   }, []);
 
@@ -140,13 +200,33 @@ function AppLayout() {
           items={navs}
           onSelect={onSelect}
         />
-        <div className="menu-right">
-          <Dropdown menu={{ items: LANGUANGE_OPTIONS, selectedKeys: [locale], onClick: handleLocaleChange }} placement="bottomRight">
-            <StyledActionIconBtn $size={18}>
+        <Space className="menu-right" align="center">
+          {/* theme */}
+          <Tooltip
+            placement="bottomLeft"
+            color="#fff"
+            title={<ColorListMarkup list={THEME_COLORS} onItemClick={handleThemeChange} />}
+            arrow={false}
+            fresh
+          >
+            <StyledActionIconBtn $size={18} title={$fmt('common.theme')}>
+              <img src={themeIcon} alt="" />
+            </StyledActionIconBtn>
+          </Tooltip>
+          {/* languange */}
+          <Dropdown
+            menu={{
+              items: LANGUANGE_OPTIONS,
+              selectedKeys: [locale],
+              onClick: handleLocaleChange,
+            }}
+            placement="bottomRight"
+          >
+            <StyledActionIconBtn $size={18} title={$fmt('common.language')}>
               <TranslationOutlined />
             </StyledActionIconBtn>
           </Dropdown>
-        </div>
+        </Space>
       </div>
       <div className="main-content">
         <Outlet></Outlet>
@@ -156,5 +236,5 @@ function AppLayout() {
 }
 
 export default function AppRoute() {
-  return <RouterProvider router={router} />
-};
+  return <RouterProvider router={router} />;
+}

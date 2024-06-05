@@ -6,7 +6,7 @@ export const StyledEllipsis = css`
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
-
+// action icon btn
 export const StyledActionIconBtn = styled.i<{
   $size?: number | string,
   $color?: string,
@@ -25,4 +25,26 @@ export const StyledActionIconBtn = styled.i<{
     transform: scale(1.2);
     color: ${props => props.$hoverColor || '#666'};
   }
+`;
+
+// toogle theme color block item
+export const StyledColorItem = styled.div`
+position: relative;
+width: 24px;
+height: 24px;
+border-radius: 4px;
+cursor: pointer;
+&.active {
+  &:after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -6px;
+    width: 4px;
+    height: 4px;
+    border-radius: 2px;
+    background: red;
+  }
+}
 `;

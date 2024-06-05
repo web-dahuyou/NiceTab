@@ -93,6 +93,17 @@ export function omit(
   }, {});
 }
 
+// 将数组按照size进行分组
+export const groupBySize = (list: any[], size: number = 3) => {
+  const result = [];
+  let index = 0;
+  while (index < list.length) {
+    result.push(list.slice(index, index + size));
+    index += size;
+  }
+  return result;
+};
+
 // 发送消息
 export function sendBrowserMessage(msgType: string, data: Record<string, any>) {
   browser.runtime.sendMessage({ msgType, data });
@@ -105,5 +116,6 @@ export default {
   getUrlParams,
   pick,
   omit,
+  groupBySize,
   sendBrowserMessage
 };
