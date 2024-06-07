@@ -2,6 +2,7 @@ export default {
   'common.list': 'List',
   'common.settings': 'Settings',
   'common.importExport': 'Import & Export',
+  'common.recycleBin': 'Recycle Bin',
   'common.home': 'Home',
   'common.sendAllTabs': 'Send All Tabs',
   'common.sendCurrentTab': 'Send Current Tab',

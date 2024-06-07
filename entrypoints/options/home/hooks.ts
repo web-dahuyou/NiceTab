@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { TreeProps, TreeNodeProps } from 'antd';
-import { TagItem, GroupItem, CountInfo } from '~/entrypoints/types';
+import { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
 import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
@@ -41,7 +41,7 @@ export function useTreeData() {
   // 点击更多选项
   const handleMoreItemClick = async (action: string) => {
     if (action === 'clear') {
-      await tabListUtils.setTagList([]);
+      await tabListUtils.clearAll();
       refreshTreeData();
     }
   }
@@ -200,7 +200,7 @@ export function useTreeData() {
   );
   // 创建标签组
   const handleTabGroupCreate = useCallback(async (tagKey: React.Key) => {
-    const {tagId, tabGroup} = await tabListUtils.addTabGroup(tagKey);
+    const {tagId, tabGroup} = await tabListUtils.createTabGroup(tagKey);
     refreshTreeData(treeData => {
       const tag = treeData.find((tag) => tag.key === tagId) as TreeDataNodeTag;
       const group = tag.children?.find((g) => g.key === tabGroup?.groupId) as TreeDataNodeTabGroup;
@@ -231,7 +231,7 @@ export function useTreeData() {
     },
     [treeData]
   );
-  // 恢复标签组
+  // 打开标签组
   const handleTabGroupRestore = useCallback(
     async (tabGroup: TreeDataNodeTabGroup) => {
       const tagKey = tabGroup.parentKey;
@@ -248,7 +248,14 @@ export function useTreeData() {
     },
     [treeData]
   );
-
+  // 删除标签页
+  const handleTabItemRemove = useCallback(
+    async (groupId: React.Key, tab: TabItem) => {
+      await tabListUtils.removeTabs(groupId, [tab]);
+      refreshTreeData();
+    },
+    [treeData]
+  )
 
   // 拖拽
   const handleTreeNodeDrop: TreeProps<TreeDataNodeUnion>['onDrop'] = async ({ dragNode, dropPosition, node }) => {
@@ -333,7 +340,6 @@ export function useTreeData() {
   };
 
   useEffect(() => {
-    console.log('urlParams--change', urlParams)
     init();
   }, [urlParams]);
   useEffect(() => {
@@ -367,6 +373,7 @@ export function useTreeData() {
     handleTabGroupRestore,
     handleTreeNodeDrop,
     handleTabItemDrop,
+    handleTabItemRemove
   }
 }
 

@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 // 合并class  示例：classNames(className1, className2, className3)
 export function classNames(...classes: Array<string | boolean | undefined | null>) {
   return classes.filter(Boolean).join(' ');
@@ -103,6 +105,11 @@ export const groupBySize = (list: any[], size: number = 3) => {
   }
   return result;
 };
+
+// 生成创建时间
+export const newCreateTime = () => {
+  return dayjs().format('YYYY-MM-DD HH:mm');
+}
 
 // 发送消息
 export function sendBrowserMessage(msgType: string, data: Record<string, any>) {

@@ -118,8 +118,10 @@ async function sendAllTabs() {
   const settings = await settingsUtils.getSettings();
   const filteredTabs = await getFilteredTabs(tabs, settings);
 
-  const { tagId, groupId } = await tabListUtils.addTabs(
-    filteredTabs.map((tab) => pick(tab, ['title', 'url', 'favIconUrl'])),
+  const { tagId, groupId } = await tabListUtils.createTabs(
+    filteredTabs.map((tab) => {
+      return { ...pick(tab, ['title', 'url', 'favIconUrl']), tabId: getRandomId() };
+    }),
     true
   );
   openAdminTab(settings, { tagId, groupId });
@@ -139,8 +141,8 @@ async function sendCurrentTab() {
 
   if (!tab?.id) return;
   const settings = await settingsUtils.getSettings();
-  const { tagId, groupId } = await tabListUtils.addTabs([
-    pick(tab, ['title', 'url', 'favIconUrl']),
+  const { tagId, groupId } = await tabListUtils.createTabs([
+    { ...pick(tab, ['title', 'url', 'favIconUrl']), tabId: getRandomId() },
   ]);
   openAdminTab(settings, { tagId, groupId });
   if (settings[CLOSE_TABS_AFTER_SEND_TABS]) {
@@ -160,8 +162,10 @@ async function sendOtherTabs() {
   });
   const settings = await settingsUtils.getSettings();
   const filteredTabs = await getFilteredTabs(tabs, settings);
-  const { tagId, groupId } = await tabListUtils.addTabs(
-    filteredTabs.map((tab) => pick(tab, ['title', 'url', 'favIconUrl'])),
+  const { tagId, groupId } = await tabListUtils.createTabs(
+    filteredTabs.map((tab) => {
+      return { ...pick(tab, ['title', 'url', 'favIconUrl']), tabId: getRandomId() };
+    }),
     true
   );
   openAdminTab(settings, { tagId, groupId });
@@ -185,8 +189,10 @@ async function sendLeftTabs(currTab?: Tabs.Tab) {
 
   const settings = await settingsUtils.getSettings();
   const filteredTabs = await getFilteredTabs(leftTabs, settings);
-  const { tagId, groupId } = await tabListUtils.addTabs(
-    filteredTabs.map((tab) => pick(tab, ['title', 'url', 'favIconUrl'])),
+  const { tagId, groupId } = await tabListUtils.createTabs(
+    filteredTabs.map((tab) => {
+      return { ...pick(tab, ['title', 'url', 'favIconUrl']), tabId: getRandomId() };
+    }),
     true
   );
   openAdminTab(settings, { tagId, groupId });
@@ -211,8 +217,10 @@ async function sendRightTabs(currTab?: Tabs.Tab) {
 
   const settings = await settingsUtils.getSettings();
   const filteredTabs = await getFilteredTabs(rightTabs, settings);
-  const { tagId, groupId } = await tabListUtils.addTabs(
-    filteredTabs.map((tab) => pick(tab, ['title', 'url', 'favIconUrl'])),
+  const { tagId, groupId } = await tabListUtils.createTabs(
+    filteredTabs.map((tab) => {
+      return { ...pick(tab, ['title', 'url', 'favIconUrl']), tabId: getRandomId() };
+    }),
     true
   );
   openAdminTab(settings, { tagId, groupId });

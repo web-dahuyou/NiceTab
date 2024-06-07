@@ -12,6 +12,7 @@ import {
   SettingOutlined,
   ImportOutlined,
   TranslationOutlined,
+  RestOutlined
 } from '@ant-design/icons';
 import styled from 'styled-components';
 import { classNames, pick, sendBrowserMessage } from '~/entrypoints/common/utils';
@@ -19,17 +20,13 @@ import '~/assets/css/reset.css';
 import './style.css';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks';
 import { StyledActionIconBtn, StyledColorItem } from '~/entrypoints/common/style/Common.styled';
-import Home from './home/index.tsx';
-import Settings from './Settings.tsx';
-import ImportExport from './importExport/index.tsx';
 import { LANGUANGE_OPTIONS, THEME_COLORS } from '~/entrypoints/common/constants';
 import { ColorItem } from '~/entrypoints/types';
 import themeIcon from '/icon/theme.svg';
-
-// const StyledColorList = styled.div`
-//   display: flex;
-//   gap: 12px;
-// `;
+import Home from './home/index.tsx';
+import Settings from './Settings.tsx';
+import ImportExport from './importExport/index.tsx';
+import RecycleBin from './recycleBin/index.tsx';
 
 // 主题色分组
 function ColorListMarkup({
@@ -79,6 +76,7 @@ const StyledPageContainer = styled.div`
     }
     .navbar-menu {
       flex: 1;
+      margin-left: 16px;
     }
     .menu-right {
       display: flex;
@@ -133,6 +131,13 @@ const navsTemplate: NavProps[] = [
     path: '/import-export',
     icon: <ImportOutlined />,
     element: <ImportExport />,
+  },
+  {
+    key: 'recycleBin',
+    label: 'common.recycleBin',
+    path: '/recycle',
+    icon: <RestOutlined />,
+    element: <RecycleBin />,
   },
 ];
 
@@ -190,7 +195,7 @@ function AppLayout() {
   return (
     <StyledPageContainer className="page-container">
       <div className="header-navbar">
-        <div className="logo"></div>
+        {/* <div className="logo"></div> */}
         <Menu
           className="navbar-menu"
           theme="light"

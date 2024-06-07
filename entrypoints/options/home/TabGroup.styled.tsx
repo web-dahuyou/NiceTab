@@ -38,14 +38,17 @@ export const StyledGroupHeader = styled.div<{ $primaryColor?: string }>`
     .tab-count {
       margin-right: 8px;
       font-size: 14px;
+      color: #333;
     }
     .group-create-time {
       font-size: 12px;
       color: #999;
     }
     .group-action-btns {
+      margin-top: 4px;
       .action-btn {
-        display: inline-flex;
+        display: flex;
+        align-items: center;
         font-size: 12px;
         color: #333;
         cursor: pointer;
@@ -86,6 +89,7 @@ export const StyledTabTitle = styled.a<{ $primaryColor?: string }>`
   width: 0;
   ${StyledEllipsis}
   .tab-title {
+    font-size: 14px;
     color: ${ENUM_COLORS.blue.primary};
     text-decoration: underline;
     cursor: pointer;

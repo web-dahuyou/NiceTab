@@ -33,6 +33,7 @@ type CustomStyleProps = {
 export default function EditInput({
   type = 'text',
   value,
+  disabled,
   maxLength,
   maxWidth,
   fontSize = 14,
@@ -90,14 +91,16 @@ export default function EditInput({
       ) : (
         <>
           <span className="text-readonly" title={innerValue}>{innerValue}</span>
-          <StyledActionIconBtn
-            $size={iconSize}
-            $hoverColor={token.colorPrimaryHover}
-            title={$fmt('common.edit')}
-            onClick={handleClick}
-          >
-            <EditOutlined />
-          </StyledActionIconBtn>
+          { !disabled && (
+            <StyledActionIconBtn
+              $size={iconSize}
+              $hoverColor={token.colorPrimaryHover}
+              title={$fmt('common.edit')}
+              onClick={handleClick}
+            >
+              <EditOutlined />
+            </StyledActionIconBtn>
+          ) }
         </>
       )}
     </StyledWrapper>

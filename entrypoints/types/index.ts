@@ -33,7 +33,7 @@ export type SettingsProps = {
 // 管理后台-tab列表页相关
 // 标签信息
 export interface TabItem {
-  tabId?: string;
+  tabId: string;
   title?: string;
   url?: string;
   favIconUrl?: string;
@@ -51,6 +51,7 @@ export interface GroupItem {
 export interface TagItem {
   tagId: string;
   tagName: string;
+  createTime: string;
   groupList: GroupItem[];
   isLocked?: boolean;
   isStarred?: boolean;

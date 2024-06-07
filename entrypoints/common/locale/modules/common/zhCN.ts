@@ -2,6 +2,7 @@ export default {
   'common.list': '列表',
   'common.settings': '设置',
   'common.importExport': '导入/导出',
+  'common.recycleBin': '回收站',
   'common.home': '首页',
   'common.sendAllTabs': '发送所有标签页',
   'common.sendCurrentTab': '发送当前标签页',

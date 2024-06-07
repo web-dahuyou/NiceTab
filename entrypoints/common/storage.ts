@@ -8,8 +8,8 @@ import type {
   CountInfo,
   ThemeProps,
 } from '../types';
-import { ENUM_COLORS, ENUM_SETTINGS_PROPS } from './constants';
-import { getRandomId, omit } from './utils';
+import { ENUM_COLORS, ENUM_SETTINGS_PROPS, UNNAMED_TAG, UNNAMED_GROUP } from './constants';
+import { getRandomId, omit, newCreateTime } from './utils';
 
 const {
   LANGUAGE,
@@ -20,6 +20,9 @@ const {
   ALLOW_SEND_PINNED_TABS,
   DELETE_AFTER_RESTORE,
 } = ENUM_SETTINGS_PROPS;
+
+let listStoreUtils: TabListUtils;
+let recycleBinUtils: RecycleBinUtils;
 
 // 设置工具类
 class SettingsUtils {
@@ -52,16 +55,30 @@ class TabListUtils {
     groupCount: 0,
     tabCount: 0,
   };
+  storageKey: string = 'local:tabList';
+
   /* 分类相关方法 */
   getInitialTag(): TagItem {
     return {
       tagId: getRandomId(),
-      tagName: 'Unnamed Tag',
+      tagName: UNNAMED_TAG,
+      createTime: newCreateTime(),
       groupList: [],
     };
   }
+  // 过滤空分类，空标签组
+  getFilteredTagList(tagList: TagItem[]) {
+    return tagList.reduce<TagItem[]>((result, tag) => {
+      const groupList = tag?.groupList?.filter((group) => group?.tabList?.length > 0);
+      if (groupList?.length > 0) {
+        return [...result, { ...tag, groupList }];
+      } else {
+        return result;
+      }
+    }, []);
+  }
   async getTagList() {
-    const tagList = await storage.getItem<TagItem[]>('local:tabList');
+    const tagList = await storage.getItem<TagItem[]>(this.storageKey);
     this.tagList = tagList || [this.getInitialTag()];
     if (!tagList) {
       await this.setTagList(this.tagList);
@@ -72,7 +89,7 @@ class TabListUtils {
   async setTagList(list?: TagItem[]) {
     this.tagList = list || [this.getInitialTag()];
     this.setCountInfo();
-    storage.setItem('local:tabList', this.tagList);
+    storage.setItem(this.storageKey, this.tagList);
   }
   setCountInfo() {
     let tagCount = 0,
@@ -93,6 +110,23 @@ class TabListUtils {
       tabCount,
     };
   }
+  async clearAll() {
+    const tagList = await this.getTagList();
+    await this.setTagList([]);
+    if (this.constructor === TabListUtils) {
+      const filteredTagList = tagList.reduce<TagItem[]>((result, tag) => {
+        const groupList = tag?.groupList?.filter((group) => group?.tabList?.length > 0);
+        if (groupList?.length > 0) {
+          return [...result, { ...tag, groupList }];
+        } else {
+          return result;
+        }
+      }, []);
+
+      // 分类中有标签页，才放入到回收站
+      recycleBinUtils.addTags(filteredTagList);
+    }
+  }
   async addTag(tag?: TagItem) {
     const tagList = await this.getTagList();
     const newTag = Object.assign(this.getInitialTag(), tag || {});
@@ -111,8 +145,19 @@ class TabListUtils {
   }
   async removeTag(tagId: Key) {
     await this.getTagList();
+    const tagItem = this.tagList.find((item) => item.tagId === tagId);
     const tagList = this.tagList.filter((item) => item.tagId !== tagId);
     await this.setTagList(tagList);
+
+    if (this.constructor === TabListUtils) {
+      console.log('removeTagItem', tagItem);
+      // 分类中有标签页，才放入到回收站
+      if (!tagItem) return;
+      tagItem.groupList = tagItem?.groupList?.filter(group => group?.tabList?.length > 0) || [];
+      if (tagItem?.groupList?.length > 0) {
+        recycleBinUtils.addTags([tagItem]);
+      }
+    }
   }
   // 分类拖拽
   async onTagDrop(sourceIndex: number, targetIndex: number) {
@@ -134,12 +179,12 @@ class TabListUtils {
   getInitialTabGroup(): GroupItem {
     return {
       groupId: getRandomId(),
-      groupName: 'Unnamed Group',
-      createTime: dayjs().format('YYYY-MM-DD HH:mm'),
+      groupName: UNNAMED_GROUP,
+      createTime: newCreateTime(),
       tabList: [],
     };
   }
-  async addTabGroup(tagId: Key, tabGroup?: GroupItem) {
+  async createTabGroup(tagId: Key, tabGroup?: GroupItem) {
     const tagList = await this.getTagList();
     const newGroup = Object.assign(this.getInitialTabGroup(), tabGroup);
     for (let tag of tagList) {
@@ -171,7 +216,16 @@ class TabListUtils {
     const tagList = await this.getTagList();
     for (let tag of tagList) {
       if (tag.tagId === tagId) {
+        const removeGroup = tag.groupList.find((g) => g.groupId === groupId);
         tag.groupList = tag.groupList.filter((g) => g.groupId !== groupId);
+
+        if (this.constructor === TabListUtils) {
+          console.log('removeGroup', removeGroup);
+          // 标签组中有标签页，才放入到回收站
+          if (removeGroup && removeGroup?.tabList?.length > 0) {
+            recycleBinUtils.addTabGroups(tag, [removeGroup]);
+          }
+        }
         break;
       }
     }
@@ -273,9 +327,9 @@ class TabListUtils {
   }
 
   /* 标签相关方法 */
-  async addTabs(tabs: TabItem[], createNewGroup = false) {
+  async createTabs(tabs: TabItem[], createNewGroup = false) {
     await this.getTagList();
-    const newTabs = tabs.map(tab => ({ ...tab, tabId: getRandomId() }));
+    const newTabs = tabs.map((tab) => ({ ...tab, tabId: tab.tabId || getRandomId() }));
     let tag0 = this.tagList?.[0];
     const group = tag0?.groupList?.find((group) => !group.isLocked && !group.isStarred);
     if (!createNewGroup && group) {
@@ -300,20 +354,30 @@ class TabListUtils {
     await this.setTagList([tag]);
     return { tagId: tag.tagId, groupId: newtabGroup.groupId };
   }
-  // 删除标签页
-  async removeTabs(groupId: Key, tabIds: Key[]) {
+  // 删除标签页: filterFlag 是否过滤空分类、标签组 (列表页保留空分类、标签组；回收站中不保留)
+  async removeTabs(groupId: Key, tabs: TabItem[], filterFlag = false) {
     const tagList = await this.getTagList();
-    for (let tag of tagList) {
-      for (let group of tag.groupList) {
-        if (group.groupId === groupId) {
-          group.tabList = group.tabList?.filter((tab) => !tab?.tabId || !tabIds.includes(tab?.tabId));
+    const tabIds = tabs.map((tab) => tab.tabId);
+    let tag = undefined, group = undefined;
+    for (let t of tagList) {
+      for (let g of t.groupList) {
+        if (g.groupId === groupId) {
+          tag = t;
+          group = g;
+          g.tabList = g.tabList?.filter(
+            (tab) => !tabIds.includes(tab.tabId)
+          );
           break;
         }
       }
-      break;
     }
 
-    await this.setTagList(tagList);
+    await this.setTagList(filterFlag ? this.getFilteredTagList(tagList) : tagList);
+
+    if (this.constructor === TabListUtils) {
+      if (!tag || !group) return;
+      await recycleBinUtils.addTabs(tag, group, tabs);
+    }
   }
   // tab标签页拖拽
   async onTabDrop(
@@ -391,11 +455,11 @@ class TabListUtils {
             tag?.groupList?.map((g) => {
               return omit(
                 { ...g, tabList: g?.tabList?.map((tab) => omit(tab, ['tabId'])) || [] },
-                ['groupId']
+                ['groupId', 'createTime']
               );
             }) || [],
         },
-        ['tagId']
+        ['tagId', 'createTime']
       );
     });
     return exportTagList;
@@ -419,9 +483,204 @@ class ThemeUtils {
   }
 }
 
+// 回收站工具类
+class RecycleBinUtils extends TabListUtils {
+  tagList: TagItem[] = [];
+  countInfo: CountInfo = {
+    tagCount: 0,
+    groupCount: 0,
+    tabCount: 0,
+  };
+  storageKey: string = 'local:recycleBin';
+
+  constructor() {
+    super();
+  }
+
+  async getTagList() {
+    const tagList = await storage.getItem<TagItem[]>(this.storageKey);
+    this.tagList = tagList || [];
+    this.setCountInfo();
+    return this.tagList;
+  }
+  async setTagList(list?: TagItem[]) {
+    this.tagList = list || [];
+    this.setCountInfo();
+    storage.setItem(this.storageKey, this.tagList);
+  }
+
+  // 批量添加分类
+  async addTags(tags: TagItem[]) {
+    if (!tags?.length) return [];
+    let tagList = await this.getTagList();
+    for (let index = tags.length - 1; index >= 0; index--) {
+      const tag = tags[index];
+      tagList = this.addTabGroupsBasic(tagList, tag, tag.groupList);
+    }
+
+    await this.setTagList(tagList);
+  }
+  // 还原分类
+  async recoverTag(tag: TagItem) {
+    // 从回收站中删除
+    const tagList = await this.getTagList();
+    const tagIndex = tagList.findIndex(t => t.tagId === tag.tagId);
+    if (~tagIndex) {
+      tagList.splice(tagIndex, 1);
+    }
+    await this.setTagList(tagList);
+    await this.recoverTabGroups(tag, tag.groupList);
+  }
+  // 批量还原分类
+  async recoverTags(tags: TagItem[]) {
+    // 从回收站中删除
+    let tagList = await this.getTagList();
+    tagList = tagList.filter(t => {
+      return !tags.some(tag => tag.tagId === t.tagId);
+    });
+    await this.setTagList(tagList);
+
+    // 还原到标签列表（如果标签列表中有相同的标签组，则合并标签组）
+    let storeTagList = await listStoreUtils.getTagList();
+    for (let index = tags.length - 1; index >= 0; index--) {
+      const tag = tags[index];
+      storeTagList = this.recoverTabGroupsBasic(storeTagList, tag, tag.groupList);
+    }
+    await listStoreUtils.setTagList(storeTagList);
+    return tagList;
+  }
+  // 全部还原
+  async recoverAll() {
+    let tagList = await this.getTagList();
+    await this.recoverTags(tagList);
+  }
+  // 批量添加标签组（内部调用：多分类循环添加）
+  addTabGroupsBasic(tagList: TagItem[], tag: TagItem, groups: GroupItem[]) {
+    let isTagInRecycleBin = false;
+    for (let t of tagList) {
+      // 如果回收站中有相同的标签组，则合并标签组
+      if (t.tagId === tag.tagId) {
+        isTagInRecycleBin = true;
+        for (let group of groups) {
+          let isGroupInRecycleBin = false;
+          for (let g of t.groupList) {
+            if (g.groupId === group.groupId) {
+              isGroupInRecycleBin = true;
+              g.tabList = [...group.tabList, ...g.tabList];
+              break;
+            }
+          }
+          if (!isGroupInRecycleBin) {
+            t.groupList.unshift({ ...group, isLocked: false, isStarred: false });
+          }
+        }
+        break;
+      }
+    }
+    // 如果回收站没有相同的分类，则直接添加新的分类
+    if (!isTagInRecycleBin) {
+      tagList.unshift({
+        ...tag,
+        groupList: groups.map(group => ({...group, isLocked: false, isStarred: false}))
+      });
+    }
+
+    return tagList;
+  }
+  // 批量添加标签组（外部调用：单分类添加）
+  async addTabGroups( tag: TagItem, groups: GroupItem[] ) {
+    let tagList = await this.getTagList();
+    tagList = this.addTabGroupsBasic(tagList, tag, groups);
+    await this.setTagList(tagList);
+    return tagList;
+  }
+
+  // 批量还原标签组（内部调用：多分类循环还原）
+  recoverTabGroupsBasic(storeTagList: TagItem[], tag: TagItem, groups: GroupItem[]) {
+    let isTagInListStore = false;
+    for (let storeTag of storeTagList) {
+      if (storeTag.tagId === tag.tagId) {
+        isTagInListStore = true;
+        for (let group of groups) {
+          let isGroupInListStore = false;
+          for (let storeGroup of storeTag.groupList) {
+            if (storeGroup.groupId === group.groupId) {
+              isGroupInListStore = true;
+              storeGroup.tabList = [...group.tabList, ...storeGroup.tabList];
+              break;
+            }
+          }
+          if (!isGroupInListStore) {
+            storeTag.groupList.unshift(group);
+          }
+        }
+        break;
+      }
+    }
+    if (!isTagInListStore) {
+      storeTagList.unshift({ ...tag, groupList: groups });
+    }
+
+    return storeTagList;
+  }
+  // 批量还原标签组（外部调用：单分类添加）
+  async recoverTabGroups(tag: TagItem, groups: GroupItem[]) {
+    // 从回收站中删除
+    let tagList = await this.getTagList();
+    for (let t of tagList) {
+      if (t.tagId === tag.tagId) {
+        t.groupList = t.groupList?.filter(g => !groups.some(group => group.groupId === g.groupId));
+        break;
+      }
+    }
+    tagList = tagList.filter(tag => tag?.groupList?.length > 0);
+    await this.setTagList(tagList);
+
+    // 还原到标签列表（如果标签列表中有相同的标签组，则合并标签组）
+    let storeTagList = await listStoreUtils.getTagList();
+    storeTagList = this.recoverTabGroupsBasic(storeTagList, tag, groups);
+    await listStoreUtils.setTagList(storeTagList);
+    return tagList;
+  }
+
+  async addTabs(tag: TagItem, group: GroupItem, tabs: TabItem[]) {
+    const tagList = await this.getTagList();
+    let isTagInRecycleBin = false;
+    let isGroupInRecycleBin = false;
+    for (let t of tagList) {
+      // 如果回收站中有相同的标签组，则合并标签组
+      if (t.tagId === tag.tagId) {
+        isTagInRecycleBin = true;
+        for (let g of t.groupList) {
+          if (g.groupId === group.groupId) {
+            isGroupInRecycleBin = true;
+            g.tabList = [...tabs, ...g.tabList];
+            break;
+          }
+        }
+        if (!isGroupInRecycleBin) {
+          t.groupList.unshift({ ...group, isLocked: false, isStarred: false, tabList: tabs });
+        }
+        break;
+      }
+    }
+    // 如果回收站没有相同的分类，则直接添加新的分类
+    if (!isTagInRecycleBin) {
+      const newGroup = { ...group, isLocked: false, isStarred: false, tabList: tabs };
+      tagList.unshift({ ...tag, groupList: [newGroup] });
+    }
+    await this.setTagList(tagList);
+    return tagList;
+  }
+}
+
+listStoreUtils = new TabListUtils();
+recycleBinUtils = new RecycleBinUtils();
+export const recycleUtils = recycleBinUtils;
+export const tabListUtils = listStoreUtils;
 export const settingsUtils = new SettingsUtils();
-export const tabListUtils = new TabListUtils();
 export const themeUtils = new ThemeUtils();
+
 
 // 监听storage变化
 export default function initStorageListener(callback: (settings: SettingsProps) => void) {

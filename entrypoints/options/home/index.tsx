@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { theme, Flex, Tree, Button, Input, Dropdown, Drawer, Empty } from 'antd';
+import { useState, useMemo, useCallback } from 'react';
+import { theme, Flex, Tree, Button, Input, Dropdown, Modal, Drawer, Empty } from 'antd';
 import type { MenuProps, TreeProps } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
 import { DownOutlined, MoreOutlined, ClearOutlined, QuestionCircleOutlined } from '@ant-design/icons';
@@ -41,17 +41,24 @@ export default function Home() {
     handleTabGroupRestore,
     handleTreeNodeDrop,
     handleTabItemDrop,
+    handleTabItemRemove,
   } = useTreeData();
 
+  const [confirmModalVisible, setConfirmModalVisible] = useState<boolean>(false);
   const [helpDrawerVisible, setHelpDrawerVisible] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>('');
   const moreItems: MenuProps['items'] = [
     {
       key: 'clear',
-      label: <span onClick={() => handleMoreItemClick('clear')}>{$fmt('home.clearAll')}</span>,
+      label: <span onClick={() => setConfirmModalVisible(true)}>{$fmt('home.clearAll')}</span>,
       icon: <ClearOutlined />,
     },
   ];
+  // 确认清空全部
+  const handleClearConfirm = () => {
+    handleMoreItemClick('clear');
+    setConfirmModalVisible(false);
+  };
 
   const onSearch: SearchProps['onSearch'] = (value) => {
     setSearchValue(value);
@@ -203,11 +210,23 @@ export default function Home() {
                     handleTabGroupStarredChange(tabGroup, isStarred)
                   }
                   onDrop={handleTabItemDrop}
+                  onTabRemove={handleTabItemRemove}
                 ></TabGroup>
               )
           )}
         </div>
       </StyledListWrapper>
+      {/* 清空全部提示 */}
+      <Modal
+        title={$fmt('home.removeTitle')}
+        width={400}
+        open={confirmModalVisible}
+        onOk={handleClearConfirm}
+        onCancel={() => setConfirmModalVisible(false)}
+      >
+        <div>{$fmt('home.clearDesc')}</div>
+      </Modal>
+
       {/* 帮助信息弹层 */}
       <Drawer
         title={$fmt('home.helpInfo')}

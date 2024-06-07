@@ -44,10 +44,12 @@ type OnDropCallback<T extends DropTargetData> = ({
 
 export default function DropComponent<IncomeData extends DropTargetData>({
   data,
+  canDrop = true,
   onDrop,
   children,
 }: {
   data: IncomeData;
+  canDrop?: boolean;
   onDrop?: OnDropCallback<IncomeData>;
   children: JSX.Element;
 }) {
@@ -70,7 +72,7 @@ export default function DropComponent<IncomeData extends DropTargetData>({
           });
         },
         canDrop({ source }) {
-          return data?.allowKeys.includes(source?.data?.dndKey as Symbol);
+          return canDrop && data?.allowKeys.includes(source?.data?.dndKey as Symbol);
         },
         onDrag({ self, source }) {
           // console.log('onDrag-allowKeys', data?.allowKeys);

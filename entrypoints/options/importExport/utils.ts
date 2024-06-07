@@ -1,7 +1,7 @@
 import type { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
 import { tabListUtils } from '~/entrypoints/common/storage';
 import type { ExtContentImporterProps, ExtContentExporterProps } from './types';
-import { getRandomId, omit } from '~/entrypoints/common/utils';
+import { getRandomId, omit, newCreateTime } from '~/entrypoints/common/utils';
 
 // 解析 NiceTab、OneTab等 插件的导入内容
 export const extContentImporter: ExtContentImporterProps = {
@@ -19,7 +19,7 @@ export const extContentImporter: ExtContentImporterProps = {
       }
 
       let [url, title] = line?.trim()?.split(' | ');
-      tabList.push({ url, title });
+      tabList.push({ url, title, tabId: getRandomId() });
     }
 
     if (tabList?.length > 0) {
@@ -34,10 +34,16 @@ export const extContentImporter: ExtContentImporterProps = {
   },
   niceTab(content: string): TagItem[] {
     const tagList = JSON.parse(content) as TagItem[];
+    const createTime = newCreateTime();
     tagList.forEach(tag => {
       tag.tagId = getRandomId();
+      tag.createTime = createTime;
       tag?.groupList?.forEach(group => {
         group.groupId = getRandomId();
+        group.createTime = createTime;
+        group?.tabList?.forEach(tab => {
+          tab.tabId = getRandomId();
+        })
       });
     })
     return tagList;

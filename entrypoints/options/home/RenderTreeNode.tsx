@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { theme, Modal } from 'antd';
 import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks';
-import { ENUM_COLORS } from '~/entrypoints/common/constants';
+import { ENUM_COLORS, UNNAMED_TAG, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { StyledTreeNodeItem } from './Home.styled';
 import { RenderTreeNodeProps } from './types';
@@ -14,6 +14,8 @@ export default function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) 
   const { $fmt } = useIntlUtls();
   const [modalVisible, setModalVisible] = useState(false);
   const removeDesc = $fmt({ id: 'home.removeDesc', values: { type: $fmt(`home.${node.type || 'tag'}`) }});
+  const unnamedNodeName = node.type === 'tag' ? UNNAMED_TAG : UNNAMED_GROUP;
+
   // 是否锁定
   const isLocked = useMemo(() => {
     return !!node?.originData?.isLocked;
@@ -34,7 +36,7 @@ export default function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) 
       actionType: node.type,
       node,
       actionName: 'rename',
-      data: { [fieldKey]: value || 'Unnamed' },
+      data: { [fieldKey]: value || unnamedNodeName },
     });
   };
 
@@ -54,8 +56,8 @@ export default function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) 
         <span style={{ marginRight: '4px' }}>{ node.icon }</span>
         <span className="tree-node-title">
           <EditInput
-            value={node.title || 'Unnamed'}
-            maxLength={18}
+            value={node.title || unnamedNodeName}
+            maxLength={20}
             fontSize={14}
             iconSize={14}
             onValueChange={handleRenameChange}
@@ -67,7 +69,7 @@ export default function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) 
             <StyledActionIconBtn
               className="btn-add"
               $size="14"
-              title={$fmt('home.addTabGroup')}
+              title={$fmt('home.createTabGroup')}
               $hoverColor={token.colorPrimaryHover}
               onClick={(e) => handleGroupCreate?.(e)}
             >

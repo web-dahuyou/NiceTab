@@ -74,6 +74,9 @@ export const LANGUANGE_OPTIONS: Array<{
   { key: 'en-US', locale: 'en-US', label: 'English' },
 ];
 
+export const UNNAMED_TAG = 'Unnamed Tag';
+export const UNNAMED_GROUP = 'Unnamed Group';
+
 export default {
   ENUM_COLORS,
   THEME_COLORS,
@@ -81,4 +84,6 @@ export default {
   ENUM_SETTINGS_PROPS,
   TAB_EVENTS,
   LANGUANGE_OPTIONS,
+  UNNAMED_TAG,
+  UNNAMED_GROUP,
 };
