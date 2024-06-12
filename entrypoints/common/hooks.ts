@@ -8,7 +8,7 @@ import type {
 } from '~/entrypoints/types';
 import { settingsUtils, themeUtils } from '~/entrypoints/common/storage';
 import { capitalize } from '~/entrypoints/common/utils';
-import { ENUM_COLORS } from './constants';
+import { ENUM_COLORS, defaultLanguage } from './constants';
 
 // global context
 export const GlobalContext = createContext({
@@ -22,9 +22,6 @@ export const GlobalContext = createContext({
     callback?.();
   },
 });
-
-export const defaultLanguage: LanguageTypes = (navigator?.language ||
-  'zh-CN') as LanguageTypes;
 
 // antd locale
 export function useAntdLocale() {

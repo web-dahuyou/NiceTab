@@ -10,6 +10,7 @@ export default {
   'common.sendLeftTabs': '发送左侧标签页',
   'common.sendRightTabs': '发送右侧标签页',
   'common.sendPinnedTabs': '发送固定标签页',
+  'common.openAdminPage': '打开NiceTab管理后台',
   'common.save': '保存',
   'common.saveSuccess': '保存成功',
   'common.submit': '提交',

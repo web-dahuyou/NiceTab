@@ -74,6 +74,9 @@ export const LANGUANGE_OPTIONS: Array<{
   { key: 'en-US', locale: 'en-US', label: 'English' },
 ];
 
+export const defaultLanguage: LanguageTypes = (navigator?.language ||
+  'zh-CN') as LanguageTypes;
+
 export const UNNAMED_TAG = 'Unnamed Tag';
 export const UNNAMED_GROUP = 'Unnamed Group';
 

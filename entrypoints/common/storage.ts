@@ -8,7 +8,7 @@ import type {
   CountInfo,
   ThemeProps,
 } from '../types';
-import { ENUM_COLORS, ENUM_SETTINGS_PROPS, UNNAMED_TAG, UNNAMED_GROUP } from './constants';
+import { ENUM_COLORS, ENUM_SETTINGS_PROPS, defaultLanguage, UNNAMED_TAG, UNNAMED_GROUP } from './constants';
 import { getRandomId, omit, newCreateTime } from './utils';
 
 const {
@@ -27,7 +27,7 @@ let recycleBinUtils: RecycleBinUtils;
 // 设置工具类
 class SettingsUtils {
   initialSettings = {
-    [LANGUAGE]: 'zh-CN',
+    [LANGUAGE]: defaultLanguage || 'zh-CN',
     [OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH]: true, // 启动浏览器时是否自动打开管理后台
     [OPEN_ADMIN_TAB_AFTER_SEND_TABS]: true, // 发送标签页后默认打开管理后台
     [CLOSE_TABS_AFTER_SEND_TABS]: true, // 发送标签页后是否关闭标签页

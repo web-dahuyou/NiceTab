@@ -4,8 +4,8 @@ import type { FormProps } from 'antd';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import type { SettingsProps } from '~/entrypoints/types';
 import { settingsUtils } from '~/entrypoints/common/storage';
-import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
-import { GlobalContext, useIntlUtls, defaultLanguage } from '~/entrypoints/common/hooks';
+import { ENUM_SETTINGS_PROPS, defaultLanguage } from '~/entrypoints/common/constants';
+import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks';
 
 const {
   LANGUAGE,

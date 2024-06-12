@@ -1,26 +1,30 @@
 import { Menus } from 'wxt/browser';
-import { ENUM_ACTION_NAME, ENUM_SETTINGS_PROPS } from './constants';
+import { LanguageTypes } from '~/entrypoints/types';
+import { ENUM_ACTION_NAME, ENUM_SETTINGS_PROPS, TAB_EVENTS, defaultLanguage } from './constants';
 import tabUtils from '~/entrypoints/common/tabs';
-import { TAB_EVENTS } from '~/entrypoints/common/constants';
-import { settingsUtils } from './storage';
+import initStorageListener, { settingsUtils } from './storage';
+import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 
-const { ALLOW_SEND_PINNED_TABS } = ENUM_SETTINGS_PROPS;
+const { LANGUAGE, ALLOW_SEND_PINNED_TABS } = ENUM_SETTINGS_PROPS;
 
-const menus: Menus.CreateCreatePropertiesType[] = [
-  { id: ENUM_ACTION_NAME.SEND_ALL_TABS, title: '发送全部标签页', contexts: ['all'] },
-  { id: ENUM_ACTION_NAME.SEND_CURRENT_TAB, title: '发送当前标签页', contexts: ['all'] },
-  {
-    id: ENUM_ACTION_NAME.OPEN_ADMIN_TAB,
-    title: '打开NiceTab管理后台',
-    contexts: ['all'],
-  },
-  { id: ENUM_ACTION_NAME.SEND_OTHER_TABS, title: '发送其他标签页', contexts: ['all'] },
-  { id: ENUM_ACTION_NAME.SEND_LEFT_TABS, title: '发送左侧标签页', contexts: ['all'] },
-  { id: ENUM_ACTION_NAME.SEND_RIGHT_TABS, title: '发送右侧标签页', contexts: ['all'] },
-];
+const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> => {
+  const settings = await settingsUtils.getSettings();
+  const language = settings[LANGUAGE] as LanguageTypes || defaultLanguage;
+  const customMessages = getCustomLocaleMessages(language);
+
+  return [
+    { id: ENUM_ACTION_NAME.SEND_ALL_TABS, title: customMessages['common.sendAllTabs'], contexts: ['all'] },
+    { id: ENUM_ACTION_NAME.SEND_CURRENT_TAB, title: customMessages['common.sendCurrentTab'], contexts: ['all'] },
+    { id: ENUM_ACTION_NAME.OPEN_ADMIN_TAB, title: customMessages['common.openAdminPage'], contexts: ['all'] },
+    { id: ENUM_ACTION_NAME.SEND_OTHER_TABS, title: customMessages['common.sendOtherTabs'], contexts: ['all'] },
+    { id: ENUM_ACTION_NAME.SEND_LEFT_TABS, title: customMessages['common.sendLeftTabs'], contexts: ['all'] },
+    { id: ENUM_ACTION_NAME.SEND_RIGHT_TABS, title: customMessages['common.sendRightTabs'], contexts: ['all'] },
+  ];
+};
 
 // 创建 contextMenus
-function createContextMenus() {
+async function createContextMenus() {
+  const menus = await getMenus();
   menus.forEach((menu) => {
     browser.contextMenus.create(menu);
   });
@@ -54,6 +58,10 @@ async function handleContextMenusUpdate() {
 
 export default function contextMenusRegister() {
   browser.runtime.onInstalled.addListener(() => {
+    browser.contextMenus.removeAll();
+    createContextMenus();
+  });
+  initStorageListener(() => {
     browser.contextMenus.removeAll();
     createContextMenus();
   });

@@ -10,6 +10,7 @@ export default {
   'common.sendLeftTabs': 'Send Left Tabs',
   'common.sendRightTabs': 'Send Right Tabs',
   'common.sendPinnedTabs': 'Send Pinned Tabs',
+  'common.openAdminPage': 'Open NiceTab-Admin-Page',
   'common.save': 'Save',
   'common.saveSuccess': 'Save Success',
   'common.submit': 'Submit',

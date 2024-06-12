@@ -1,7 +1,7 @@
 import contextMenusRegister from '../common/contextMenus';
 import tabUtils from '~/entrypoints/common/tabs';
-import { themeUtils } from '~/entrypoints/common/storage';
-import { ENUM_COLORS, TAB_EVENTS } from '~/entrypoints/common/constants';
+import { themeUtils, settingsUtils } from '~/entrypoints/common/storage';
+import { ENUM_COLORS, TAB_EVENTS, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 
 // 设置插件图标徽标
 async function setBadge() {
@@ -25,7 +25,13 @@ export default defineBackground(() => {
   // 注册 contextMenus
   contextMenusRegister();
 
-  tabUtils.openAdminTab();
+  browser.runtime.onInstalled.addListener(async () => {
+    const settings = await settingsUtils.getSettings();
+    const { OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH } = ENUM_SETTINGS_PROPS;
+    if (settings[OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH]) {
+      tabUtils.openAdminRoutePage({ path: '/home' });
+    }
+  });
 
   browser.runtime.onMessage.addListener(async (msg, msgSender, sendResponse) => {
     // console.log('browser.runtime.onMessage--background', msg);
