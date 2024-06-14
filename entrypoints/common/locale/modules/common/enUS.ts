@@ -25,4 +25,6 @@ export default {
   'common.theme': 'Theme',
   'common.openedTabs': 'Opened Tabs',
   'common.language': 'Language',
+  'common.moveUp': 'Move up',
+  'common.moveDown': 'Move down',
 }

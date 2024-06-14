@@ -5,14 +5,15 @@ import { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
 import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
+import { getRandomId } from '@/entrypoints/common/utils';
 import {
   TreeDataNodeTabGroup,
   TreeDataNodeTag,
   TreeDataNodeUnion,
   RenderTreeNodeActionProps,
   DndTabItemOnDropCallback
-} from './types';
-import { getTreeData } from './utils';
+} from '../types';
+import { getTreeData } from '../utils';
 
 export function useTreeData() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -23,6 +24,7 @@ export function useTreeData() {
   const [selectedTabGroupKey, setSelectedTabGroupKey] = useState<React.Key | undefined>();
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
+  const [refreshKey, setRefreshKey] = useState<string>(getRandomId());
 
   const urlParams = useMemo(() => {
     const params: Record<string, string> = {};
@@ -93,7 +95,8 @@ export function useTreeData() {
     ) => {
       if (node.type === 'tag') {
         setSelectedTagKey(node.key);
-        setSelectedTabGroupKey(node?.children?.[0]?.key);
+        // setSelectedTabGroupKey(node?.children?.[0]?.key);
+        setSelectedTabGroupKey('');
         setExpandedKeys((keys) => {
           return [...new Set([...keys, node.key])];
         });
@@ -314,6 +317,7 @@ export function useTreeData() {
     setTreeData(treeData);
     // console.log('refresh-treeData', treeData);
     setCountInfo(tabListUtils.countInfo);
+    setRefreshKey(getRandomId());
     callback?.(treeData);
   };
   // 初始化
@@ -339,6 +343,39 @@ export function useTreeData() {
     });
   };
 
+  // 快捷键操作
+  const handleHotkeyAction = useCallback(async ({ action }: { action: string }) => {
+    if (!selectedTagKey) return;
+    if (selectedTabGroupKey) {
+      await tabListUtils.tabGroupMove(action === 'moveUp' ? 'up' : 'down', selectedTagKey, selectedTabGroupKey);
+      refreshTreeData((treeData) => {
+        let tabGroup = {} as TreeDataNodeTabGroup;
+        for (let tag of treeData) {
+          let hasFound = false;
+          for (let group of tag?.children || []) {
+            if (group.key === selectedTabGroupKey) {
+              tabGroup = group as TreeDataNodeTabGroup;
+              hasFound = true;
+              break;
+            }
+          }
+          if (hasFound) break;
+        }
+        handleSelect(treeData, [tabGroup.key || selectedTagKey], {
+          node: tabGroup.key ? tabGroup : (treeData.find((t) => t.key === selectedTagKey) as TreeDataNodeTag),
+        });
+      });
+    } else {
+      const tagIndex = treeData.findIndex(tag => tag.type === 'tag' && tag.key === selectedTagKey);
+      if (action === 'moveUp' && tagIndex === 0 || action === 'moveDown' && tagIndex === treeData.length - 1) return;
+      await tabListUtils.onTagDrop(tagIndex, action === 'moveUp' ? tagIndex - 1 : tagIndex + 2);
+      refreshTreeData((treeData) => {
+        const tag = treeData.find((t) => t.key === selectedTagKey) as TreeDataNodeTag;
+        handleSelect(treeData, [tag.key], { node: tag });
+      });
+    }
+  }, [treeData, selectedTagKey, selectedTabGroupKey]);
+
   useEffect(() => {
     init();
   }, [urlParams]);
@@ -357,6 +394,7 @@ export function useTreeData() {
     expandedKeys,
     setExpandedKeys,
     selectedTag,
+    refreshKey,
     handleSelect,
     onSelect,
     handleMoreItemClick,
@@ -373,7 +411,10 @@ export function useTreeData() {
     handleTabGroupRestore,
     handleTreeNodeDrop,
     handleTabItemDrop,
-    handleTabItemRemove
+    handleTabItemRemove,
+    handleHotkeyAction
   }
 }
+
+
 

@@ -25,4 +25,6 @@ export default {
   'common.theme': '主题',
   'common.openedTabs': '打开的标签页',
   'common.language': '语言',
+  'common.moveUp': '上移',
+  'common.moveDown': '下移',
 }

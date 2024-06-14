@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import { theme, Flex, Tree, Button, Input, Dropdown, Modal, Drawer, Empty } from 'antd';
 import type { MenuProps, TreeProps } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
@@ -10,12 +10,14 @@ import RenderTreeNode from './RenderTreeNode';
 import TabGroup from './TabGroup';
 import { TagItem, GroupItem } from '@/entrypoints/types';
 import { TreeDataNodeTabGroup, TreeDataNodeUnion, } from './types';
-import { useTreeData } from './hooks';
+import { useTreeData } from './hooks/treeData';
+import useHotkeys from './hooks/hotkeys';
 import { getTreeData } from './utils';
 
 export default function Home() {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
+  const listRef = useRef<HTMLDivElement>(null);
   const {
     countInfo,
     tagList,
@@ -26,6 +28,7 @@ export default function Home() {
     expandedKeys,
     setExpandedKeys,
     selectedTag,
+    refreshKey,
     onSelect,
     handleMoreItemClick,
     onTreeNodeAction,
@@ -42,7 +45,10 @@ export default function Home() {
     handleTreeNodeDrop,
     handleTabItemDrop,
     handleTabItemRemove,
+    handleHotkeyAction
   } = useTreeData();
+
+  const { hotkeyList } = useHotkeys({ onAction: handleHotkeyAction });
 
   const [confirmModalVisible, setConfirmModalVisible] = useState<boolean>(false);
   const [helpDrawerVisible, setHelpDrawerVisible] = useState<boolean>(false);
@@ -104,6 +110,14 @@ export default function Home() {
       || (dragNode.type === 'tabGroup' && dropNode.type === 'tag' && dropPosition >= 0);
   }
 
+  // 阻止右键默认行为
+  const onRightClick: TreeProps<TreeDataNodeUnion>['onRightClick'] = ({ event, node }) => {
+    event?.preventDefault();
+    event?.stopPropagation();
+    // console.log('onRightClick--node', node)
+    // TODO 添加右键菜单
+  }
+
   return (
     <>
       <StyledListWrapper className="home-wrapper" $primaryColor={token.colorPrimary}>
@@ -153,7 +167,7 @@ export default function Home() {
               onSearch={onSearch}
             />
             {/* 标签组列表 */}
-            <div className="sidebar-tree-wrapper">
+            <div ref={listRef} className="sidebar-tree-wrapper">
               {searchTreeData?.length > 0 ? (
                 <Tree
                   // draggable
@@ -169,12 +183,16 @@ export default function Home() {
                   titleRender={(node) => (
                     <RenderTreeNode
                       node={node}
+                      selected={selectedKeys.includes(node.key)}
+                      container={listRef.current}
+                      refreshKey={refreshKey}
                       onAction={onTreeNodeAction}
                     ></RenderTreeNode>
                   )}
                   onExpand={(expandedKeys) => setExpandedKeys(expandedKeys)}
                   onSelect={onSelect}
                   onDrop={handleTreeNodeDrop}
+                  onRightClick={onRightClick}
                 />
               ) : (
                 <div className="no-data">
@@ -200,6 +218,7 @@ export default function Home() {
                 <TabGroup
                   key={tabGroup.key}
                   selected={tabGroup.key === selectedTabGroupKey}
+                  refreshKey={refreshKey}
                   {...tabGroup.originData}
                   onChange={(data) => handleTabGroupChange(tabGroup, data)}
                   onRemove={() =>

@@ -27,6 +27,9 @@ export type RenderTreeNodeActionProps = {
 };
 export type RenderTreeNodeProps = {
   node: TreeDataNodeUnion;
+  selected?: boolean;
+  container?: HTMLElement | null;
+  refreshKey?: string;
   onAction?: (props: RenderTreeNodeActionProps) => void;
 };
 // 拖拽tab数据

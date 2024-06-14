@@ -19,6 +19,7 @@ import DropComponent from '@/entrypoints/common/components/DropComponent';
 import { DndTabItemProps, DndTabItemOnDropCallback } from './types';
 
 type TabGroupProps = GroupItem & {
+  refreshKey?: string;
   canDrag?: boolean;
   canDrop?: boolean;
   allowActions?: string[];
@@ -36,6 +37,7 @@ const dndKey = Symbol('dnd-tab-item');
 const defaultGroupActions = ['remove', 'rename', 'restore', 'lock', 'star'];
 
 export default function TabGroup({
+  refreshKey,
   groupId,
   groupName,
   createTime,
@@ -72,10 +74,10 @@ export default function TabGroup({
   useEffect(() => {
     if (selected && groupRef.current) {
       // console.log('groupRef.current', groupRef.current)
-      const offsetTop = groupRef.current.offsetTop;
+      const offsetTop = groupRef.current?.offsetTop || 0;
       window.scrollTo({ top: offsetTop - 100, behavior: 'instant' });
     }
-  }, [selected]);
+  }, [refreshKey, selected]);
 
   return (
     <>

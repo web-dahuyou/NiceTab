@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { theme, Modal } from 'antd';
 import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks';
@@ -9,9 +9,10 @@ import { RenderTreeNodeProps } from './types';
 import EditInput from '../components/EditInput';
 
 // 渲染 treeNode 节点
-export default function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
+export default function RenderTreeNode({ node, selected, container, refreshKey, onAction }: RenderTreeNodeProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
+  const nodeRef = useRef<HTMLDivElement>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const removeDesc = $fmt({ id: 'home.removeDesc', values: { type: $fmt(`home.${node.type || 'tag'}`) }});
   const unnamedNodeName = node.type === 'tag' ? UNNAMED_TAG : UNNAMED_GROUP;
@@ -50,9 +51,15 @@ export default function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) 
     setModalVisible(false);
   };
 
+  useEffect(() => {
+    if (selected && nodeRef.current) {
+      nodeRef.current?.scrollIntoView({ behavior: 'instant' });
+    }
+  }, [container, refreshKey, selected]);
+
   return (
     <>
-      <StyledTreeNodeItem className="tree-node-item">
+      <StyledTreeNodeItem ref={nodeRef} className="tree-node-item">
         <span style={{ marginRight: '4px' }}>{ node.icon }</span>
         <span className="tree-node-title">
           <EditInput

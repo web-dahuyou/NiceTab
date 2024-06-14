@@ -22,6 +22,7 @@
     "antd": "^5.16.4",
     "dayjs": "^1.11.11",
     "file-saver": "^2.0.5",
+    "hotkeys-js": "^3.13.7",
     "react": "^18.2.0",
     "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "^18.2.0",

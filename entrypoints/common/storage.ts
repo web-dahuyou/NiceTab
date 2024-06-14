@@ -326,6 +326,54 @@ class TabListUtils {
     await this.setTagList(tagList);
   }
 
+  // 标签组上移、下移
+  async tabGroupMove(direction: 'up' | 'down', tagId: Key, groupId: Key) {
+    const tagList = await this.getTagList();
+    const tagIndex = tagList.findIndex((tag) => tag.tagId === tagId);
+    const tag = tagList[tagIndex];
+    const groupIndex = tag?.groupList?.findIndex((g) => g.groupId === groupId);
+    const group = { ...tag?.groupList?.[groupIndex] };
+    if (direction === 'up') {
+      if (groupIndex === 0) {
+        if (tagIndex === 0) return;
+        const prevTag = tagList[tagIndex - 1];
+        const prevTagLastGroup = prevTag?.groupList?.[prevTag?.groupList?.length - 1];
+        if (!prevTagLastGroup?.isStarred) {
+          group.isStarred = false;
+        }
+        prevTag.groupList.push(group);
+        tag.groupList.splice(groupIndex, 1);
+      } else {
+        const prevGroup = tag?.groupList?.[groupIndex - 1];
+        if (prevGroup?.isStarred) {
+          group.isStarred = true;
+        }
+        tag.groupList.splice(groupIndex, 1);
+        tag.groupList.splice(groupIndex - 1, 0, group);
+      }
+    } else {
+      if (groupIndex >= tag?.groupList?.length - 1) {
+        if (tagIndex >= tagList.length - 1) return;
+        const nextTag = tagList[tagIndex + 1];
+        const nextTagFirstGroup = nextTag?.groupList?.[0];
+        if (nextTagFirstGroup?.isStarred) {
+          group.isStarred = true;
+        }
+        nextTag.groupList.unshift(group);
+        tag.groupList.splice(groupIndex, 1);
+      } else {
+        const nextGroup = tag?.groupList?.[groupIndex + 1];
+        if (!nextGroup?.isStarred) {
+          group.isStarred = false;
+        }
+        tag.groupList.splice(groupIndex + 2, 0, group);
+        tag.groupList.splice(groupIndex, 1);
+      }
+    }
+
+    await this.setTagList(tagList);
+  }
+
   /* 标签相关方法 */
   async createTabs(tabs: TabItem[], createNewGroup = false) {
     await this.getTagList();
