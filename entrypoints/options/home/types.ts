@@ -31,6 +31,7 @@ export type RenderTreeNodeProps = {
   container?: HTMLElement | null;
   refreshKey?: string;
   onAction?: (props: RenderTreeNodeActionProps) => void;
+  onDrop?: DndTabItemOnDropCallback;
 };
 // 拖拽tab数据
 export type DndTabItemProps = TabItem & {

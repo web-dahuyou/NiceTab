@@ -11,9 +11,12 @@ import TabGroup from './TabGroup';
 import HotkeyList from '../components/HotkeyList';
 import type { TagItem, GroupItem } from '@/entrypoints/types';
 import type { TreeDataNodeTabGroup, TreeDataNodeUnion } from './types';
+import { dndKeys } from './constants';
 import { useTreeData } from './hooks/treeData';
 import useHotkeys from './hooks/hotkeys';
 import { getTreeData } from './utils';
+
+const dndKey = dndKeys.tabItem;
 
 export default function Home() {
   const { token } = theme.useToken();
@@ -188,6 +191,7 @@ export default function Home() {
                       container={listRef.current}
                       refreshKey={refreshKey}
                       onAction={onTreeNodeAction}
+                      onDrop={handleTabItemDrop}
                     ></RenderTreeNode>
                   )}
                   onExpand={(expandedKeys) => setExpandedKeys(expandedKeys)}

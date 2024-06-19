@@ -1,5 +1,4 @@
 import { Key } from 'react';
-import dayjs from 'dayjs';
 import type {
   SettingsProps,
   TagItem,
@@ -8,7 +7,13 @@ import type {
   CountInfo,
   ThemeProps,
 } from '../types';
-import { ENUM_COLORS, ENUM_SETTINGS_PROPS, defaultLanguage, UNNAMED_TAG, UNNAMED_GROUP } from './constants';
+import {
+  ENUM_COLORS,
+  ENUM_SETTINGS_PROPS,
+  defaultLanguage,
+  UNNAMED_TAG,
+  UNNAMED_GROUP,
+} from './constants';
 import { getRandomId, omit, newCreateTime } from './utils';
 
 const {
@@ -153,7 +158,8 @@ class TabListUtils {
       console.log('removeTagItem', tagItem);
       // 分类中有标签页，才放入到回收站
       if (!tagItem) return;
-      tagItem.groupList = tagItem?.groupList?.filter(group => group?.tabList?.length > 0) || [];
+      tagItem.groupList =
+        tagItem?.groupList?.filter((group) => group?.tabList?.length > 0) || [];
       if (tagItem?.groupList?.length > 0) {
         recycleBinUtils.addTags([tagItem]);
       }
@@ -406,15 +412,14 @@ class TabListUtils {
   async removeTabs(groupId: Key, tabs: TabItem[], filterFlag = false) {
     const tagList = await this.getTagList();
     const tabIds = tabs.map((tab) => tab.tabId);
-    let tag = undefined, group = undefined;
+    let tag = undefined,
+      group = undefined;
     for (let t of tagList) {
       for (let g of t.groupList) {
         if (g.groupId === groupId) {
           tag = t;
           group = g;
-          g.tabList = g.tabList?.filter(
-            (tab) => !tabIds.includes(tab.tabId)
-          );
+          g.tabList = g.tabList?.filter((tab) => !tabIds.includes(tab.tabId));
           break;
         }
       }
@@ -457,23 +462,38 @@ class TabListUtils {
         if (isDone) break;
       }
     } else {
-      for (let tag of tagList) {
-        let tmp = null,
-          sourceGroupIndex = 0,
-          targetGroupIndex = tag.groupList.length - 1;
-
+      let tabItemTmp = null,
+        targetTagIndex = 0,
+        targetGroupIndex = 0;
+      let isSourceFound = false,
+        isTargetFound = false;
+      for (let tIndex = 0; tIndex < tagList.length; tIndex++) {
+        const tag = tagList[tIndex];
         for (let gIndex = 0; gIndex < tag.groupList.length; gIndex++) {
           const group = tag.groupList[gIndex];
           if (group.groupId === sourceGroupId) {
-            tmp = group.tabList?.[sourceIndex];
-            sourceGroupIndex = gIndex;
+            tabItemTmp = group.tabList?.[sourceIndex];
             group.tabList.splice(sourceIndex, 1);
+            isSourceFound = true;
           } else if (group.groupId === targetGroupId) {
+            targetTagIndex = tIndex;
             targetGroupIndex = gIndex;
+            isTargetFound = true;
           }
+
+          if (isSourceFound && isTargetFound) break;
         }
-        tmp && tag.groupList?.[targetGroupIndex]?.tabList?.splice(targetIndex, 0, tmp);
+
+        if (isSourceFound && isTargetFound) break;
       }
+      tabItemTmp &&
+        isSourceFound &&
+        isTargetFound &&
+        tagList?.[targetTagIndex]?.groupList?.[targetGroupIndex]?.tabList?.splice(
+          targetIndex,
+          0,
+          tabItemTmp
+        );
     }
 
     await this.setTagList(tagList);
@@ -572,7 +592,7 @@ class RecycleBinUtils extends TabListUtils {
   async recoverTag(tag: TagItem) {
     // 从回收站中删除
     const tagList = await this.getTagList();
-    const tagIndex = tagList.findIndex(t => t.tagId === tag.tagId);
+    const tagIndex = tagList.findIndex((t) => t.tagId === tag.tagId);
     if (~tagIndex) {
       tagList.splice(tagIndex, 1);
     }
@@ -583,8 +603,8 @@ class RecycleBinUtils extends TabListUtils {
   async recoverTags(tags: TagItem[]) {
     // 从回收站中删除
     let tagList = await this.getTagList();
-    tagList = tagList.filter(t => {
-      return !tags.some(tag => tag.tagId === t.tagId);
+    tagList = tagList.filter((t) => {
+      return !tags.some((tag) => tag.tagId === t.tagId);
     });
     await this.setTagList(tagList);
 
@@ -629,14 +649,18 @@ class RecycleBinUtils extends TabListUtils {
     if (!isTagInRecycleBin) {
       tagList.unshift({
         ...tag,
-        groupList: groups.map(group => ({...group, isLocked: false, isStarred: false}))
+        groupList: groups.map((group) => ({
+          ...group,
+          isLocked: false,
+          isStarred: false,
+        })),
       });
     }
 
     return tagList;
   }
   // 批量添加标签组（外部调用：单分类添加）
-  async addTabGroups( tag: TagItem, groups: GroupItem[] ) {
+  async addTabGroups(tag: TagItem, groups: GroupItem[]) {
     let tagList = await this.getTagList();
     tagList = this.addTabGroupsBasic(tagList, tag, groups);
     await this.setTagList(tagList);
@@ -677,11 +701,13 @@ class RecycleBinUtils extends TabListUtils {
     let tagList = await this.getTagList();
     for (let t of tagList) {
       if (t.tagId === tag.tagId) {
-        t.groupList = t.groupList?.filter(g => !groups.some(group => group.groupId === g.groupId));
+        t.groupList = t.groupList?.filter(
+          (g) => !groups.some((group) => group.groupId === g.groupId)
+        );
         break;
       }
     }
-    tagList = tagList.filter(tag => tag?.groupList?.length > 0);
+    tagList = tagList.filter((tag) => tag?.groupList?.length > 0);
     await this.setTagList(tagList);
 
     // 还原到标签列表（如果标签列表中有相同的标签组，则合并标签组）
@@ -707,7 +733,12 @@ class RecycleBinUtils extends TabListUtils {
           }
         }
         if (!isGroupInRecycleBin) {
-          t.groupList.unshift({ ...group, isLocked: false, isStarred: false, tabList: tabs });
+          t.groupList.unshift({
+            ...group,
+            isLocked: false,
+            isStarred: false,
+            tabList: tabs,
+          });
         }
         break;
       }
@@ -728,7 +759,6 @@ export const recycleUtils = recycleBinUtils;
 export const tabListUtils = listStoreUtils;
 export const settingsUtils = new SettingsUtils();
 export const themeUtils = new ThemeUtils();
-
 
 // 监听storage变化
 export default function initStorageListener(callback: (settings: SettingsProps) => void) {

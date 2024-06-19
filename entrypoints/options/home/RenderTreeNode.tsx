@@ -6,15 +6,29 @@ import { ENUM_COLORS, UNNAMED_TAG, UNNAMED_GROUP } from '~/entrypoints/common/co
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { StyledTreeNodeItem } from './Home.styled';
 import { RenderTreeNodeProps } from './types';
+import { dndKeys } from './constants';
 import EditInput from '../components/EditInput';
+import DropComponent from '@/entrypoints/common/components/DropComponent';
+
+const allowDropKey = dndKeys.tabItem;
 
 // 渲染 treeNode 节点
-export default function RenderTreeNode({ node, selected, container, refreshKey, onAction }: RenderTreeNodeProps) {
+export default function RenderTreeNode({
+  node,
+  selected,
+  container,
+  refreshKey,
+  onAction,
+  onDrop
+}: RenderTreeNodeProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const nodeRef = useRef<HTMLDivElement>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const removeDesc = $fmt({ id: 'home.removeDesc', values: { type: $fmt(`home.${node.type || 'tag'}`) }});
+  const removeDesc = $fmt({
+    id: 'home.removeDesc',
+    values: { type: $fmt(`home.${node.type || 'tag'}`) },
+  });
   const unnamedNodeName = node.type === 'tag' ? UNNAMED_TAG : UNNAMED_GROUP;
 
   // 是否锁定
@@ -58,56 +72,62 @@ export default function RenderTreeNode({ node, selected, container, refreshKey, 
   }, [container, refreshKey, selected]);
 
   return (
-    <>
-      <StyledTreeNodeItem ref={nodeRef} className="tree-node-item">
-        <span style={{ marginRight: '4px' }}>{ node.icon }</span>
-        <span className="tree-node-title">
-          <EditInput
-            value={node.title || unnamedNodeName}
-            maxLength={20}
-            fontSize={14}
-            iconSize={14}
-            onValueChange={handleRenameChange}
-          ></EditInput>
-        </span>
+    <DropComponent
+      data={{ index: 0, groupId: node.key as string, allowKeys: node.type === 'tag' ? [] : [allowDropKey] }}
+      canDrop={node.type === 'tabGroup'}
+      onDrop={onDrop}
+    >
+      <>
+        <StyledTreeNodeItem ref={nodeRef} className="tree-node-item">
+          <span style={{ marginRight: '4px' }}>{node.icon}</span>
+          <span className="tree-node-title">
+            <EditInput
+              value={node.title || unnamedNodeName}
+              maxLength={20}
+              fontSize={14}
+              iconSize={14}
+              onValueChange={handleRenameChange}
+            ></EditInput>
+          </span>
 
-        <span className="tree-node-icon-group">
-          {node.type === 'tag' && (
-            <StyledActionIconBtn
-              className="btn-add"
-              $size="14"
-              title={$fmt('home.createTabGroup')}
-              $hoverColor={token.colorPrimaryHover}
-              onClick={(e) => handleGroupCreate?.(e)}
-            >
-              <PlusOutlined />
-            </StyledActionIconBtn>
-          )}
-          { !isLocked && (
-            <StyledActionIconBtn
-              className="btn-remove"
-              $size="14"
-              title={$fmt('common.remove')}
-              $hoverColor={ENUM_COLORS.red.primary}
-              onClick={(e) => onRemoveClick?.(e)}
-            >
-              <CloseOutlined />
-            </StyledActionIconBtn>
-          ) }
-        </span>
-      </StyledTreeNodeItem>
+          <span className="tree-node-icon-group">
+            {node.type === 'tag' && (
+              <StyledActionIconBtn
+                className="btn-add"
+                $size="14"
+                title={$fmt('home.createTabGroup')}
+                $hoverColor={token.colorPrimaryHover}
+                onClick={(e) => handleGroupCreate?.(e)}
+              >
+                <PlusOutlined />
+              </StyledActionIconBtn>
+            )}
+            {!isLocked && (
+              <StyledActionIconBtn
+                className="btn-remove"
+                $size="14"
+                title={$fmt('common.remove')}
+                $hoverColor={ENUM_COLORS.red.primary}
+                onClick={(e) => onRemoveClick?.(e)}
+              >
+                <CloseOutlined />
+              </StyledActionIconBtn>
+            )}
+          </span>
+        </StyledTreeNodeItem>
 
-      {modalVisible && (
-        <Modal
-          title={$fmt('home.removeTitle')}
-          width={400}
-          open={modalVisible}
-          onOk={handleRemove}
-          onCancel={handleModalCancel}
-        >
-          <div>{removeDesc}</div>
-        </Modal>
-      )}
-    </>
+        {modalVisible && (
+          <Modal
+            title={$fmt('home.removeTitle')}
+            width={400}
+            open={modalVisible}
+            onOk={handleRemove}
+            onCancel={handleModalCancel}
+          >
+            <div>{removeDesc}</div>
+          </Modal>
+        )}
+      </>
+    </DropComponent>
   );
 }

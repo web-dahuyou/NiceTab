@@ -7,11 +7,11 @@ import {
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import {
-  attachInstruction,
-  extractInstruction,
-  Instruction,
-} from '@atlaskit/pragmatic-drag-and-drop-hitbox/tree-item';
-import { DropIndicator } from '@atlaskit/pragmatic-drag-and-drop-react-drop-indicator/tree-item';
+  attachClosestEdge,
+  Edge,
+  extractClosestEdge,
+} from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
+import { DropIndicator } from '@atlaskit/pragmatic-drag-and-drop-react-drop-indicator/box';
 import { ENUM_COLORS } from '~/entrypoints/common/constants';
 
 const StyledDndWrapper = styled.div`
@@ -54,7 +54,7 @@ export default function DropComponent<IncomeData extends DropTargetData>({
   children: JSX.Element;
 }) {
   const ref = useRef<HTMLDivElement | null>(null);;
-  const [instruction, setInstruction] = useState<Instruction | null>(null);
+  const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -65,42 +65,34 @@ export default function DropComponent<IncomeData extends DropTargetData>({
         element,
         getData({ input }) {
           // console.log('dropTargetForElements-getData--input', input);
-          return attachInstruction(data, {
-            input,
+          return attachClosestEdge(data, {
             element,
-            currentLevel: 0,
-            indentPerLevel: 10,
-            mode: "expanded",
-            block: ['reorder-above', 'reorder-below', 'reparent']
+            input,
+            allowedEdges: ['top', 'bottom'],
           });
         },
         canDrop({ source }) {
           return canDrop && data?.allowKeys.includes(source?.data?.dndKey as Symbol);
         },
         onDrag({ self, source }) {
-          console.log('onDrag-allowKeys', data?.allowKeys);
-          console.log('onDrag-self', self);
-          console.log('onDrag-source', source);
+          // console.log('onDrag-allowKeys', data?.allowKeys);
+          // console.log('onDrag-self', self);
+          // console.log('onDrag-source', source);
           const isSource = source.element === element || source?.data?.groupId === data.groupId;
           if (isSource || !data?.allowKeys?.includes(source?.data?.dndKey as Symbol)) {
-            setInstruction(null);
+            setClosestEdge(null);
             return;
           }
 
-          const instruction: Instruction | null = extractInstruction(self.data);
-          if (instruction?.type === 'make-child') {
-            setInstruction(instruction);
-          } else {
-            setInstruction(null);
-          }
+          setClosestEdge('top');
         },
         onDragLeave() {
           setTimeout(() => {
-            setInstruction(null);
+            setClosestEdge(null);
           }, 30);
         },
         onDrop({ location, source }) {
-          setInstruction(null);
+          setClosestEdge(null);
 
           const target = location.current.dropTargets[0];
           if (!target) {
@@ -121,7 +113,7 @@ export default function DropComponent<IncomeData extends DropTargetData>({
   return (
     <StyledDndWrapper ref={ref}>
       {children}
-      {instruction && <DropIndicator instruction={instruction} />}
+      {closestEdge && <DropIndicator edge={closestEdge} gap="0px" />}
     </StyledDndWrapper>
   );
 }

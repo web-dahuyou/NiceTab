@@ -17,6 +17,9 @@ import {
 import DndComponent from '@/entrypoints/common/components/DndComponent';
 import DropComponent from '@/entrypoints/common/components/DropComponent';
 import { DndTabItemProps, DndTabItemOnDropCallback } from './types';
+import { dndKeys } from './constants';
+
+const dndKey = dndKeys.tabItem;
 
 type TabGroupProps = GroupItem & {
   refreshKey?: string;
@@ -33,7 +36,6 @@ type TabGroupProps = GroupItem & {
   onTabRemove?: (groupId: string, tabItem: TabItem) => void;
 };
 
-const dndKey = Symbol('dnd-tab-item');
 const defaultGroupActions = ['remove', 'rename', 'restore', 'lock', 'star'];
 
 export default function TabGroup({
