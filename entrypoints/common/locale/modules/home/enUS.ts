@@ -42,4 +42,10 @@ export default {
     one {# Tab}
     other {# Tabs}
   }`,
+
+  'home.help.content.1': '1. The left side list displays the categories, and the secondary menus represent the tab groups. The list supports searching for both categories and tab groups. The right-side panel displays all the tab groups and the tabs within each tab group.',
+  'home.help.content.2': '2. When a tab group is locked, the group and its tabs cannot be removed or moved out. However, tabs from other tab groups can be moved into the locked group. To remove a tab group, you need to first unlock it.',
+  'home.help.content.3': '3. When a tab group is starred, it will be placed at the top of the current category. Moving other tab groups to a position before the starred tab group will automatically star them as well. If a starred tab group is moved to a position after a non-starred tab group, the star status will be automatically released.',
+  'home.help.content.4': '4. When restoring a tab group, each of the tabs within the tab group will be opened in browser. If the "Automatically remove tabs from list when restoring" setting is enabled, the tabs will be removed from the list after they are opened.',
+  'home.help.content.5': '5. Categories/tab groups/tabs support drag-and-drop sorting. When a category/tab group is selected, it can be sorted using shortcut keys. The shortcut key mapping is shown in the table below:',
 }

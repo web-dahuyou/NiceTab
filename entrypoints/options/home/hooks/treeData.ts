@@ -310,14 +310,17 @@ export function useTreeData() {
   };
 
   // 刷新treeData
-  const refreshTreeData = async (callback?: (treeData: TreeDataNodeUnion[]) => void) => {
+  const refreshTreeData = async (
+    callback?: (treeData: TreeDataNodeUnion[]) => void,
+    { autoScroll = false }: { autoScroll?: boolean } = {}
+  ) => {
     const tagList = tabListUtils.tagList;
     setTagList(tagList);
     const treeData = getTreeData(tagList);
     setTreeData(treeData);
     // console.log('refresh-treeData', treeData);
     setCountInfo(tabListUtils.countInfo);
-    setRefreshKey(getRandomId());
+    autoScroll && setRefreshKey(getRandomId());
     callback?.(treeData);
   };
   // 初始化
@@ -364,7 +367,7 @@ export function useTreeData() {
         handleSelect(treeData, [tabGroup.key || selectedTagKey], {
           node: tabGroup.key ? tabGroup : (treeData.find((t) => t.key === selectedTagKey) as TreeDataNodeTag),
         });
-      });
+      }, { autoScroll: true });
     } else {
       const tagIndex = treeData.findIndex(tag => tag.type === 'tag' && tag.key === selectedTagKey);
       if (action === 'moveUp' && tagIndex === 0 || action === 'moveDown' && tagIndex === treeData.length - 1) return;
@@ -372,7 +375,7 @@ export function useTreeData() {
       refreshTreeData((treeData) => {
         const tag = treeData.find((t) => t.key === selectedTagKey) as TreeDataNodeTag;
         handleSelect(treeData, [tag.key], { node: tag });
-      });
+      }, { autoScroll: true });
     }
   }, [treeData, selectedTagKey, selectedTabGroupKey]);
 

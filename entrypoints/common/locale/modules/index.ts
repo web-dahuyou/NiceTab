@@ -3,6 +3,7 @@ import common from './common';
 import home from './home';
 import settings from './settings';
 import importExport from './importExport';
+import hotkeys from './hotkeys';
 
 const getLocales = (language: LanguageTypes) => {
   return {
@@ -10,6 +11,7 @@ const getLocales = (language: LanguageTypes) => {
     ...common[language],
     ...settings[language],
     ...importExport[language],
+    ...hotkeys[language]
   }
 }
 export const zhCN = getLocales('zh-CN');

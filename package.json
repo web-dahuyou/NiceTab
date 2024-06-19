@@ -1,6 +1,6 @@
 {
   "name": "nice-tab",
-  "description": "A nice, convenient and powerful tab manager",
+  "description": "A nice, convenient, powerful tab manager",
   "private": true,
   "version": "1.1.0",
   "type": "module",

@@ -63,4 +63,15 @@ export interface CountInfo {
   tabCount: number;
 }
 
+export interface HotkeyOption {
+  macKey: string;
+  winKey: string;
+  action: string;
+}
+export type HotkeyItem = HotkeyOption & {
+  key: string;
+  combo: string[];
+  label?: string;
+}
+
 export default { name: 'Nice-Tab-types' }

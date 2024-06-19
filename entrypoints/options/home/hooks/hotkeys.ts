@@ -1,16 +1,19 @@
 import { useEffect, useCallback, useMemo } from "react";
 import hotkeys from 'hotkeys-js';
 import { useIntlUtls } from '~/entrypoints/common/hooks';
-import { getKeysByOS } from '~/entrypoints/common/utils';
+import { getOSInfo, getKeysByOS } from '~/entrypoints/common/utils';
+import type { HotkeyOption } from '~/entrypoints/types';
 
+const osInfo = getOSInfo();
 const keyMap = getKeysByOS();
 
-const hotkeyOptions = () => ([
-  { key: 'shift+up', action: 'moveUp' },
-  { key: 'shift+down', action: 'moveDown' },
-]);
+const hotkeyOptions = [
+  { macKey: 'option+up', winKey: 'alt+up', action: 'moveUp' },
+  { macKey: 'option+down', winKey: 'alt+down', action: 'moveDown' },
+];
 
-const getSymbols = (key: string, splitKey: string = '+') => {
+const getSymbols = (option: HotkeyOption, splitKey: string = '+') => {
+  const key = osInfo.isMac ? option.macKey : option.winKey;
   const splitKeys = key.split(splitKey);
   return splitKeys.map(key => keyMap?.[key]?.symbol || key);
 }
@@ -18,11 +21,11 @@ const getSymbols = (key: string, splitKey: string = '+') => {
 export default function useListHotkeys ({ onAction }: { onAction: (params: { action: string }) => void }) {
   const { $fmt } = useIntlUtls();
   const hotkeyList = useMemo(() => {
-    return hotkeyOptions().map((item) => {
+    return hotkeyOptions.map((item) => {
       return {
-        key: item.key,
-        combo: getSymbols(item.key),
-        action: item.action,
+        ...item,
+        key: `${item.macKey},${item.winKey}`,
+        combo: getSymbols(item),
         label: $fmt(`common.${item.action}`),
       }
     })

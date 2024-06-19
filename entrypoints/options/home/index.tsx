@@ -8,8 +8,9 @@ import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { StyledListWrapper } from './Home.styled';
 import RenderTreeNode from './RenderTreeNode';
 import TabGroup from './TabGroup';
-import { TagItem, GroupItem } from '@/entrypoints/types';
-import { TreeDataNodeTabGroup, TreeDataNodeUnion, } from './types';
+import HotkeyList from '../components/HotkeyList';
+import type { TagItem, GroupItem } from '@/entrypoints/types';
+import type { TreeDataNodeTabGroup, TreeDataNodeUnion } from './types';
 import { useTreeData } from './hooks/treeData';
 import useHotkeys from './hooks/hotkeys';
 import { getTreeData } from './utils';
@@ -254,9 +255,14 @@ export default function Home() {
         width={500}
       >
         <Flex vertical gap="8px">
-          <p>1、左侧列表一级菜单表示分类，二级菜单表示标签组，右侧面板展示的是当前选中分类中的所有标签组以及标签组中标签页；左侧列表支持分类和标签组的搜索。</p>
-          <p>2、标签组锁定后可以移动，该标签组以及组内的标签页，将禁止删除和移出，但可以将其他标签组的标签页移入该标签组；如果想要删除或移出，可先解锁该标签组。</p>
-          <p>3、标签组星标后将在当前分类中置顶，移动其他标签组到星标状态的标签组之前，将自动被星标；移动星标状态的标签组到非星标的标签组之后，将自动解除星标状态。</p>
+          <p>{ $fmt('home.help.content.1') }</p>
+          <p>{ $fmt('home.help.content.2') }</p>
+          <p>{ $fmt('home.help.content.3') }</p>
+          <p>{ $fmt('home.help.content.4') }</p>
+          <p>{ $fmt('home.help.content.5') }</p>
+
+          <p style={{ marginTop: '8px' }}><strong>{ $fmt('common.hotkeys') }</strong></p>
+          <HotkeyList list={hotkeyList}></HotkeyList>
         </Flex>
       </Drawer>
     </>
