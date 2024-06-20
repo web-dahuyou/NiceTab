@@ -112,7 +112,7 @@ export default function DropComponent<IncomeData extends DropTargetData>({
 
           const sourceIndex = +(sourceData?.index || 0);
 
-          onDrop && onDrop({ sourceData, targetData, sourceIndex, targetIndex: 0 });
+          onDrop && onDrop({ sourceData, targetData, sourceIndex, targetIndex: data.index || 0 });
         },
       })
     );

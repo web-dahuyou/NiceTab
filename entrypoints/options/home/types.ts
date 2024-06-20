@@ -1,5 +1,5 @@
 import type { TreeDataNode } from 'antd';
-import { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
+import { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
 
 export type TreeDataNodeTabGroup = TreeDataNode & {
   type: 'tabGroup';
@@ -31,8 +31,23 @@ export type RenderTreeNodeProps = {
   container?: HTMLElement | null;
   refreshKey?: string;
   onAction?: (props: RenderTreeNodeActionProps) => void;
-  onDrop?: DndTabItemOnDropCallback;
+  onTabItemDrop?: DndTabItemOnDropCallback;
 };
+
+// 需要移动的数据
+export interface MoveDataProps {
+  groupId: string;
+  tabs?: TabItem[];
+}
+// tagList 级联 option
+export type CascaderOption = {
+  type: string;
+  value: string;
+  label: React.ReactNode;
+  children?: CascaderOption[];
+  parentKey?: string;
+} & Record<string, any>;
+
 // 拖拽tab数据
 export type DndTabItemProps = TabItem & {
   groupId: string;

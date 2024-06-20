@@ -4,6 +4,7 @@ import { TagOutlined } from '@ant-design/icons';
 import { TagItem } from '@/entrypoints/types';
 import { useIntlUtls } from '~/entrypoints/common/hooks';
 import { recycleUtils } from '~/entrypoints/common/storage';
+import { ENUM_COLORS } from '~/entrypoints/common/constants';
 import { StyledTagNode } from './index.styled';
 
 export default function TagNode({
@@ -76,12 +77,12 @@ export default function TagNode({
       <TagOutlined />
       <div className="tag-name">{tag.tagName}</div>
       <Flex align="center">
-        <Tag color="volcano">
+        <span className="count" style={{ color: ENUM_COLORS.volcano.primary }}>
           {$fmt({
             id: 'home.tabGroup.count',
             values: { count: tag?.groupList?.length || 0 },
           })}
-        </Tag>
+        </span>
         <span className="tag-create-time">{tag.createTime}</span>
       </Flex>
       <Space

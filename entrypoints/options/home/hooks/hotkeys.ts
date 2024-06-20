@@ -8,8 +8,8 @@ const osInfo = getOSInfo();
 const keyMap = getKeysByOS();
 
 const hotkeyOptions = [
-  { macKey: 'option+up', winKey: 'alt+up', action: 'moveUp' },
-  { macKey: 'option+down', winKey: 'alt+down', action: 'moveDown' },
+  { macKey: 'shift+option+up', winKey: 'shift+alt+up', action: 'moveUp' },
+  { macKey: 'shift+option+down', winKey: 'shift+alt+down', action: 'moveDown' },
 ];
 
 const getSymbols = (option: HotkeyOption, splitKey: string = '+') => {
@@ -18,7 +18,7 @@ const getSymbols = (option: HotkeyOption, splitKey: string = '+') => {
   return splitKeys.map(key => keyMap?.[key]?.symbol || key);
 }
 
-export default function useListHotkeys ({ onAction }: { onAction: (params: { action: string }) => void }) {
+export default function useListHotkeys ({ onAction }: { onAction?: (params: { action: string }) => void }) {
   const { $fmt } = useIntlUtls();
   const hotkeyList = useMemo(() => {
     return hotkeyOptions.map((item) => {
@@ -32,13 +32,13 @@ export default function useListHotkeys ({ onAction }: { onAction: (params: { act
   }, []);
 
   const hotkeyRegister = useCallback(() => {
-    console.log('hotkeyList', hotkeyList);
+    // console.log('hotkeyList', hotkeyList);
     hotkeyList.forEach((item) => {
       hotkeys.unbind(item.key, 'tagList');
       hotkeys(item.key, {scope: 'tagList'}, (event, handler) => {
         // console.log('hotkeys--event', event)
         // console.log('hotkeys--handler', handler)
-        onAction({ action: item.action });
+        onAction?.({ action: item.action });
       });
       hotkeys.setScope('tagList');
     });

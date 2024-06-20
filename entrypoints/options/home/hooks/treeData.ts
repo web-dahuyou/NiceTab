@@ -17,6 +17,7 @@ import { getTreeData } from '../utils';
 
 export function useTreeData() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [loading, setLoading] = useState<boolean>(true);
   const [countInfo, setCountInfo] = useState<CountInfo>();
   const [tagList, setTagList] = useState<TagItem[]>([]);
   const [treeData, setTreeData] = useState([] as TreeDataNodeUnion[]);
@@ -253,8 +254,8 @@ export function useTreeData() {
   );
   // 删除标签页
   const handleTabItemRemove = useCallback(
-    async (groupId: React.Key, tab: TabItem) => {
-      await tabListUtils.removeTabs(groupId, [tab]);
+    async (groupId: React.Key, tabs: TabItem[]) => {
+      await tabListUtils.removeTabs(groupId, tabs);
       refreshTreeData();
     },
     [treeData]
@@ -329,6 +330,8 @@ export function useTreeData() {
     setTagList(tagList);
     const treeData = getTreeData(tagList);
     setTreeData(treeData);
+
+    setLoading(false);
     // console.log('init-treeData', treeData);
     setCountInfo(tabListUtils.countInfo);
     setExpandedKeys(treeData.map((tag) => tag.key));
@@ -340,6 +343,7 @@ export function useTreeData() {
     const tabGroup =
       tag?.children?.find((g) => g.key === urlParams.groupId) ||
       tag?.children?.[0];
+
     if (!tag) return;
     handleSelect(treeData, [tabGroup ? tabGroup.key : tag.key], {
       node: tabGroup ? (tabGroup as TreeDataNodeTabGroup) : tag,
@@ -383,11 +387,13 @@ export function useTreeData() {
     init();
   }, [urlParams]);
   useEffect(() => {
+    setLoading(true);
     init();
   }, []);
 
   return {
     urlParams,
+    loading,
     countInfo,
     tagList,
     treeData,

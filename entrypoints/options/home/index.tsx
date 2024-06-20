@@ -1,5 +1,5 @@
-import { useState, useMemo, useCallback, useRef } from 'react';
-import { theme, Flex, Tree, Button, Input, Dropdown, Modal, Drawer, Empty } from 'antd';
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import { theme, Flex, Tree, Button, Input, Dropdown, Modal, Drawer, Empty, Spin } from 'antd';
 import type { MenuProps, TreeProps } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
 import { DownOutlined, MoreOutlined, ClearOutlined, QuestionCircleOutlined } from '@ant-design/icons';
@@ -10,7 +10,7 @@ import RenderTreeNode from './RenderTreeNode';
 import TabGroup from './TabGroup';
 import HotkeyList from '../components/HotkeyList';
 import type { TagItem, GroupItem } from '@/entrypoints/types';
-import type { TreeDataNodeTabGroup, TreeDataNodeUnion } from './types';
+import type { TreeDataNodeTabGroup, TreeDataNodeUnion, MoveDataProps } from './types';
 import { dndKeys } from './constants';
 import { useTreeData } from './hooks/treeData';
 import useHotkeys from './hooks/hotkeys';
@@ -23,6 +23,7 @@ export default function Home() {
   const { $fmt } = useIntlUtls();
   const listRef = useRef<HTMLDivElement>(null);
   const {
+    loading,
     countInfo,
     tagList,
     treeData,
@@ -33,6 +34,7 @@ export default function Home() {
     setExpandedKeys,
     selectedTag,
     refreshKey,
+    handleSelect,
     onSelect,
     handleMoreItemClick,
     onTreeNodeAction,
@@ -69,6 +71,27 @@ export default function Home() {
     handleMoreItemClick('clear');
     setConfirmModalVisible(false);
   };
+
+  const handleTabGroupMoveTo = async ({ moveData, selected }: { moveData?: MoveDataProps; selected: boolean }) => {
+    refreshTreeData(treeData => {
+      if (selected) {
+        const { groupId, tabs } = moveData || {};
+        if (!groupId) return;
+        // 如果是移动标签页的话，则不需要重新选择标签组
+        if (tabs && tabs?.length > 0) return;
+
+        let group = null;
+        for (let tag of treeData) {
+          for (let g of tag.children || []) {
+            group = g;
+            break;
+          }
+        }
+        group && handleSelect(treeData, [groupId], { node: group as TreeDataNodeTabGroup });
+      }
+
+    });
+  }
 
   const onSearch: SearchProps['onSearch'] = (value) => {
     setSearchValue(value);
@@ -172,46 +195,48 @@ export default function Home() {
             />
             {/* 标签组列表 */}
             <div ref={listRef} className="sidebar-tree-wrapper">
-              {searchTreeData?.length > 0 ? (
-                <Tree
-                  // draggable
-                  draggable={{ icon: false, nodeDraggable: () => true }}
-                  allowDrop={checkAllowDrop}
-                  blockNode
-                  switcherIcon={<DownOutlined />}
-                  autoExpandParent
-                  defaultExpandAll
-                  expandedKeys={expandedKeys}
-                  selectedKeys={selectedKeys}
-                  treeData={searchTreeData}
-                  titleRender={(node) => (
-                    <RenderTreeNode
-                      node={node}
-                      selected={selectedKeys.includes(node.key)}
-                      container={listRef.current}
-                      refreshKey={refreshKey}
-                      onAction={onTreeNodeAction}
-                      onDrop={handleTabItemDrop}
-                    ></RenderTreeNode>
-                  )}
-                  onExpand={(expandedKeys) => setExpandedKeys(expandedKeys)}
-                  onSelect={onSelect}
-                  onDrop={handleTreeNodeDrop}
-                  onRightClick={onRightClick}
-                />
-              ) : (
-                <div className="no-data">
-                  <Empty description={$fmt('home.emptyTip')}>
-                    <Button
-                      type="primary"
-                      size="small"
-                      onClick={handleTagCreate}
-                    >
-                      {$fmt('home.addTag')}
-                    </Button>
-                  </Empty>
-                </div>
-              )}
+              <Spin spinning={loading} size="large">
+                {searchTreeData?.length > 0 ? (
+                  <Tree
+                    // draggable
+                    draggable={{ icon: false, nodeDraggable: () => true }}
+                    allowDrop={checkAllowDrop}
+                    blockNode
+                    switcherIcon={<DownOutlined />}
+                    autoExpandParent
+                    defaultExpandAll
+                    expandedKeys={expandedKeys}
+                    selectedKeys={selectedKeys}
+                    treeData={searchTreeData}
+                    titleRender={(node) => (
+                      <RenderTreeNode
+                        node={node}
+                        selected={selectedKeys.includes(node.key)}
+                        container={listRef.current}
+                        refreshKey={refreshKey}
+                        onAction={onTreeNodeAction}
+                        onTabItemDrop={handleTabItemDrop}
+                      ></RenderTreeNode>
+                    )}
+                    onExpand={(expandedKeys) => setExpandedKeys(expandedKeys)}
+                    onSelect={onSelect}
+                    onDrop={handleTreeNodeDrop}
+                    onRightClick={onRightClick}
+                  />
+                ) : (
+                  <div className="no-data">
+                    <Empty description={$fmt('home.emptyTip')}>
+                      <Button
+                        type="primary"
+                        size="small"
+                        onClick={handleTagCreate}
+                      >
+                        {$fmt('home.addTag')}
+                      </Button>
+                    </Empty>
+                  </div>
+                )}
+              </Spin>
             </div>
           </div>
         </div>
@@ -224,6 +249,7 @@ export default function Home() {
                   key={tabGroup.key}
                   selected={tabGroup.key === selectedTabGroupKey}
                   refreshKey={refreshKey}
+                  tagList={tagList}
                   {...tabGroup.originData}
                   onChange={(data) => handleTabGroupChange(tabGroup, data)}
                   onRemove={() =>
@@ -235,11 +261,13 @@ export default function Home() {
                   }
                   onDrop={handleTabItemDrop}
                   onTabRemove={handleTabItemRemove}
+                  onMoveTo={handleTabGroupMoveTo}
                 ></TabGroup>
               )
           )}
         </div>
       </StyledListWrapper>
+
       {/* 清空全部提示 */}
       <Modal
         title={$fmt('home.removeTitle')}
@@ -250,6 +278,9 @@ export default function Home() {
       >
         <div>{$fmt('home.clearDesc')}</div>
       </Modal>
+
+      {/* 移动到弹窗 */}
+      {/* <MoveToModal visible={moveToModalVisible} listData={tagList} moveData={moveData} onOk={moveToConfirm} onCancel={closeMoveToModal}></MoveToModal> */}
 
       {/* 帮助信息弹层 */}
       <Drawer

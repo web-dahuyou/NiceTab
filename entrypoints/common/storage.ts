@@ -155,7 +155,7 @@ class TabListUtils {
     await this.setTagList(tagList);
 
     if (this.constructor === TabListUtils) {
-      console.log('removeTagItem', tagItem);
+      // console.log('removeTagItem', tagItem);
       // 分类中有标签页，才放入到回收站
       if (!tagItem) return;
       tagItem.groupList =
@@ -226,7 +226,7 @@ class TabListUtils {
         tag.groupList = tag.groupList.filter((g) => g.groupId !== groupId);
 
         if (this.constructor === TabListUtils) {
-          console.log('removeGroup', removeGroup);
+          // console.log('removeGroup', removeGroup);
           // 标签组中有标签页，才放入到回收站
           if (removeGroup && removeGroup?.tabList?.length > 0) {
             recycleBinUtils.addTabGroups(tag, [removeGroup]);
@@ -379,6 +379,42 @@ class TabListUtils {
 
     await this.setTagList(tagList);
   }
+  // 标签组移动到（穿越）
+  async tabGroupMoveThrough(sourceGroupId: Key, targetTagId: Key) {
+    const tagList = await this.getTagList();
+    let isSourceFound = false, isTargetFound = false, sourceGroupIndex = 0, targetTagIndex = 0, sourceGroup = null;
+    for (let tIndex = 0; tIndex < tagList.length; tIndex++) {
+      const tag = tagList[tIndex];
+      if (tag.tagId === targetTagId) {
+        isTargetFound = true;
+        targetTagIndex = tIndex;
+      }
+      for (let gIndex = 0; gIndex < tag?.groupList?.length; gIndex++) {
+        const group = tag?.groupList?.[gIndex];
+        if (group.groupId === sourceGroupId) {
+          isSourceFound = true;
+          sourceGroupIndex = gIndex;
+          sourceGroup = group;
+          break;
+        }
+      }
+      if (isSourceFound) {
+        tag.groupList.splice(sourceGroupIndex, 1);
+      }
+
+      if (isSourceFound && isTargetFound) break;
+    }
+
+    if (isSourceFound && isTargetFound && sourceGroup) {
+      const targetGroup0 = tagList?.[targetTagIndex]?.groupList?.[0];
+      if (targetGroup0?.isStarred) {
+        sourceGroup.isStarred = true;
+      }
+      tagList?.[targetTagIndex]?.groupList.splice(0, 0, sourceGroup);
+    }
+
+    await this.setTagList(tagList);
+  }
 
   /* 标签相关方法 */
   async createTabs(tabs: TabItem[], createNewGroup = false) {
@@ -463,6 +499,7 @@ class TabListUtils {
       }
     } else {
       let tabItemTmp = null,
+        sourceGroupIndex = 0,
         targetTagIndex = 0,
         targetGroupIndex = 0;
       let isSourceFound = false,
@@ -473,7 +510,7 @@ class TabListUtils {
           const group = tag.groupList[gIndex];
           if (group.groupId === sourceGroupId) {
             tabItemTmp = group.tabList?.[sourceIndex];
-            group.tabList.splice(sourceIndex, 1);
+            sourceGroupIndex = gIndex;
             isSourceFound = true;
           } else if (group.groupId === targetGroupId) {
             targetTagIndex = tIndex;
@@ -482,6 +519,10 @@ class TabListUtils {
           }
 
           if (isSourceFound && isTargetFound) break;
+        }
+
+        if (isSourceFound) {
+          tag?.groupList?.[sourceGroupIndex]?.tabList.splice(sourceIndex, 1);
         }
 
         if (isSourceFound && isTargetFound) break;
@@ -494,6 +535,42 @@ class TabListUtils {
           0,
           tabItemTmp
         );
+    }
+
+    await this.setTagList(tagList);
+  }
+  // tab标签页移动到（穿越）
+  async tabMoveThrough(sourceGroupId: Key, targetTagId: Key, targetGroupId: Key, tabs: TabItem[]) {
+    const tagList = await this.getTagList();
+    const tabIds = tabs.map((tab) => tab.tabId);
+    let isSourceFound = false, isTargetFound = false, sourceGroupIndex = 0, targetTagIndex = 0, targetGroupIndex = 0;
+    for (let tIndex = 0; tIndex < tagList.length; tIndex++) {
+      const tag = tagList[tIndex];
+      if (tag.tagId === targetTagId) {
+        targetTagIndex = tIndex;
+      }
+
+      for (let gIndex = 0; gIndex < tag.groupList.length; gIndex++) {
+        const group = tag.groupList[gIndex];
+        if (group.groupId === sourceGroupId) {
+          isSourceFound = true;
+          sourceGroupIndex = gIndex;
+          group.tabList = group.tabList?.filter((tab) => !tabIds.includes(tab.tabId));
+        } else if (group.groupId === targetGroupId) {
+          isTargetFound = true;
+          targetGroupIndex = gIndex;
+        }
+      }
+
+      if (isSourceFound && isTargetFound) break;
+    }
+
+    if (isSourceFound && isTargetFound) {
+      const tag = tagList[targetTagIndex];
+      const group = tag.groupList[targetGroupIndex];
+      if (group) {
+        group.tabList = [ ...tabs, ...group.tabList];
+      }
     }
 
     await this.setTagList(tagList);

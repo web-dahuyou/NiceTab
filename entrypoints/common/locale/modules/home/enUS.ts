@@ -48,4 +48,6 @@ export default {
   'home.help.content.3': '3. When a tab group is starred, it will be placed at the top of the current category. Moving other tab groups to a position before the starred tab group will automatically star them as well. If a starred tab group is moved to a position after a non-starred tab group, the star status will be automatically released.',
   'home.help.content.4': '4. When restoring a tab group, each of the tabs within the tab group will be opened in browser. If the "Automatically remove tabs from list when restoring" setting is enabled, the tabs will be removed from the list after they are opened.',
   'home.help.content.5': '5. Categories/tab groups/tabs support drag-and-drop sorting. When a category/tab group is selected, it can be sorted using shortcut keys. The shortcut key mapping is shown in the table below:',
+
+  'home.moveTo.missingTip': 'Please select a {type}',
 }

@@ -31,14 +31,13 @@ export const StyledGroupHeader = styled.div<{ $primaryColor?: string }>`
   }
   .group-header-right-part {
     flex: 1;
-    group-info {
+    .group-info {
       display: flex;
       align-items: center;
     }
     .tab-count {
       margin-right: 8px;
       font-size: 14px;
-      color: #333;
     }
     .group-create-time {
       font-size: 12px;
@@ -46,6 +45,7 @@ export const StyledGroupHeader = styled.div<{ $primaryColor?: string }>`
     }
     .group-action-btns {
       margin-top: 4px;
+      font-size: 12px;
       .action-btn {
         display: flex;
         align-items: center;
@@ -60,16 +60,50 @@ export const StyledGroupHeader = styled.div<{ $primaryColor?: string }>`
   }
 `;
 
+export const StyledTabActions = styled.div<{ $primaryColor?: string }>`
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin: 8px 0;
+  padding: 0 20px;
+  font-size: 12px;
+  .checkall-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .tab-action-btns {
+    margin: 4px 0;
+    font-size: 12px;
+    .action-btn {
+      display: flex;
+      align-items: center;
+      color: #333;
+      cursor: pointer;
+      &:hover {
+        color: ${(props) => props.$primaryColor || ENUM_COLORS.primary};
+      }
+    }
+  }
+`;
+
 export const StyledTabListWrapper = styled.div<{ $primaryColor?: string }>`
   min-height: 24px;
   margin-top: 8px;
   padding-left: 20px;
+  .tab-list-checkbox-group {
+    width: 100%;
+    display: block;
+  }
   .tab-list-item {
     position: relative;
     display: flex;
     align-items: center;
     width: 100%;
     height: 24px;
+    .checkbox-item {
+      margin-right: 8px;
+    }
     .tab-item-btn {
       margin-right: 8px;
     }

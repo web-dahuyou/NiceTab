@@ -15,7 +15,7 @@ export const StyledRecycleBinWrapper = styled.div<{ $primaryColor: string }>`
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 24px;
+    padding: 20px;
     button {
       font-size: 12px;
     }
@@ -31,6 +31,10 @@ export const StyledTagNode = styled.div<{ $primaryColor: string }>`
     flex-shrink: 0;
     font-size: 14px;
     color: #333;
+  }
+  .count {
+    margin-right: 8px;
+    font-size: 14px;
   }
   .tag-create-time {
     font-size: 12px;

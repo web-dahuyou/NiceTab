@@ -28,4 +28,10 @@ export default {
   'common.hotkeys': '快捷键',
   'common.moveUp': '上移',
   'common.moveDown': '下移',
+  'common.moveTo': '移动到',
+  'common.choose': '选择',
+  'common.select': '选择',
+  'common.cancleSelect': '取消选择',
+  'common.enableSelect': '开启选择',
+  'common.disableSelect': '关闭选择',
 }

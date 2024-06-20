@@ -28,4 +28,10 @@ export default {
   'common.hotkeys': 'Hotkeys',
   'common.moveUp': 'Move up',
   'common.moveDown': 'Move down',
+  'common.moveTo': 'Move to',
+  'common.choose': 'Choose',
+  'common.select': 'Select',
+  'common.cancleSelect': 'Cancel Select',
+  'common.enableSelect': 'Enable Select',
+  'common.disableSelect': 'Disable Select',
 }

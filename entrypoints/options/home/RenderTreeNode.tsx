@@ -19,7 +19,7 @@ export default function RenderTreeNode({
   container,
   refreshKey,
   onAction,
-  onDrop
+  onTabItemDrop // 这个 onTabItemDrop 只是为了方便右侧面板的标签页拖拽到左侧树的标签组，左侧树中的 分类和标签组的拖拽由 antd 的 Tree 组件自带实现
 }: RenderTreeNodeProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
@@ -72,10 +72,11 @@ export default function RenderTreeNode({
   }, [container, refreshKey, selected]);
 
   return (
+    // 这个 DropComponent 只是为了方便右侧面板的标签页拖拽到左侧树的标签组，左侧树中的 分类和标签组的拖拽由 antd 的 Tree 组件自带实现
     <DropComponent
       data={{ index: 0, groupId: node.key as string, allowKeys: node.type === 'tag' ? [] : [allowDropKey] }}
       canDrop={node.type === 'tabGroup'}
-      onDrop={onDrop}
+      onDrop={onTabItemDrop}
     >
       <>
         <StyledTreeNodeItem ref={nodeRef} className="tree-node-item">

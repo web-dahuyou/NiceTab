@@ -1,9 +1,9 @@
 import { Tabs } from 'wxt/browser';
 import {
   cyan,
+  blue,
   volcano,
   orange,
-  blue,
   red,
   green,
   purple,
@@ -15,9 +15,9 @@ import type { LanguageTypes, SettingsProps, TabEvents } from '~/entrypoints/type
 export const ENUM_COLORS = {
   primary: cyan.primary || cyan[6],
   cyan,
+  blue,
   volcano,
   orange,
-  blue,
   red,
   green,
   purple,

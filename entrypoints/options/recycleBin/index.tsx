@@ -5,6 +5,7 @@ import { TagItem, GroupItem, TabItem } from '@/entrypoints/types';
 import { recycleUtils } from '~/entrypoints/common/storage';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import { StyledEmptyBox, StyledRecycleBinWrapper } from './index.styled';
+import { StickyBox } from '@/entrypoints/common/components/StickyBox';
 import TagNodeMarkup from './TagNode';
 import TabGroup from '../home/TabGroup';
 
@@ -21,7 +22,7 @@ export default function RecycleBin() {
   const getRecycleBinData = useCallback(async () => {
     const recycleList = await recycleUtils.getTagList();
     setTagList(recycleList || []);
-    setActiveKey(recycleList.map((tag) => tag.tagId) || []);
+    // setActiveKey(recycleList.map((tag) => tag.tagId) || []); // 默认全部展开
   }, []);
 
   // 修改标签组
@@ -66,8 +67,8 @@ export default function RecycleBin() {
   }, [getRecycleBinData]);
   // 删除标签页
   const handleTabItemRemove = useCallback(
-    async (groupId: React.Key, tab: TabItem) => {
-      await recycleUtils.removeTabs(groupId, [tab], true);
+    async (groupId: React.Key, tabs: TabItem[]) => {
+      await recycleUtils.removeTabs(groupId, tabs, true);
       getRecycleBinData();
     },
     [getRecycleBinData]
@@ -113,20 +114,22 @@ export default function RecycleBin() {
       className="recycle-bin-wrapper"
       $primaryColor={token.colorPrimary}
     >
-      <Space className="header-action-btns">
-        <Button type="primary" size="small" onClick={() => toggleExpand(true)}>
-          {$fmt('home.expandAll')}
-        </Button>
-        <Button type="primary" size="small" onClick={() => toggleExpand(false)}>
-          {$fmt('home.collapseAll')}
-        </Button>
-        <Button type="primary" size="small" onClick={() => setRecoverModalVisible(true)}>
-          {$fmt('home.recoverAll')}
-        </Button>
-        <Button type="primary" size="small" onClick={() => setConfirmModalVisible(true)}>
-          {$fmt('home.clearAll')}
-        </Button>
-      </Space>
+      <StickyBox topGap={60} fullWidth>
+        <Space className="header-action-btns">
+          <Button type="primary" size="small" onClick={() => toggleExpand(true)}>
+            {$fmt('home.expandAll')}
+          </Button>
+          <Button type="primary" size="small" onClick={() => toggleExpand(false)}>
+            {$fmt('home.collapseAll')}
+          </Button>
+          <Button type="primary" size="small" onClick={() => setRecoverModalVisible(true)}>
+            {$fmt('home.recoverAll')}
+          </Button>
+          <Button type="primary" size="small" onClick={() => setConfirmModalVisible(true)}>
+            {$fmt('home.clearAll')}
+          </Button>
+        </Space>
+      </StickyBox>
       <Collapse
         bordered={false}
         size="large"
@@ -157,7 +160,8 @@ export default function RecycleBin() {
                     {...group}
                     canDrag={false}
                     canDrop={false}
-                    allowActions={['remove', 'recover']}
+                    allowGroupActions={['remove', 'recover']}
+                    allowTabActions={['remove', 'recover']}
                     onChange={(data) => handleTabGroupChange(tag, group, data)}
                     onRemove={() => handleTabGroupRemove(tag, group)}
                     onRestore={() => handleTabGroupRestore(group)}
