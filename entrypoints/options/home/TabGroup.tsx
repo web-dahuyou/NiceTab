@@ -214,7 +214,7 @@ export default function TabGroup({
           </div>
         </StyledGroupHeader>
 
-        { tabList?.length > 0 && (
+        { tabList?.length > 0 && !isLocked && (
           <StyledTabActions $primaryColor={token.colorPrimary}>
             <div className="checkall-wrapper">
               <Checkbox checked={isAllChecked} indeterminate={checkAllIndeterminate} onChange={handleSelectAll}></Checkbox>
@@ -254,7 +254,9 @@ export default function TabGroup({
                   onDrop={onDrop}
                 >
                   <div className="tab-list-item" key={tab.tabId || index}>
-                    <Checkbox className="checkbox-item" value={tab.tabId}></Checkbox>
+                    { !isLocked && (
+                      <Checkbox className="checkbox-item" value={tab.tabId}></Checkbox>
+                    )}
                     { !isLocked && (
                       <StyledActionIconBtn
                         className="tab-item-btn btn-remove"

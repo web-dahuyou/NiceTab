@@ -295,6 +295,7 @@ export default function Home() {
           <p>{ $fmt('home.help.content.3') }</p>
           <p>{ $fmt('home.help.content.4') }</p>
           <p>{ $fmt('home.help.content.5') }</p>
+          <p>{ $fmt('home.help.content.6') }</p>
 
           <p style={{ marginTop: '8px' }}><strong>{ $fmt('common.hotkeys') }</strong></p>
           <HotkeyList list={hotkeyList}></HotkeyList>
