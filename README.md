@@ -36,6 +36,10 @@
 - 支持一键发送 所有标签页、当前标签页、其他标签页、左侧标签页、右侧标签页。
 - 支持快捷键（目前只添加了分类、标签组的上下移动排序的快捷键操作，后续可根据需求添加其他功能的快捷键操作）
 
+## 扩展商店
+- 谷歌 Chrome 应用商店：[Chrome Web Store](https://chromewebstore.google.com/detail/fonflmjnjbkigocpoommgmhljdpljain)
+- 微软 Edge 商店：[Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/ompjiaelpibiggcnanhbdblkhfdmkgnl)
+- Firefox 暂未发布。
 
 ## 使用
 - 点击扩展图标，打开popup面板，显示当前已打开的标签页列表，可快速访问扩展管理后台，快速切换主题。
@@ -45,6 +49,13 @@
 - 打开**管理后台 > 设置**页，可保存扩展的偏好设置。
 - 打开**管理后台 > 导入导出**页，可进行NiceTab和OneTab格式的标签页导入导出操作。
 - 打开**管理后台 > 回收站**页，可查看和管理从标签列表页中删除的分类、标签组、标签页，并进行还原和删除操作。
+
+## 更新计划
+- 远程存储同步
+- 发送标签页操作添加快捷键
+- 列表中标签页支持修改标题和链接
+- 扩展图标右键菜单支持按需配置
+- ...
 
 ## 参考链接
 - [Chrome for Developers - Extensions > API 参考](https://developer.chrome.com/docs/extensions/reference/api?hl=zh-cn)
