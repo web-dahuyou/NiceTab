@@ -24,7 +24,7 @@ export async function openAdminRoutePage(route: { path: string, query?: Record<s
   const paramsStr = objectToUrlParams(Object.assign(route?.query || {}, { randomId: getRandomId(6) }));
   const settings = await settingsUtils.getSettings();
   const { tab, adminTabUrl } = await getAdminTabInfo();
-  const urlWithParams = `${adminTabUrl}/#${route.path || '/home'}${paramsStr ? `?${paramsStr}` : ''}`;
+  const urlWithParams = `${adminTabUrl}#${route.path || '/home'}${paramsStr ? `?${paramsStr}` : ''}`;
 
   // 如果发送标签页后不需要打开管理后台页面，则刷新管理后台页
   if (!needOpen && tab?.id) {
