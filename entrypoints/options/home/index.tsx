@@ -9,14 +9,11 @@ import { StyledListWrapper } from './Home.styled';
 import RenderTreeNode from './RenderTreeNode';
 import TabGroup from './TabGroup';
 import HotkeyList from '../components/HotkeyList';
-import type { TagItem, GroupItem } from '@/entrypoints/types';
+import type { TagItem, GroupItem, TabItem } from '@/entrypoints/types';
 import type { TreeDataNodeTabGroup, TreeDataNodeUnion, MoveDataProps } from './types';
-import { dndKeys } from './constants';
 import { useTreeData } from './hooks/treeData';
 import useHotkeys from './hooks/hotkeys';
 import { getTreeData } from './utils';
-
-const dndKey = dndKeys.tabItem;
 
 export default function Home() {
   const { token } = theme.useToken();
@@ -50,6 +47,7 @@ export default function Home() {
     handleTabGroupRestore,
     handleTreeNodeDrop,
     handleTabItemDrop,
+    handleTabItemChange,
     handleTabItemRemove,
     handleHotkeyAction
   } = useTreeData();
@@ -260,6 +258,7 @@ export default function Home() {
                     handleTabGroupStarredChange(tabGroup, isStarred)
                   }
                   onDrop={handleTabItemDrop}
+                  onTabChange={(tabItem: TabItem) => handleTabItemChange(tabGroup, tabItem)}
                   onTabRemove={handleTabItemRemove}
                   onMoveTo={handleTabGroupMoveTo}
                 ></TabGroup>
@@ -278,9 +277,6 @@ export default function Home() {
       >
         <div>{$fmt('home.clearDesc')}</div>
       </Modal>
-
-      {/* 移动到弹窗 */}
-      {/* <MoveToModal visible={moveToModalVisible} listData={tagList} moveData={moveData} onOk={moveToConfirm} onCancel={closeMoveToModal}></MoveToModal> */}
 
       {/* 帮助信息弹层 */}
       <Drawer

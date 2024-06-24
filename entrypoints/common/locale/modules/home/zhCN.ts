@@ -34,6 +34,8 @@ export default {
 
   'home.tabGroup.count': '{count}个标签组',
   'home.tab.count': '{count}个标签页',
+  'home.tab.name': '名称',
+  'home.tab.url': '网址',
 
   'home.help.content.1': '1、左侧列表一级菜单表示分类，二级菜单表示标签组，左侧列表支持分类和标签组的搜索；右侧面板展示的是当前选中分类中的所有标签组以及标签组中的标签页。',
   'home.help.content.2': '2、标签组锁定后可以移动，该标签组以及组内的标签页，将禁止删除和移出，但可以将其他标签组的标签页移入该标签组；如果想要删除或移出，可先解锁该标签组。',

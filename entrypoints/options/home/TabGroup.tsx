@@ -3,18 +3,16 @@ import { theme, Modal, Space, Divider, Tag, Checkbox } from 'antd';
 import type { CheckboxProps } from 'antd';
 import { LockOutlined, StarOutlined, CloseOutlined } from '@ant-design/icons';
 import { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
-import { openNewTab } from '~/entrypoints/common/tabs';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks';
 import EditInput from '../components/EditInput';
+import TabListItem from './TabListItem';
 import {
   StyledGroupWrapper,
   StyledGroupHeader,
   StyledTabActions,
   StyledTabListWrapper,
-  StyledTabTitle,
-  StyledTabItemFavicon,
 } from './TabGroup.styled';
 import DndComponent from '@/entrypoints/common/components/DndComponent';
 import DropComponent from '@/entrypoints/common/components/DropComponent';
@@ -39,6 +37,7 @@ type TabGroupProps = GroupItem & {
   onStarredChange?: (isStarred: boolean) => void;
   onRecover?: () => void;
   onDrop?: DndTabItemOnDropCallback;
+  onTabChange?: (data: TabItem) => void;
   onTabRemove?: (groupId: string, tabs: TabItem[]) => void;
   onMoveTo?: ({ moveData, selected }: { moveData?: MoveDataProps, selected: boolean }) => void;
 };
@@ -66,6 +65,7 @@ export default function TabGroup({
   onStarredChange,
   onRecover,
   onDrop,
+  onTabChange,
   onTabRemove,
   onMoveTo
 }: TabGroupProps) {
@@ -253,35 +253,13 @@ export default function TabGroup({
                   dndKey={dndKey}
                   onDrop={onDrop}
                 >
-                  <div className="tab-list-item" key={tab.tabId || index}>
-                    { !isLocked && (
-                      <Checkbox className="checkbox-item" value={tab.tabId}></Checkbox>
-                    )}
-                    { !isLocked && (
-                      <StyledActionIconBtn
-                        className="tab-item-btn btn-remove"
-                        $size="16"
-                        title={$fmt('common.remove')}
-                        $hoverColor={ENUM_COLORS.red.primary}
-                        onClick={() =>
-                          onTabRemove?.(groupId, [tab])
-                        }
-                      >
-                        <CloseOutlined />
-                      </StyledActionIconBtn>
-                    ) }
-                    {tab.favIconUrl && (
-                      <StyledTabItemFavicon
-                        className="tab-item-favicon"
-                        $bgUrl={tab.favIconUrl}
-                      />
-                    )}
-                    <StyledTabTitle $primaryColor={token.colorPrimary}>
-                      <span className="tab-title" title={tab.title} onClick={() => openNewTab(tab)}>
-                        {tab.title}
-                      </span>
-                    </StyledTabTitle>
-                  </div>
+                  <TabListItem
+                    key={tab.tabId || index}
+                    group={{groupId, isLocked, isStarred}}
+                    tab={tab}
+                    onRemove={() => onTabRemove?.(groupId, [tab])}
+                    onChange={onTabChange}
+                  />
                 </DndComponent>
               ))}
             </Checkbox.Group>

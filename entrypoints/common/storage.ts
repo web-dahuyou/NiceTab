@@ -203,18 +203,19 @@ class TabListUtils {
     await this.setTagList(tagList);
     return { tagId, tabGroup: newGroup };
   }
-  async updateTabGroup(tagId: Key, groupId: Key, group: Partial<GroupItem>) {
+  async updateTabGroup({tagId, groupId, data}: {tagId?: Key; groupId: Key; data: Partial<GroupItem>;}) {
     const tagList = await this.getTagList();
+    let isFound = false;
     for (let tag of tagList) {
-      if (tag.tagId === tagId) {
-        for (let g of tag.groupList) {
-          if (g.groupId === groupId) {
-            Object.assign(g, group);
-            break;
-          }
+      if (tagId && tag.tagId !== tagId) continue;
+      for (let g of tag.groupList) {
+        if (g.groupId === groupId) {
+          Object.assign(g, data);
+          isFound = true;
+          break;
         }
-        break;
       }
+      if (isFound) break;
     }
     await this.setTagList(tagList);
   }
@@ -467,6 +468,28 @@ class TabListUtils {
       if (!tag || !group) return;
       await recycleBinUtils.addTabs(tag, group, tabs);
     }
+  }
+  // 更新标签页
+  async updateTab({ tagId, groupId, data }: { tagId?: Key; groupId: Key; data: Partial<TabItem>; }) {
+    const tagList = await this.getTagList();
+    let isFound = false;
+    for (let tag of tagList) {
+      if (tagId && tag.tagId !== tagId) continue;
+      for (let g of tag.groupList) {
+        if (g.groupId === groupId) {
+          g.tabList = g?.tabList.map(tab => {
+            if (tab.tabId === data.tabId) {
+              return { ...tab, ...data };
+            }
+            return tab;
+          });
+          isFound = true;
+          break;
+        }
+      }
+      if (isFound) break;
+    }
+    await this.setTagList(tagList);
   }
   // tab标签页拖拽
   async onTabDrop(

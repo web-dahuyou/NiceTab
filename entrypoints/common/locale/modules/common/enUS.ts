@@ -34,4 +34,6 @@ export default {
   'common.cancleSelect': 'Cancel Select',
   'common.enableSelect': 'Enable Select',
   'common.disableSelect': 'Disable Select',
+  'common.name': 'Name',
+  'common.url': 'URL',
 }

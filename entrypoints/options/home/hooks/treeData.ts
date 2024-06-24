@@ -116,9 +116,6 @@ export function useTreeData() {
   const onSelect = useCallback(
     (selectedKeys: React.Key[], { node }: { node: TreeDataNodeUnion }) => {
       handleSelect(treeData, selectedKeys, { node });
-      if (urlParams.tagId || urlParams.groupId) {
-        setSearchParams({}, { replace: true });
-      }
     },
     [treeData]
   );
@@ -219,7 +216,11 @@ export function useTreeData() {
     async (tabGroup: TreeDataNodeTabGroup, data: Partial<GroupItem>) => {
       const tagKey = tabGroup.parentKey;
       if (!tabGroup.key || !tagKey) return;
-      await tabListUtils.updateTabGroup(tagKey, tabGroup.key, data);
+      await tabListUtils.updateTabGroup({
+        tagId: tagKey,
+        groupId: tabGroup.key,
+        data
+      });
       refreshTreeData();
     },
     []
@@ -260,6 +261,15 @@ export function useTreeData() {
     },
     [treeData]
   )
+  // 修改标签页
+  const handleTabItemChange = useCallback(async (tabGroup: TreeDataNodeTabGroup, tabData: TabItem) => {
+    await tabListUtils.updateTab({
+      tagId: tabGroup.parentKey,
+      groupId: tabGroup.key,
+      data: tabData
+    });
+    refreshTreeData();
+  }, []);
 
   // 拖拽
   const handleTreeNodeDrop: TreeProps<TreeDataNodeUnion>['onDrop'] = async ({ dragNode, dropPosition, node }) => {
@@ -420,6 +430,7 @@ export function useTreeData() {
     handleTabGroupRestore,
     handleTreeNodeDrop,
     handleTabItemDrop,
+    handleTabItemChange,
     handleTabItemRemove,
     handleHotkeyAction
   }

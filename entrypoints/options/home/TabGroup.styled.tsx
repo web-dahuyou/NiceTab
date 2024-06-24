@@ -95,42 +95,6 @@ export const StyledTabListWrapper = styled.div<{ $primaryColor?: string }>`
     width: 100%;
     display: block;
   }
-  .tab-list-item {
-    position: relative;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    height: 24px;
-    .checkbox-item {
-      margin-right: 8px;
-    }
-    .tab-item-btn {
-      margin-right: 8px;
-    }
-  }
-`;
-
-export const StyledTabItemFavicon = styled.i<{ $bgUrl?: string }>`
-  flex: 0 0 16px;
-  width: 16px;
-  height: 16px;
-  margin-right: 8px;
-  background: url(${(props) => props.$bgUrl}) no-repeat center / 100% 100%;
-`;
-
-export const StyledTabTitle = styled.a<{ $primaryColor?: string }>`
-  flex: 1;
-  width: 0;
-  ${StyledEllipsis}
-  .tab-title {
-    font-size: 14px;
-    color: ${ENUM_COLORS.blue.primary};
-    text-decoration: underline;
-    cursor: pointer;
-    &:hover {
-      color: ${(props) => props.$primaryColor || ENUM_COLORS.primary};
-    }
-  }
 `;
 
 export default {

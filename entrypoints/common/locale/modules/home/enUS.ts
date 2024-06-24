@@ -42,6 +42,8 @@ export default {
     one {# Tab}
     other {# Tabs}
   }`,
+  'home.tab.name': 'Name',
+  'home.tab.url': 'URL',
 
   'home.help.content.1': '1. The left side list displays the tags, and the secondary menus represent the tab groups. The list supports searching for both tags and tab groups. The right-side panel displays all the tab groups and the tabs within each tab group.',
   'home.help.content.2': '2. When a tab group is locked, the group and its tabs cannot be removed or moved out. However, tabs from other tab groups can be moved into the locked group. To remove a tab group, you need to first unlock it.',

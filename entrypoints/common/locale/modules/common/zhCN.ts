@@ -34,4 +34,6 @@ export default {
   'common.cancleSelect': '取消选择',
   'common.enableSelect': '开启选择',
   'common.disableSelect': '关闭选择',
+  'common.name': '名称',
+  'common.url': '网址',
 }

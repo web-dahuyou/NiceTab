@@ -29,7 +29,11 @@ export default function RecycleBin() {
   const handleTabGroupChange = useCallback(
     async (tag: TagItem, group: GroupItem, data: Partial<GroupItem>) => {
       if (!tag?.tagId || !group?.groupId) return;
-      await recycleUtils.updateTabGroup(tag.tagId, group.groupId, data);
+      await recycleUtils.updateTabGroup({
+        tagId: tag.tagId,
+        groupId: group.groupId,
+        data
+      });
       getRecycleBinData();
     },
     [getRecycleBinData]
@@ -69,6 +73,18 @@ export default function RecycleBin() {
   const handleTabItemRemove = useCallback(
     async (groupId: React.Key, tabs: TabItem[]) => {
       await recycleUtils.removeTabs(groupId, tabs, true);
+      getRecycleBinData();
+    },
+    [getRecycleBinData]
+  );
+  // 修改标签页
+  const handleTabItemChange = useCallback(
+    async (tag: TagItem, group: GroupItem, tabData: TabItem) => {
+      await recycleUtils.updateTab({
+        tagId: tag.tagId,
+        groupId: group.groupId,
+        data: tabData
+      });
       getRecycleBinData();
     },
     [getRecycleBinData]
@@ -169,6 +185,7 @@ export default function RecycleBin() {
                       handleTabGroupStarredChange(tag, group, isStarred)
                     }
                     onRecover={() => handleTabGroupRecover(tag, group)}
+                    onTabChange={(tabItem: TabItem) => handleTabItemChange(tag, group, tabItem)}
                     onTabRemove={handleTabItemRemove}
                   ></TabGroup>
                 ))}
