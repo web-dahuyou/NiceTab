@@ -110,6 +110,7 @@ export function useTreeData() {
         });
       }
       setSelectedKeys([node.key]);
+      setRefreshKey(getRandomId());
     },
     []
   );

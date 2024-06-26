@@ -42,7 +42,9 @@ export const extContentImporter: ExtContentImporterProps = {
         group.groupId = getRandomId();
         group.createTime = createTime;
         group?.tabList?.forEach(tab => {
+          const { favIconUrl } = tab;
           tab.tabId = getRandomId();
+          tab.favIconUrl = favIconUrl?.startsWith('data:image/') ? '' : favIconUrl
         })
       });
     })

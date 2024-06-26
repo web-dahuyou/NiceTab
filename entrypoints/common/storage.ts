@@ -420,7 +420,14 @@ class TabListUtils {
   /* 标签相关方法 */
   async createTabs(tabs: TabItem[], createNewGroup = false) {
     await this.getTagList();
-    const newTabs = tabs.map((tab) => ({ ...tab, tabId: tab.tabId || getRandomId() }));
+    const newTabs = tabs.map((tab) => {
+      const { favIconUrl } = tab;
+      return {
+        ...tab,
+        tabId: tab.tabId || getRandomId(),
+        favIconUrl: favIconUrl?.startsWith('data:image/') ? '' : favIconUrl
+      };
+    });
     let tag0 = this.tagList?.[0];
     const group = tag0?.groupList?.find((group) => !group.isLocked && !group.isStarred);
     if (!createNewGroup && group) {

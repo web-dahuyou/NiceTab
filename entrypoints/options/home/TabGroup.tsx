@@ -132,6 +132,7 @@ export default function TabGroup({
         $bgColor={selected ? token.colorPrimaryBg : ''}
         ref={groupRef}
       >
+        {/* 标签组 header 展示、操作区域 */}
         <StyledGroupHeader className="group-header" $primaryColor={token.colorPrimary}>
           {allowGroupActions.includes('remove') && !isLocked && (
             <StyledActionIconBtn
@@ -214,6 +215,7 @@ export default function TabGroup({
           </div>
         </StyledGroupHeader>
 
+        {/* tab 选择、操作区域 */}
         { tabList?.length > 0 && !isLocked && (
           <StyledTabActions $primaryColor={token.colorPrimary}>
             <div className="checkall-wrapper">
@@ -242,6 +244,7 @@ export default function TabGroup({
           </StyledTabActions>
         ) }
 
+        {/* tab 列表 */}
         <DropComponent data={{index: 0, groupId, allowKeys: tabList?.length > 0 ? [] : [dndKey]}} canDrop={canDrop} onDrop={onDrop}>
           <StyledTabListWrapper className="tab-list-wrapper">
             <Checkbox.Group className="tab-list-checkbox-group" value={ selectedTabIds } onChange={ setSelectedTabIds }>

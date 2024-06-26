@@ -52,7 +52,7 @@ export function objectToUrlParams(params: Record<string, any>): string {
  * @param isPlainNumber 随机字符串是否纯数字
  * @return 要输出的字符串
  */
-export function getRandomId(digit: number = 16, isPlainNumber: boolean = false) {
+export function getRandomId(digit: number = 8, isPlainNumber: boolean = false) {
   return 'x'.repeat(digit).replace(/[x]/g, (c) => {
     return ((Math.random() * digit) | 0).toString(isPlainNumber ? 10 : 16);
   });

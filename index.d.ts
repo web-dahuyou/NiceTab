@@ -1,6 +1,6 @@
 declare module 'react-copy-to-clipboard' {
   type CopyToClipboardProps = {
-    value: string;
+    text: string;
     onCopy: (text: string, result: boolean) => void;
     children: JSX.Element
   }
@@ -10,7 +10,3 @@ declare module 'react-copy-to-clipboard' {
 declare module 'file-saver' {
   export function saveAs(blob: Blob, name?: string): void
 };
-
-export default {
-  name: 'Nice-Tab.d.ts',
-}

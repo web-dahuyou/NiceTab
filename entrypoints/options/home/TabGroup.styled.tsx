@@ -64,6 +64,7 @@ export const StyledTabActions = styled.div<{ $primaryColor?: string }>`
   display: flex;
   align-items: center;
   gap: 24px;
+  height: 26px;
   margin: 8px 0;
   padding: 0 20px;
   font-size: 12px;
