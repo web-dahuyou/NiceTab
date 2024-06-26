@@ -60,7 +60,7 @@ class TabListUtils {
     groupCount: 0,
     tabCount: 0,
   };
-  storageKey: string = 'local:tabList';
+  storageKey: `local:${string}` = 'local:tabList';
 
   /* 分类相关方法 */
   getInitialTag(): TagItem {
@@ -666,7 +666,7 @@ class RecycleBinUtils extends TabListUtils {
     groupCount: 0,
     tabCount: 0,
   };
-  storageKey: string = 'local:recycleBin';
+  storageKey: `local:${string}` = 'local:recycleBin';
 
   constructor() {
     super();
