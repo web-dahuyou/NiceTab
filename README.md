@@ -39,7 +39,56 @@
 - 支持快捷键（目前只添加了分类、标签组的上下移动排序的快捷键操作，后续可根据需求添加其他功能的快捷键操作）。
 - 标签页支持自定义编辑修改标题和url。
 
-## 扩展商店
+
+## 功能截图
+### 点击扩展图标
+- 点击扩展图标，弹出popup面板。
+- popup面板，可快速访问 列表页，设置页面，导入导出页面，回收站页面。
+- popup面板，可快捷切换主题色。
+- popup面板，可快捷访问和关闭当前打开的标签页。
+
+![NiceTab-扩展图标点击](https://github.com/web-dahuyou/NiceTab/assets/22833786/00ffecc1-da89-4a27-b769-1e645db4f216)
+
+### 右键菜单
+右击扩展图标，展示右键菜单，可打开扩展管理后台页面。支持 一键发送 所有标签页、当前标签页、其他标签页、左侧标签页、右侧标签页。
+
+![NiceTab-扩展图标右键菜单.png](https://github.com/web-dahuyou/NiceTab/assets/22833786/120e9c7d-5732-4b31-8adb-1c532d905eae)
+
+### 扩展管理后台-列表页
+- 管理发送到NiceTab的标签页，支持分类，标签组管理。
+- 左侧列表支持拖拽和快捷键排序，右侧面板展示当前分类中的所有标签组和标签页，可进行相应的操作。
+- 支持标签组删除和跨分类移动，以及多选标签页删除和跨标签组移动。
+
+![NiceTab-列表页](https://github.com/web-dahuyou/NiceTab/assets/22833786/98b4413c-f36a-4e9f-a429-19dc8bd75520)
+
+### 扩展管理后台-偏好设置页
+您可根据自己的喜好，作相应的偏好设置。
+
+![NiceTab-偏好设置页.png](https://github.com/web-dahuyou/NiceTab/assets/22833786/d1f06a16-bc68-49e5-8396-97d1adb687af)
+
+### 扩展管理后台-导入导出
+导入导出功能目前支持 `NiceTab` 和 `OneTab` 格式的交叉导入导出。
+- 可导入 `OneTab` 格式的列表并解析为 `NiceTab` 格式。
+- 可将 `NiceTab`格式的列表导出为 `NiceTab` 或 `OneTab` 格式。
+
+![NiceTab-导入导出.png](https://github.com/web-dahuyou/NiceTab/assets/22833786/3d819f9a-60a7-4420-afe0-1c3239f2458a)
+
+### 扩展管理后台-回收站
+- 分类、标签组、标签页删除后，会保留到回收站，您可将回收站的分类、标签组等还原到列表页或者彻底删除。
+
+![NiceTab-回收站.png](https://github.com/web-dahuyou/NiceTab/assets/22833786/92fb10cc-49f3-4009-b9df-c7898d46529c)
+
+### 切换主题色
+插件支持主题切换，您可以在扩展管理后台页或者 popup 弹窗中进行切换。
+
+![NiceTab-切换主题色.png](https://github.com/web-dahuyou/NiceTab/assets/22833786/7b36493f-fcfb-4441-a8d5-3a228b2374c7)
+
+### 切换语言
+插件支持语言切换，您可以在扩展管理后台页进行切换。
+
+![NiceTab-切换语言.png](https://github.com/web-dahuyou/NiceTab/assets/22833786/b9d4f6da-151f-460d-ac4c-4ddbcaee0a05)
+
+## 扩展安装
 - 谷歌 Chrome 应用商店：[Chrome Web Store](https://chromewebstore.google.com/detail/fonflmjnjbkigocpoommgmhljdpljain)
 - 微软 Edge 商店：[Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/ompjiaelpibiggcnanhbdblkhfdmkgnl)
 - Firefox 暂未发布。
@@ -57,7 +106,7 @@
 - 由于 Chrome Api限制，远程同步有数据大小和频次限制，大小限制 100K，频次限制 1次/2秒。所以目前暂时使用浏览器本地存储+支持导出到本地的方案。后续会添加远程存储同步功能
 - 发送标签页操作添加快捷键
 - 扩展图标右键菜单支持按需配置
-- 列表中标签页支持预览功能
+- 支持浏览器自带的标签页分组单独创建分组，从列表恢复标签组时自动组成标签页分组
 - ...
 
 ## 参考链接
