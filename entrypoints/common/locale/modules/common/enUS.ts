@@ -39,4 +39,5 @@ export default {
   'common.goToGithub': 'Give me a star',
   'common.update.available': 'New version available',
   'common.update.upgradeNow': 'Upgrade right now',
+  'common.backToTop': 'Back to Top',
 }

@@ -39,4 +39,5 @@ export default {
   'common.goToGithub': '给个小星星吧',
   'common.update.available': '有可用的新版本',
   'common.update.upgradeNow': '立即升级',
+  'common.backToTop': '回到顶部',
 }

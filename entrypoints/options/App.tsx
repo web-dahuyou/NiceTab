@@ -6,7 +6,7 @@ import {
   useNavigate,
   useLocation,
 } from 'react-router-dom';
-import { theme, Menu, Dropdown, Flex, Space, Tooltip, Typography } from 'antd';
+import { theme, Menu, Dropdown, Flex, Space, Tooltip, Typography, FloatButton } from 'antd';
 import {
   HomeOutlined,
   SettingOutlined,
@@ -268,6 +268,14 @@ function AppLayout() {
       <div className="main-content">
         <Outlet></Outlet>
       </div>
+
+      {/* 回到顶部 */}
+      <FloatButton.Group shape="circle" style={{ right: 30 }}>
+        {/* BackTop组件自带的 tooltip 在点击按钮时会闪 */}
+        <span title={$fmt('common.backToTop')}>
+          <FloatButton.BackTop duration={100} visibilityHeight={400} />
+        </span>
+      </FloatButton.Group>
     </StyledPageContainer>
   );
 }
