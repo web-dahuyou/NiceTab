@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { theme, Modal } from 'antd';
 import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
-import { useIntlUtls } from '~/entrypoints/common/hooks';
+import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { ENUM_COLORS, UNNAMED_TAG, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { StyledTreeNodeItem } from './Home.styled';

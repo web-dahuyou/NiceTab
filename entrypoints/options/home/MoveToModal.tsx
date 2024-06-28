@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import { theme, Modal, Cascader, Typography } from 'antd';
 import styled from 'styled-components';
-import { useIntlUtls } from '~/entrypoints/common/hooks';
+import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { tabListUtils } from '~/entrypoints/common/storage';
 import type { TagItem } from '~/entrypoints/types';
 import type { MoveDataProps, CascaderOption } from './types';

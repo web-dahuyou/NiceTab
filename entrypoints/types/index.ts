@@ -1,6 +1,16 @@
 
 import { MessageDescriptor } from 'react-intl';
 
+// 扩展版本信息
+export type VersionInfo = { updateAvailable: boolean; version?: string; };
+
+// 全局 Context
+export interface GlobalContextProps {
+  colorPrimary: string;
+  setThemeData: (themeData: Partial<ThemeProps>) => void;
+  setLocale: (language?: LanguageTypes, callback?: () => void) => Promise<void>;
+}
+
 // 语言
 export type LanguageTypes = 'zh-CN' | 'en-US';
 // react-intl formatMessage 参数

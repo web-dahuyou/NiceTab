@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useState } from "react";
-import { useIntlUtls } from '~/entrypoints/common/hooks';
+import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import type { MoveDataProps } from '../types';
 
 export default function useMoveTo() {

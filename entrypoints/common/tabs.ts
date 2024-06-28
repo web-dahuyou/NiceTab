@@ -212,7 +212,7 @@ async function sendRightTabs(currTab?: Tabs.Tab) {
   for (let i = tabs.length - 1; i >= 0; i--) {
     const tab = tabs[i];
     if (tab.id === currTab?.id) break;
-    rightTabs.push(tab);
+    rightTabs.unshift(tab);
   }
 
   const settings = await settingsUtils.getSettings();
@@ -232,8 +232,11 @@ async function sendRightTabs(currTab?: Tabs.Tab) {
   cancelHighlightTabs();
 }
 
-export function openNewTab(tab: TabItem) {
-  browser.tabs.create({ url: tab.url, active: false });
+// 打开标签页
+export function openNewTab(url?: string, active: boolean = false) {
+  // 注意：如果打开标签页不想 active, 则 active 必须设置默认值为 false，
+  // create 方法 active参数传 undefined 也会激活 active
+  url && browser.tabs.create({ url, active });
 }
 
 export default {

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { theme, Collapse, Space, Button, Modal, Empty } from 'antd';
-import { useIntlUtls } from '~/entrypoints/common/hooks';
+import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { TagItem, GroupItem, TabItem } from '@/entrypoints/types';
 import { recycleUtils } from '~/entrypoints/common/storage';
 import { openNewTab } from '~/entrypoints/common/tabs';
@@ -61,7 +61,7 @@ export default function RecycleBin() {
   // 打开标签组
   const handleTabGroupRestore = useCallback(async (group: GroupItem) => {
     group?.tabList.forEach((tab) => {
-      openNewTab(tab);
+      openNewTab(tab.url);
     });
   }, []);
   // 恢复标签组 (从回收站恢复到列表页)

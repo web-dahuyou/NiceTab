@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { theme, Input } from 'antd';
 import type { InputProps, InputRef } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
-import { useIntlUtls } from '~/entrypoints/common/hooks';
+import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import styled from 'styled-components';
 import {
   StyledEllipsis,

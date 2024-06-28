@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { saveAs } from 'file-saver';
 import dayjs from 'dayjs';
-import { useIntlUtls } from '~/entrypoints/common/hooks';
+import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { tabListUtils } from '~/entrypoints/common/storage';
 import { initialValues, formatTypeOptions, importModeOptions } from './constants';
 import { extContentImporter, extContentExporter } from './utils';

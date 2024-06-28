@@ -26,17 +26,17 @@ export const StyledTabItemFavicon = styled.i<{ $bgUrl?: string }>`
   background: url(${(props) => props.$bgUrl}) no-repeat center / 100% 100%;
 `;
 
-export const StyledTabTitle = styled.a<{ $primaryColor?: string }>`
+export const StyledTabTitle = styled.span<{ $color?: string; $colorHover?: string }>`
   flex: 1;
   width: 0;
   ${StyledEllipsis}
-  .tab-title {
+  .tab-item-title-text {
     font-size: 14px;
-    color: ${ENUM_COLORS.blue.primary};
+    color: ${(props) => props.$color || ENUM_COLORS.blue.primary};
     text-decoration: underline;
     cursor: pointer;
     &:hover {
-      color: ${(props) => props.$primaryColor || ENUM_COLORS.primary};
+      color: ${(props) => props.$colorHover || ENUM_COLORS.primary};
     }
   }
 `;

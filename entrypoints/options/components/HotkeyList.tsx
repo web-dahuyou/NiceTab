@@ -1,5 +1,5 @@
 import { Flex, Table } from 'antd';
-import { useIntlUtls } from '~/entrypoints/common/hooks';
+import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import styled from 'styled-components';
 import type { HotkeyItem } from '~/entrypoints/types';
 

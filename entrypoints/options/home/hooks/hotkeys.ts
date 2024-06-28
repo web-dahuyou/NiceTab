@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useMemo } from "react";
 import hotkeys from 'hotkeys-js';
-import { useIntlUtls } from '~/entrypoints/common/hooks';
+import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { getOSInfo, getKeysByOS } from '~/entrypoints/common/utils';
 import type { HotkeyOption } from '~/entrypoints/types';
 

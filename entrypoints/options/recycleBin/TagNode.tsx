@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { theme, Flex, Space, Modal, Divider, Tag } from 'antd';
 import { TagOutlined } from '@ant-design/icons';
 import { TagItem } from '@/entrypoints/types';
-import { useIntlUtls } from '~/entrypoints/common/hooks';
+import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { recycleUtils } from '~/entrypoints/common/storage';
 import { ENUM_COLORS } from '~/entrypoints/common/constants';
 import { StyledTagNode } from './index.styled';

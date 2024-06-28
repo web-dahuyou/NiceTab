@@ -2,20 +2,28 @@ import React, { useEffect, useState } from 'react';
 import { ConfigProvider } from 'antd';
 import { IntlProvider } from 'react-intl';
 import { ENUM_COLORS } from '../constants';
-import { GlobalContext, useAntdLocale, useCustomLocale } from '~/entrypoints/common/hooks';
+import {
+  GlobalContext,
+  useAntdLocale,
+  useCustomLocale,
+} from '~/entrypoints/common/hooks/global';
 import type { ThemeProps, LanguageTypes } from '~/entrypoints/types';
 import { themeUtils } from '~/entrypoints/common/storage';
 
 export default function Root({ children }: { children: React.ReactNode }) {
   const { locale: localeAntd, changeLocale: changeLocaleAntd } = useAntdLocale();
-  const { locale: localeCustom, changeLocale: changeLocaleCustom, messages } = useCustomLocale();
+  const {
+    locale: localeCustom,
+    changeLocale: changeLocaleCustom,
+    messages,
+  } = useCustomLocale();
   const [hasReady, setHasReady] = useState(false);
   const [primaryColor, setPrimaryColor] = useState(ENUM_COLORS.primary);
 
   const handleLocaleChange = async (languange?: LanguageTypes) => {
     changeLocaleAntd(languange);
     changeLocaleCustom(languange);
-  }
+  };
   const handleThemeChange = async (themeData: Partial<ThemeProps>) => {
     const theme = await themeUtils.setThemeData(themeData);
     setPrimaryColor(theme.colorPrimary);
@@ -25,7 +33,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
     const theme = await themeUtils.getThemeData();
     setPrimaryColor(theme.colorPrimary);
     setHasReady(true);
-  }
+  };
 
   useEffect(() => {
     initThemeData();
@@ -58,10 +66,10 @@ export default function Root({ children }: { children: React.ReactNode }) {
           value={{
             colorPrimary: primaryColor,
             setThemeData: handleThemeChange,
-            setLocale: handleLocaleChange
+            setLocale: handleLocaleChange,
           }}
         >
-          { hasReady && children }
+          {hasReady && children}
         </GlobalContext.Provider>
       </ConfigProvider>
     </IntlProvider>

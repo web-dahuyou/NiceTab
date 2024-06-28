@@ -36,4 +36,7 @@ export default {
   'common.disableSelect': '关闭选择',
   'common.name': '名称',
   'common.url': '网址',
+  'common.goToGithub': '给个小星星吧',
+  'common.update.available': '有可用的新版本',
+  'common.update.upgradeNow': '立即升级',
 }

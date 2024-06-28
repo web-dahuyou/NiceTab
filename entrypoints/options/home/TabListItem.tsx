@@ -5,7 +5,7 @@ import { GroupItem, TabItem } from '~/entrypoints/types';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS } from '~/entrypoints/common/constants';
-import { useIntlUtls } from '~/entrypoints/common/hooks';
+import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import {
   StyledTabItemWrapper,
   StyledTabTitle,
@@ -37,9 +37,11 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
   return (
     <>
       <StyledTabItemWrapper className="tab-list-item">
+        {/* checkbox */}
         {!group?.isLocked && (
           <Checkbox className="checkbox-item" value={tab.tabId}></Checkbox>
         )}
+        {/* icon tab edit */}
         <StyledActionIconBtn
           className="tab-item-btn btn-edit"
           $size="16"
@@ -49,6 +51,7 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
         >
           <EditOutlined />
         </StyledActionIconBtn>
+        {/* icon tab remove */}
         {!group?.isLocked && (
           <StyledActionIconBtn
             className="tab-item-btn btn-remove"
@@ -60,11 +63,21 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
             <CloseOutlined />
           </StyledActionIconBtn>
         )}
+        {/* icon tab favicon */}
         {tab.favIconUrl && (
           <StyledTabItemFavicon className="tab-item-favicon" $bgUrl={tab.favIconUrl} />
         )}
-        <StyledTabTitle $primaryColor={token.colorPrimary}>
-          <span className="tab-title" title={tab.title} onClick={() => openNewTab(tab)}>
+        {/* tab title */}
+        <StyledTabTitle
+          className="tab-item-title"
+          $color={token.colorLink}
+          $colorHover={token.colorLinkHover}
+        >
+          <span
+            className="tab-item-title-text"
+            title={tab.title}
+            onClick={() => openNewTab(tab.url)}
+          >
             {tab.title}
           </span>
         </StyledTabTitle>

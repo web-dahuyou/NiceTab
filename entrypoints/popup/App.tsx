@@ -6,11 +6,13 @@ import {
   HomeOutlined,
   SettingOutlined,
   ImportOutlined,
+  RestOutlined
 } from '@ant-design/icons';
 import { classNames, sendBrowserMessage } from '~/entrypoints/common/utils';
 import '~/assets/css/reset.css';
+import '~/assets/css/index.css';
 import './App.css';
-import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks';
+import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { StyledActionIconBtn, StyledColorItem } from '~/entrypoints/common/style/Common.styled';
 import { StyledContainer, StyledList, StyledFavIcon } from './App.styled';
 import { THEME_COLORS } from '~/entrypoints/common/constants';
@@ -47,7 +49,14 @@ export default function App() {
       icon: <ImportOutlined />,
       onClick: () => handleQuickAction({ path: '/import-export' }),
     },
+    {
+      label: $fmt('common.recycleBin'),
+      path: '/recycle',
+      icon: <RestOutlined />,
+      onClick: () => handleQuickAction({ path: '/recycle' }),
+    },
   ];
+
   // 切换主题
   const handleThemeChange = (item: ColorItem) => {
     const themeData = { colorPrimary: item.color };
@@ -75,7 +84,7 @@ export default function App() {
   }, []);
 
   return (
-    <StyledContainer className="popup-container" $primaryColor={token.colorPrimary}>
+    <StyledContainer className="popup-container select-none" $primaryColor={token.colorPrimary}>
       <div className="block quick-actions">
         <span className="block-title">{$fmt('common.view')}：</span>
         <Space size={0} split={<Divider type="vertical" style={{ background: token.colorBorder }} />}>

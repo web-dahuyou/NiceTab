@@ -1,7 +1,8 @@
-import { useCallback } from 'react';
-import { theme, Modal, Form, Input } from 'antd';
+import { useRef, useCallback, useEffect } from 'react';
+import { Modal, Form, Input } from 'antd';
+import { InputRef } from 'antd';
 import { TabItem } from '~/entrypoints/types';
-import { useIntlUtls } from '~/entrypoints/common/hooks';
+import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { StyledModalContent } from './TabListItem.styled';
 
 
@@ -23,9 +24,9 @@ export default function TabItemEditModal({
   onOk,
   onCancel,
 }: ModalProps) {
-  const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const [form] = Form.useForm();
+  const titleInputRef = useRef<InputRef>(null);
 
   // 确认编辑
   const handleModalConfirm = useCallback(() => {
@@ -45,6 +46,14 @@ export default function TabItemEditModal({
     onCancel?.();
   }, []);
 
+  useEffect(() => {
+    if (visible) {
+      setTimeout(() => {
+        titleInputRef.current?.focus();
+      }, 30);
+    }
+  }, [visible]);
+
   return (
     <Modal
       title={`${$fmt('common.edit')} - ${$fmt('home.tab')}`}
@@ -60,7 +69,7 @@ export default function TabItemEditModal({
             name={'title'}
             rules={[{ required: true }]}
           >
-            <Input />
+            <Input ref={titleInputRef} />
           </Form.Item>
           <Form.Item<EditTabFormProps>
             label={$fmt('common.url')}

@@ -5,7 +5,7 @@ import { LockOutlined, StarOutlined, CloseOutlined } from '@ant-design/icons';
 import { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
-import { useIntlUtls } from '~/entrypoints/common/hooks';
+import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import EditInput from '../components/EditInput';
 import TabListItem from './TabListItem';
 import {
@@ -133,7 +133,7 @@ export default function TabGroup({
         ref={groupRef}
       >
         {/* 标签组 header 展示、操作区域 */}
-        <StyledGroupHeader className="group-header" $primaryColor={token.colorPrimary}>
+        <StyledGroupHeader className="group-header select-none" $primaryColor={token.colorPrimary}>
           {allowGroupActions.includes('remove') && !isLocked && (
             <StyledActionIconBtn
               className="btn-remove"
@@ -225,7 +225,7 @@ export default function TabGroup({
               </span>
             </div>
             { selectedTabIds.length > 0 && (
-              <Space className="tab-action-btns" size={0} split={<Divider type="vertical" style={{ background: token.colorBorder }} />}>
+              <Space className="tab-action-btns select-none" size={0} split={<Divider type="vertical" style={{ background: token.colorBorder }} />}>
                 { allowTabActions.includes('remove') && (
                   <span className="action-btn" onClick={() => {
                     setSelectedTabIds([]);

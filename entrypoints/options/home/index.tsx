@@ -3,7 +3,7 @@ import { theme, Flex, Tree, Button, Input, Dropdown, Modal, Drawer, Empty, Spin 
 import type { MenuProps, TreeProps } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
 import { DownOutlined, MoreOutlined, ClearOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import { useIntlUtls } from '~/entrypoints/common/hooks';
+import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { StyledListWrapper } from './Home.styled';
 import RenderTreeNode from './RenderTreeNode';

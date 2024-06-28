@@ -36,4 +36,7 @@ export default {
   'common.disableSelect': 'Disable Select',
   'common.name': 'Name',
   'common.url': 'URL',
+  'common.goToGithub': 'Give me a star',
+  'common.update.available': 'New version available',
+  'common.update.upgradeNow': 'Upgrade right now',
 }

@@ -6,22 +6,33 @@ import {
   useNavigate,
   useLocation,
 } from 'react-router-dom';
-import { theme, Menu, Dropdown, Flex, Space, Tooltip } from 'antd';
+import { theme, Menu, Dropdown, Flex, Space, Tooltip, Typography } from 'antd';
 import {
   HomeOutlined,
   SettingOutlined,
   ImportOutlined,
   TranslationOutlined,
-  RestOutlined
+  RestOutlined,
+  GithubOutlined,
 } from '@ant-design/icons';
 import styled from 'styled-components';
-import { classNames, pick, sendBrowserMessage } from '~/entrypoints/common/utils';
 import '~/assets/css/reset.css';
+import '~/assets/css/index.css';
 import './style.css';
-import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks';
-import { StyledActionIconBtn, StyledColorItem } from '~/entrypoints/common/style/Common.styled';
-import { LANGUANGE_OPTIONS, THEME_COLORS } from '~/entrypoints/common/constants';
-import { ColorItem } from '~/entrypoints/types';
+import { classNames, pick, sendBrowserMessage } from '~/entrypoints/common/utils';
+import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
+import useUpdate from '~/entrypoints/common/hooks/update';
+import {
+  GITHUB_URL,
+  LANGUANGE_OPTIONS,
+  THEME_COLORS,
+} from '~/entrypoints/common/constants';
+import { openNewTab } from '~/entrypoints/common/tabs';
+import {
+  StyledActionIconBtn,
+  StyledColorItem,
+} from '~/entrypoints/common/style/Common.styled';
+import type { ColorItem } from '~/entrypoints/types';
 import themeIcon from '/icon/theme.svg';
 import Home from './home/index.tsx';
 import Settings from './Settings.tsx';
@@ -42,7 +53,7 @@ function ColorListMarkup({
       {list.map((item) => (
         <StyledColorItem
           className={classNames(
-            "color-item",
+            'color-item',
             item?.color?.toLowerCase() === token?.colorPrimary?.toLowerCase() && 'active'
           )}
           key={item.key}
@@ -158,6 +169,7 @@ function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const NiceGlobalContext = useContext(GlobalContext);
+  const { updateDetail, updateReload } = useUpdate();
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const { $fmt, locale } = useIntlUtls();
   const navs = useMemo(() => {
@@ -194,7 +206,7 @@ function AppLayout() {
 
   return (
     <StyledPageContainer className="page-container">
-      <div className="header-navbar">
+      <div className="header-navbar select-none">
         {/* <div className="logo"></div> */}
         <Menu
           className="navbar-menu"
@@ -205,12 +217,24 @@ function AppLayout() {
           items={navs}
           onSelect={onSelect}
         />
-        <Space className="menu-right" align="center">
+
+        {updateDetail?.updateAvailable && (
+          <Space className="header-tip select-none" style={{ margin: '0 12px' }}>
+            <Typography.Text type="warning">{ $fmt('common.update.available') }:</Typography.Text>
+            <Typography.Link href="javascript:void(0);" onClick={updateReload}>
+              { $fmt('common.update.upgradeNow') }
+            </Typography.Link>
+          </Space>
+        )}
+
+        <Space className="menu-right select-none" align="center" size="middle">
           {/* theme */}
           <Tooltip
             placement="bottomLeft"
             color="#fff"
-            title={<ColorListMarkup list={THEME_COLORS} onItemClick={handleThemeChange} />}
+            title={
+              <ColorListMarkup list={THEME_COLORS} onItemClick={handleThemeChange} />
+            }
             arrow={false}
             fresh
           >
@@ -231,6 +255,14 @@ function AppLayout() {
               <TranslationOutlined />
             </StyledActionIconBtn>
           </Dropdown>
+          {/* github */}
+          <StyledActionIconBtn
+            $size={18}
+            title={$fmt('common.goToGithub')}
+            onClick={() => openNewTab(GITHUB_URL, true)}
+          >
+            <GithubOutlined />
+          </StyledActionIconBtn>
         </Space>
       </div>
       <div className="main-content">

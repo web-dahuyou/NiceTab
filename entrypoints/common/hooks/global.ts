@@ -2,21 +2,22 @@ import { createContext, useState, useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { antdMap, customMap } from '~/entrypoints/common/locale';
 import type {
+  GlobalContextProps,
   ThemeProps,
   LanguageTypes,
   IntlForamtMessageParams,
 } from '~/entrypoints/types';
 import { settingsUtils, themeUtils } from '~/entrypoints/common/storage';
 import { capitalize } from '~/entrypoints/common/utils';
-import { ENUM_COLORS, defaultLanguage } from './constants';
+import { ENUM_COLORS, defaultLanguage } from '../constants';
 
 // global context
-export const GlobalContext = createContext({
+export const GlobalContext = createContext<GlobalContextProps>({
   colorPrimary: ENUM_COLORS.primary,
-  setThemeData: (themeData: Partial<ThemeProps>) => {
+  setThemeData: (themeData) => {
     themeUtils.setThemeData(themeData);
   },
-  setLocale: async (language: LanguageTypes = defaultLanguage, callback?: () => void) => {
+  setLocale: async (language = defaultLanguage, callback) => {
     const settings = await settingsUtils.getSettings();
     settingsUtils.setSettings({ ...settings, language });
     callback?.();

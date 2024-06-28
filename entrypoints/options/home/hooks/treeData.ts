@@ -245,7 +245,7 @@ export function useTreeData() {
       const { DELETE_AFTER_RESTORE } = ENUM_SETTINGS_PROPS;
       const settings = await settingsUtils.getSettings();
       tabGroup?.originData?.tabList.forEach((tab) => {
-        openNewTab(tab);
+        openNewTab(tab.url);
       });
       if (settings[DELETE_AFTER_RESTORE]) {
         await tabListUtils.removeTabGroup(tag.key, tabGroup.key);

@@ -12,6 +12,8 @@ import {
 } from '@ant-design/colors';
 import type { LanguageTypes, SettingsProps, TabEvents } from '~/entrypoints/types';
 
+export const GITHUB_URL = 'https://github.com/web-dahuyou/NiceTab';
+
 export const ENUM_COLORS = {
   primary: cyan.primary || cyan[6],
   cyan,

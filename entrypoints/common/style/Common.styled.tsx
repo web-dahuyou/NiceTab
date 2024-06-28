@@ -1,4 +1,3 @@
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 export const StyledEllipsis = css`
@@ -6,6 +5,7 @@ export const StyledEllipsis = css`
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
+
 // action icon btn
 export const StyledActionIconBtn = styled.i<{
   $size?: number | string,
