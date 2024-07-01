@@ -1,8 +1,8 @@
 import { browser, Tabs } from 'wxt/browser';
 import { settingsUtils, tabListUtils } from './storage';
-import type { SettingsProps, TabItem } from '~/entrypoints/types';
+import type { SettingsProps } from '~/entrypoints/types';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
-import { pick, objectToUrlParams, sendBrowserMessage, getRandomId } from '~/entrypoints/common/utils';
+import { objectToUrlParams, getRandomId } from '~/entrypoints/common/utils';
 
 const {
   OPEN_ADMIN_TAB_AFTER_SEND_TABS,
@@ -11,7 +11,7 @@ const {
   ALLOW_SEND_PINNED_TABS,
 } = ENUM_SETTINGS_PROPS;
 
-const matchUrls: string[] = ['https://*/*', 'http://*/*', 'chrome://*/*', 'file://*/*'];
+// const matchUrls: string[] = ['https://*/*', 'http://*/*', 'chrome://*/*', 'file://*/*'];
 
 export async function getAdminTabInfo() {
   const adminTabUrl = browser.runtime.getURL('/options.html');
@@ -20,11 +20,18 @@ export async function getAdminTabInfo() {
   return { tab, adminTabUrl };
 }
 // 打开管理后台
-export async function openAdminRoutePage(route: { path: string, query?: Record<string, string> }, needOpen = true) {
-  const paramsStr = objectToUrlParams(Object.assign(route?.query || {}, { randomId: getRandomId(6) }));
+export async function openAdminRoutePage(
+  route: { path: string; query?: Record<string, string> },
+  needOpen = true
+) {
+  const paramsStr = objectToUrlParams(
+    Object.assign(route?.query || {}, { randomId: getRandomId(6) })
+  );
   const settings = await settingsUtils.getSettings();
   const { tab, adminTabUrl } = await getAdminTabInfo();
-  const urlWithParams = `${adminTabUrl}#${route.path || '/home'}${paramsStr ? `?${paramsStr}` : ''}`;
+  const urlWithParams = `${adminTabUrl}#${route.path || '/home'}${
+    paramsStr ? `?${paramsStr}` : ''
+  }`;
 
   // 如果发送标签页后不需要打开管理后台页面，则刷新管理后台页
   if (!needOpen && tab?.id) {
@@ -41,7 +48,7 @@ export async function openAdminRoutePage(route: { path: string, query?: Record<s
     });
     // browser.tabs.reload(tab.id); // 这个方法会清空路由参数，切记
   } else {
-    browser.tabs.create({
+    await browser.tabs.create({
       index: 0,
       url: urlWithParams,
       pinned: !!settings[AUTO_PIN_ADMIN_TAB],
@@ -55,7 +62,8 @@ export async function openAdminTab(
 ) {
   const settings = settingsData || (await settingsUtils.getSettings());
   const openAdminTabAfterSendTabs = settings[OPEN_ADMIN_TAB_AFTER_SEND_TABS] as boolean;
-  openAdminRoutePage({ path: '/home', query: params }, openAdminTabAfterSendTabs);
+  await openAdminRoutePage({ path: '/home', query: params }, openAdminTabAfterSendTabs);
+
   if (!openAdminTabAfterSendTabs) {
     // 如果设置了 发送标签页后不打开管理后台，则可以发送通知提醒
     // browser.notifications.create(undefined, {
@@ -88,19 +96,23 @@ async function getFilteredTabs(
 }
 // 取消标签页高亮
 async function cancelHighlightTabs(tabs?: Tabs.Tab[]) {
-  await new Promise(res => setTimeout(res, 50));
+  await new Promise((res) => setTimeout(res, 50));
   if (tabs) {
     tabs.forEach((tab) => {
-      tab?.highlighted && browser.tabs.update(tab.id, { highlighted: false, active: false });
+      tab?.highlighted &&
+        browser.tabs.update(tab.id, { highlighted: false, active: false });
     });
   } else {
-    const highlightedTabs = await browser.tabs.query({ highlighted: true, currentWindow: true });
+    const highlightedTabs = await browser.tabs.query({
+      highlighted: true,
+      currentWindow: true,
+    });
     const { tab: adminTab } = await getAdminTabInfo();
     highlightedTabs.forEach((tab) => {
       if (adminTab && adminTab.id !== tab.id) {
         browser.tabs.update(tab.id, { highlighted: false, active: false });
       }
-    })
+    });
   }
 }
 // 获取全部标签页
@@ -117,41 +129,36 @@ async function sendAllTabs() {
   // 获取插件设置
   const settings = await settingsUtils.getSettings();
   const filteredTabs = await getFilteredTabs(tabs, settings);
+  const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs);
+  await openAdminTab(settings, { tagId, groupId });
+  if (settings[CLOSE_TABS_AFTER_SEND_TABS]) {
+    setTimeout(() => {
+      browser.tabs.remove(filteredTabs.map((t) => t.id as number).filter(Boolean));
+    }, 30);
+  } else {
+    // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
+    cancelHighlightTabs(filteredTabs);
+  }
+}
+// 发送当前选中的标签页（支持多选）
+async function sendCurrentTab() {
+  const tabs = await browser.tabs.query({
+    // url: matchUrls,
+    highlighted: true,
+    currentWindow: true,
+  });
 
-  const { tagId, groupId } = await tabListUtils.createTabs(
-    filteredTabs.map((tab) => {
-      return { ...pick(tab, ['title', 'url', 'favIconUrl']), tabId: getRandomId() };
-    }),
-    true
-  );
+  const settings = await settingsUtils.getSettings();
+  let filteredTabs = await getFilteredTabs(tabs, settings);
+  // 发送当前选中的标签页时，选中的标签页成组，不考虑原生标签组（即多选时，选中的非标签组的标签页和标签组中的标签页合并到一个组）
+  filteredTabs = filteredTabs.map(tab => ({ ...tab, groupId: -1 }));
+  const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs);
   openAdminTab(settings, { tagId, groupId });
   if (settings[CLOSE_TABS_AFTER_SEND_TABS]) {
     browser.tabs.remove(filteredTabs.map((t) => t.id as number).filter(Boolean));
   } else {
     // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
     cancelHighlightTabs(filteredTabs);
-  }
-}
-async function sendCurrentTab() {
-  const [tab] = await browser.tabs.query({
-    // url: matchUrls,
-    highlighted: true,
-    currentWindow: true,
-  });
-
-  if (!tab?.id) return;
-  const settings = await settingsUtils.getSettings();
-  const { tagId, groupId } = await tabListUtils.createTabs([
-    { ...pick(tab, ['title', 'url', 'favIconUrl']), tabId: getRandomId() },
-  ]);
-  openAdminTab(settings, { tagId, groupId });
-  if (settings[CLOSE_TABS_AFTER_SEND_TABS]) {
-    if (tab?.id && !tab?.pinned) {
-      browser.tabs.remove(tab.id);
-    }
-  } else {
-    // 如果发送标签页后打开管理后台，则跳转之后将标签页取消高亮
-    cancelHighlightTabs([tab]);
   }
 }
 async function sendOtherTabs() {
@@ -162,12 +169,7 @@ async function sendOtherTabs() {
   });
   const settings = await settingsUtils.getSettings();
   const filteredTabs = await getFilteredTabs(tabs, settings);
-  const { tagId, groupId } = await tabListUtils.createTabs(
-    filteredTabs.map((tab) => {
-      return { ...pick(tab, ['title', 'url', 'favIconUrl']), tabId: getRandomId() };
-    }),
-    true
-  );
+  const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs);
   openAdminTab(settings, { tagId, groupId });
   if (settings[CLOSE_TABS_AFTER_SEND_TABS]) {
     browser.tabs.remove(filteredTabs.map((t) => t.id as number).filter(Boolean));
@@ -189,12 +191,7 @@ async function sendLeftTabs(currTab?: Tabs.Tab) {
 
   const settings = await settingsUtils.getSettings();
   const filteredTabs = await getFilteredTabs(leftTabs, settings);
-  const { tagId, groupId } = await tabListUtils.createTabs(
-    filteredTabs.map((tab) => {
-      return { ...pick(tab, ['title', 'url', 'favIconUrl']), tabId: getRandomId() };
-    }),
-    true
-  );
+  const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs);
   openAdminTab(settings, { tagId, groupId });
 
   if (settings[CLOSE_TABS_AFTER_SEND_TABS]) {
@@ -217,12 +214,7 @@ async function sendRightTabs(currTab?: Tabs.Tab) {
 
   const settings = await settingsUtils.getSettings();
   const filteredTabs = await getFilteredTabs(rightTabs, settings);
-  const { tagId, groupId } = await tabListUtils.createTabs(
-    filteredTabs.map((tab) => {
-      return { ...pick(tab, ['title', 'url', 'favIconUrl']), tabId: getRandomId() };
-    }),
-    true
-  );
+  const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs);
   openAdminTab(settings, { tagId, groupId });
 
   if (settings[CLOSE_TABS_AFTER_SEND_TABS]) {

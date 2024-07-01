@@ -1,4 +1,5 @@
 import { Key } from 'react';
+import { Tabs } from 'wxt/browser';
 import type {
   SettingsProps,
   TagItem,
@@ -14,7 +15,7 @@ import {
   UNNAMED_TAG,
   UNNAMED_GROUP,
 } from './constants';
-import { getRandomId, omit, newCreateTime } from './utils';
+import { getRandomId, pick, omit, newCreateTime } from './utils';
 
 const {
   LANGUAGE,
@@ -418,16 +419,75 @@ class TabListUtils {
   }
 
   /* 标签相关方法 */
-  async createTabs(tabs: TabItem[], createNewGroup = false) {
+  transformTabItem(tab: Tabs.Tab) {
+    const { favIconUrl } = tab;
+    return {
+      ...pick(tab, ['title', 'url']),
+      tabId: getRandomId(),
+      favIconUrl: favIconUrl?.startsWith('data:image/') ? '' : favIconUrl
+    };
+  }
+  // 外部调用：创建标签页（区分浏览器是否支持群组）
+  async createTabs(tabs: Tabs.Tab[], createNewGroup = true): Promise<{tagId: string; groupId: string}> {
     await this.getTagList();
-    const newTabs = tabs.map((tab) => {
-      const { favIconUrl } = tab;
-      return {
-        ...tab,
-        tabId: tab.tabId || getRandomId(),
-        favIconUrl: favIconUrl?.startsWith('data:image/') ? '' : favIconUrl
-      };
-    });
+    let result = {} as {tagId: string; groupId: string};
+    if ('group' in browser.tabs) {
+      result = await this.createTabsByGroups(tabs, createNewGroup);
+    } else {
+      result = await this.createTabsIndependent(tabs, createNewGroup);
+    }
+
+    await this.setTagList(this.tagList);
+    return result;
+  }
+  // 内部调用：保留浏览器群组的标签页
+  async createTabsByGroups(tabs: Tabs.Tab[], createNewGroup = true) {
+    const groupsMap = new Map<number, GroupItem>(), independentTabs = [];
+    for (let tab of tabs) {
+      // 目前 webextension-polyfill 中没有 group 相关的类型定义, 但是新版浏览器有相关的属性
+      if ('groupId' in tab && tab.groupId && tab.groupId != -1) {
+        const group: GroupItem = groupsMap.get(tab.groupId) || {
+          ...this.getInitialTabGroup(),
+          tabList: [] as TabItem[]
+        };
+
+        group.tabList.push(this.transformTabItem(tab));
+        groupsMap.set(tab.groupId, group);
+      } else {
+        independentTabs.push(tab);
+      }
+    }
+
+    // 目前 webextension-polyfill 中没有 group 相关的类型定义, 但是新版浏览器有相关的 API
+    if ('tabGroups' in browser && 'get' in browser.tabGroups) {
+        for (const [bsGroupId, group] of groupsMap.entries()) {
+            const tabGroup = await browser.tabGroups?.get(bsGroupId);
+            console.log('tabGroup', tabGroup)
+            group.groupName = tabGroup?.title || group.groupName;
+        };
+    }
+
+    if (independentTabs.length > 0) {
+      // 先创建独立的tab页
+      const result = await this.createTabsIndependent(independentTabs, createNewGroup);
+      // 不存在浏览器自带的标签组，直接返回独立标签页创建的标签组信息
+      if (groupsMap.size == 0) return result;
+    }
+    // 接下来保存浏览器自带的标签组
+    let tag0 = this.tagList?.[0];
+    if (!tag0) {
+      tag0 = this.getInitialTag();
+      this.tagList.push(tag0);
+    }
+
+    const unstarredIndex = tag0.groupList.findIndex((g) => !g.isStarred);
+    const idx = unstarredIndex > -1 ? unstarredIndex : tag0.groupList.length;
+    tag0.groupList.splice(idx, 0, ...groupsMap.values());
+    return { tagId: tag0.tagId, groupId: tag0?.groupList?.[idx]?.groupId };
+  }
+  // 内部调用：所有标签页独立创建
+  async createTabsIndependent(tabs: Tabs.Tab[], createNewGroup = true) {
+    const newTabs = tabs.map(this.transformTabItem);
     let tag0 = this.tagList?.[0];
     const group = tag0?.groupList?.find((group) => !group.isLocked && !group.isStarred);
     if (!createNewGroup && group) {
@@ -449,7 +509,7 @@ class TabListUtils {
     // 不存在tag分类，就创建一个新的tag
     const tag = this.getInitialTag();
     tag.groupList = [newtabGroup];
-    await this.setTagList([tag]);
+    this.tagList.push(tag);
     return { tagId: tag.tagId, groupId: newtabGroup.groupId };
   }
   // 删除标签页: filterFlag 是否过滤空分类、标签组 (列表页保留空分类、标签组；回收站中不保留)
