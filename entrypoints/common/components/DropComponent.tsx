@@ -78,9 +78,6 @@ export default function DropComponent<IncomeData extends DropTargetData>({
           return canDrop && data?.allowKeys.includes(source?.data?.dndKey as Symbol);
         },
         onDrag({ self, source }) {
-          console.log('onDrag-allowKeys', data?.allowKeys);
-          console.log('onDrag-self', self);
-          console.log('onDrag-source', source);
           const isSource = source.element === element || source?.data?.groupId === data.groupId;
           if (isSource || !data?.allowKeys?.includes(source?.data?.dndKey as Symbol)) {
             setInstruction(null);

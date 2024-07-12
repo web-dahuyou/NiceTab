@@ -6,6 +6,15 @@ import { StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
 export const StyledContainer = styled.div<{ $primaryColor?: string }>`
   min-width: 420px;
   max-width: 520px;
+  min-height: 300px;
+  max-height: 590px; // 浏览器popup高度最大为600px, 超过这个高度会出现body滚动条
+  display: flex;
+  flex-direction: column;
+
+  .fixed-top {
+    flex-shrink: 0;
+    flex-grow: 0;
+  }
   .block {
     display: flex;
     align-items: center;
@@ -43,7 +52,7 @@ export const StyledContainer = styled.div<{ $primaryColor?: string }>`
 `;
 
 export const StyledList = styled.div<{$primaryColor?: string; $bgColor?: string}>`
-  max-height: 500px;
+  flex: 1;
   overflow-y: auto;
   .tab-item {
     position: relative;

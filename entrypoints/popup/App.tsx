@@ -85,32 +85,34 @@ export default function App() {
 
   return (
     <StyledContainer className="popup-container select-none" $primaryColor={token.colorPrimary}>
-      <div className="block quick-actions">
-        <span className="block-title">{$fmt('common.view')}：</span>
-        <Space size={0} split={<Divider type="vertical" style={{ background: token.colorBorder }} />}>
-          {quickActionBtns.map((item) => (
-            <span className="action-btn" key={item.path} onClick={item.onClick}> {item.label} </span>
-          ))}
-        </Space>
-      </div>
-      <div className="block theme-colors">
-        <span className="block-title">{$fmt('common.theme')}：</span>
-        <Space>
-          {THEME_COLORS.map((item) => (
-            <StyledColorItem
-              className={classNames(
-                "theme-color-item",
-                item?.color?.toLowerCase() === token?.colorPrimary?.toLowerCase() && 'active'
-              )}
-              key={item.key}
-              style={{ background: item.color }}
-              onClick={() => handleThemeChange(item)}
-            ></StyledColorItem>
-          ))}
-        </Space>
-      </div>
+      <div className="fixed-top">
+        <div className="block quick-actions">
+          <span className="block-title">{$fmt('common.view')}：</span>
+          <Space size={0} split={<Divider type="vertical" style={{ background: token.colorBorder }} />}>
+            {quickActionBtns.map((item) => (
+              <span className="action-btn" key={item.path} onClick={item.onClick}> {item.label} </span>
+            ))}
+          </Space>
+        </div>
+        <div className="block theme-colors">
+          <span className="block-title">{$fmt('common.theme')}：</span>
+          <Space>
+            {THEME_COLORS.map((item) => (
+              <StyledColorItem
+                className={classNames(
+                  "theme-color-item",
+                  item?.color?.toLowerCase() === token?.colorPrimary?.toLowerCase() && 'active'
+                )}
+                key={item.key}
+                style={{ background: item.color }}
+                onClick={() => handleThemeChange(item)}
+              ></StyledColorItem>
+            ))}
+          </Space>
+        </div>
 
-      <div className="tab-list-title">{$fmt('common.openedTabs')}：</div>
+        <div className="tab-list-title">{$fmt('common.openedTabs')}：</div>
+      </div>
       <StyledList className="tab-list" $primaryColor={token.colorPrimary} $bgColor={token.colorPrimaryBg}>
         {tabs.map((tab, index) => (
           <li

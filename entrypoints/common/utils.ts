@@ -54,7 +54,8 @@ export function objectToUrlParams(params: Record<string, any>): string {
  */
 export function getRandomId(digit: number = 8, isPlainNumber: boolean = false) {
   return 'x'.repeat(digit).replace(/[x]/g, (c) => {
-    return ((Math.random() * digit) | 0).toString(isPlainNumber ? 10 : 16);
+    const radix = isPlainNumber ? 10 : 16;
+    return ((Math.random() * radix) | 0).toString(radix);
   });
 }
 

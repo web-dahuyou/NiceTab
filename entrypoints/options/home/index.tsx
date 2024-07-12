@@ -150,7 +150,7 @@ export default function Home() {
           <div className="sidebar-inner">
             <div className="tag-list-title">
               {$fmt('home.tabGroupList')}
-              <StyledActionIconBtn className="btn-help" title="帮助信息" onClick={() => setHelpDrawerVisible(true)}>
+              <StyledActionIconBtn className="btn-help" title={$fmt('home.helpInfo')} onClick={() => setHelpDrawerVisible(true)}>
                 <QuestionCircleOutlined />
               </StyledActionIconBtn>
             </div>
