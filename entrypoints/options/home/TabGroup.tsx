@@ -185,7 +185,7 @@ export default function TabGroup({
               )}
               {allowGroupActions.includes('restore') && (
                 <span className="action-btn" onClick={() => onRestore?.()}>
-                  {$fmt('home.tabGroup.restore')}
+                  {$fmt('home.tabGroup.open')}
                 </span>
               )}
               {allowGroupActions.includes('lock') && (

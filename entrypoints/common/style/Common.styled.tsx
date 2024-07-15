@@ -1,10 +1,21 @@
 import styled, { css } from 'styled-components';
 
+// 单行超长省略
 export const StyledEllipsis = css`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
+// 多行超长省略
+export const StyledEllipsisLines = css<{$lines?: number}>`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: ${props => props.$lines || 2};
+`;
+
 
 // action icon btn
 export const StyledActionIconBtn = styled.i<{

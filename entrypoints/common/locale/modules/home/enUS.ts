@@ -31,6 +31,7 @@ export default {
   'home.tabGroup.star': 'Top',
   'home.tabGroup.unstar': 'Untop',
   'home.tabGroup.recover': 'Recover',
+  'home.tabGroup.open': 'Open Group',
 
   'home.tabGroup.count': `{count, plural,
     =0 {No Groups}
