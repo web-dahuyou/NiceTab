@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import type { TreeProps, TreeNodeProps } from 'antd';
+import type { TreeProps } from 'antd';
 import { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
 import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
 import { openNewTab } from '~/entrypoints/common/tabs';
@@ -14,6 +14,8 @@ import {
   DndTabItemOnDropCallback
 } from '../types';
 import { getTreeData } from '../utils';
+
+const { DELETE_AFTER_RESTORE, DELETE_UNLOCKED_EMPTY_GROUP } = ENUM_SETTINGS_PROPS;
 
 export function useTreeData() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -242,7 +244,6 @@ export function useTreeData() {
     async (tabGroup: TreeDataNodeTabGroup) => {
       const tagKey = tabGroup.parentKey;
       const tag = treeData.find((tag) => tag.key === tagKey) as TreeDataNodeTag;
-      const { DELETE_AFTER_RESTORE } = ENUM_SETTINGS_PROPS;
       const settings = await settingsUtils.getSettings();
       tabGroup?.originData?.tabList.forEach((tab) => {
         openNewTab(tab.url);

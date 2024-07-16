@@ -38,6 +38,7 @@ export type SettingsProps = {
   deleteAfterRestore?: boolean; // 恢复标签页/标签组时是否从列表中删除
   openAdminTabAfterSendTabs?: boolean; // 发送标签页后是否打开管理后台
   closeTabsAfterSendTabs?: boolean; // 发送标签页后是否关闭标签页
+  deleteUnlockedEmptyGroup?: boolean; // 是否删除未锁定的空标签组
 };
 
 // 管理后台-tab列表页相关

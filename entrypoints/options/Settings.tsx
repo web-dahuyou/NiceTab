@@ -15,6 +15,7 @@ const {
   AUTO_PIN_ADMIN_TAB,
   ALLOW_SEND_PINNED_TABS,
   DELETE_AFTER_RESTORE,
+  DELETE_UNLOCKED_EMPTY_GROUP
 } = ENUM_SETTINGS_PROPS;
 
 const module = 'settings'; // locale module name
@@ -63,8 +64,8 @@ export default function Settings() {
             <Radio value="en-US"> English </Radio>
           </Radio.Group>
         </Form.Item>
+        {/* 启动浏览器时是否自动打开NiceTab管理后台 */}
         <Form.Item<SettingsProps>
-          // label="启动浏览器时是否自动打开NiceTab管理后台："
           label={$fmt({id: `${module}.${OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH}`, values: {mark: '：'}})}
           name={OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH}
         >
@@ -73,6 +74,7 @@ export default function Settings() {
             <Radio value={false}> {$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH}.no`)} </Radio>
           </Radio.Group>
         </Form.Item>
+        {/* 是否固定管理后台 */}
         <Form.Item<SettingsProps>
           label={$fmt({id: `${module}.${AUTO_PIN_ADMIN_TAB}`, values: {mark: '：'}})}
           name={AUTO_PIN_ADMIN_TAB}
@@ -82,6 +84,7 @@ export default function Settings() {
             <Radio value={false}> {$fmt(`${module}.${AUTO_PIN_ADMIN_TAB}.no`)} </Radio>
           </Radio.Group>
         </Form.Item>
+        {/* 是否发送固定标签页 */}
         <Form.Item<SettingsProps>
           label={$fmt({ id: `${module}.${ALLOW_SEND_PINNED_TABS}`, values: {mark: '：'}})}
           name={ALLOW_SEND_PINNED_TABS}
@@ -91,6 +94,7 @@ export default function Settings() {
             <Radio value={false}> {$fmt(`${module}.${ALLOW_SEND_PINNED_TABS}.no`)} </Radio>
           </Radio.Group>
         </Form.Item>
+        {/* 发送标签页后是否打开管理后台 */}
         {/* <Form.Item<SettingsProps>
           label={<div>{$fmt({ id: `${module}.${OPEN_ADMIN_TAB_AFTER_SEND_TABS}`, values: {mark: '：'}})}：</div>}
           name={OPEN_ADMIN_TAB_AFTER_SEND_TABS}
@@ -101,6 +105,7 @@ export default function Settings() {
             <Radio value={false}> {$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_SEND_TABS}.no`)} </Radio>
           </Radio.Group>
         </Form.Item> */}
+        {/* 发送标签页后是否关闭标签页 */}
         <Form.Item<SettingsProps>
           label={$fmt({ id: `${module}.${CLOSE_TABS_AFTER_SEND_TABS}`, values: {mark: '：'}})}
           name={CLOSE_TABS_AFTER_SEND_TABS}
@@ -110,6 +115,7 @@ export default function Settings() {
             <Radio value={false}> {$fmt(`${module}.${CLOSE_TABS_AFTER_SEND_TABS}.no`)} </Radio>
           </Radio.Group>
         </Form.Item>
+        {/* 恢复标签页/标签组时是否从列表中删除 */}
         <Form.Item<SettingsProps>
           label={$fmt({ id: `${module}.${DELETE_AFTER_RESTORE}`, values: {mark: '：'}})}
           name={DELETE_AFTER_RESTORE}
@@ -117,6 +123,16 @@ export default function Settings() {
           <Radio.Group>
             <Radio value={false}> {$fmt(`${module}.${DELETE_AFTER_RESTORE}.no`)} </Radio>
             <Radio value={true}> {$fmt(`${module}.${DELETE_AFTER_RESTORE}.yes`)}</Radio>
+          </Radio.Group>
+        </Form.Item>
+        {/* 是否删除未锁定的空标签组 */}
+        <Form.Item<SettingsProps>
+          label={$fmt({ id: `${module}.${DELETE_UNLOCKED_EMPTY_GROUP}`, values: {mark: '：'}})}
+          name={DELETE_UNLOCKED_EMPTY_GROUP}
+        >
+          <Radio.Group>
+            <Radio value={true}> {$fmt(`${module}.${DELETE_UNLOCKED_EMPTY_GROUP}.yes`)}</Radio>
+            <Radio value={false}> {$fmt(`${module}.${DELETE_UNLOCKED_EMPTY_GROUP}.no`)} </Radio>
           </Radio.Group>
         </Form.Item>
         <Form.Item>

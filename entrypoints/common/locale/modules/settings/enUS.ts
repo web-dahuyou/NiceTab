@@ -20,4 +20,7 @@ export default {
   'settings.deleteAfterRestore': 'When restoring tabs - whether to remove the tabs ?',
   'settings.deleteAfterRestore.yes': 'Remove (pinned tabs remain)',
   'settings.deleteAfterRestore.no': 'All remain (recommended)',
+  'settings.deleteUnlockedEmptyGroup': 'When clearing tabs - whether to remove the empty group ?',
+  'settings.deleteUnlockedEmptyGroup.yes': 'Automatically remove (retain the locked group)',
+  'settings.deleteUnlockedEmptyGroup.no': 'Do not',
 }

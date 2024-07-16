@@ -51,6 +51,7 @@ export const ENUM_SETTINGS_PROPS: Record<string, keyof SettingsProps> = {
   AUTO_PIN_ADMIN_TAB: 'autoPinAdminTab', // 是否固定管理后台
   ALLOW_SEND_PINNED_TABS: 'allowSendPinnedTabs', // 是否发送固定标签页
   DELETE_AFTER_RESTORE: 'deleteAfterRestore', // 恢复标签页/标签组时是否从列表中删除
+  DELETE_UNLOCKED_EMPTY_GROUP: 'deleteUnlockedEmptyGroup', // 是否删除未锁定的空标签组
 };
 
 // tab 事件
