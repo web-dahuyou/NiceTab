@@ -85,6 +85,8 @@ export const defaultLanguage: LanguageTypes = (navigator?.language ||
 export const UNNAMED_TAG = 'Unnamed Tag';
 export const UNNAMED_GROUP = 'Unnamed Group';
 
+export const IS_GROUP_SUPPORT  = 'group' in browser.tabs && 'tabGroups' in browser;
+
 export default {
   ENUM_COLORS,
   THEME_COLORS,
@@ -94,4 +96,5 @@ export default {
   LANGUANGE_OPTIONS,
   UNNAMED_TAG,
   UNNAMED_GROUP,
+  IS_GROUP_SUPPORT
 };

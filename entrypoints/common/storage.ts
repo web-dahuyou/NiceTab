@@ -14,6 +14,7 @@ import {
   defaultLanguage,
   UNNAMED_TAG,
   UNNAMED_GROUP,
+  IS_GROUP_SUPPORT
 } from './constants';
 import { getRandomId, pick, omit, newCreateTime, getUniqueList, getMergedList } from './utils';
 
@@ -458,7 +459,7 @@ class TabListUtils {
   ): Promise<{ tagId: string; groupId: string }> {
     await this.getTagList();
     let result = {} as { tagId: string; groupId: string };
-    if ('group' in browser.tabs) {
+    if (IS_GROUP_SUPPORT) {
       result = await this.createTabsByGroups(tabs, createNewGroup);
     } else {
       result = await this.createTabsIndependent(tabs, createNewGroup);
@@ -473,7 +474,7 @@ class TabListUtils {
       independentTabs = [];
     for (let tab of tabs) {
       // 目前 webextension-polyfill 中没有 group 相关的类型定义, 但是新版浏览器有相关的属性
-      if ('groupId' in tab && tab.groupId && tab.groupId != -1) {
+      if (tab.groupId && tab.groupId != -1) {
         const group: GroupItem = groupsMap.get(tab.groupId) || {
           ...this.getInitialTabGroup(),
           tabList: [] as TabItem[],
@@ -487,7 +488,7 @@ class TabListUtils {
     }
 
     // 目前 webextension-polyfill 中没有 group 相关的类型定义, 但是新版浏览器有相关的 API
-    if ('tabGroups' in browser && 'get' in browser.tabGroups) {
+    if ('get' in browser.tabGroups) {
       for (const [bsGroupId, group] of groupsMap.entries()) {
         const tabGroup = await browser.tabGroups?.get(bsGroupId);
         // console.log('tabGroup', tabGroup);

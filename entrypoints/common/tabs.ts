@@ -1,7 +1,7 @@
-import { browser, Tabs } from 'wxt/browser';
+import { Tabs } from 'wxt/browser';
 import { settingsUtils, tabListUtils } from './storage';
 import type { SettingsProps } from '~/entrypoints/types';
-import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
+import { ENUM_SETTINGS_PROPS, IS_GROUP_SUPPORT } from '~/entrypoints/common/constants';
 import { objectToUrlParams, getRandomId } from '~/entrypoints/common/utils';
 
 const {
@@ -229,6 +229,24 @@ export function openNewTab(url?: string, active: boolean = false) {
   // 注意：如果打开标签页不想 active, 则 active 必须设置默认值为 false，
   // create 方法 active参数传 undefined 也会激活 active
   url && browser.tabs.create({ url, active });
+}
+
+// 打开标签组
+export async function openNewGroup(groupName: string, urls: Array<string | undefined>) {
+  if (!IS_GROUP_SUPPORT) {
+    for (let url of urls) {
+      openNewTab(url);
+    }
+    return;
+  }
+
+  Promise.all(urls.map(url => {
+    return browser.tabs.create({ url, active: false });
+  })).then(async tabs => {
+    const filteredTabs = tabs.filter((tab) => !!tab.id);
+    const bsGroupId = await browser.tabs.group({ tabIds: filteredTabs.map(tab => tab.id!) });
+    browser.tabGroups?.update(bsGroupId, { title: groupName });
+  })
 }
 
 export default {
