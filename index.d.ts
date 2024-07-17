@@ -1,18 +1,5 @@
 import type { AugmentedBrowser as WxtBrowser, Tabs as WxtTabs } from 'wxt/browser';
 
-declare module 'react-copy-to-clipboard' {
-  type CopyToClipboardProps = {
-    text: string;
-    onCopy: (text: string, result: boolean) => void;
-    children: JSX.Element
-  }
-  export function CopyToClipboard(props: CopyToClipboardProps): JSX.Element
-};
-
-declare module 'file-saver' {
-  export function saveAs(blob: Blob, name?: string): void
-};
-
 // 目前 webextension-polyfill 中没有 group 相关的类型定义, 但是新版浏览器有相关的 API
 enum Color {
     grey = 'grey',

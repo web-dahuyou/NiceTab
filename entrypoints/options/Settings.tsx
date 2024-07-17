@@ -15,7 +15,9 @@ const {
   AUTO_PIN_ADMIN_TAB,
   ALLOW_SEND_PINNED_TABS,
   DELETE_AFTER_RESTORE,
-  DELETE_UNLOCKED_EMPTY_GROUP
+  DELETE_UNLOCKED_EMPTY_GROUP,
+  ALLOW_DUPLICATE_TABS,
+  ALLOW_DUPLICATE_GROUPS,
 } = ENUM_SETTINGS_PROPS;
 
 const module = 'settings'; // locale module name
@@ -135,6 +137,29 @@ export default function Settings() {
             <Radio value={false}> {$fmt(`${module}.${DELETE_UNLOCKED_EMPTY_GROUP}.no`)} </Radio>
           </Radio.Group>
         </Form.Item>
+
+        {/* 是否允许重复的标签页 */}
+        <Form.Item<SettingsProps>
+          label={$fmt({ id: `${module}.${ALLOW_DUPLICATE_TABS}`, values: {mark: '：'}})}
+          name={ALLOW_DUPLICATE_TABS}
+        >
+          <Radio.Group>
+            <Radio value={true}> {$fmt(`${module}.${ALLOW_DUPLICATE_TABS}.yes`)}</Radio>
+            <Radio value={false}> {$fmt(`${module}.${ALLOW_DUPLICATE_TABS}.no`)} </Radio>
+          </Radio.Group>
+        </Form.Item>
+
+        {/* 是否允许重复的标签组 */}
+        <Form.Item<SettingsProps>
+          label={$fmt({ id: `${module}.${ALLOW_DUPLICATE_GROUPS}`, values: {mark: '：'}})}
+          name={ALLOW_DUPLICATE_GROUPS}
+        >
+          <Radio.Group>
+            <Radio value={true}> {$fmt(`${module}.${ALLOW_DUPLICATE_GROUPS}.yes`)}</Radio>
+            <Radio value={false}> {$fmt(`${module}.${ALLOW_DUPLICATE_GROUPS}.no`)} </Radio>
+          </Radio.Group>
+        </Form.Item>
+
         <Form.Item>
           <Button type="primary" htmlType="submit">
             {$fmt('common.save')}

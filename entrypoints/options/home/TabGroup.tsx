@@ -260,7 +260,10 @@ export default function TabGroup({
                     key={tab.tabId || index}
                     group={{groupId, isLocked, isStarred}}
                     tab={tab}
-                    onRemove={() => onTabRemove?.(groupId, [tab])}
+                    onRemove={async () => {
+                      await onTabRemove?.(groupId, [tab])
+                      setSelectedTabIds(selectedTabIds.filter((id) => id !== tab.tabId));
+                    }}
                     onChange={onTabChange}
                   />
                 </DndComponent>

@@ -52,6 +52,8 @@ export const ENUM_SETTINGS_PROPS: Record<string, keyof SettingsProps> = {
   ALLOW_SEND_PINNED_TABS: 'allowSendPinnedTabs', // 是否发送固定标签页
   DELETE_AFTER_RESTORE: 'deleteAfterRestore', // 恢复标签页/标签组时是否从列表中删除
   DELETE_UNLOCKED_EMPTY_GROUP: 'deleteUnlockedEmptyGroup', // 是否删除未锁定的空标签组
+  ALLOW_DUPLICATE_TABS: 'allowDuplicateTabs', // 同一个标签组中是否允许重复的标签页
+  ALLOW_DUPLICATE_GROUPS: 'allowDuplicateGroups', // 同一个分类中是否允许重复的标签组
 };
 
 // tab 事件
