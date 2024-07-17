@@ -54,7 +54,8 @@ export function objectToUrlParams(params: Record<string, any>): string {
  */
 export function getRandomId(digit: number = 8, isPlainNumber: boolean = false) {
   return 'x'.repeat(digit).replace(/[x]/g, (c) => {
-    return ((Math.random() * digit) | 0).toString(isPlainNumber ? 10 : 16);
+    const radix = isPlainNumber ? 10 : 16;
+    return ((Math.random() * radix) | 0).toString(radix);
   });
 }
 
@@ -64,17 +65,17 @@ export function getRandomId(digit: number = 8, isPlainNumber: boolean = false) {
  * @param keys 想要挑选的属性列表
  * @return 返回过滤后的对象
  */
-export function pick(
-  obj: Record<string | number | symbol, any>,
-  keys: Array<keyof typeof obj>
-) {
-  return Object.keys(obj).reduce((result, key) => {
-    if (key && keys.includes(key)) {
+export function pick<T extends object, K extends keyof T>(
+  obj: T,
+  keys: K[]
+): Pick<T, K> {
+  return keys.reduce((result, key) => {
+    if (key in obj) {
       return { ...result, [key]: obj[key] };
     } else {
       return result;
     }
-  }, {});
+  }, {} as Pick<T, K>);
 }
 /**
  * @description: 从对象中过滤掉指定的keys
@@ -82,17 +83,17 @@ export function pick(
  * @param keys 想要过滤的属性列表
  * @return 返回过滤后的对象
  */
-export function omit(
-  obj: Record<string | number | symbol, any>,
-  keys: Array<keyof typeof obj>
-) {
+export function omit<T extends Record<string, any>, K extends keyof T>(
+  obj: T,
+  keys: K[]
+): Omit<T, K> {
   return Object.keys(obj).reduce((result, key) => {
-    if (key && keys.includes(key)) {
+    if (keys.includes(key as K)) {
       return result;
     } else {
       return { ...result, [key]: obj[key] };
     }
-  }, {});
+  }, {} as Omit<T, K>);
 }
 
 // 将数组按照size进行分组
@@ -109,6 +110,52 @@ export const groupBySize = (list: any[], size: number = 3) => {
 // 生成创建时间
 export const newCreateTime = () => {
   return dayjs().format('YYYY-MM-DD HH:mm');
+}
+
+/**
+ * @description: 列表去重
+ * @param list 原始列表
+ * @param key 去重依据的字段名
+ * @return 返回去重后的列表
+ */
+export function getUniqueList<T>(list: T[], key: keyof T): T[] {
+  const existKeys = new Map();
+  const result: T[] = [];
+  for (const item of list) {
+    if (!existKeys.has(item[key])) {
+      existKeys.set(item[key], true);
+      result.push(item);
+    }
+  }
+  return result;
+}
+
+/**
+ * @description: 列表去重
+ * @param list 原始列表
+ * @param key 合并对象依据的字段名
+ * @param childListKey 对象中需要合并的子数组字段名
+ * @return 返回合并后的列表
+ */
+export function getMergedList<T, K extends keyof T>(
+  list: T[],
+  key: K,
+  handler: (previousValue: T, currentValue: T) => T
+): T[] {
+  const resultMap = new Map<T[K], T>();
+
+  for (const item of list) {
+    let groupValue = resultMap.get(item[key]);
+    if (!groupValue) {
+      groupValue = item;
+    } else {
+      // groupValue[childListKey] = [...groupValue[childListKey], ...item[childListKey]];
+      groupValue = handler(groupValue, item);
+    }
+    resultMap.set(item[key], groupValue);
+  }
+
+  return [...resultMap.values()];
 }
 
 // 发送消息

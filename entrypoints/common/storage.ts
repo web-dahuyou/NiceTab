@@ -14,8 +14,9 @@ import {
   defaultLanguage,
   UNNAMED_TAG,
   UNNAMED_GROUP,
+  IS_GROUP_SUPPORT
 } from './constants';
-import { getRandomId, pick, omit, newCreateTime } from './utils';
+import { getRandomId, pick, omit, newCreateTime, getUniqueList, getMergedList } from './utils';
 
 const {
   LANGUAGE,
@@ -25,10 +26,14 @@ const {
   AUTO_PIN_ADMIN_TAB,
   ALLOW_SEND_PINNED_TABS,
   DELETE_AFTER_RESTORE,
+  DELETE_UNLOCKED_EMPTY_GROUP,
+  ALLOW_DUPLICATE_TABS,
+  ALLOW_DUPLICATE_GROUPS,
 } = ENUM_SETTINGS_PROPS;
 
-let listStoreUtils: TabListUtils;
-let recycleBinUtils: RecycleBinUtils;
+let _settingsUtils: SettingsUtils;
+let _listStoreUtils: TabListUtils;
+let _recycleBinUtils: RecycleBinUtils;
 
 // 设置工具类
 class SettingsUtils {
@@ -40,16 +45,22 @@ class SettingsUtils {
     [AUTO_PIN_ADMIN_TAB]: true, // 是否固定管理后台
     [ALLOW_SEND_PINNED_TABS]: false, // 是否发送固定标签页
     [DELETE_AFTER_RESTORE]: false, // 恢复标签页/标签组时是否从列表中删除
+    [DELETE_UNLOCKED_EMPTY_GROUP]: true, // 是否删除未锁定的空标签组
+    [ALLOW_DUPLICATE_TABS]: true, // 同一个标签组中是否允许重复的标签页
+    [ALLOW_DUPLICATE_GROUPS]: true, // 同一个分类中是否允许重复的标签组
   };
   async setSettings(settings: SettingsProps) {
-    return await storage.setItem('local:settings', settings || this.initialSettings);
+    return await storage.setItem('local:settings', {
+      ...this.initialSettings,
+      ...settings,
+    });
   }
   async getSettings() {
     const settings = await storage.getItem<SettingsProps>('local:settings', {
       defaultValue: this.initialSettings,
     });
 
-    return settings || {};
+    return { ...this.initialSettings, ...settings };
   }
 }
 
@@ -130,7 +141,7 @@ class TabListUtils {
       }, []);
 
       // 分类中有标签页，才放入到回收站
-      recycleBinUtils.addTags(filteredTagList);
+      _recycleBinUtils.addTags(filteredTagList);
     }
   }
   async addTag(tag?: TagItem) {
@@ -162,7 +173,7 @@ class TabListUtils {
       tagItem.groupList =
         tagItem?.groupList?.filter((group) => group?.tabList?.length > 0) || [];
       if (tagItem?.groupList?.length > 0) {
-        recycleBinUtils.addTags([tagItem]);
+        _recycleBinUtils.addTags([tagItem]);
       }
     }
   }
@@ -204,7 +215,15 @@ class TabListUtils {
     await this.setTagList(tagList);
     return { tagId, tabGroup: newGroup };
   }
-  async updateTabGroup({tagId, groupId, data}: {tagId?: Key; groupId: Key; data: Partial<GroupItem>;}) {
+  async updateTabGroup({
+    tagId,
+    groupId,
+    data,
+  }: {
+    tagId?: Key;
+    groupId: Key;
+    data: Partial<GroupItem>;
+  }) {
     const tagList = await this.getTagList();
     let isFound = false;
     for (let tag of tagList) {
@@ -231,7 +250,7 @@ class TabListUtils {
           // console.log('removeGroup', removeGroup);
           // 标签组中有标签页，才放入到回收站
           if (removeGroup && removeGroup?.tabList?.length > 0) {
-            recycleBinUtils.addTabGroups(tag, [removeGroup]);
+            _recycleBinUtils.addTabGroups(tag, [removeGroup]);
           }
         }
         break;
@@ -384,7 +403,11 @@ class TabListUtils {
   // 标签组移动到（穿越）
   async tabGroupMoveThrough(sourceGroupId: Key, targetTagId: Key) {
     const tagList = await this.getTagList();
-    let isSourceFound = false, isTargetFound = false, sourceGroupIndex = 0, targetTagIndex = 0, sourceGroup = null;
+    let isSourceFound = false,
+      isTargetFound = false,
+      sourceGroupIndex = 0,
+      targetTagIndex = 0,
+      sourceGroup = null;
     for (let tIndex = 0; tIndex < tagList.length; tIndex++) {
       const tag = tagList[tIndex];
       if (tag.tagId === targetTagId) {
@@ -408,30 +431,35 @@ class TabListUtils {
     }
 
     if (isSourceFound && isTargetFound && sourceGroup) {
-      const targetGroup0 = tagList?.[targetTagIndex]?.groupList?.[0];
-      if (targetGroup0?.isStarred) {
-        sourceGroup.isStarred = true;
-      }
-      tagList?.[targetTagIndex]?.groupList.splice(0, 0, sourceGroup);
+      const targetTag = tagList?.[targetTagIndex];
+      const unstarredIndex = targetTag?.groupList?.findIndex((g) => !g.isStarred);
+      targetTag?.groupList.splice(
+        unstarredIndex > -1 ? unstarredIndex : targetTag?.groupList?.length,
+        0,
+        sourceGroup
+      );
     }
 
     await this.setTagList(tagList);
   }
 
   /* 标签相关方法 */
-  transformTabItem(tab: Tabs.Tab) {
+  transformTabItem(tab: Tabs.Tab): TabItem {
     const { favIconUrl } = tab;
     return {
       ...pick(tab, ['title', 'url']),
       tabId: getRandomId(),
-      favIconUrl: favIconUrl?.startsWith('data:image/') ? '' : favIconUrl
+      favIconUrl: favIconUrl?.startsWith('data:image/') ? '' : favIconUrl,
     };
   }
   // 外部调用：创建标签页（区分浏览器是否支持群组）
-  async createTabs(tabs: Tabs.Tab[], createNewGroup = true): Promise<{tagId: string; groupId: string}> {
+  async createTabs(
+    tabs: Tabs.Tab[],
+    createNewGroup = true
+  ): Promise<{ tagId: string; groupId: string }> {
     await this.getTagList();
-    let result = {} as {tagId: string; groupId: string};
-    if ('group' in browser.tabs) {
+    let result = {} as { tagId: string; groupId: string };
+    if (IS_GROUP_SUPPORT) {
       result = await this.createTabsByGroups(tabs, createNewGroup);
     } else {
       result = await this.createTabsIndependent(tabs, createNewGroup);
@@ -442,13 +470,14 @@ class TabListUtils {
   }
   // 内部调用：保留浏览器群组的标签页
   async createTabsByGroups(tabs: Tabs.Tab[], createNewGroup = true) {
-    const groupsMap = new Map<number, GroupItem>(), independentTabs = [];
+    const groupsMap = new Map<number, GroupItem>(),
+      independentTabs = [];
     for (let tab of tabs) {
       // 目前 webextension-polyfill 中没有 group 相关的类型定义, 但是新版浏览器有相关的属性
-      if ('groupId' in tab && tab.groupId && tab.groupId != -1) {
+      if (tab.groupId && tab.groupId != -1) {
         const group: GroupItem = groupsMap.get(tab.groupId) || {
           ...this.getInitialTabGroup(),
-          tabList: [] as TabItem[]
+          tabList: [] as TabItem[],
         };
 
         group.tabList.push(this.transformTabItem(tab));
@@ -459,12 +488,12 @@ class TabListUtils {
     }
 
     // 目前 webextension-polyfill 中没有 group 相关的类型定义, 但是新版浏览器有相关的 API
-    if ('tabGroups' in browser && 'get' in browser.tabGroups) {
-        for (const [bsGroupId, group] of groupsMap.entries()) {
-            const tabGroup = await browser.tabGroups?.get(bsGroupId);
-            console.log('tabGroup', tabGroup)
-            group.groupName = tabGroup?.title || group.groupName;
-        };
+    if ('get' in browser.tabGroups) {
+      for (const [bsGroupId, group] of groupsMap.entries()) {
+        const tabGroup = await browser.tabGroups?.get(bsGroupId);
+        // console.log('tabGroup', tabGroup);
+        group.groupName = tabGroup?.title || group.groupName;
+      }
     }
 
     if (independentTabs.length > 0) {
@@ -480,23 +509,44 @@ class TabListUtils {
       this.tagList.push(tag0);
     }
 
+    let newGroups = [...groupsMap.values()];
+    const settings = await _settingsUtils.getSettings();
+
+    if (!settings[ALLOW_DUPLICATE_GROUPS]) {
+      newGroups = getMergedList(newGroups, 'groupName', (prev, curr) => {
+        let mergedTabList = [...prev.tabList, ...curr.tabList];
+        if (!settings[ALLOW_DUPLICATE_TABS]) {
+          mergedTabList = getUniqueList(mergedTabList, 'url');
+        }
+        return { ...prev, tabList: mergedTabList };
+      });
+    }
+
     const unstarredIndex = tag0.groupList.findIndex((g) => !g.isStarred);
     const idx = unstarredIndex > -1 ? unstarredIndex : tag0.groupList.length;
-    tag0.groupList.splice(idx, 0, ...groupsMap.values());
+    tag0.groupList.splice(idx, 0, ...newGroups);
     return { tagId: tag0.tagId, groupId: tag0?.groupList?.[idx]?.groupId };
   }
   // 内部调用：所有标签页独立创建
   async createTabsIndependent(tabs: Tabs.Tab[], createNewGroup = true) {
-    const newTabs = tabs.map(this.transformTabItem);
+    let newTabs = tabs.map(this.transformTabItem);
     let tag0 = this.tagList?.[0];
     const group = tag0?.groupList?.find((group) => !group.isLocked && !group.isStarred);
+    const settings = await _settingsUtils.getSettings();
     if (!createNewGroup && group) {
-      group.tabList = [...newTabs, ...(group?.tabList || [])];
+      newTabs = [...newTabs, ...(group?.tabList || [])];
+      if (!settings[ALLOW_DUPLICATE_TABS]) {
+        newTabs = getUniqueList(newTabs, 'url');
+      }
+      group.tabList = newTabs;
       await this.setTagList([tag0, ...this.tagList.slice(1)]);
       return { tagId: tag0.tagId, groupId: group.groupId };
     }
     // 不存在标签组或者createNewGroup=true，就创建一个新标签组
     const newtabGroup = this.getInitialTabGroup();
+    if (!settings[ALLOW_DUPLICATE_TABS]) {
+      newTabs = getUniqueList(newTabs, 'url');
+    }
     newtabGroup.tabList = newTabs;
 
     if (tag0) {
@@ -518,12 +568,24 @@ class TabListUtils {
     const tabIds = tabs.map((tab) => tab.tabId);
     let tag = undefined,
       group = undefined;
+
+    const settings = await _settingsUtils.getSettings();
+
     for (let t of tagList) {
-      for (let g of t.groupList) {
+      for (let i = 0; i < t.groupList?.length; i++) {
+        const g = t.groupList[i];
         if (g.groupId === groupId) {
           tag = t;
           group = g;
           g.tabList = g.tabList?.filter((tab) => !tabIds.includes(tab.tabId));
+          // 如果未锁定的标签组内没有标签页，则删除标签组
+          if (
+            !g?.tabList?.length &&
+            settings[DELETE_UNLOCKED_EMPTY_GROUP] &&
+            !g.isLocked
+          ) {
+            t.groupList.splice(i, 1);
+          }
           break;
         }
       }
@@ -533,18 +595,28 @@ class TabListUtils {
 
     if (this.constructor === TabListUtils) {
       if (!tag || !group) return;
-      await recycleBinUtils.addTabs(tag, group, tabs);
+      await _recycleBinUtils.addTabs(tag, group, tabs);
     }
+
+    return { tagId: tag?.tagId, groupId: group?.groupId };
   }
   // 更新标签页
-  async updateTab({ tagId, groupId, data }: { tagId?: Key; groupId: Key; data: Partial<TabItem>; }) {
+  async updateTab({
+    tagId,
+    groupId,
+    data,
+  }: {
+    tagId?: Key;
+    groupId: Key;
+    data: Partial<TabItem>;
+  }) {
     const tagList = await this.getTagList();
     let isFound = false;
     for (let tag of tagList) {
       if (tagId && tag.tagId !== tagId) continue;
       for (let g of tag.groupList) {
         if (g.groupId === groupId) {
-          g.tabList = g?.tabList.map(tab => {
+          g.tabList = g?.tabList.map((tab) => {
             if (tab.tabId === data.tabId) {
               return { ...tab, ...data };
             }
@@ -613,6 +685,16 @@ class TabListUtils {
 
         if (isSourceFound) {
           tag?.groupList?.[sourceGroupIndex]?.tabList.splice(sourceIndex, 1);
+          const settings = await _settingsUtils.getSettings();
+          const group = tag?.groupList?.[sourceGroupIndex];
+          // 如果未锁定的标签组内没有标签页，则删除标签组
+          if (
+            !group?.tabList?.length &&
+            settings[DELETE_UNLOCKED_EMPTY_GROUP] &&
+            !group?.isLocked
+          ) {
+            tag?.groupList?.splice(sourceGroupIndex, 1);
+          }
         }
 
         if (isSourceFound && isTargetFound) break;
@@ -630,10 +712,19 @@ class TabListUtils {
     await this.setTagList(tagList);
   }
   // tab标签页移动到（穿越）
-  async tabMoveThrough(sourceGroupId: Key, targetTagId: Key, targetGroupId: Key, tabs: TabItem[]) {
+  async tabMoveThrough(
+    sourceGroupId: Key,
+    targetTagId: Key,
+    targetGroupId: Key,
+    tabs: TabItem[]
+  ) {
     const tagList = await this.getTagList();
     const tabIds = tabs.map((tab) => tab.tabId);
-    let isSourceFound = false, isTargetFound = false, sourceGroupIndex = 0, targetTagIndex = 0, targetGroupIndex = 0;
+    let isSourceFound = false,
+      isTargetFound = false,
+      sourceGroupIndex = 0,
+      targetTagIndex = 0,
+      targetGroupIndex = 0;
     for (let tIndex = 0; tIndex < tagList.length; tIndex++) {
       const tag = tagList[tIndex];
       if (tag.tagId === targetTagId) {
@@ -659,7 +750,7 @@ class TabListUtils {
       const tag = tagList[targetTagIndex];
       const group = tag.groupList[targetGroupIndex];
       if (group) {
-        group.tabList = [ ...tabs, ...group.tabList];
+        group.tabList = [...tabs, ...group.tabList];
       }
     }
 
@@ -695,7 +786,7 @@ class TabListUtils {
             }) || [],
         },
         ['tagId', 'createTime']
-      );
+      ) as Partial<TagItem>;
     });
     return exportTagList;
   }
@@ -776,12 +867,12 @@ class RecycleBinUtils extends TabListUtils {
     await this.setTagList(tagList);
 
     // 还原到标签列表（如果标签列表中有相同的标签组，则合并标签组）
-    let storeTagList = await listStoreUtils.getTagList();
+    let storeTagList = await _listStoreUtils.getTagList();
     for (let index = tags.length - 1; index >= 0; index--) {
       const tag = tags[index];
       storeTagList = this.recoverTabGroupsBasic(storeTagList, tag, tag.groupList);
     }
-    await listStoreUtils.setTagList(storeTagList);
+    await _listStoreUtils.setTagList(storeTagList);
     return tagList;
   }
   // 全部还原
@@ -850,7 +941,12 @@ class RecycleBinUtils extends TabListUtils {
             }
           }
           if (!isGroupInListStore) {
-            storeTag.groupList.unshift(group);
+            const unstarredIndex = storeTag.groupList.findIndex((g) => !g.isStarred);
+            storeTag.groupList.splice(
+              unstarredIndex > -1 ? unstarredIndex : storeTag.groupList.length,
+              0,
+              group
+            );
           }
         }
         break;
@@ -878,9 +974,9 @@ class RecycleBinUtils extends TabListUtils {
     await this.setTagList(tagList);
 
     // 还原到标签列表（如果标签列表中有相同的标签组，则合并标签组）
-    let storeTagList = await listStoreUtils.getTagList();
+    let storeTagList = await _listStoreUtils.getTagList();
     storeTagList = this.recoverTabGroupsBasic(storeTagList, tag, groups);
-    await listStoreUtils.setTagList(storeTagList);
+    await _listStoreUtils.setTagList(storeTagList);
     return tagList;
   }
 
@@ -920,11 +1016,12 @@ class RecycleBinUtils extends TabListUtils {
   }
 }
 
-listStoreUtils = new TabListUtils();
-recycleBinUtils = new RecycleBinUtils();
-export const recycleUtils = recycleBinUtils;
-export const tabListUtils = listStoreUtils;
-export const settingsUtils = new SettingsUtils();
+_settingsUtils = new SettingsUtils();
+_listStoreUtils = new TabListUtils();
+_recycleBinUtils = new RecycleBinUtils();
+export const settingsUtils = _settingsUtils;
+export const recycleUtils = _recycleBinUtils;
+export const tabListUtils = _listStoreUtils;
 export const themeUtils = new ThemeUtils();
 
 // 监听storage变化

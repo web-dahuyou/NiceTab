@@ -185,7 +185,7 @@ export default function TabGroup({
               )}
               {allowGroupActions.includes('restore') && (
                 <span className="action-btn" onClick={() => onRestore?.()}>
-                  {$fmt('home.tabGroup.restore')}
+                  {$fmt('home.tabGroup.open')}
                 </span>
               )}
               {allowGroupActions.includes('lock') && (
@@ -260,7 +260,10 @@ export default function TabGroup({
                     key={tab.tabId || index}
                     group={{groupId, isLocked, isStarred}}
                     tab={tab}
-                    onRemove={() => onTabRemove?.(groupId, [tab])}
+                    onRemove={async () => {
+                      await onTabRemove?.(groupId, [tab])
+                      setSelectedTabIds(selectedTabIds.filter((id) => id !== tab.tabId));
+                    }}
                     onChange={onTabChange}
                   />
                 </DndComponent>

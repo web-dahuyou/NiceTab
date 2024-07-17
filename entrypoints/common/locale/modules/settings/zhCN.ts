@@ -20,4 +20,14 @@ export default {
   'settings.deleteAfterRestore': '恢复标签页/标签组时-是否自动删除标签页{mark}',
   'settings.deleteAfterRestore.yes': '从NiceTab列表中删除（仍保留固定标签页）',
   'settings.deleteAfterRestore.no': '保留在NiceTab列表中（推荐）',
+  'settings.deleteUnlockedEmptyGroup': '清空标签页时-是否自动删除该标签组{mark}',
+  'settings.deleteUnlockedEmptyGroup.yes': '自动删除（仍保留锁定的空标签组）',
+  'settings.deleteUnlockedEmptyGroup.no': '不自动删除',
+
+  'settings.allowDuplicateTabs': '发送标签页时-是否保留重复的标签页{mark}',
+  'settings.allowDuplicateTabs.yes': '保留',
+  'settings.allowDuplicateTabs.no': '去重（只针对发送的标签页）',
+  'settings.allowDuplicateGroups': '发送标签页时-是否保留重复的标签组{mark}',
+  'settings.allowDuplicateGroups.yes': '保留',
+  'settings.allowDuplicateGroups.no': '去重（只针对发送的标签组）',
 }

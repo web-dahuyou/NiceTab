@@ -51,6 +51,9 @@ export const ENUM_SETTINGS_PROPS: Record<string, keyof SettingsProps> = {
   AUTO_PIN_ADMIN_TAB: 'autoPinAdminTab', // 是否固定管理后台
   ALLOW_SEND_PINNED_TABS: 'allowSendPinnedTabs', // 是否发送固定标签页
   DELETE_AFTER_RESTORE: 'deleteAfterRestore', // 恢复标签页/标签组时是否从列表中删除
+  DELETE_UNLOCKED_EMPTY_GROUP: 'deleteUnlockedEmptyGroup', // 是否删除未锁定的空标签组
+  ALLOW_DUPLICATE_TABS: 'allowDuplicateTabs', // 同一个标签组中是否允许重复的标签页
+  ALLOW_DUPLICATE_GROUPS: 'allowDuplicateGroups', // 同一个分类中是否允许重复的标签组
 };
 
 // tab 事件
@@ -82,6 +85,8 @@ export const defaultLanguage: LanguageTypes = (navigator?.language ||
 export const UNNAMED_TAG = 'Unnamed Tag';
 export const UNNAMED_GROUP = 'Unnamed Group';
 
+export const IS_GROUP_SUPPORT  = 'group' in browser.tabs && 'tabGroups' in browser;
+
 export default {
   ENUM_COLORS,
   THEME_COLORS,
@@ -91,4 +96,5 @@ export default {
   LANGUANGE_OPTIONS,
   UNNAMED_TAG,
   UNNAMED_GROUP,
+  IS_GROUP_SUPPORT
 };

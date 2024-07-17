@@ -10,7 +10,7 @@ export default {
   'settings.autoPinAdminTab.no': 'Do not',
   'settings.allowSendPinnedTabs': 'When sending tabs - Whether to send the pinned tabs to NiceTab ?',
   'settings.allowSendPinnedTabs.yes': 'Allowed',
-  'settings.allowSendPinnedTabs.no': 'Do not (recommended)',
+  'settings.allowSendPinnedTabs.no': 'Not allowed (recommended)',
   'settings.openAdminTabAfterSendTabs': 'When sending tabs - Whether to open the NiceTab-Admin-Page ?',
   'settings.openAdminTabAfterSendTabs.yes': 'Automatically open (recommended)',
   'settings.openAdminTabAfterSendTabs.no': 'Do not',
@@ -20,4 +20,14 @@ export default {
   'settings.deleteAfterRestore': 'When restoring tabs - whether to remove the tabs ?',
   'settings.deleteAfterRestore.yes': 'Remove (pinned tabs remain)',
   'settings.deleteAfterRestore.no': 'All remain (recommended)',
+  'settings.deleteUnlockedEmptyGroup': 'When clearing tabs - whether to remove the empty group ?',
+  'settings.deleteUnlockedEmptyGroup.yes': 'Automatically remove (retain the locked group)',
+  'settings.deleteUnlockedEmptyGroup.no': 'Do not',
+
+  'settings.allowDuplicateTabs': 'When sending tabs - retain duplicate tabs ?',
+  'settings.allowDuplicateTabs.yes': 'Retain',
+  'settings.allowDuplicateTabs.no': 'Remove duplicate tabs (only for sending tabs)',
+  'settings.allowDuplicateGroups': 'When sending tabs - retain duplicate groups ?',
+  'settings.allowDuplicateGroups.yes': 'Retain',
+  'settings.allowDuplicateGroups.no': 'Merge duplicate groups (only for sending groups)',
 }

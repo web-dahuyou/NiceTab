@@ -31,6 +31,7 @@ export default {
   'home.tabGroup.star': '星标该组',
   'home.tabGroup.unstar': '取消星标',
   'home.tabGroup.recover': '还原该组',
+  'home.tabGroup.open': '打开该组',
 
   'home.tabGroup.count': '{count}个标签组',
   'home.tab.count': '{count}个标签页',
