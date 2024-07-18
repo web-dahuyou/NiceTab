@@ -10,7 +10,7 @@ import RenderTreeNode from './RenderTreeNode';
 import TabGroup from './TabGroup';
 import HotkeyList from '../components/HotkeyList';
 import type { TagItem, GroupItem, TabItem } from '@/entrypoints/types';
-import type { TreeDataNodeTabGroup, TreeDataNodeUnion, MoveDataProps } from './types';
+import type { TreeDataNodeTabGroup, TreeDataNodeUnion, MoveToCallbackProps } from './types';
 import { useTreeData } from './hooks/treeData';
 import useHotkeys from './hooks/hotkeys';
 import { getTreeData } from './utils';
@@ -70,19 +70,23 @@ export default function Home() {
     setConfirmModalVisible(false);
   };
 
-  const handleTabGroupMoveTo = async ({ moveData, selected }: { moveData?: MoveDataProps; selected: boolean }) => {
+  const handleTabGroupMoveTo = async ({ moveData, targetData, selected }: MoveToCallbackProps) => {
     refreshTreeData(treeData => {
       if (selected) {
         const { groupId, tabs } = moveData || {};
+        const { targetTagId, targetGroupId } = targetData || {};
         if (!groupId) return;
         // 如果是移动标签页的话，则不需要重新选择标签组
         if (tabs && tabs?.length > 0) return;
 
         let group = null;
         for (let tag of treeData) {
+          if (!!targetTagId && tag.key !== targetTagId) continue;
           for (let g of tag.children || []) {
-            group = g;
-            break;
+            if (g.key === targetGroupId) {
+              group = g;
+              break;
+            }
           }
         }
         group && handleSelect(treeData, [groupId], { node: group as TreeDataNodeTabGroup });

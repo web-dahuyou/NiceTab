@@ -408,10 +408,19 @@ class TabListUtils {
     await this.setTagList(tagList);
   }
   // 标签组移动到（穿越）
-  async tabGroupMoveThrough(sourceGroupId: Key, targetTagId: Key) {
+  async tabGroupMoveThrough({
+    sourceGroupId,
+    targetTagId,
+    autoMerge = false,
+  }: {
+    sourceGroupId: Key;
+    targetTagId: Key;
+    autoMerge?: boolean;
+  }) {
     const tagList = await this.getTagList();
     let isSourceFound = false,
       isTargetFound = false,
+      sourceTagIndex = 0,
       sourceGroupIndex = 0,
       targetTagIndex = 0,
       sourceGroup = null;
@@ -425,29 +434,51 @@ class TabListUtils {
         const group = tag?.groupList?.[gIndex];
         if (group.groupId === sourceGroupId) {
           isSourceFound = true;
+          sourceTagIndex = tIndex;
           sourceGroupIndex = gIndex;
           sourceGroup = group;
           break;
         }
-      }
-      if (isSourceFound) {
-        tag.groupList.splice(sourceGroupIndex, 1);
       }
 
       if (isSourceFound && isTargetFound) break;
     }
 
     if (isSourceFound && isTargetFound && sourceGroup) {
+      const sourceTag = tagList?.[sourceTagIndex];
+      sourceTag?.groupList?.splice(sourceGroupIndex, 1);
+
       const targetTag = tagList?.[targetTagIndex];
-      const unstarredIndex = targetTag?.groupList?.findIndex((g) => !g.isStarred);
-      targetTag?.groupList.splice(
-        unstarredIndex > -1 ? unstarredIndex : targetTag?.groupList?.length,
-        0,
-        sourceGroup
+      const sameNameGroupIndex = targetTag?.groupList?.findIndex(
+        (g) => g.groupName === sourceGroup?.groupName
       );
+      // 如果开启自动合并，则同名标签组会自动合并
+      if (autoMerge && ~sameNameGroupIndex) {
+        const targetSameNameGroup = targetTag?.groupList[sameNameGroupIndex];
+        targetTag?.groupList?.splice(sameNameGroupIndex, 1, {
+          ...targetSameNameGroup,
+          tabList: getUniqueList(
+            [...targetSameNameGroup?.tabList, ...sourceGroup?.tabList],
+            'url'
+          ),
+        });
+        await this.setTagList(tagList);
+        return { targetGroupId: targetSameNameGroup.groupId };
+      } else {
+        const unstarredIndex = targetTag?.groupList?.findIndex((g) => !g.isStarred);
+        targetTag?.groupList.splice(
+          unstarredIndex > -1 ? unstarredIndex : targetTag?.groupList?.length,
+          0,
+          sourceGroup
+        );
+
+        await this.setTagList(tagList);
+        return { targetGroupId: sourceGroup.groupId };
+      }
     }
 
     await this.setTagList(tagList);
+    return { targetGroupId: undefined };
   }
 
   /* 标签相关方法 */
@@ -668,6 +699,7 @@ class TabListUtils {
       }
     } else {
       let tabItemTmp = null,
+        sourceTagIndex = 0,
         sourceGroupIndex = 0,
         targetTagIndex = 0,
         targetGroupIndex = 0;
@@ -679,6 +711,7 @@ class TabListUtils {
           const group = tag.groupList[gIndex];
           if (group.groupId === sourceGroupId) {
             tabItemTmp = group.tabList?.[sourceIndex];
+            sourceTagIndex = tIndex;
             sourceGroupIndex = gIndex;
             isSourceFound = true;
           } else if (group.groupId === targetGroupId) {
@@ -688,20 +721,6 @@ class TabListUtils {
           }
 
           if (isSourceFound && isTargetFound) break;
-        }
-
-        if (isSourceFound) {
-          tag?.groupList?.[sourceGroupIndex]?.tabList.splice(sourceIndex, 1);
-          const settings = await _settingsUtils.getSettings();
-          const group = tag?.groupList?.[sourceGroupIndex];
-          // 如果未锁定的标签组内没有标签页，则删除标签组
-          if (
-            settings[DELETE_UNLOCKED_EMPTY_GROUP] &&
-            !group?.tabList?.length &&
-            !group?.isLocked
-          ) {
-            tag?.groupList?.splice(sourceGroupIndex, 1);
-          }
         }
 
         if (isSourceFound && isTargetFound) break;
@@ -714,17 +733,39 @@ class TabListUtils {
           0,
           tabItemTmp
         );
+
+      if (isSourceFound) {
+        const sourceTag = tagList?.[sourceTagIndex];
+        sourceTag?.groupList?.[sourceGroupIndex]?.tabList.splice(sourceIndex, 1);
+        const settings = await _settingsUtils.getSettings();
+        const sourceGroup = sourceTag?.groupList?.[sourceGroupIndex];
+        // 如果未锁定的标签组内没有标签页，则删除标签组
+        if (
+          settings[DELETE_UNLOCKED_EMPTY_GROUP] &&
+          !sourceGroup?.tabList?.length &&
+          !sourceGroup?.isLocked
+        ) {
+          sourceTag?.groupList?.splice(sourceGroupIndex, 1);
+        }
+      }
     }
 
     await this.setTagList(tagList);
   }
   // tab标签页移动到（穿越）
-  async tabMoveThrough(
-    sourceGroupId: Key,
-    targetTagId: Key,
-    targetGroupId: Key,
-    tabs: TabItem[]
-  ) {
+  async tabMoveThrough({
+    sourceGroupId,
+    targetTagId,
+    targetGroupId,
+    tabs,
+    autoMerge = false,
+  }: {
+    sourceGroupId: Key;
+    targetTagId: Key;
+    targetGroupId: Key;
+    tabs: TabItem[];
+    autoMerge?: boolean;
+  }) {
     const tagList = await this.getTagList();
     const tabIds = tabs.map((tab) => tab.tabId);
     let isSourceFound = false,
@@ -759,7 +800,12 @@ class TabListUtils {
       const tag = tagList[targetTagIndex];
       const group = tag.groupList[targetGroupIndex];
       if (group) {
-        group.tabList = [...tabs, ...group.tabList];
+        let newTabList = [...tabs, ...group.tabList];
+        // 如果开启自动合并，则标签页去重
+        if (autoMerge) {
+          newTabList = getUniqueList(newTabList, 'url');
+        }
+        group.tabList = newTabList;
       }
 
       // 如果source标签组内没有标签，则删除标签组

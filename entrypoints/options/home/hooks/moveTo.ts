@@ -1,9 +1,7 @@
-import { useEffect, useCallback, useState } from "react";
-import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { useState } from "react";
 import type { MoveDataProps } from '../types';
 
 export default function useMoveTo() {
-  const { $fmt } = useIntlUtls();
   const [modalVisible, setModalVisible] = useState(false);
   const [moveData, setMoveData] = useState<MoveDataProps>();
 
@@ -20,10 +18,6 @@ export default function useMoveTo() {
   const onClose = () => {
     setModalVisible(false);
   };
-
-  useEffect(() => {
-
-  }, []);
 
   return {
     modalVisible,

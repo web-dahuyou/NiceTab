@@ -16,7 +16,7 @@ import {
 } from './TabGroup.styled';
 import DndComponent from '@/entrypoints/common/components/DndComponent';
 import DropComponent from '@/entrypoints/common/components/DropComponent';
-import { DndTabItemProps, DndTabItemOnDropCallback, MoveDataProps } from './types';
+import { DndTabItemProps, DndTabItemOnDropCallback, MoveToCallbackProps } from './types';
 import { dndKeys } from './constants';
 import MoveToModal from './MoveToModal';
 import useMoveTo from './hooks/moveTo';
@@ -39,7 +39,7 @@ type TabGroupProps = GroupItem & {
   onDrop?: DndTabItemOnDropCallback;
   onTabChange?: (data: TabItem) => void;
   onTabRemove?: (groupId: string, tabs: TabItem[]) => void;
-  onMoveTo?: ({ moveData, selected }: { moveData?: MoveDataProps, selected: boolean }) => void;
+  onMoveTo?: ({ moveData, targetData, selected }: MoveToCallbackProps) => void;
 };
 
 const defaultGroupActions = ['remove', 'rename', 'restore', 'lock', 'star', 'moveTo'];
@@ -301,9 +301,9 @@ export default function TabGroup({
           visible={moveToModalVisible}
           listData={tagList}
           moveData={moveData}
-          onOk={() => {
+          onOk={(targetData) => {
             onMoveToConfirm(() => {
-              onMoveTo?.({ moveData, selected: !!selected });
+              onMoveTo?.({ moveData, targetData, selected: !!selected });
               setSelectedTabIds([]);
             });
           }}

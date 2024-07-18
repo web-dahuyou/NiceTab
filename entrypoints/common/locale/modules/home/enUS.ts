@@ -54,4 +54,7 @@ export default {
   'home.help.content.6': '6. Tags / tab groups / tabs support drag-and-drop sorting. When a category/tab group is selected, it can be sorted using shortcut keys. The shortcut key mapping is shown in the table below:',
 
   'home.moveTo.missingTip': 'Please select a {type}',
+  'home.moveTo.mergeLabel': 'Merge Duplicate Items ?',
+  'home.moveTo.mergeTip.1': '1. If Checked, when moving tabs, the tabs will be de-duplicated with the same URL in the target group.',
+  'home.moveTo.mergeTip.2': '2. If Checked, when moving a tab group, it will be merged to the group of the same name in the target category (tag).',
 }

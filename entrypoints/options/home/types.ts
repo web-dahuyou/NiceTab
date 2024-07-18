@@ -39,6 +39,19 @@ export interface MoveDataProps {
   groupId: string;
   tabs?: TabItem[];
 }
+
+// 移动后的目标数据
+export interface MoveTargetProps {
+  targetTagId?: string;
+  targetGroupId?: string;
+}
+// 移动后的目标数据
+export interface MoveToCallbackProps {
+  moveData?: MoveDataProps;
+  targetData: MoveTargetProps;
+  selected: boolean;
+}
+
 // tagList 级联 option
 export type CascaderOption = {
   type: string;
