@@ -14,9 +14,16 @@ import {
   defaultLanguage,
   UNNAMED_TAG,
   UNNAMED_GROUP,
-  IS_GROUP_SUPPORT
+  IS_GROUP_SUPPORT,
 } from './constants';
-import { getRandomId, pick, omit, newCreateTime, getUniqueList, getMergedList } from './utils';
+import {
+  getRandomId,
+  pick,
+  omit,
+  newCreateTime,
+  getUniqueList,
+  getMergedList,
+} from './utils';
 
 const {
   LANGUAGE,
@@ -580,8 +587,8 @@ class TabListUtils {
           g.tabList = g.tabList?.filter((tab) => !tabIds.includes(tab.tabId));
           // 如果未锁定的标签组内没有标签页，则删除标签组
           if (
-            !g?.tabList?.length &&
             settings[DELETE_UNLOCKED_EMPTY_GROUP] &&
+            !g?.tabList?.length &&
             !g.isLocked
           ) {
             t.groupList.splice(i, 1);
@@ -689,8 +696,8 @@ class TabListUtils {
           const group = tag?.groupList?.[sourceGroupIndex];
           // 如果未锁定的标签组内没有标签页，则删除标签组
           if (
-            !group?.tabList?.length &&
             settings[DELETE_UNLOCKED_EMPTY_GROUP] &&
+            !group?.tabList?.length &&
             !group?.isLocked
           ) {
             tag?.groupList?.splice(sourceGroupIndex, 1);
@@ -722,6 +729,7 @@ class TabListUtils {
     const tabIds = tabs.map((tab) => tab.tabId);
     let isSourceFound = false,
       isTargetFound = false,
+      sourceTagIndex = 0,
       sourceGroupIndex = 0,
       targetTagIndex = 0,
       targetGroupIndex = 0;
@@ -735,6 +743,7 @@ class TabListUtils {
         const group = tag.groupList[gIndex];
         if (group.groupId === sourceGroupId) {
           isSourceFound = true;
+          sourceTagIndex = tIndex;
           sourceGroupIndex = gIndex;
           group.tabList = group.tabList?.filter((tab) => !tabIds.includes(tab.tabId));
         } else if (group.groupId === targetGroupId) {
@@ -751,6 +760,16 @@ class TabListUtils {
       const group = tag.groupList[targetGroupIndex];
       if (group) {
         group.tabList = [...tabs, ...group.tabList];
+      }
+
+      // 如果source标签组内没有标签，则删除标签组
+      const settings = await _settingsUtils.getSettings();
+      if (settings[DELETE_UNLOCKED_EMPTY_GROUP]) {
+        const sourceTag = tagList?.[sourceTagIndex];
+        const sourceGroup = sourceTag?.groupList?.[sourceGroupIndex];
+        if (!sourceGroup?.tabList?.length && !sourceGroup?.isLocked) {
+          sourceTag?.groupList?.splice(sourceGroupIndex, 1);
+        }
       }
     }
 
