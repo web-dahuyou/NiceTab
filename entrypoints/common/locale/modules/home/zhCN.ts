@@ -46,4 +46,8 @@ export default {
   'home.help.content.6': '6、分类/标签组/标签页支持拖拽排序，当分类/标签组处在选中状态时，可通过快捷键进行排序，快捷键映射见下表：',
 
   'home.moveTo.missingTip': '请选择{type}',
+  'home.moveTo.mergeLabel': '是否合并重复项',
+  'home.moveTo.mergeTip.1': '1、勾选后，如果移动标签页，则与目标分组中相同 url 的标签页合并（去重）。',
+  'home.moveTo.mergeTip.2': '2、勾选后，如果移动标签组，则与目标分类中同名的标签组合并，标签页去重。',
+
 }
