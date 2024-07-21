@@ -3,6 +3,8 @@ export default {
   'home.tabGroup': 'Tab Group',
   'home.tab': 'Tab',
   'home.tabGroupList': 'Tab Group List',
+  'home.expand': 'Expand the {name}',
+  'home.collapse': 'Collapse the {name}',
   'home.expandAll': 'Expand',
   'home.collapseAll': 'Collapse',
   'home.addTag': 'Create Tag',

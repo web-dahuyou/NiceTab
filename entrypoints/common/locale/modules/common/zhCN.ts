@@ -40,4 +40,6 @@ export default {
   'common.update.available': '有可用的新版本',
   'common.update.upgradeNow': '立即升级',
   'common.backToTop': '回到顶部',
+  'common.panel': '面板',
+  'common.sidebar': '侧边栏',
 }

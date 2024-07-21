@@ -3,6 +3,8 @@ export default {
   'home.tabGroup': '标签组',
   'home.tab': '标签页',
   'home.tabGroupList': '标签组列表',
+  'home.expand': '展开{name}',
+  'home.collapse': '折叠{name}',
   'home.expandAll': '全部展开',
   'home.collapseAll': '全部折叠',
   'home.addTag': '创建分类',

@@ -8,7 +8,7 @@ export const StyledGroupWrapper = styled.div<{ $bgColor?: string }>`
   position: relative;
   width: 100%;
   margin-bottom: 24px;
-  padding: 8px 12px;
+  padding: 8px;
   border-radius: 8px;
   background: ${props => props.$bgColor || '#fff'};
 `;
