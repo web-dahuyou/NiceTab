@@ -67,6 +67,7 @@ export default function Home() {
     handleTabGroupCreate,
     handleTabGroupChange,
     handleTabGroupStarredChange,
+    handleTabGroupDedup,
     handleTabGroupRestore,
     handleTreeNodeDrop,
     handleTabItemDrop,
@@ -313,6 +314,7 @@ export default function Home() {
                   onStarredChange={(isStarred) =>
                     handleTabGroupStarredChange(tabGroup, isStarred)
                   }
+                  onDedup={() => handleTabGroupDedup(tabGroup)}
                   onDrop={handleTabItemDrop}
                   onTabChange={(tabItem: TabItem) =>
                     handleTabItemChange(tabGroup, tabItem)

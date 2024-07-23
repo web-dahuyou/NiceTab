@@ -29,7 +29,7 @@ export default function ToggleSidebarBtn({
     >
       <StyledActionIconBtn
         className="btn-collapse"
-        $size={12}
+        $size={14}
         $color="#999"
         $hoverColor="#999"
         $hoverScale={1}

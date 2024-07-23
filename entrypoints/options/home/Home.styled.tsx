@@ -16,9 +16,9 @@ export const StyledSidebarWrapper = styled.div<{ $primaryColor?: string; $collap
       position: absolute;
       box-sizing: border-box;
       top: 0;
-      right: -18px;
-      width: 18px;
-      height: 36px;
+      right: -20px;
+      width: 20px;
+      height: 40px;
       border: 1px solid #ccc;
       border-radius: 0 6px 6px 0;
       display: flex;
@@ -93,12 +93,12 @@ export const StyledListWrapper = styled.div<{$collapsed?: boolean;}>`
   min-height: 400px;
   display: grid;
   // grid-template-columns: 280px auto;
-  // grid-column-gap: 20px;
+  // grid-column-gap: 32px;
   grid-template-columns: ${(props) => props.$collapsed ? '0px auto' : '280px auto' };
   transition: grid-template-columns 0.2s ease-in-out;
 
   .content {
-    padding-left: 24px;
+    padding-left: 32px;
     border-left: 1px solid rgba(5, 5, 5, 0.06);
   }
 `;

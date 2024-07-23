@@ -42,4 +42,5 @@ export default {
   'common.backToTop': 'Back to Top',
   'common.panel': 'Panel',
   'common.sidebar': 'Sidebar',
+  'common.dedup': 'Dedup',
 }

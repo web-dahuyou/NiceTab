@@ -18,6 +18,8 @@ export default {
   'home.removeDesc': 'Are you sure you want to remove the {type} ?',
   'home.clearTitle': 'Clear Reminder',
   'home.clearDesc': 'Are you sure you want to clear all the list ?',
+  'home.dedupTitle': 'Dedup Reminder',
+  'home.dedupDesc': 'Are you sure you want to perform deduplication ?',
   'home.recoverTitle': 'Recover Reminder',
   'home.recoverDesc': 'Are you sure you want to recover the {type} ?',
   'home.recoverAllDesc': 'Are you sure you want to recover All ?',

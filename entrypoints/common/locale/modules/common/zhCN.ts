@@ -42,4 +42,5 @@ export default {
   'common.backToTop': '回到顶部',
   'common.panel': '面板',
   'common.sidebar': '侧边栏',
+  'common.dedup': '去重',
 }
