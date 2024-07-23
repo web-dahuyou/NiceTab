@@ -35,6 +35,7 @@ type TabGroupProps = GroupItem & {
   onRemove?: () => void;
   onRestore?: () => void;
   onStarredChange?: (isStarred: boolean) => void;
+  onDedup?: () => void;
   onRecover?: () => void;
   onDrop?: DndTabItemOnDropCallback;
   onTabChange?: (data: TabItem) => void;
@@ -42,7 +43,7 @@ type TabGroupProps = GroupItem & {
   onMoveTo?: ({ moveData, targetData, selected }: MoveToCallbackProps) => void;
 };
 
-const defaultGroupActions = ['remove', 'rename', 'restore', 'lock', 'star', 'moveTo'];
+const defaultGroupActions = ['remove', 'rename', 'restore', 'lock', 'star', 'dedup', 'moveTo'];
 const defaultTabActions = ['remove', 'moveTo'];
 
 export default function TabGroup({
@@ -63,6 +64,7 @@ export default function TabGroup({
   onRemove,
   onRestore,
   onStarredChange,
+  onDedup,
   onRecover,
   onDrop,
   onTabChange,
@@ -74,6 +76,7 @@ export default function TabGroup({
   const groupRef = useRef<HTMLDivElement>(null);
   const [selectedTabIds, setSelectedTabIds] = useState<string[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [dedupModalVisible, setDedupModalVisible] = useState(false);
   const [recoverModalVisible, setRecoverModalVisible] = useState(false);
 
   const {
@@ -110,6 +113,10 @@ export default function TabGroup({
   const handleTabGroupRemove = () => {
     setModalVisible(false);
     onRemove?.();
+  };
+  const handleTabGroupDedup = () => {
+    setDedupModalVisible(false);
+    onDedup?.();
   };
   const handleTabGroupRecover = () => {
     setRecoverModalVisible(false);
@@ -206,6 +213,11 @@ export default function TabGroup({
                   {$fmt('common.moveTo')}
                 </span>
               )}
+              {allowGroupActions.includes('dedup') && (
+                <span className="action-btn" onClick={() => setDedupModalVisible(true)}>
+                  {$fmt('common.dedup')}
+                </span>
+              )}
               {allowGroupActions.includes('recover') && (
                 <span className="action-btn" onClick={() => setRecoverModalVisible(true)}>
                   {$fmt('home.tabGroup.recover')}
@@ -273,6 +285,7 @@ export default function TabGroup({
         </DropComponent>
       </StyledGroupWrapper>
 
+      {/* 标签组删除确认弹窗 */}
       {modalVisible && (
         <Modal
           title={$fmt('home.removeTitle')}
@@ -284,6 +297,19 @@ export default function TabGroup({
           <div>{$fmt({ id: 'home.removeDesc', values: { type: $fmt(`home.tabGroup`) }})}</div>
         </Modal>
       )}
+      {/* 标签组去重确认弹窗 */}
+      {dedupModalVisible && (
+        <Modal
+          title={$fmt('home.dedupTitle')}
+          width={400}
+          open={dedupModalVisible}
+          onOk={handleTabGroupDedup}
+          onCancel={() => setDedupModalVisible(false)}
+        >
+          <div>{$fmt('home.dedupDesc')}</div>
+        </Modal>
+      )}
+      {/* 还原确认弹窗 */}
       {recoverModalVisible && (
         <Modal
           title={$fmt('home.recoverTitle')}

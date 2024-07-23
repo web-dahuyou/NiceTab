@@ -3,6 +3,8 @@ export default {
   'home.tabGroup': '标签组',
   'home.tab': '标签页',
   'home.tabGroupList': '标签组列表',
+  'home.expand': '展开{name}',
+  'home.collapse': '折叠{name}',
   'home.expandAll': '全部展开',
   'home.collapseAll': '全部折叠',
   'home.addTag': '创建分类',
@@ -16,6 +18,8 @@ export default {
   'home.removeDesc': '您确定要删除该{type}吗？',
   'home.clearTitle': '删除提醒',
   'home.clearDesc': '您确定要清空列表吗？',
+  'home.dedupTitle': '去重提醒',
+  'home.dedupDesc': '您确定要进行去重操作吗？',
   'home.recoverTitle': '还原提醒',
   'home.recoverDesc': '您确定要还原该{type}吗？',
   'home.recoverAllDesc': '您确定要全部还原吗？',
@@ -49,5 +53,4 @@ export default {
   'home.moveTo.mergeLabel': '是否合并重复项',
   'home.moveTo.mergeTip.1': '1、勾选后，如果移动标签页，则与目标分组中相同 url 的标签页合并（去重）。',
   'home.moveTo.mergeTip.2': '2、勾选后，如果移动标签组，则与目标分类中同名的标签组合并，标签页去重。',
-
 }

@@ -134,7 +134,6 @@ export function getUniqueList<T>(list: T[], key: keyof T): T[] {
  * @description: 列表去重
  * @param list 原始列表
  * @param key 合并对象依据的字段名
- * @param childListKey 对象中需要合并的子数组字段名
  * @return 返回合并后的列表
  */
 export function getMergedList<T, K extends keyof T>(
@@ -149,7 +148,6 @@ export function getMergedList<T, K extends keyof T>(
     if (!groupValue) {
       groupValue = item;
     } else {
-      // groupValue[childListKey] = [...groupValue[childListKey], ...item[childListKey]];
       groupValue = handler(groupValue, item);
     }
     resultMap.set(item[key], groupValue);

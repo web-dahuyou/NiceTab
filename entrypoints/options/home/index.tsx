@@ -1,16 +1,39 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
-import { theme, Flex, Tree, Button, Input, Dropdown, Modal, Drawer, Empty, Spin } from 'antd';
+import {
+  theme,
+  Flex,
+  Tree,
+  Button,
+  Input,
+  Dropdown,
+  Modal,
+  Drawer,
+  Empty,
+  Spin,
+} from 'antd';
 import type { MenuProps, TreeProps } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
-import { DownOutlined, MoreOutlined, ClearOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import {
+  DownOutlined,
+  MoreOutlined,
+  ClearOutlined,
+  QuestionCircleOutlined,
+} from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { classNames } from '~/entrypoints/common/utils';
+
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
-import { StyledListWrapper } from './Home.styled';
+import { StyledListWrapper, StyledSidebarWrapper } from './Home.styled';
+import ToggleSidebarBtn from './ToggleSidebarBtn';
 import RenderTreeNode from './RenderTreeNode';
 import TabGroup from './TabGroup';
 import HotkeyList from '../components/HotkeyList';
-import type { TagItem, GroupItem, TabItem } from '@/entrypoints/types';
-import type { TreeDataNodeTabGroup, TreeDataNodeUnion, MoveToCallbackProps } from './types';
+import type { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
+import type {
+  TreeDataNodeTabGroup,
+  TreeDataNodeUnion,
+  MoveToCallbackProps,
+} from './types';
 import { useTreeData } from './hooks/treeData';
 import useHotkeys from './hooks/hotkeys';
 import { getTreeData } from './utils';
@@ -44,23 +67,27 @@ export default function Home() {
     handleTabGroupCreate,
     handleTabGroupChange,
     handleTabGroupStarredChange,
+    handleTabGroupDedup,
     handleTabGroupRestore,
     handleTreeNodeDrop,
     handleTabItemDrop,
     handleTabItemChange,
     handleTabItemRemove,
-    handleHotkeyAction
+    handleHotkeyAction,
   } = useTreeData();
 
   const { hotkeyList } = useHotkeys({ onAction: handleHotkeyAction });
 
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState<boolean>(false);
   const [helpDrawerVisible, setHelpDrawerVisible] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>('');
   const moreItems: MenuProps['items'] = [
     {
       key: 'clear',
-      label: <span onClick={() => setConfirmModalVisible(true)}>{$fmt('home.clearAll')}</span>,
+      label: (
+        <span onClick={() => setConfirmModalVisible(true)}>{$fmt('home.clearAll')}</span>
+      ),
       icon: <ClearOutlined />,
     },
   ];
@@ -70,8 +97,12 @@ export default function Home() {
     setConfirmModalVisible(false);
   };
 
-  const handleTabGroupMoveTo = async ({ moveData, targetData, selected }: MoveToCallbackProps) => {
-    refreshTreeData(treeData => {
+  const handleTabGroupMoveTo = async ({
+    moveData,
+    targetData,
+    selected,
+  }: MoveToCallbackProps) => {
+    refreshTreeData((treeData) => {
       if (selected) {
         const { groupId, tabs } = moveData || {};
         const { targetTagId, targetGroupId } = targetData || {};
@@ -89,11 +120,11 @@ export default function Home() {
             }
           }
         }
-        group && handleSelect(treeData, [groupId], { node: group as TreeDataNodeTabGroup });
+        group &&
+          handleSelect(treeData, [groupId], { node: group as TreeDataNodeTabGroup });
       }
-
     });
-  }
+  };
 
   const onSearch: SearchProps['onSearch'] = (value) => {
     setSearchValue(value);
@@ -106,27 +137,33 @@ export default function Home() {
   const searchTreeData = useMemo(() => {
     if (!searchValue) return treeData;
     const value = searchValue?.trim().toLowerCase();
-    const searchTagList = tagList.reduce<TagItem[]>((result, tag): TagItem[] => {
-      if (tag?.tagName?.toLowerCase().includes(value)) {
-        return [...result, tag];
-      }
-
-      const groupList = tag?.groupList?.reduce<GroupItem[]>((list, group: GroupItem): GroupItem[] => {
-        if (group?.groupName?.toLowerCase().includes(value)) {
-          return [...list, group];
+    const searchTagList =
+      tagList.reduce<TagItem[]>((result, tag): TagItem[] => {
+        if (tag?.tagName?.toLowerCase().includes(value)) {
+          return [...result, tag];
         }
-        return list;
+
+        const groupList =
+          tag?.groupList?.reduce<GroupItem[]>((list, group: GroupItem): GroupItem[] => {
+            if (group?.groupName?.toLowerCase().includes(value)) {
+              return [...list, group];
+            }
+            return list;
+          }, []) || [];
+        if (groupList?.length > 0) {
+          return [...result, { ...tag, groupList }];
+        } else {
+          return result;
+        }
       }, []) || [];
-      if (groupList?.length > 0) {
-        return [...result, { ...tag, groupList }];
-      } else {
-        return result;
-      }
-    }, []) || [];
     return getTreeData(searchTagList);
   }, [tagList, searchValue]);
 
-  const checkAllowDrop: TreeProps<TreeDataNodeUnion>['allowDrop'] = ({ dragNode, dropNode, dropPosition }) => {
+  const checkAllowDrop: TreeProps<TreeDataNodeUnion>['allowDrop'] = ({
+    dragNode,
+    dropNode,
+    dropPosition,
+  }) => {
     // console.log('checkAllowDrop--dragNode', dragNode)
     // console.log('checkAllowDrop--dropNode', dropNode)
     // console.log('checkAllowDrop--dropPosition', dropPosition)
@@ -134,114 +171,130 @@ export default function Home() {
     // dropPosition = 0 时表示，拖放到目标 node 的子集
     // dropPosition = 1 时表示，拖放到目标 node 的同级之后
     // dropPosition = -1 时表示，拖放到目标 node 的同级之前
-    return (dragNode.type === 'tabGroup' && dropNode.type === 'tabGroup')
-      || (dragNode.type === 'tag' && dropNode.type === 'tag' && dropPosition !== 0)
-      || (dragNode.type === 'tabGroup' && dropNode.type === 'tag' && dropPosition >= 0);
-  }
+    return (
+      (dragNode.type === 'tabGroup' && dropNode.type === 'tabGroup') ||
+      (dragNode.type === 'tag' && dropNode.type === 'tag' && dropPosition !== 0) ||
+      (dragNode.type === 'tabGroup' && dropNode.type === 'tag' && dropPosition >= 0)
+    );
+  };
 
   // 阻止右键默认行为
-  const onRightClick: TreeProps<TreeDataNodeUnion>['onRightClick'] = ({ event, node }) => {
+  const onRightClick: TreeProps<TreeDataNodeUnion>['onRightClick'] = ({
+    event,
+    node,
+  }) => {
     event?.preventDefault();
     event?.stopPropagation();
     // console.log('onRightClick--node', node)
     // TODO 添加右键菜单
-  }
+  };
 
   return (
     <>
-      <StyledListWrapper className="home-wrapper" $primaryColor={token.colorPrimary}>
-        <div className="sidebar">
-          <div className="sidebar-inner">
-            <div className="tag-list-title">
-              {$fmt('home.tabGroupList')}
-              <StyledActionIconBtn className="btn-help" title={$fmt('home.helpInfo')} onClick={() => setHelpDrawerVisible(true)}>
-                <QuestionCircleOutlined />
-              </StyledActionIconBtn>
-            </div>
-            <ul className="count-info">
-              <li>{$fmt('home.tag')} ({countInfo?.tagCount})</li>
-              <li>{$fmt('home.tabGroup')} ({countInfo?.groupCount})</li>
-              <li>{$fmt('home.tab')} ({countInfo?.tabCount})</li>
-            </ul>
-            {/* 顶部操作按钮组 */}
-            <div className="sidebar-action-btns-wrapper">
-              <Button
-                type="primary"
-                size="small"
-                onClick={() => toggleExpand(true)}
-              >
-                {$fmt('home.expandAll')}
-              </Button>
-              <Button
-                type="primary"
-                size="small"
-                onClick={() => toggleExpand(false)}
-              >
-                {$fmt('home.collapseAll')}
-              </Button>
-              <Button type="primary" size="small" onClick={handleTagCreate}>
-                {$fmt('home.addTag')}
-              </Button>
-              <Dropdown menu={{ items: moreItems }} placement="bottomLeft">
-                <StyledActionIconBtn className="btn-more" $size="20" title="更多">
-                  <MoreOutlined />
+      <StyledListWrapper
+        className={classNames('home-wrapper', sidebarCollapsed && 'collapsed')}
+        $collapsed={sidebarCollapsed}
+      >
+        <StyledSidebarWrapper
+          className="sidebar"
+          $primaryColor={token.colorPrimary}
+          $collapsed={sidebarCollapsed}
+        >
+          <div
+            className={classNames('sidebar-inner-box', sidebarCollapsed && 'collapsed')}
+          >
+            <ToggleSidebarBtn onCollapseChange={setSidebarCollapsed}></ToggleSidebarBtn>
+
+            <div className="sidebar-inner-content">
+              <div className="tag-list-title">
+                {$fmt('home.tabGroupList')}
+                <StyledActionIconBtn
+                  className="btn-help"
+                  title={$fmt('home.helpInfo')}
+                  onClick={() => setHelpDrawerVisible(true)}
+                >
+                  <QuestionCircleOutlined />
                 </StyledActionIconBtn>
-              </Dropdown>
-            </div>
-            {/* 列表搜索框 */}
-            <Input.Search
-              style={{ marginBottom: 8 }}
-              placeholder={$fmt('home.searchTagAndGroup')}
-              allowClear
-              onSearch={onSearch}
-            />
-            {/* 标签组列表 */}
-            <div ref={listRef} className="sidebar-tree-wrapper">
-              <Spin spinning={loading} size="large">
-                {searchTreeData?.length > 0 ? (
-                  <Tree
-                    // draggable
-                    draggable={{ icon: false, nodeDraggable: () => true }}
-                    allowDrop={checkAllowDrop}
-                    blockNode
-                    switcherIcon={<DownOutlined />}
-                    autoExpandParent
-                    defaultExpandAll
-                    expandedKeys={expandedKeys}
-                    selectedKeys={selectedKeys}
-                    treeData={searchTreeData}
-                    titleRender={(node) => (
-                      <RenderTreeNode
-                        node={node}
-                        selected={selectedKeys.includes(node.key)}
-                        container={listRef.current}
-                        refreshKey={refreshKey}
-                        onAction={onTreeNodeAction}
-                        onTabItemDrop={handleTabItemDrop}
-                      ></RenderTreeNode>
-                    )}
-                    onExpand={(expandedKeys) => setExpandedKeys(expandedKeys)}
-                    onSelect={onSelect}
-                    onDrop={handleTreeNodeDrop}
-                    onRightClick={onRightClick}
-                  />
-                ) : (
-                  <div className="no-data">
-                    <Empty description={$fmt('home.emptyTip')}>
-                      <Button
-                        type="primary"
-                        size="small"
-                        onClick={handleTagCreate}
-                      >
-                        {$fmt('home.addTag')}
-                      </Button>
-                    </Empty>
-                  </div>
-                )}
-              </Spin>
+              </div>
+              <ul className="count-info">
+                <li>
+                  {$fmt('home.tag')} ({countInfo?.tagCount})
+                </li>
+                <li>
+                  {$fmt('home.tabGroup')} ({countInfo?.groupCount})
+                </li>
+                <li>
+                  {$fmt('home.tab')} ({countInfo?.tabCount})
+                </li>
+              </ul>
+              {/* 顶部操作按钮组 */}
+              <div className="sidebar-action-btns-wrapper">
+                <Button type="primary" size="small" onClick={() => toggleExpand(true)}>
+                  {$fmt('home.expandAll')}
+                </Button>
+                <Button type="primary" size="small" onClick={() => toggleExpand(false)}>
+                  {$fmt('home.collapseAll')}
+                </Button>
+                <Button type="primary" size="small" onClick={handleTagCreate}>
+                  {$fmt('home.addTag')}
+                </Button>
+                <Dropdown menu={{ items: moreItems }} placement="bottomLeft">
+                  <StyledActionIconBtn className="btn-more" $size="20" title="更多">
+                    <MoreOutlined />
+                  </StyledActionIconBtn>
+                </Dropdown>
+              </div>
+              {/* 列表搜索框 */}
+              <Input.Search
+                style={{ marginBottom: 8 }}
+                placeholder={$fmt('home.searchTagAndGroup')}
+                allowClear
+                onSearch={onSearch}
+              />
+              {/* 标签组列表 */}
+              <div ref={listRef} className="sidebar-tree-wrapper">
+                <Spin spinning={loading} size="large">
+                  {searchTreeData?.length > 0 ? (
+                    <Tree
+                      // draggable
+                      draggable={{ icon: false, nodeDraggable: () => true }}
+                      allowDrop={checkAllowDrop}
+                      blockNode
+                      switcherIcon={<DownOutlined />}
+                      autoExpandParent
+                      defaultExpandAll
+                      expandedKeys={expandedKeys}
+                      selectedKeys={selectedKeys}
+                      treeData={searchTreeData}
+                      titleRender={(node) => (
+                        <RenderTreeNode
+                          node={node}
+                          selected={selectedKeys.includes(node.key)}
+                          container={listRef.current}
+                          refreshKey={refreshKey}
+                          onAction={onTreeNodeAction}
+                          onTabItemDrop={handleTabItemDrop}
+                        ></RenderTreeNode>
+                      )}
+                      onExpand={(expandedKeys) => setExpandedKeys(expandedKeys)}
+                      onSelect={onSelect}
+                      onDrop={handleTreeNodeDrop}
+                      onRightClick={onRightClick}
+                    />
+                  ) : (
+                    <div className="no-data">
+                      <Empty description={$fmt('home.emptyTip')}>
+                        <Button type="primary" size="small" onClick={handleTagCreate}>
+                          {$fmt('home.addTag')}
+                        </Button>
+                      </Empty>
+                    </div>
+                  )}
+                </Spin>
+              </div>
             </div>
           </div>
-        </div>
+        </StyledSidebarWrapper>
         {/* 单个标签组（标签列表） */}
         <div className="content">
           {selectedTag?.children?.map(
@@ -261,8 +314,11 @@ export default function Home() {
                   onStarredChange={(isStarred) =>
                     handleTabGroupStarredChange(tabGroup, isStarred)
                   }
+                  onDedup={() => handleTabGroupDedup(tabGroup)}
                   onDrop={handleTabItemDrop}
-                  onTabChange={(tabItem: TabItem) => handleTabItemChange(tabGroup, tabItem)}
+                  onTabChange={(tabItem: TabItem) =>
+                    handleTabItemChange(tabGroup, tabItem)
+                  }
                   onTabRemove={handleTabItemRemove}
                   onMoveTo={handleTabGroupMoveTo}
                 ></TabGroup>
@@ -290,14 +346,16 @@ export default function Home() {
         width={500}
       >
         <Flex vertical gap="8px">
-          <p>{ $fmt('home.help.content.1') }</p>
-          <p>{ $fmt('home.help.content.2') }</p>
-          <p>{ $fmt('home.help.content.3') }</p>
-          <p>{ $fmt('home.help.content.4') }</p>
-          <p>{ $fmt('home.help.content.5') }</p>
-          <p>{ $fmt('home.help.content.6') }</p>
+          <p>{$fmt('home.help.content.1')}</p>
+          <p>{$fmt('home.help.content.2')}</p>
+          <p>{$fmt('home.help.content.3')}</p>
+          <p>{$fmt('home.help.content.4')}</p>
+          <p>{$fmt('home.help.content.5')}</p>
+          <p>{$fmt('home.help.content.6')}</p>
 
-          <p style={{ marginTop: '8px' }}><strong>{ $fmt('common.hotkeys') }</strong></p>
+          <p style={{ marginTop: '8px' }}>
+            <strong>{$fmt('common.hotkeys')}</strong>
+          </p>
           <HotkeyList list={hotkeyList}></HotkeyList>
         </Flex>
       </Drawer>

@@ -40,4 +40,7 @@ export default {
   'common.update.available': 'New version available',
   'common.update.upgradeNow': 'Upgrade right now',
   'common.backToTop': 'Back to Top',
+  'common.panel': 'Panel',
+  'common.sidebar': 'Sidebar',
+  'common.dedup': 'Dedup',
 }

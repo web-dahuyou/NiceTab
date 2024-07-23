@@ -239,6 +239,14 @@ export function useTreeData() {
     },
     [treeData]
   );
+  // 标签组去重
+  const handleTabGroupDedup = useCallback(
+    async (tabGroup: TreeDataNodeTabGroup) => {
+      await tabListUtils.tabGroupDedup(tabGroup.parentKey, tabGroup.key);
+      refreshTreeData();
+    },
+    [treeData]
+  );
   // 打开标签组
   const handleTabGroupRestore = useCallback(
     async (tabGroup: TreeDataNodeTabGroup) => {
@@ -435,6 +443,7 @@ export function useTreeData() {
     handleTabGroupCreate,
     handleTabGroupChange,
     handleTabGroupStarredChange,
+    handleTabGroupDedup,
     handleTabGroupRestore,
     handleTreeNodeDrop,
     handleTabItemDrop,

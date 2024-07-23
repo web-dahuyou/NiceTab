@@ -300,6 +300,20 @@ class TabListUtils {
 
     await this.setTagList(tagList);
   }
+  // 标签组去重
+  async tabGroupDedup(tagId: Key, groupId: Key) {
+    const tagList = await this.getTagList();
+    for (let tag of tagList) {
+      if (tag.tagId !== tagId) continue;
+      for (let g of tag.groupList) {
+        if (g.groupId === groupId) {
+          g.tabList = getUniqueList(g.tabList, 'url');
+          break;
+        }
+      }
+    }
+    await this.setTagList(tagList);
+  }
   // 标签组拖拽
   async onTabGroupDrop(
     sourceTagId: Key,
