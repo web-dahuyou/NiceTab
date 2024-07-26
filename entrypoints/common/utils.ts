@@ -1,4 +1,10 @@
 import dayjs from 'dayjs';
+import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
+import type { LanguageTypes } from '~/entrypoints/types';
+import { settingsUtils } from './storage';
+import { ENUM_SETTINGS_PROPS, defaultLanguage } from './constants';
+
+const { LANGUAGE } = ENUM_SETTINGS_PROPS;
 
 // 合并class  示例：classNames(className1, className2, className3)
 export function classNames(...classes: Array<string | boolean | undefined | null>) {
@@ -154,6 +160,13 @@ export function getMergedList<T, K extends keyof T>(
   }
 
   return [...resultMap.values()];
+}
+
+// 在react上下文之外获取locale信息
+export async function getLocaleMessages() {
+  const settings = await settingsUtils.getSettings();
+  const language = settings[LANGUAGE] as LanguageTypes || defaultLanguage;
+  return getCustomLocaleMessages(language);
 }
 
 // 发送消息

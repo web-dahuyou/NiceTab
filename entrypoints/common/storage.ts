@@ -81,6 +81,17 @@ class TabListUtils {
   };
   storageKey: `local:${string}` = 'local:tabList';
 
+  // 特殊的分类：中转站
+  createStagingAreaTag(): TagItem {
+    return {
+      static: true,
+      tagId: '0',
+      tagName: 'Staging Area',
+      createTime: newCreateTime(),
+      groupList: [],
+    };
+  }
+
   /* 分类相关方法 */
   getInitialTag(): TagItem {
     return {
@@ -102,16 +113,24 @@ class TabListUtils {
     }, []);
   }
   async getTagList() {
-    const tagList = await storage.getItem<TagItem[]>(this.storageKey);
-    this.tagList = tagList || [this.getInitialTag()];
-    if (!tagList) {
-      await this.setTagList(this.tagList);
+    let tagList = await storage.getItem<TagItem[]>(this.storageKey);
+    const staticIndex = tagList?.findIndex((tag) => tag.static) ?? -1;
+    // 必须保证中转站排在第一位
+    if (!tagList?.length || staticIndex == -1) {
+      tagList = [this.createStagingAreaTag(), ...(tagList || [])];
+    } else if (staticIndex > 0) {
+      console.log('staticIndex', staticIndex);
+      const staticTag = tagList.splice(staticIndex, 1);
+      tagList = [staticTag[0], ...tagList];
     }
+    this.tagList = tagList;
+    await this.setTagList(tagList);
+
     this.setCountInfo();
     return this.tagList;
   }
   async setTagList(list?: TagItem[]) {
-    this.tagList = list || [this.getInitialTag()];
+    this.tagList = list?.length ? list : [this.createStagingAreaTag()];
     this.setCountInfo();
     storage.setItem(this.storageKey, this.tagList);
   }
@@ -154,7 +173,10 @@ class TabListUtils {
   async addTag(tag?: TagItem) {
     const tagList = await this.getTagList();
     const newTag = Object.assign(this.getInitialTag(), tag || {});
-    await this.setTagList([newTag, ...tagList]);
+    // 第一个分类为中转站，其他分类都往后插入
+    const insertIndex = tagList?.[0]?.static ? 1 : 0;
+    tagList.splice(insertIndex, 0, newTag);
+    await this.setTagList(tagList);
     return newTag;
   }
   async updateTag(tagId: Key, tag: Partial<TagItem>) {
@@ -843,10 +865,14 @@ class TabListUtils {
       importMode === 'override' ||
       !tagList.length ||
       (tagList.length == 1 && !tagList?.[0].groupList?.length);
+
     if (needOverride) {
       await this.setTagList(tags);
     } else {
-      await this.setTagList([...tags, ...tagList]);
+      // await this.setTagList([...tags, ...tagList]);
+      const insertIndex = tagList?.[0]?.static ? 1 : 0;
+      tagList.splice(insertIndex, 0, ...tags);
+      await this.setTagList(tagList);
     }
   }
   // 导出

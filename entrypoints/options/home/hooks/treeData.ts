@@ -15,7 +15,7 @@ import {
 } from '../types';
 import { getTreeData } from '../utils';
 
-const { DELETE_AFTER_RESTORE, DELETE_UNLOCKED_EMPTY_GROUP } = ENUM_SETTINGS_PROPS;
+const { DELETE_AFTER_RESTORE } = ENUM_SETTINGS_PROPS;
 
 export function useTreeData() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -400,7 +400,18 @@ export function useTreeData() {
       }, { autoScroll: true });
     } else {
       const tagIndex = treeData.findIndex(tag => tag.type === 'tag' && tag.key === selectedTagKey);
-      if (action === 'moveUp' && tagIndex === 0 || action === 'moveDown' && tagIndex === treeData.length - 1) return;
+      // if (action === 'moveUp' && tagIndex === 0 || action === 'moveDown' && tagIndex === treeData.length - 1) return;
+      if (action === 'moveUp') {
+        if (tagIndex === 0) return;
+        const prevTagData = treeData[tagIndex - 1]?.originData as TagItem;
+        // 中转站始终在第一位
+        if (tagIndex === 1 && prevTagData.static) return;
+      } else if (action === 'moveDown') {
+        if (tagIndex === treeData.length - 1) return;
+        const firstTagData = treeData[0]?.originData as TagItem;
+        // 中转站始终在第一位
+        if (tagIndex === 0 && firstTagData?.static) return;
+      }
       await tabListUtils.onTagDrop(tagIndex, action === 'moveUp' ? tagIndex - 1 : tagIndex + 2);
       refreshTreeData((treeData) => {
         const tag = treeData.find((t) => t.key === selectedTagKey) as TreeDataNodeTag;

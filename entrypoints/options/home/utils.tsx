@@ -1,7 +1,7 @@
 
-import { TagOutlined, ProductOutlined } from '@ant-design/icons';
-import { GroupItem, TagItem } from '~/entrypoints/types';
-import { TreeDataNodeUnion, MoveDataProps, CascaderOption } from './types';
+import { PushpinOutlined, TagOutlined, ProductOutlined } from '@ant-design/icons';
+import type { TagItem } from '~/entrypoints/types';
+import type { TreeDataNodeUnion, MoveDataProps, CascaderOption } from './types';
 
 // 生成treeData
 export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
@@ -10,7 +10,7 @@ export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
     key: tag.tagId,
     title: tag.tagName,
     isLeaf: false,
-    icon: <TagOutlined />,
+    icon: tag.static ? <PushpinOutlined /> : <TagOutlined />,
     originData: { ...tag },
     children: tag?.groupList?.map((group) => {
       return {

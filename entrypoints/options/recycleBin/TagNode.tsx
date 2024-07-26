@@ -75,7 +75,7 @@ export default function TagNode({
   return (
     <StyledTagNode $primaryColor={token.colorPrimary}>
       <TagOutlined />
-      <div className="tag-name">{tag.tagName}</div>
+      <div className="tag-name">{ $fmt('home.stagingArea') || tag.tagName }</div>
       <Flex align="center">
         <span className="count" style={{ color: ENUM_COLORS.volcano.primary }}>
           {$fmt({

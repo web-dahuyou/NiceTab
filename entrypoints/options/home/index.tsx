@@ -11,7 +11,7 @@ import {
   Empty,
   Spin,
 } from 'antd';
-import type { MenuProps, TreeProps } from 'antd';
+import type { MenuProps, TreeDataNode, TreeProps } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
 import {
   DownOutlined,
@@ -159,6 +159,15 @@ export default function Home() {
     return getTreeData(searchTagList);
   }, [tagList, searchValue]);
 
+  // 判断节点是否可拖拽
+  const isNodeDraggable = useCallback((node: TreeDataNode) => {
+    const _node = node as TreeDataNodeUnion;
+    // 中转站分类不可拖拽
+    if (_node.type === 'tag' && _node?.originData?.static) return false;
+    return true;
+  }, []);
+
+  // 判断能否拖拽到节点上
   const checkAllowDrop: TreeProps<TreeDataNodeUnion>['allowDrop'] = ({
     dragNode,
     dropNode,
@@ -171,6 +180,14 @@ export default function Home() {
     // dropPosition = 0 时表示，拖放到目标 node 的子集
     // dropPosition = 1 时表示，拖放到目标 node 的同级之后
     // dropPosition = -1 时表示，拖放到目标 node 的同级之前
+    if (
+      dragNode.type === 'tag' && dragNode?.originData?.static
+      || dropNode.type === 'tag' && dropNode?.originData?.static && dropPosition == -1
+    ) {
+      // 中转站永远置顶，不允许其他分类排到它前面
+      return false;
+    }
+
     return (
       (dragNode.type === 'tabGroup' && dropNode.type === 'tabGroup') ||
       (dragNode.type === 'tag' && dropNode.type === 'tag' && dropPosition !== 0) ||
@@ -257,7 +274,7 @@ export default function Home() {
                   {searchTreeData?.length > 0 ? (
                     <Tree
                       // draggable
-                      draggable={{ icon: false, nodeDraggable: () => true }}
+                      draggable={{ icon: false, nodeDraggable: isNodeDraggable }}
                       allowDrop={checkAllowDrop}
                       blockNode
                       switcherIcon={<DownOutlined />}
@@ -352,6 +369,7 @@ export default function Home() {
           <p>{$fmt('home.help.content.4')}</p>
           <p>{$fmt('home.help.content.5')}</p>
           <p>{$fmt('home.help.content.6')}</p>
+          <p>{$fmt('home.help.content.7')}</p>
 
           <p style={{ marginTop: '8px' }}>
             <strong>{$fmt('common.hotkeys')}</strong>

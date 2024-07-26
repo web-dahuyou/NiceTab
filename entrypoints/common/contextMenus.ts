@@ -72,7 +72,7 @@ export default function contextMenusRegister() {
 
   browser.contextMenus.onClicked.addListener((info, tab) => {
     // console.log('info', info);
-    console.log('tab', tab);
+    // console.log('tab', tab);
 
     const actionName = String(info.menuItemId);
     switch (actionName) {

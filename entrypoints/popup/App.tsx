@@ -1,6 +1,6 @@
 import React, { useContext, useCallback, useEffect, useState } from 'react';
 import { browser, Tabs } from 'wxt/browser';
-import { theme, Space, Divider, Button } from 'antd';
+import { theme, Space, Divider } from 'antd';
 import {
   CloseOutlined,
   HomeOutlined,
@@ -26,7 +26,7 @@ function handleQuickAction(route: { path: string; query?: Record<string, any> })
 export default function App() {
   const { token } = theme.useToken();
   const NiceGlobalContext = useContext(GlobalContext);
-  const { $fmt, locale } = useIntlUtls();
+  const { $fmt } = useIntlUtls();
   const [tabs, setTabs] = useState<Tabs.Tab[]>([]);
 
   // 快捷按钮
