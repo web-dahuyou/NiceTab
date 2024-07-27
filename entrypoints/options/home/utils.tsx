@@ -1,5 +1,5 @@
-
 import { PushpinOutlined, TagOutlined, ProductOutlined } from '@ant-design/icons';
+import { getLocaleMessages } from '~/entrypoints/common/utils';
 import type { TagItem } from '~/entrypoints/types';
 import type { TreeDataNodeUnion, MoveDataProps, CascaderOption } from './types';
 
@@ -27,13 +27,17 @@ export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
 };
 
 // 生成Cascader级联数据
-export const getCascaderData = (tagList: TagItem[], moveData?: MoveDataProps): CascaderOption[] => {
+export const getCascaderData = async (
+  tagList: TagItem[],
+  moveData?: MoveDataProps
+): Promise<CascaderOption[]> => {
+  const localeMessage = await getLocaleMessages();
   const { groupId, tabs } = moveData || {};
   const moveType = tabs && tabs?.length > 0 ? 'tab' : 'tabGroup';
 
   const tagDisabled = (tag: TagItem) => {
-    if (moveType === 'tabGroup' ) {
-      return tag?.groupList.some(g => g.groupId === groupId);
+    if (moveType === 'tabGroup') {
+      return tag?.groupList.some((g) => g.groupId === groupId);
     } else {
       return tag?.groupList?.length === 0;
     }
@@ -43,9 +47,9 @@ export const getCascaderData = (tagList: TagItem[], moveData?: MoveDataProps): C
     type: 'tag',
     value: tag.tagId,
     label: (
-      <div className='cascader-label-custom cascader-label-tag'>
+      <div className="cascader-label-custom cascader-label-tag">
         <TagOutlined />
-        <span>{tag.tagName}</span>
+        <span>{tag.static ? localeMessage?.['home.stagingArea'] : tag.tagName}</span>
       </div>
     ),
     disabled: tagDisabled(tag),
@@ -56,7 +60,7 @@ export const getCascaderData = (tagList: TagItem[], moveData?: MoveDataProps): C
         type: 'tabGroup',
         value: group.groupId,
         label: (
-          <div className='cascader-label-custom cascader-label-group'>
+          <div className="cascader-label-custom cascader-label-group">
             <ProductOutlined />
             <span>{group.groupName}</span>
           </div>
@@ -72,5 +76,5 @@ export const getCascaderData = (tagList: TagItem[], moveData?: MoveDataProps): C
 
 export default {
   getTreeData,
-  getCascaderData
-}
+  getCascaderData,
+};

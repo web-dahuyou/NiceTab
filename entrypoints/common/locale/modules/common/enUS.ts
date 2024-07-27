@@ -43,4 +43,6 @@ export default {
   'common.panel': 'Panel',
   'common.sidebar': 'Sidebar',
   'common.dedup': 'Dedup',
+  'common.ascending': 'Ascending',
+  'common.descending': 'Descending',
 }

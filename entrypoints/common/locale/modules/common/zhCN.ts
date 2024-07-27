@@ -43,4 +43,6 @@ export default {
   'common.panel': '面板',
   'common.sidebar': '侧边栏',
   'common.dedup': '去重',
+  'common.ascending': '升序',
+  'common.descending': '降序',
 }

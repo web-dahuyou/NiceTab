@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
-import { theme } from 'antd';
+import { theme, Button } from 'antd';
 import { DoubleRightOutlined, DoubleLeftOutlined } from '@ant-design/icons';
-import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 
 export default function ToggleSidebarBtn({
@@ -20,22 +19,16 @@ export default function ToggleSidebarBtn({
 
   return (
     <div
-      className="toggle-icon"
+      className="action-icon"
       title={$fmt({
         id: `home.${collapsed ? 'expand' : 'collapse'}`,
         values: { name: $fmt('common.sidebar') },
       })}
       onClick={handleToggle}
     >
-      <StyledActionIconBtn
-        className="btn-collapse"
-        $size={14}
-        $color="#999"
-        $hoverColor="#999"
-        $hoverScale={1}
-      >
-        {collapsed ? <DoubleRightOutlined /> : <DoubleLeftOutlined />}
-      </StyledActionIconBtn>
+      <Button
+        icon={collapsed ? <DoubleRightOutlined /> : <DoubleLeftOutlined />}
+      ></Button>
     </div>
   );
 }

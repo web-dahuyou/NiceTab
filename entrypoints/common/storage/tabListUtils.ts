@@ -528,6 +528,28 @@ export default class TabListUtils {
     await this.setTagList(tagList);
     return { targetGroupId: undefined };
   }
+  // 标签组排序
+  async groupListSort(sortType: string, tagId: Key) {
+    const tagList = await this.getTagList();
+    const tag = tagList.find((t) => t.tagId === tagId);
+    if (!tag) return;
+    const _locale = 'en-US-u-kf-lower' // 排序顺序：数字 > 小写英文 > 大写英文 > 中文
+    // const _locale = 'en-US-u-kf-upper' // 排序顺序：数字 > 大写英文 > 小写英文 > 中文
+    // const _locale = 'zh-CN-u-kf-lower' // 排序顺序：数字 > 中文 > 小写英文 > 大写英文
+    // const _locale = 'zh-CN-u-kf-upper' // 排序顺序：数字 > 中文 > 大写英文 > 小写英文
+
+    const unstarredIndex = tag.groupList?.findIndex((g) => !g.isStarred) ?? tag.groupList.length;
+    const doSortList = unstarredIndex > -1 ? tag?.groupList?.slice(unstarredIndex) : [];
+
+    if (sortType === 'ascending') {
+      doSortList?.sort((a, b) => a.groupName.localeCompare(b.groupName, _locale));
+    } else {
+      doSortList?.sort((a, b) => b.groupName.localeCompare(a.groupName, _locale));
+    }
+
+    tag.groupList = tag.groupList?.slice(0, unstarredIndex).concat(doSortList);
+    await this.setTagList(tagList);
+  }
 
   /* 标签相关方法 */
   transformTabItem(tab: Tabs.Tab): TabItem {
