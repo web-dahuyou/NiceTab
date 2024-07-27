@@ -66,6 +66,7 @@ export interface TagItem {
   tagName: string;
   createTime: string;
   groupList: GroupItem[];
+  static?: boolean; // static 为true 时，表示是中转站
   isLocked?: boolean;
   isStarred?: boolean;
 }

@@ -19,7 +19,7 @@ export default function RenderTreeNode({
   container,
   refreshKey,
   onAction,
-  onTabItemDrop // 这个 onTabItemDrop 只是为了方便右侧面板的标签页拖拽到左侧树的标签组，左侧树中的 分类和标签组的拖拽由 antd 的 Tree 组件自带实现
+  onTabItemDrop, // 这个 onTabItemDrop 只是为了方便右侧面板的标签页拖拽到左侧树的标签组，左侧树中的 分类和标签组的拖拽由 antd 的 Tree 组件自带实现
 }: RenderTreeNodeProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
@@ -34,6 +34,11 @@ export default function RenderTreeNode({
   // 是否锁定
   const isLocked = useMemo(() => {
     return !!node?.originData?.isLocked;
+  }, [node]);
+
+  // 是否是中转站
+  const isStaticTag = useMemo(() => {
+    return node.type === 'tag' && !!node?.originData?.static;
   }, [node]);
 
   const onRemoveClick = (e: React.MouseEvent) => {
@@ -66,30 +71,51 @@ export default function RenderTreeNode({
   };
 
   useEffect(() => {
-    if (selected && nodeRef.current) {
-      nodeRef.current?.scrollIntoView({ behavior: 'instant' });
-    }
+    setTimeout(() => {
+      if (selected && container && nodeRef.current) {
+          const containerRect = container.getBoundingClientRect();
+          const nodeRect = nodeRef.current.getBoundingClientRect();
+
+          const scrollTop = container.scrollTop;
+
+          if (nodeRect.top < containerRect.top) {
+            container.scrollTo(0, scrollTop - 80);
+          } else if (nodeRect.bottom > containerRect.bottom) {
+            container.scrollTo(0, scrollTop + 80);
+          }
+        }
+      }, 300);
   }, [container, refreshKey, selected]);
 
   return (
     // 这个 DropComponent 只是为了方便右侧面板的标签页拖拽到左侧树的标签组，左侧树中的 分类和标签组的拖拽由 antd 的 Tree 组件自带实现
     <DropComponent
-      data={{ index: 0, groupId: node.key as string, allowKeys: node.type === 'tag' ? [] : [allowDropKey] }}
+      data={{
+        index: 0,
+        groupId: node.key as string,
+        allowKeys: node.type === 'tag' ? [] : [allowDropKey],
+      }}
       canDrop={node.type === 'tabGroup'}
       onDrop={onTabItemDrop}
     >
       <>
         <StyledTreeNodeItem ref={nodeRef} className="tree-node-item">
           <span style={{ marginRight: '4px' }}>{node.icon}</span>
-          <span className="tree-node-title">
-            <EditInput
-              value={node.title || unnamedNodeName}
-              maxLength={20}
-              fontSize={14}
-              iconSize={14}
-              onValueChange={handleRenameChange}
-            ></EditInput>
-          </span>
+          {isStaticTag ? (
+            <span className="tree-node-title static">
+              {$fmt('home.stagingArea') || node.title}
+            </span>
+          ) : (
+            <span className="tree-node-title">
+              <EditInput
+                value={node.title || unnamedNodeName}
+                maxLength={20}
+                fontSize={14}
+                iconSize={14}
+                onValueChange={handleRenameChange}
+              ></EditInput>
+            </span>
+          )}
 
           <span className="tree-node-icon-group">
             {node.type === 'tag' && (
@@ -103,7 +129,7 @@ export default function RenderTreeNode({
                 <PlusOutlined />
               </StyledActionIconBtn>
             )}
-            {!isLocked && (
+            {!isLocked && !isStaticTag && (
               <StyledActionIconBtn
                 className="btn-remove"
                 $size="14"

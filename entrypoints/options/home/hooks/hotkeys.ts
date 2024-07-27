@@ -24,7 +24,7 @@ export default function useListHotkeys ({ onAction }: { onAction?: (params: { ac
     return hotkeyOptions.map((item) => {
       return {
         ...item,
-        key: `${item.macKey},${item.winKey}`,
+        key: osInfo.isMac ? item.macKey : item.winKey,
         combo: getSymbols(item),
         label: $fmt(`common.${item.action}`),
       }

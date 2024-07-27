@@ -1,0 +1,24 @@
+import type { SettingsProps } from '~/entrypoints/types';
+
+import Store from './instanceStore';
+import SettingsUtils from './settingsUtils';
+import ThemeUtils from './themeUtils';
+import TabListUtils from './tabListUtils';
+import RecycleBinUtils from './recycleBinUtils';
+
+Store.settingsUtils = new SettingsUtils();
+Store.themeUtils = new ThemeUtils();
+Store.tabListUtils = new TabListUtils();
+Store.recycleBinUtils = new RecycleBinUtils();
+
+export const settingsUtils = Store.settingsUtils;
+export const themeUtils = Store.themeUtils;
+export const tabListUtils = Store.tabListUtils;
+export const recycleUtils = Store.recycleBinUtils;
+
+// 监听storage变化
+export default function initStorageListener(callback: (settings: SettingsProps) => void) {
+  storage.watch<SettingsProps>('local:settings', (settings) => {
+    callback(settings || settingsUtils.initialSettings);
+  });
+}

@@ -26,8 +26,8 @@ export default {
 
   'settings.allowDuplicateTabs': 'When sending tabs - retain duplicate tabs ?',
   'settings.allowDuplicateTabs.yes': 'Retain',
-  'settings.allowDuplicateTabs.no': 'Remove duplicate tabs (only for sending tabs)',
+  'settings.allowDuplicateTabs.no': 'Remove duplicate tabs (for sending tabs or in merging group)',
   'settings.allowDuplicateGroups': 'When sending tabs - retain duplicate groups ?',
   'settings.allowDuplicateGroups.yes': 'Retain',
-  'settings.allowDuplicateGroups.no': 'Merge duplicate groups (only for sending groups)',
+  'settings.allowDuplicateGroups.no': 'Merge duplicate groups (sending groups merge to Staging Area groups)',
 }
