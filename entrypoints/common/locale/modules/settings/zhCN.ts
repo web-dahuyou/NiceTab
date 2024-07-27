@@ -26,8 +26,8 @@ export default {
 
   'settings.allowDuplicateTabs': '发送标签页时-是否保留重复的标签页{mark}',
   'settings.allowDuplicateTabs.yes': '保留',
-  'settings.allowDuplicateTabs.no': '去重（只针对发送的标签页）',
+  'settings.allowDuplicateTabs.no': '去重（针对发送的标签页以及标签组合并时的标签页）',
   'settings.allowDuplicateGroups': '发送标签页时-是否保留重复的标签组{mark}',
   'settings.allowDuplicateGroups.yes': '保留',
-  'settings.allowDuplicateGroups.no': '去重（只针对发送的标签组）',
+  'settings.allowDuplicateGroups.no': '去重（发送的标签组和中转站的标签组合并）',
 }

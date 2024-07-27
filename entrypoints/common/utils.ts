@@ -13,10 +13,13 @@ export function classNames(...classes: Array<string | boolean | undefined | null
 // 首字母转大写
 export const capitalize = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
-}
+};
 
 // 拼接url
-export function handleUrlWidthParams(url: string, params: Record<string, any> = {}): string {
+export function handleUrlWidthParams(
+  url: string,
+  params: Record<string, any> = {}
+): string {
   const urlObject = new URL(url);
   const searchParams = new URLSearchParams(urlObject.search);
   for (const [key, value] of Object.entries(params)) {
@@ -71,10 +74,7 @@ export function getRandomId(digit: number = 8, isPlainNumber: boolean = false) {
  * @param keys 想要挑选的属性列表
  * @return 返回过滤后的对象
  */
-export function pick<T extends object, K extends keyof T>(
-  obj: T,
-  keys: K[]
-): Pick<T, K> {
+export function pick<T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> {
   return keys.reduce((result, key) => {
     if (key in obj) {
       return { ...result, [key]: obj[key] };
@@ -116,7 +116,7 @@ export const groupBySize = (list: any[], size: number = 3) => {
 // 生成创建时间
 export const newCreateTime = () => {
   return dayjs().format('YYYY-MM-DD HH:mm');
-}
+};
 
 /**
  * @description: 列表去重
@@ -140,6 +140,7 @@ export function getUniqueList<T>(list: T[], key: keyof T): T[] {
  * @description: 列表去重
  * @param list 原始列表
  * @param key 合并对象依据的字段名
+ * @param handler 合并去重handler
  * @return 返回合并后的列表
  */
 export function getMergedList<T, K extends keyof T>(
@@ -165,7 +166,7 @@ export function getMergedList<T, K extends keyof T>(
 // 在react上下文之外获取locale信息
 export async function getLocaleMessages() {
   const settings = await settingsUtils.getSettings();
-  const language = settings[LANGUAGE] as LanguageTypes || defaultLanguage;
+  const language = (settings[LANGUAGE] as LanguageTypes) || defaultLanguage;
   return getCustomLocaleMessages(language);
 }
 
@@ -178,14 +179,18 @@ export function sendBrowserMessage(msgType: string, data: Record<string, any>) {
 export function getOSInfo() {
   const userAgent = navigator.userAgent.toLowerCase();
   const isWin = userAgent.includes('win32') || userAgent.includes('windows');
-  const isMac = userAgent.includes('macintosh') || userAgent.includes('mac68k') || userAgent.includes('macppc') || userAgent.includes('macintel');
+  const isMac =
+    userAgent.includes('macintosh') ||
+    userAgent.includes('mac68k') ||
+    userAgent.includes('macppc') ||
+    userAgent.includes('macintel');
   const isLinux = userAgent.includes('linux');
   const isUnix = userAgent.includes('x11') && !isWin && !isMac;
 
   return { isWin, isMac, isLinux, isUnix };
 }
 // 获取功能键的别名
-export function getKeysByOS (): Record<string, { key: string, symbol: string }> {
+export function getKeysByOS(): Record<string, { key: string; symbol: string }> {
   const osInfo = getOSInfo();
 
   return {
@@ -200,7 +205,7 @@ export function getKeysByOS (): Record<string, { key: string, symbol: string }> 
     down: { key: 'ArrowDown', symbol: '↓' },
     left: { key: 'ArrowLeft', symbol: '←' },
     right: { key: 'ArrowRight', symbol: '→' },
-  }
+  };
 }
 
 export default {
@@ -211,5 +216,5 @@ export default {
   pick,
   omit,
   groupBySize,
-  sendBrowserMessage
+  sendBrowserMessage,
 };
