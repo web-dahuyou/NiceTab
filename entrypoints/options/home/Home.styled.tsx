@@ -12,21 +12,6 @@ export const StyledSidebarWrapper = styled.div<{ $primaryColor?: string; $collap
     top: 100px;
     transition: transform 0.2s ease-in-out;
 
-    .toggle-icon {
-      position: absolute;
-      box-sizing: border-box;
-      top: 0;
-      right: -20px;
-      width: 20px;
-      height: 40px;
-      border: 1px solid #ccc;
-      border-radius: 0 6px 6px 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      visibility: visible;
-    }
     &.collapsed {
       .sidebar-inner-content {
         pointer-events: none;
@@ -34,6 +19,19 @@ export const StyledSidebarWrapper = styled.div<{ $primaryColor?: string; $collap
         opacity: 0;
       }
       transform: translateX(-280px);
+    }
+
+    .sidebar-action-box {
+      position: absolute;
+      box-sizing: border-box;
+      top: 0;
+      right: -32px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
+      justify-content: center;
+      visibility: visible;
     }
   }
 
@@ -93,12 +91,12 @@ export const StyledListWrapper = styled.div<{$collapsed?: boolean;}>`
   min-height: 400px;
   display: grid;
   // grid-template-columns: 280px auto;
-  // grid-column-gap: 32px;
+  // grid-column-gap: 40px;
   grid-template-columns: ${(props) => props.$collapsed ? '0px auto' : '280px auto' };
   transition: grid-template-columns 0.2s ease-in-out;
 
   .content {
-    padding-left: 32px;
+    padding-left: 40px;
     border-left: 1px solid rgba(5, 5, 5, 0.06);
   }
 `;

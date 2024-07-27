@@ -102,7 +102,7 @@ export default function MoveToModal({
 
   const initData = async () => {
     const tagList = listData || (await tabListUtils.getTagList());
-    const cascaderData = getCascaderData(tagList, moveData);
+    const cascaderData = await getCascaderData(tagList, moveData);
     setOptions(cascaderData);
   };
 

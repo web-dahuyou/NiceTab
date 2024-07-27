@@ -57,7 +57,8 @@ export default {
   'home.help.content.4': '4. When a tab group is starred, it will be placed at the top of the current category. Moving other tab groups to a position before the starred tab group will automatically star them as well. If a starred tab group is moved to a position after a non-starred tab group, the star status will be automatically released.',
   'home.help.content.5': '5. When restoring a tab group, each of the tabs within the tab group will be opened in browser. If the "Automatically remove tabs from list when restoring" setting is enabled, the tabs will be removed from the list after they are opened.',
   'home.help.content.6': '6. The "Restore" action means opening the tabs in the browser, while the "Recover" action means recover the tags / tab groups / tabs from the "Recycle Bin" to the "List" home.',
-  'home.help.content.7': '7. Tags / tab groups / tabs support drag-and-drop sorting. When a category/tab group is selected, it can be sorted using shortcut keys. The shortcut key mapping is shown in the table below:',
+  'home.help.content.7': '7. The "Ascending" and "Descending" only work for unstarred tab groups in the current category.',
+  'home.help.content.8': '8. Tags / tab groups / tabs support drag-and-drop sorting. When a category/tab group is selected, it can be sorted using shortcut keys. The shortcut key mapping is shown in the table below:',
 
   'home.moveTo.missingTip': 'Please select a {type}',
   'home.moveTo.mergeLabel': 'Merge Duplicate Items ?',

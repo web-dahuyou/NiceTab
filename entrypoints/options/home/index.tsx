@@ -25,6 +25,7 @@ import { classNames } from '~/entrypoints/common/utils';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { StyledListWrapper, StyledSidebarWrapper } from './Home.styled';
 import ToggleSidebarBtn from './ToggleSidebarBtn';
+import SortingBtns from './SortingBtns';
 import RenderTreeNode from './RenderTreeNode';
 import TabGroup from './TabGroup';
 import HotkeyList from '../components/HotkeyList';
@@ -37,6 +38,7 @@ import type {
 import { useTreeData } from './hooks/treeData';
 import useHotkeys from './hooks/hotkeys';
 import { getTreeData } from './utils';
+import { tabListUtils } from '@/entrypoints/common/storage';
 
 export default function Home() {
   const { token } = theme.useToken();
@@ -181,8 +183,8 @@ export default function Home() {
     // dropPosition = 1 时表示，拖放到目标 node 的同级之后
     // dropPosition = -1 时表示，拖放到目标 node 的同级之前
     if (
-      dragNode.type === 'tag' && dragNode?.originData?.static
-      || dropNode.type === 'tag' && dropNode?.originData?.static && dropPosition == -1
+      (dragNode.type === 'tag' && dragNode?.originData?.static) ||
+      (dropNode.type === 'tag' && dropNode?.originData?.static && dropPosition == -1)
     ) {
       // 中转站永远置顶，不允许其他分类排到它前面
       return false;
@@ -206,6 +208,16 @@ export default function Home() {
     // TODO 添加右键菜单
   };
 
+  // 排序
+  const onSort = useCallback(
+    async (sortType: string) => {
+      if (!selectedTagKey) return;
+      await tabListUtils.groupListSort(sortType, selectedTagKey);
+      refreshTreeData();
+    },
+    [selectedTagKey]
+  );
+
   return (
     <>
       <StyledListWrapper
@@ -220,7 +232,10 @@ export default function Home() {
           <div
             className={classNames('sidebar-inner-box', sidebarCollapsed && 'collapsed')}
           >
-            <ToggleSidebarBtn onCollapseChange={setSidebarCollapsed}></ToggleSidebarBtn>
+            <div className="sidebar-action-box">
+              <ToggleSidebarBtn onCollapseChange={setSidebarCollapsed}></ToggleSidebarBtn>
+              {selectedTagKey ? <SortingBtns onSort={onSort}></SortingBtns> : null}
+            </div>
 
             <div className="sidebar-inner-content">
               <div className="tag-list-title">
@@ -370,6 +385,7 @@ export default function Home() {
           <p>{$fmt('home.help.content.5')}</p>
           <p>{$fmt('home.help.content.6')}</p>
           <p>{$fmt('home.help.content.7')}</p>
+          <p>{$fmt('home.help.content.8')}</p>
 
           <p style={{ marginTop: '8px' }}>
             <strong>{$fmt('common.hotkeys')}</strong>
