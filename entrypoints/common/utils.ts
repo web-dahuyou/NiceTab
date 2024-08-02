@@ -165,7 +165,7 @@ export function getMergedList<T, K extends keyof T>(
 
 // 在react上下文之外获取locale信息
 export async function getLocaleMessages() {
-  const settings = await settingsUtils.getSettings();
+  const settings = settingsUtils.settings;
   const language = (settings[LANGUAGE] as LanguageTypes) || defaultLanguage;
   return getCustomLocaleMessages(language);
 }

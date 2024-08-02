@@ -131,7 +131,6 @@ export default class TabListUtils {
     if (!tagList?.length || staticIndex == -1) {
       tagList = [this.createStagingAreaTag(), ...(tagList || [])];
     } else if (staticIndex > 0) {
-      console.log('staticIndex', staticIndex);
       const staticTag = tagList.splice(staticIndex, 1);
       tagList = [staticTag[0], ...tagList];
     }
@@ -618,9 +617,9 @@ export default class TabListUtils {
     }
 
     let newGroups = [...groupsMap.values()];
-    const settings = await Store.settingsUtils?.getSettings();
+    const settings = Store.settingsUtils?.settings;
 
-    if (settings[ALLOW_DUPLICATE_GROUPS]) {
+    if (settings?.[ALLOW_DUPLICATE_GROUPS]) {
       const unstarredIndex = tag0.groupList.findIndex((g) => !g.isStarred);
       const idx = unstarredIndex > -1 ? unstarredIndex : tag0.groupList.length;
       tag0.groupList.splice(idx, 0, ...newGroups);
@@ -635,7 +634,7 @@ export default class TabListUtils {
       },
       (prev, curr) => {
         let mergedTabList = [...prev.tabList, ...curr.tabList];
-        if (!settings[ALLOW_DUPLICATE_TABS]) {
+        if (!settings?.[ALLOW_DUPLICATE_TABS]) {
           mergedTabList = getUniqueList(mergedTabList, 'url');
         }
         return { ...prev, tabList: mergedTabList };
@@ -645,7 +644,6 @@ export default class TabListUtils {
     const activeGroup = tag0.groupList.find(
       (g) => g.groupName === newGroups?.[0]?.groupName
     );
-    console.log('activeGroup', activeGroup)
 
     return {
       tagId: tag0.tagId,
@@ -657,10 +655,10 @@ export default class TabListUtils {
     let newTabs = tabs.map(this.transformTabItem);
     let tag0 = this.tagList?.[0];
     const group = tag0?.groupList?.find((group) => !group.isLocked && !group.isStarred);
-    const settings = await Store.settingsUtils?.getSettings();
+    const settings = Store.settingsUtils?.settings;
     if (!createNewGroup && group) {
       newTabs = [...newTabs, ...(group?.tabList || [])];
-      if (!settings[ALLOW_DUPLICATE_TABS]) {
+      if (!settings?.[ALLOW_DUPLICATE_TABS]) {
         newTabs = getUniqueList(newTabs, 'url');
       }
       group.tabList = newTabs;
@@ -669,20 +667,20 @@ export default class TabListUtils {
     }
     // 不存在标签组或者createNewGroup=true，就创建一个新标签组
     const newtabGroup = this.getInitialTabGroup();
-    if (!settings[ALLOW_DUPLICATE_TABS]) {
+    if (!settings?.[ALLOW_DUPLICATE_TABS]) {
       newTabs = getUniqueList(newTabs, 'url');
     }
     newtabGroup.tabList = newTabs;
 
     if (tag0) {
-      if (!settings[ALLOW_DUPLICATE_GROUPS]) {
+      if (!settings?.[ALLOW_DUPLICATE_GROUPS]) {
         const sameNameGroupIndex = tag0.groupList.findIndex(
           (g) => g.groupName === newtabGroup.groupName
         );
         if (sameNameGroupIndex > -1) {
           const sameNameGroup = tag0.groupList[sameNameGroupIndex];
           sameNameGroup.tabList = [...newTabs, ...sameNameGroup.tabList];
-          if (!settings[ALLOW_DUPLICATE_TABS]) {
+          if (!settings?.[ALLOW_DUPLICATE_TABS]) {
             sameNameGroup.tabList = getUniqueList(sameNameGroup.tabList, 'url');
           }
           return { tagId: tag0.tagId, groupId: sameNameGroup.groupId };
@@ -707,7 +705,7 @@ export default class TabListUtils {
     let tag = undefined,
       group = undefined;
 
-    const settings = await Store.settingsUtils?.getSettings();
+    const settings = Store.settingsUtils?.settings;
 
     for (let t of tagList) {
       for (let i = 0; i < t.groupList?.length; i++) {
@@ -718,7 +716,7 @@ export default class TabListUtils {
           g.tabList = g.tabList?.filter((tab) => !tabIds.includes(tab.tabId));
           // 如果未锁定的标签组内没有标签页，则删除标签组
           if (
-            settings[DELETE_UNLOCKED_EMPTY_GROUP] &&
+            settings?.[DELETE_UNLOCKED_EMPTY_GROUP] &&
             !g?.tabList?.length &&
             !g.isLocked
           ) {
@@ -837,11 +835,11 @@ export default class TabListUtils {
       if (isSourceFound) {
         const sourceTag = tagList?.[sourceTagIndex];
         sourceTag?.groupList?.[sourceGroupIndex]?.tabList.splice(sourceIndex, 1);
-        const settings = await Store.settingsUtils?.getSettings();
+        const settings = Store.settingsUtils?.settings;
         const sourceGroup = sourceTag?.groupList?.[sourceGroupIndex];
         // 如果未锁定的标签组内没有标签页，则删除标签组
         if (
-          settings[DELETE_UNLOCKED_EMPTY_GROUP] &&
+          settings?.[DELETE_UNLOCKED_EMPTY_GROUP] &&
           !sourceGroup?.tabList?.length &&
           !sourceGroup?.isLocked
         ) {
@@ -909,8 +907,8 @@ export default class TabListUtils {
       }
 
       // 如果source标签组内没有标签，则删除标签组
-      const settings = await Store.settingsUtils?.getSettings();
-      if (settings[DELETE_UNLOCKED_EMPTY_GROUP]) {
+      const settings = Store.settingsUtils?.settings;
+      if (settings?.[DELETE_UNLOCKED_EMPTY_GROUP]) {
         const sourceTag = tagList?.[sourceTagIndex];
         const sourceGroup = sourceTag?.groupList?.[sourceGroupIndex];
         if (!sourceGroup?.tabList?.length && !sourceGroup?.isLocked) {

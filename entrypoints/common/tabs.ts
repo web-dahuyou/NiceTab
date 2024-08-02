@@ -127,7 +127,7 @@ async function sendAllTabs() {
   });
 
   // 获取插件设置
-  const settings = await settingsUtils.getSettings();
+  const settings = settingsUtils.settings;
   const filteredTabs = await getFilteredTabs(tabs, settings);
   const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs);
   await openAdminTab(settings, { tagId, groupId });
@@ -148,7 +148,7 @@ async function sendCurrentTab() {
     currentWindow: true,
   });
 
-  const settings = await settingsUtils.getSettings();
+  const settings = settingsUtils.settings;
   let filteredTabs = await getFilteredTabs(tabs, settings);
   // 发送当前选中的标签页时，选中的标签页成组，不考虑原生标签组（即多选时，选中的非标签组的标签页和标签组中的标签页合并到一个组）
   filteredTabs = filteredTabs.map(tab => ({ ...tab, groupId: -1 }));
@@ -167,7 +167,7 @@ async function sendOtherTabs() {
     highlighted: false,
     currentWindow: true,
   });
-  const settings = await settingsUtils.getSettings();
+  const settings = settingsUtils.settings;
   const filteredTabs = await getFilteredTabs(tabs, settings);
   const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs);
   openAdminTab(settings, { tagId, groupId });
@@ -189,7 +189,7 @@ async function sendLeftTabs(currTab?: Tabs.Tab) {
     leftTabs.push(tab);
   }
 
-  const settings = await settingsUtils.getSettings();
+  const settings = settingsUtils.settings;
   const filteredTabs = await getFilteredTabs(leftTabs, settings);
   const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs);
   openAdminTab(settings, { tagId, groupId });
@@ -212,7 +212,7 @@ async function sendRightTabs(currTab?: Tabs.Tab) {
     rightTabs.unshift(tab);
   }
 
-  const settings = await settingsUtils.getSettings();
+  const settings = settingsUtils.settings;
   const filteredTabs = await getFilteredTabs(rightTabs, settings);
   const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs);
   openAdminTab(settings, { tagId, groupId });
