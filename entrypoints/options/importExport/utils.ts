@@ -29,6 +29,7 @@ export const extContentImporter: ExtContentImporterProps = {
     }
 
     const newTag = tabListUtils.getInitialTag();
+    newTag.tagName = 'OneTab';
     newTag.groupList = groupList || [];
     return [newTag];
   },

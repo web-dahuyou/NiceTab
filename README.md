@@ -2,6 +2,11 @@
 
 ![NiceTab](https://github.com/user-attachments/assets/6099f21e-fc0a-4bb5-8280-e497be3fb0ae)
 
+## 扩展安装
+- 谷歌 Chrome 应用商店：[Chrome Web Store](https://chromewebstore.google.com/detail/fonflmjnjbkigocpoommgmhljdpljain)
+- 微软 Edge 商店：[Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/ompjiaelpibiggcnanhbdblkhfdmkgnl)
+- Firefox 暂未发布。
+
 ## 基础介绍
 - 本项目是一个方便快捷管理浏览器标签页的浏览器插件。
 - 取名 `NiceTab` 是希望它是一个用起来很 nice 的 tab 标签页管理工具（不过本人的UI和交互设计太差，只能凑合凑合了）。 
@@ -96,10 +101,6 @@
 
 ![NiceTab-切换语言.png](https://github.com/web-dahuyou/NiceTab/assets/22833786/b9d4f6da-151f-460d-ac4c-4ddbcaee0a05)
 
-## 扩展安装
-- 谷歌 Chrome 应用商店：[Chrome Web Store](https://chromewebstore.google.com/detail/fonflmjnjbkigocpoommgmhljdpljain)
-- 微软 Edge 商店：[Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/ompjiaelpibiggcnanhbdblkhfdmkgnl)
-- Firefox 暂未发布。
 
 ## 使用
 - 点击扩展图标，打开popup面板，显示当前已打开的标签页列表，可快速访问扩展管理后台，快速切换主题。

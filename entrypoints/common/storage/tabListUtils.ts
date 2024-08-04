@@ -83,6 +83,29 @@ export function getMergedGroupList(
   return resultGroups;
 }
 
+// 合并标签组和标签
+export function mergeGroupsAndTabs({
+  targetList,
+  insertList,
+  key = 'groupName',
+}: {
+  targetList: GroupItem[];
+  insertList: GroupItem[];
+  key?: keyof GroupItem;
+}) {
+  return getMergedGroupList(
+    {
+      list: targetList,
+      insertList,
+      key,
+    },
+    (prev, curr) => {
+      const mergedTabList = getUniqueList([...prev.tabList, ...curr.tabList], 'url');
+      return { ...prev, tabList: mergedTabList };
+    }
+  );
+}
+
 // tab列表工具类 (tag: 分类， tabGroup: 标签组， tab: 标签页)
 export default class TabListUtils {
   tagList: TagItem[] = [];
@@ -512,12 +535,8 @@ export default class TabListUtils {
         await this.setTagList(tagList);
         return { targetGroupId: targetSameNameGroup.groupId };
       } else {
-        const unstarredIndex = targetTag?.groupList?.findIndex((g) => !g.isStarred);
-        targetTag?.groupList.splice(
-          unstarredIndex > -1 ? unstarredIndex : targetTag?.groupList?.length,
-          0,
-          sourceGroup
-        );
+        // 穿越操作改为往队尾插入
+        targetTag?.groupList.push(sourceGroup);
 
         await this.setTagList(tagList);
         return { targetGroupId: sourceGroup.groupId };
@@ -898,7 +917,7 @@ export default class TabListUtils {
       const tag = tagList[targetTagIndex];
       const group = tag.groupList[targetGroupIndex];
       if (group) {
-        let newTabList = [...tabs, ...group.tabList];
+        let newTabList = [...group.tabList, ...tabs];
         // 如果开启自动合并，则标签页去重
         if (autoMerge) {
           newTabList = getUniqueList(newTabList, 'url');
@@ -920,6 +939,74 @@ export default class TabListUtils {
     await this.setTagList(tagList);
   }
 
+
+  // 导入合并
+  async mergeTags(source: TagItem[], target: TagItem[]) {
+    const targetMap = new Map<TagItem['tagName'], TagItem>();
+    const newTagMap = new Map<TagItem['tagName'], TagItem>();
+
+    for (let tag of target) {
+      let mapTag = targetMap.get(tag.tagName);
+      if (mapTag) {
+        mapTag = {
+          ...mapTag,
+          groupList: [
+            ...mapTag.groupList,
+            ...tag.groupList
+          ]
+        };
+        targetMap.set(tag.tagName, mapTag);
+      } else {
+        targetMap.set(tag.tagName, tag);
+      }
+    }
+
+    for (let tag of source) {
+      let unnamedGroups = [], groups = [];
+      const mapTag = targetMap.get(tag.tagName);
+
+      for (let group of tag.groupList) {
+        if (group.groupName === UNNAMED_GROUP) {
+          unnamedGroups.push(group);
+        } else {
+          groups.push(group);
+        }
+      }
+      if (mapTag) {
+        mapTag.groupList = [...mergeGroupsAndTabs({
+          targetList: mapTag.groupList,
+          insertList: groups
+        }), ...unnamedGroups];
+
+        targetMap.set(tag.tagName, mapTag);
+      } else {
+        const newMapTag = newTagMap.get(tag.tagName);
+        if (newMapTag) {
+          newMapTag.groupList = [...mergeGroupsAndTabs({
+            targetList: newMapTag.groupList,
+            insertList: groups
+          }), ...unnamedGroups];
+
+          newTagMap.set(tag.tagName, newMapTag);
+        } else {
+          newTagMap.set(tag.tagName, {
+            ...tag,
+            groupList: [...mergeGroupsAndTabs({
+              targetList: groups,
+              insertList: []
+            }), ...unnamedGroups]
+          });
+        }
+      }
+    }
+
+    const tagList = [...targetMap.values()];
+    const newTags = [...newTagMap.values()];
+    const insertIndex = tagList?.[0]?.static ? 1 : 0;
+    tagList.splice(insertIndex, 0, ...newTags);
+
+    return tagList;
+  }
   // 导入
   async importTags(tags: TagItem[], importMode = 'append') {
     const tagList = await this.getTagList();
@@ -930,7 +1017,12 @@ export default class TabListUtils {
 
     if (needOverride) {
       await this.setTagList(tags);
+    } else if (importMode === 'merge') {
+      // merge mode
+      const newTagList = await this.mergeTags(tags, tagList);
+      await this.setTagList(newTagList);
     } else {
+      // append mode
       // await this.setTagList([...tags, ...tagList]);
       const insertIndex = tagList?.[0]?.static ? 1 : 0;
       tagList.splice(insertIndex, 0, ...tags);

@@ -15,9 +15,9 @@ import type { LanguageTypes, SettingsProps, TabEvents } from '~/entrypoints/type
 export const GITHUB_URL = 'https://github.com/web-dahuyou/NiceTab';
 
 export const ENUM_COLORS = {
-  primary: cyan.primary || cyan[6],
-  cyan,
+  primary: blue.primary || blue[6],
   blue,
+  cyan,
   volcano,
   orange,
   red,
