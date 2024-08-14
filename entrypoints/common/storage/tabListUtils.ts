@@ -83,20 +83,46 @@ export function getMergedGroupList(
   return resultGroups;
 }
 
-// 合并标签组和标签
+/**
+ * @description: 合并标签组和标签
+ * @param targetList 原始列表
+ * @param insertList 新插入的列表
+ * @param key 合并对象依据的字段名
+ * @param exceptValue item[key] = exceptValue 的数据项不合并
+ * @return 返回合并后的列表
+ */
 export function mergeGroupsAndTabs({
   targetList,
   insertList,
   key = 'groupName',
+  exceptValue,
 }: {
   targetList: GroupItem[];
   insertList: GroupItem[];
   key?: keyof GroupItem;
+  exceptValue?: string | number | boolean;
 }) {
-  return getMergedGroupList(
+  // 分离不需要合并的数据项
+  function getSeparatedList(list: GroupItem[]) {
+    const exceptList = [],
+      resultList = [];
+    for (let item of list) {
+      if (exceptValue != undefined && item[key] === exceptValue) {
+        exceptList.push(item);
+      } else {
+        resultList.push(item);
+      }
+    }
+    return [resultList, exceptList];
+  }
+
+  const [_tResultList, _tExceptList] = getSeparatedList(targetList);
+  const [_iResultList, _iExceptList] = getSeparatedList(insertList);
+
+  const mergedList = getMergedGroupList(
     {
-      list: targetList,
-      insertList,
+      list: _tResultList,
+      insertList: _iResultList,
       key,
     },
     (prev, curr) => {
@@ -104,6 +130,8 @@ export function mergeGroupsAndTabs({
       return { ...prev, tabList: mergedTabList };
     }
   );
+
+  return [...mergedList, ..._tExceptList, ..._iExceptList];
 }
 
 // tab列表工具类 (tag: 分类， tabGroup: 标签组， tab: 标签页)
@@ -556,7 +584,8 @@ export default class TabListUtils {
     // const _locale = 'zh-CN-u-kf-lower' // 排序顺序：数字 > 中文 > 小写英文 > 大写英文
     // const _locale = 'zh-CN-u-kf-upper' // 排序顺序：数字 > 中文 > 大写英文 > 小写英文
 
-    const unstarredIndex = tag.groupList?.findIndex((g) => !g.isStarred) ?? tag.groupList.length;
+    const unstarredIndex =
+      tag.groupList?.findIndex((g) => !g.isStarred) ?? tag.groupList.length;
     const doSortList = unstarredIndex > -1 ? tag?.groupList?.slice(unstarredIndex) : [];
 
     if (sortType === 'ascending') {
@@ -939,7 +968,6 @@ export default class TabListUtils {
     await this.setTagList(tagList);
   }
 
-
   // 导入合并
   async mergeTags(source: TagItem[], target: TagItem[]) {
     const targetMap = new Map<TagItem['tagName'], TagItem>();
@@ -950,10 +978,11 @@ export default class TabListUtils {
       if (mapTag) {
         mapTag = {
           ...mapTag,
-          groupList: [
-            ...mapTag.groupList,
-            ...tag.groupList
-          ]
+          groupList: mergeGroupsAndTabs({
+            targetList: mapTag.groupList,
+            insertList: tag.groupList,
+            exceptValue: UNNAMED_GROUP,
+          }),
         };
         targetMap.set(tag.tagName, mapTag);
       } else {
@@ -962,39 +991,33 @@ export default class TabListUtils {
     }
 
     for (let tag of source) {
-      let unnamedGroups = [], groups = [];
       const mapTag = targetMap.get(tag.tagName);
-
-      for (let group of tag.groupList) {
-        if (group.groupName === UNNAMED_GROUP) {
-          unnamedGroups.push(group);
-        } else {
-          groups.push(group);
-        }
-      }
       if (mapTag) {
-        mapTag.groupList = [...mergeGroupsAndTabs({
+        mapTag.groupList = mergeGroupsAndTabs({
           targetList: mapTag.groupList,
-          insertList: groups
-        }), ...unnamedGroups];
+          insertList: tag.groupList,
+          exceptValue: UNNAMED_GROUP,
+        });
 
         targetMap.set(tag.tagName, mapTag);
       } else {
         const newMapTag = newTagMap.get(tag.tagName);
         if (newMapTag) {
-          newMapTag.groupList = [...mergeGroupsAndTabs({
+          newMapTag.groupList = mergeGroupsAndTabs({
             targetList: newMapTag.groupList,
-            insertList: groups
-          }), ...unnamedGroups];
+            insertList: tag.groupList,
+            exceptValue: UNNAMED_GROUP,
+          });
 
           newTagMap.set(tag.tagName, newMapTag);
         } else {
           newTagMap.set(tag.tagName, {
             ...tag,
-            groupList: [...mergeGroupsAndTabs({
-              targetList: groups,
-              insertList: []
-            }), ...unnamedGroups]
+            groupList: mergeGroupsAndTabs({
+              targetList: tag.groupList,
+              insertList: [],
+              exceptValue: UNNAMED_GROUP,
+            }),
           });
         }
       }

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Form, Button, Radio, Input, Divider, Space, Upload, message } from 'antd';
 import type { FormProps, UploadProps } from 'antd';
 import styled from 'styled-components';
@@ -7,8 +7,8 @@ import { saveAs } from 'file-saver';
 import dayjs from 'dayjs';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { tabListUtils } from '~/entrypoints/common/storage';
+import { extContentImporter, extContentExporter } from '~/entrypoints/common/utils';
 import { initialValues, formatTypeOptions, importModeOptions } from './constants';
-import { extContentImporter, extContentExporter } from './utils';
 
 
 const StyledWrapper = styled.div`

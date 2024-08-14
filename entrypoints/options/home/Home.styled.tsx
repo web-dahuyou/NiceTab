@@ -1,12 +1,16 @@
 import styled, { css } from 'styled-components';
 import { StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
 
-export const StyledSidebarWrapper = styled.div<{ $primaryColor?: string; $collapsed?: boolean; }>`
+export const StyledSidebarWrapper = styled.div<{
+  $primaryColor?: string;
+  $collapsed?: boolean;
+  $sidebarWidth?: number;
+}>`
   position: relative;
   height: calc(100vh - 180px);
 
   .sidebar-inner-box {
-    width: 280px;
+    width: ${(props) => props.$sidebarWidth || 280}px;
     height: calc(100vh - 180px);
     position: fixed;
     top: 100px;
@@ -18,7 +22,7 @@ export const StyledSidebarWrapper = styled.div<{ $primaryColor?: string; $collap
         visibility: hidden;
         opacity: 0;
       }
-      transform: translateX(-280px);
+      transform: translateX(-${(props) => props.$sidebarWidth || 280}px);
     }
 
     .sidebar-action-box {
@@ -85,14 +89,16 @@ export const StyledSidebarWrapper = styled.div<{ $primaryColor?: string; $collap
   }
 `;
 
-export const StyledListWrapper = styled.div<{$collapsed?: boolean;}>`
+export const StyledListWrapper = styled.div<{
+  $collapsed?: boolean;
+  $sidebarWidth?: number;
+}>`
   position: relative;
   width: 100%;
   min-height: 400px;
   display: grid;
-  // grid-template-columns: 280px auto;
-  // grid-column-gap: 40px;
-  grid-template-columns: ${(props) => props.$collapsed ? '0px auto' : '280px auto' };
+  grid-template-columns: ${(props) =>
+    props.$collapsed ? '0px auto' : `${props.$sidebarWidth || 280}px auto`};
   transition: grid-template-columns 0.2s ease-in-out;
 
   .content {
@@ -100,7 +106,6 @@ export const StyledListWrapper = styled.div<{$collapsed?: boolean;}>`
     border-left: 1px solid rgba(5, 5, 5, 0.06);
   }
 `;
-
 
 export const StyledTreeNodeItem = styled.div`
   display: flex;
@@ -131,4 +136,4 @@ export const StyledTreeNodeItem = styled.div`
 
 export default {
   name: 'option-home-styled',
-}
+};

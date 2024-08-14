@@ -24,7 +24,7 @@ import { classNames } from '~/entrypoints/common/utils';
 
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { StyledListWrapper, StyledSidebarWrapper } from './Home.styled';
-import ToggleSidebarBtn from './ToggleSidebarBtn';
+import ToggleSidebarBtn from '../components/ToggleSidebarBtn';
 import SortingBtns from './SortingBtns';
 import RenderTreeNode from './RenderTreeNode';
 import TabGroup from './TabGroup';

@@ -6,6 +6,6 @@ export default defineConfig({
     name: 'Nice Tab Manager | 标签页管理器',
     permissions: ['storage', 'tabs', 'tabGroups', 'contextMenus', 'unlimitedStorage'],
     homepage_url: 'https://github.com/web-dahuyou/NiceTab',
-    // host_permissions: ['<all_urls>'],
+    host_permissions: ['<all_urls>'],
   },
 });

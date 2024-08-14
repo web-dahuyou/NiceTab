@@ -87,6 +87,10 @@ export const UNNAMED_GROUP = 'Unnamed Group';
 
 export const IS_GROUP_SUPPORT  = 'group' in browser.tabs && 'tabGroups' in browser;
 
+// 状态标识
+export const SUCCESS_KEY = 'success';
+export const FAILED_KEY = 'failed';
+
 export default {
   ENUM_COLORS,
   THEME_COLORS,

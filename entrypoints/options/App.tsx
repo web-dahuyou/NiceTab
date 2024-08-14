@@ -6,11 +6,21 @@ import {
   useNavigate,
   useLocation,
 } from 'react-router-dom';
-import { theme, Menu, Dropdown, Flex, Space, Tooltip, Typography, FloatButton } from 'antd';
+import {
+  theme,
+  Menu,
+  Dropdown,
+  Flex,
+  Space,
+  Tooltip,
+  Typography,
+  FloatButton,
+} from 'antd';
 import {
   HomeOutlined,
   SettingOutlined,
   ImportOutlined,
+  SyncOutlined,
   TranslationOutlined,
   RestOutlined,
   GithubOutlined,
@@ -37,6 +47,7 @@ import themeIcon from '/icon/theme.svg';
 import Home from './home/index.tsx';
 import Settings from './Settings.tsx';
 import ImportExport from './importExport/index.tsx';
+import SyncPage from './sync/index.tsx';
 import RecycleBin from './recycleBin/index.tsx';
 
 // 主题色分组
@@ -144,6 +155,13 @@ const navsTemplate: NavProps[] = [
     element: <ImportExport />,
   },
   {
+    key: 'sync',
+    label: 'common.sync',
+    path: '/sync',
+    icon: <SyncOutlined />,
+    element: <SyncPage />,
+  },
+  {
     key: 'recycleBin',
     label: 'common.recycleBin',
     path: '/recycle',
@@ -173,9 +191,12 @@ function AppLayout() {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const { $fmt, locale } = useIntlUtls();
   const navs = useMemo(() => {
-    return navsTemplate.map((item) => {
-      return { ...item, label: $fmt(item.label) };
-    });
+    return navsTemplate
+      .map((item) => {
+        return { ...item, label: $fmt(item.label) };
+      })
+      // 暂时注释掉同步菜单, 发布后先测试一波
+      .filter((item) => item.key != 'sync');
   }, [$fmt]);
 
   // 导航菜单
@@ -220,9 +241,11 @@ function AppLayout() {
 
         {updateDetail?.updateAvailable && (
           <Space className="header-tip select-none" style={{ margin: '0 12px' }}>
-            <Typography.Text type="warning">{ $fmt('common.update.available') }:</Typography.Text>
+            <Typography.Text type="warning">
+              {$fmt('common.update.available')}:
+            </Typography.Text>
             <Typography.Link href="javascript:void(0);" onClick={updateReload}>
-              { $fmt('common.update.upgradeNow') }
+              {$fmt('common.update.upgradeNow')}
             </Typography.Link>
           </Space>
         )}
