@@ -83,6 +83,57 @@ export function getMergedGroupList(
   return resultGroups;
 }
 
+/**
+ * @description: 合并标签组和标签
+ * @param targetList 原始列表
+ * @param insertList 新插入的列表
+ * @param key 合并对象依据的字段名
+ * @param exceptValue item[key] = exceptValue 的数据项不合并
+ * @return 返回合并后的列表
+ */
+export function mergeGroupsAndTabs({
+  targetList,
+  insertList,
+  key = 'groupName',
+  exceptValue,
+}: {
+  targetList: GroupItem[];
+  insertList: GroupItem[];
+  key?: keyof GroupItem;
+  exceptValue?: string | number | boolean;
+}) {
+  // 分离不需要合并的数据项
+  function getSeparatedList(list: GroupItem[]) {
+    const exceptList = [],
+      resultList = [];
+    for (let item of list) {
+      if (exceptValue != undefined && item[key] === exceptValue) {
+        exceptList.push(item);
+      } else {
+        resultList.push(item);
+      }
+    }
+    return [resultList, exceptList];
+  }
+
+  const [_tResultList, _tExceptList] = getSeparatedList(targetList);
+  const [_iResultList, _iExceptList] = getSeparatedList(insertList);
+
+  const mergedList = getMergedGroupList(
+    {
+      list: _tResultList,
+      insertList: _iResultList,
+      key,
+    },
+    (prev, curr) => {
+      const mergedTabList = getUniqueList([...prev.tabList, ...curr.tabList], 'url');
+      return { ...prev, tabList: mergedTabList };
+    }
+  );
+
+  return [...mergedList, ..._tExceptList, ..._iExceptList];
+}
+
 // tab列表工具类 (tag: 分类， tabGroup: 标签组， tab: 标签页)
 export default class TabListUtils {
   tagList: TagItem[] = [];
@@ -131,7 +182,6 @@ export default class TabListUtils {
     if (!tagList?.length || staticIndex == -1) {
       tagList = [this.createStagingAreaTag(), ...(tagList || [])];
     } else if (staticIndex > 0) {
-      console.log('staticIndex', staticIndex);
       const staticTag = tagList.splice(staticIndex, 1);
       tagList = [staticTag[0], ...tagList];
     }
@@ -513,12 +563,8 @@ export default class TabListUtils {
         await this.setTagList(tagList);
         return { targetGroupId: targetSameNameGroup.groupId };
       } else {
-        const unstarredIndex = targetTag?.groupList?.findIndex((g) => !g.isStarred);
-        targetTag?.groupList.splice(
-          unstarredIndex > -1 ? unstarredIndex : targetTag?.groupList?.length,
-          0,
-          sourceGroup
-        );
+        // 穿越操作改为往队尾插入
+        targetTag?.groupList.push(sourceGroup);
 
         await this.setTagList(tagList);
         return { targetGroupId: sourceGroup.groupId };
@@ -538,7 +584,8 @@ export default class TabListUtils {
     // const _locale = 'zh-CN-u-kf-lower' // 排序顺序：数字 > 中文 > 小写英文 > 大写英文
     // const _locale = 'zh-CN-u-kf-upper' // 排序顺序：数字 > 中文 > 大写英文 > 小写英文
 
-    const unstarredIndex = tag.groupList?.findIndex((g) => !g.isStarred) ?? tag.groupList.length;
+    const unstarredIndex =
+      tag.groupList?.findIndex((g) => !g.isStarred) ?? tag.groupList.length;
     const doSortList = unstarredIndex > -1 ? tag?.groupList?.slice(unstarredIndex) : [];
 
     if (sortType === 'ascending') {
@@ -618,9 +665,9 @@ export default class TabListUtils {
     }
 
     let newGroups = [...groupsMap.values()];
-    const settings = await Store.settingsUtils?.getSettings();
+    const settings = Store.settingsUtils?.settings;
 
-    if (settings[ALLOW_DUPLICATE_GROUPS]) {
+    if (settings?.[ALLOW_DUPLICATE_GROUPS]) {
       const unstarredIndex = tag0.groupList.findIndex((g) => !g.isStarred);
       const idx = unstarredIndex > -1 ? unstarredIndex : tag0.groupList.length;
       tag0.groupList.splice(idx, 0, ...newGroups);
@@ -635,7 +682,7 @@ export default class TabListUtils {
       },
       (prev, curr) => {
         let mergedTabList = [...prev.tabList, ...curr.tabList];
-        if (!settings[ALLOW_DUPLICATE_TABS]) {
+        if (!settings?.[ALLOW_DUPLICATE_TABS]) {
           mergedTabList = getUniqueList(mergedTabList, 'url');
         }
         return { ...prev, tabList: mergedTabList };
@@ -645,7 +692,6 @@ export default class TabListUtils {
     const activeGroup = tag0.groupList.find(
       (g) => g.groupName === newGroups?.[0]?.groupName
     );
-    console.log('activeGroup', activeGroup)
 
     return {
       tagId: tag0.tagId,
@@ -657,10 +703,10 @@ export default class TabListUtils {
     let newTabs = tabs.map(this.transformTabItem);
     let tag0 = this.tagList?.[0];
     const group = tag0?.groupList?.find((group) => !group.isLocked && !group.isStarred);
-    const settings = await Store.settingsUtils?.getSettings();
+    const settings = Store.settingsUtils?.settings;
     if (!createNewGroup && group) {
       newTabs = [...newTabs, ...(group?.tabList || [])];
-      if (!settings[ALLOW_DUPLICATE_TABS]) {
+      if (!settings?.[ALLOW_DUPLICATE_TABS]) {
         newTabs = getUniqueList(newTabs, 'url');
       }
       group.tabList = newTabs;
@@ -669,20 +715,20 @@ export default class TabListUtils {
     }
     // 不存在标签组或者createNewGroup=true，就创建一个新标签组
     const newtabGroup = this.getInitialTabGroup();
-    if (!settings[ALLOW_DUPLICATE_TABS]) {
+    if (!settings?.[ALLOW_DUPLICATE_TABS]) {
       newTabs = getUniqueList(newTabs, 'url');
     }
     newtabGroup.tabList = newTabs;
 
     if (tag0) {
-      if (!settings[ALLOW_DUPLICATE_GROUPS]) {
+      if (!settings?.[ALLOW_DUPLICATE_GROUPS]) {
         const sameNameGroupIndex = tag0.groupList.findIndex(
           (g) => g.groupName === newtabGroup.groupName
         );
         if (sameNameGroupIndex > -1) {
           const sameNameGroup = tag0.groupList[sameNameGroupIndex];
           sameNameGroup.tabList = [...newTabs, ...sameNameGroup.tabList];
-          if (!settings[ALLOW_DUPLICATE_TABS]) {
+          if (!settings?.[ALLOW_DUPLICATE_TABS]) {
             sameNameGroup.tabList = getUniqueList(sameNameGroup.tabList, 'url');
           }
           return { tagId: tag0.tagId, groupId: sameNameGroup.groupId };
@@ -707,7 +753,7 @@ export default class TabListUtils {
     let tag = undefined,
       group = undefined;
 
-    const settings = await Store.settingsUtils?.getSettings();
+    const settings = Store.settingsUtils?.settings;
 
     for (let t of tagList) {
       for (let i = 0; i < t.groupList?.length; i++) {
@@ -718,7 +764,7 @@ export default class TabListUtils {
           g.tabList = g.tabList?.filter((tab) => !tabIds.includes(tab.tabId));
           // 如果未锁定的标签组内没有标签页，则删除标签组
           if (
-            settings[DELETE_UNLOCKED_EMPTY_GROUP] &&
+            settings?.[DELETE_UNLOCKED_EMPTY_GROUP] &&
             !g?.tabList?.length &&
             !g.isLocked
           ) {
@@ -837,11 +883,11 @@ export default class TabListUtils {
       if (isSourceFound) {
         const sourceTag = tagList?.[sourceTagIndex];
         sourceTag?.groupList?.[sourceGroupIndex]?.tabList.splice(sourceIndex, 1);
-        const settings = await Store.settingsUtils?.getSettings();
+        const settings = Store.settingsUtils?.settings;
         const sourceGroup = sourceTag?.groupList?.[sourceGroupIndex];
         // 如果未锁定的标签组内没有标签页，则删除标签组
         if (
-          settings[DELETE_UNLOCKED_EMPTY_GROUP] &&
+          settings?.[DELETE_UNLOCKED_EMPTY_GROUP] &&
           !sourceGroup?.tabList?.length &&
           !sourceGroup?.isLocked
         ) {
@@ -900,7 +946,7 @@ export default class TabListUtils {
       const tag = tagList[targetTagIndex];
       const group = tag.groupList[targetGroupIndex];
       if (group) {
-        let newTabList = [...tabs, ...group.tabList];
+        let newTabList = [...group.tabList, ...tabs];
         // 如果开启自动合并，则标签页去重
         if (autoMerge) {
           newTabList = getUniqueList(newTabList, 'url');
@@ -909,8 +955,8 @@ export default class TabListUtils {
       }
 
       // 如果source标签组内没有标签，则删除标签组
-      const settings = await Store.settingsUtils?.getSettings();
-      if (settings[DELETE_UNLOCKED_EMPTY_GROUP]) {
+      const settings = Store.settingsUtils?.settings;
+      if (settings?.[DELETE_UNLOCKED_EMPTY_GROUP]) {
         const sourceTag = tagList?.[sourceTagIndex];
         const sourceGroup = sourceTag?.groupList?.[sourceGroupIndex];
         if (!sourceGroup?.tabList?.length && !sourceGroup?.isLocked) {
@@ -922,6 +968,68 @@ export default class TabListUtils {
     await this.setTagList(tagList);
   }
 
+  // 导入合并
+  async mergeTags(source: TagItem[], target: TagItem[]) {
+    const targetMap = new Map<TagItem['tagName'], TagItem>();
+    const newTagMap = new Map<TagItem['tagName'], TagItem>();
+
+    for (let tag of target) {
+      let mapTag = targetMap.get(tag.tagName);
+      if (mapTag) {
+        mapTag = {
+          ...mapTag,
+          groupList: mergeGroupsAndTabs({
+            targetList: mapTag.groupList,
+            insertList: tag.groupList,
+            exceptValue: UNNAMED_GROUP,
+          }),
+        };
+        targetMap.set(tag.tagName, mapTag);
+      } else {
+        targetMap.set(tag.tagName, tag);
+      }
+    }
+
+    for (let tag of source) {
+      const mapTag = targetMap.get(tag.tagName);
+      if (mapTag) {
+        mapTag.groupList = mergeGroupsAndTabs({
+          targetList: mapTag.groupList,
+          insertList: tag.groupList,
+          exceptValue: UNNAMED_GROUP,
+        });
+
+        targetMap.set(tag.tagName, mapTag);
+      } else {
+        const newMapTag = newTagMap.get(tag.tagName);
+        if (newMapTag) {
+          newMapTag.groupList = mergeGroupsAndTabs({
+            targetList: newMapTag.groupList,
+            insertList: tag.groupList,
+            exceptValue: UNNAMED_GROUP,
+          });
+
+          newTagMap.set(tag.tagName, newMapTag);
+        } else {
+          newTagMap.set(tag.tagName, {
+            ...tag,
+            groupList: mergeGroupsAndTabs({
+              targetList: tag.groupList,
+              insertList: [],
+              exceptValue: UNNAMED_GROUP,
+            }),
+          });
+        }
+      }
+    }
+
+    const tagList = [...targetMap.values()];
+    const newTags = [...newTagMap.values()];
+    const insertIndex = tagList?.[0]?.static ? 1 : 0;
+    tagList.splice(insertIndex, 0, ...newTags);
+
+    return tagList;
+  }
   // 导入
   async importTags(tags: TagItem[], importMode = 'append') {
     const tagList = await this.getTagList();
@@ -932,7 +1040,12 @@ export default class TabListUtils {
 
     if (needOverride) {
       await this.setTagList(tags);
+    } else if (importMode === 'merge') {
+      // merge mode
+      const newTagList = await this.mergeTags(tags, tagList);
+      await this.setTagList(newTagList);
     } else {
+      // append mode
       // await this.setTagList([...tags, ...tagList]);
       const insertIndex = tagList?.[0]?.static ? 1 : 0;
       tagList.splice(insertIndex, 0, ...tags);

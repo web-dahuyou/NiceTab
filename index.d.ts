@@ -14,7 +14,7 @@ enum Color {
 }
 interface TabGroup {
   collapsed: boolean;
-  color: string;
+  color: Color;
   id: number;
   title: string;
   windowId: number;

@@ -36,7 +36,7 @@ async function handleContextMenusUpdate() {
   const currTab = tabs?.find((tab) => tab.highlighted);
 
   // 获取插件设置
-  const settings = await settingsUtils.getSettings();
+  const settings = settingsUtils.settings;
   const filteredTabs = await tabUtils.getFilteredTabs(tabs, settings);
 
   browser.contextMenus.update(ENUM_ACTION_NAME.SEND_CURRENT_TAB, {

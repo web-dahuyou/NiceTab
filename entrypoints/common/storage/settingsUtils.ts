@@ -29,17 +29,22 @@ export default class SettingsUtils {
     [ALLOW_DUPLICATE_TABS]: true, // 同一个标签组中是否允许重复的标签页
     [ALLOW_DUPLICATE_GROUPS]: true, // 同一个分类中是否允许重复的标签组
   };
+  settings: SettingsProps = this.initialSettings;
+
+  constructor() {
+    this.getSettings();
+  }
+
   async setSettings(settings: SettingsProps) {
-    return await storage.setItem('local:settings', {
-      ...this.initialSettings,
-      ...settings,
-    });
+    this.settings = { ...this.initialSettings, ...settings };
+    return await storage.setItem('local:settings', this.settings);
   }
   async getSettings() {
     const settings = await storage.getItem<SettingsProps>('local:settings', {
       defaultValue: this.initialSettings,
     });
 
-    return { ...this.initialSettings, ...settings };
+    this.settings = { ...this.initialSettings, ...settings };
+    return this.settings;
   }
 }

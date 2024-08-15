@@ -3,8 +3,9 @@ import { theme, Checkbox } from 'antd';
 import { CloseOutlined, EditOutlined } from '@ant-design/icons';
 import { GroupItem, TabItem } from '~/entrypoints/types';
 import { openNewTab } from '~/entrypoints/common/tabs';
+import { settingsUtils } from '~/entrypoints/common/storage';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
-import { ENUM_COLORS } from '~/entrypoints/common/constants';
+import { ENUM_COLORS, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import {
   StyledTabItemWrapper,
@@ -20,6 +21,8 @@ type TabItemProps = {
   onChange?: (data: TabItem) => void;
 };
 
+const { DELETE_AFTER_RESTORE } = ENUM_SETTINGS_PROPS;
+
 export default function TabListItem({ tab, group, onRemove, onChange }: TabItemProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
@@ -33,6 +36,16 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
     },
     [tab, onChange]
   );
+
+  // 点击打开标签页
+  const onTabOpen = () => {
+    const settings = settingsUtils.settings;
+    openNewTab(tab.url);
+
+    if (settings[DELETE_AFTER_RESTORE]) {
+      onRemove?.();
+    }
+  };
 
   return (
     <>
@@ -76,7 +89,7 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
           <span
             className="tab-item-title-text"
             title={tab.title}
-            onClick={() => openNewTab(tab.url)}
+            onClick={onTabOpen}
           >
             {tab.title}
           </span>

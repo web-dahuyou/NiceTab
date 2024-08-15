@@ -9,7 +9,6 @@ import { StickyBox } from '@/entrypoints/common/components/StickyBox';
 import TagNodeMarkup from './TagNode';
 import TabGroup from '../home/TabGroup';
 
-
 export default function RecycleBin() {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
@@ -32,7 +31,7 @@ export default function RecycleBin() {
       await recycleUtils.updateTabGroup({
         tagId: tag.tagId,
         groupId: group.groupId,
-        data
+        data,
       });
       getRecycleBinData();
     },
@@ -65,10 +64,13 @@ export default function RecycleBin() {
     });
   }, []);
   // 恢复标签组 (从回收站恢复到列表页)
-  const handleTabGroupRecover = useCallback(async (tag: TagItem, group: GroupItem) => {
-    await recycleUtils.recoverTabGroups(tag, [group]);
-    getRecycleBinData();
-  }, [getRecycleBinData]);
+  const handleTabGroupRecover = useCallback(
+    async (tag: TagItem, group: GroupItem) => {
+      await recycleUtils.recoverTabGroups(tag, [group]);
+      getRecycleBinData();
+    },
+    [getRecycleBinData]
+  );
   // 删除标签页
   const handleTabItemRemove = useCallback(
     async (groupId: React.Key, tabs: TabItem[]) => {
@@ -83,7 +85,7 @@ export default function RecycleBin() {
       await recycleUtils.updateTab({
         tagId: tag.tagId,
         groupId: group.groupId,
-        data: tabData
+        data: tabData,
       });
       getRecycleBinData();
     },
@@ -132,16 +134,26 @@ export default function RecycleBin() {
     >
       <StickyBox topGap={60} fullWidth>
         <Space className="header-action-btns">
+          {/*
           <Button type="primary" size="small" onClick={() => toggleExpand(true)}>
             {$fmt('home.expandAll')}
           </Button>
           <Button type="primary" size="small" onClick={() => toggleExpand(false)}>
             {$fmt('home.collapseAll')}
           </Button>
-          <Button type="primary" size="small" onClick={() => setRecoverModalVisible(true)}>
+          */}
+          <Button
+            type="primary"
+            size="small"
+            onClick={() => setRecoverModalVisible(true)}
+          >
             {$fmt('home.recoverAll')}
           </Button>
-          <Button type="primary" size="small" onClick={() => setConfirmModalVisible(true)}>
+          <Button
+            type="primary"
+            size="small"
+            onClick={() => setConfirmModalVisible(true)}
+          >
             {$fmt('home.clearAll')}
           </Button>
         </Space>
@@ -185,7 +197,9 @@ export default function RecycleBin() {
                       handleTabGroupStarredChange(tag, group, isStarred)
                     }
                     onRecover={() => handleTabGroupRecover(tag, group)}
-                    onTabChange={(tabItem: TabItem) => handleTabItemChange(tag, group, tabItem)}
+                    onTabChange={(tabItem: TabItem) =>
+                      handleTabItemChange(tag, group, tabItem)
+                    }
                     onTabRemove={handleTabItemRemove}
                   ></TabGroup>
                 ))}

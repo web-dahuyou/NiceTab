@@ -252,7 +252,7 @@ export function useTreeData() {
     async (tabGroup: TreeDataNodeTabGroup) => {
       const tagKey = tabGroup.parentKey;
       const tag = treeData.find((tag) => tag.key === tagKey) as TreeDataNodeTag;
-      const settings = await settingsUtils.getSettings();
+      const settings = settingsUtils.settings;
       // 打开标签组 (标签页单独打开)
       // tabGroup?.originData?.tabList.forEach((tab) => {
       //   openNewTab(tab.url);
@@ -262,7 +262,7 @@ export function useTreeData() {
         tabGroup.originData.groupName,
         tabGroup.originData.tabList.map(tab => tab.url)
       );
-      if (settings[DELETE_AFTER_RESTORE]) {
+      if (settings?.[DELETE_AFTER_RESTORE]) {
         await tabListUtils.removeTabGroup(tag.key, tabGroup.key);
         refreshTreeData((treeData) => handleSelect(treeData, [tag.key], { node: tag }));
       }

@@ -1,7 +1,7 @@
-import type { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
+import type { TagItem, TabItem } from '~/entrypoints/types';
 import { tabListUtils } from '~/entrypoints/common/storage';
-import type { ExtContentImporterProps, ExtContentExporterProps } from './types';
-import { getRandomId, omit, newCreateTime } from '~/entrypoints/common/utils';
+import type { ExtContentImporterProps, ExtContentExporterProps } from '~/entrypoints/types';
+import { getRandomId, newCreateTime } from '~/entrypoints/common/utils';
 
 // 解析 NiceTab、OneTab等 插件的导入内容
 export const extContentImporter: ExtContentImporterProps = {
@@ -29,26 +29,31 @@ export const extContentImporter: ExtContentImporterProps = {
     }
 
     const newTag = tabListUtils.getInitialTag();
+    newTag.tagName = 'OneTab';
     newTag.groupList = groupList || [];
     return [newTag];
   },
   niceTab(content: string): TagItem[] {
-    const tagList = JSON.parse(content) as TagItem[];
-    const createTime = newCreateTime();
-    tagList.forEach(tag => {
-      tag.tagId = getRandomId();
-      tag.createTime = createTime;
-      tag?.groupList?.forEach(group => {
-        group.groupId = getRandomId();
-        group.createTime = createTime;
-        group?.tabList?.forEach(tab => {
-          const { favIconUrl } = tab;
-          tab.tabId = getRandomId();
-          tab.favIconUrl = favIconUrl?.startsWith('data:image/') ? '' : favIconUrl
-        })
-      });
-    })
-    return tagList;
+    try {
+      const tagList = JSON.parse(content || '[]') as TagItem[];
+      const createTime = newCreateTime();
+      tagList.forEach(tag => {
+        tag.tagId = getRandomId();
+        tag.createTime = createTime;
+        tag?.groupList?.forEach(group => {
+          group.groupId = getRandomId();
+          group.createTime = createTime;
+          group?.tabList?.forEach(tab => {
+            const { favIconUrl } = tab;
+            tab.tabId = getRandomId();
+            tab.favIconUrl = favIconUrl?.startsWith('data:image/') ? '' : favIconUrl
+          })
+        });
+      })
+      return tagList;
+    } catch {
+      return [];
+    }
   }
 }
 

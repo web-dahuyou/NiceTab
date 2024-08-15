@@ -18,8 +18,7 @@ export const GlobalContext = createContext<GlobalContextProps>({
     themeUtils.setThemeData(themeData);
   },
   setLocale: async (language = defaultLanguage, callback) => {
-    const settings = await settingsUtils.getSettings();
-    settingsUtils.setSettings({ ...settings, language });
+    settingsUtils.setSettings({ ...settingsUtils.settings, language });
     callback?.();
   },
 });
@@ -33,7 +32,7 @@ export function useAntdLocale() {
   }, [language]);
 
   const changeLocale = async (language: LanguageTypes = defaultLanguage) => {
-    const settings = await settingsUtils.getSettings();
+    const settings = settingsUtils.settings;
     let lang = language;
     if (!antdMap[language]) {
       lang = defaultLanguage;
@@ -60,7 +59,7 @@ export function useCustomLocale() {
   );
 
   const changeLocale = async (language: LanguageTypes = defaultLanguage) => {
-    const settings = await settingsUtils.getSettings();
+    const settings = settingsUtils.settings;
     await settingsUtils.setSettings({ ...settings, language });
     setLocale(language);
   };

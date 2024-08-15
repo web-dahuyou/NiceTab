@@ -3,6 +3,7 @@ import common from './common';
 import home from './home';
 import settings from './settings';
 import importExport from './importExport';
+import sync from './sync';
 import hotkeys from './hotkeys';
 
 const getLocales = (language: LanguageTypes) => {
@@ -11,6 +12,7 @@ const getLocales = (language: LanguageTypes) => {
     ...common[language],
     ...settings[language],
     ...importExport[language],
+    ...sync[language],
     ...hotkeys[language]
   }
 }

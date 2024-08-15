@@ -60,7 +60,7 @@ export const StyledList = styled.div<{$primaryColor?: string; $bgColor?: string}
     align-items: center;
     padding: 6px 10px;
     cursor: pointer;
-    &:hover {
+    &:hover, &.active {
       background: ${props => props.$bgColor || 'rgba(0, 0, 0, 0.1)'};
     }
     &.active:before {

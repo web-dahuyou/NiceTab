@@ -15,9 +15,9 @@ import type { LanguageTypes, SettingsProps, TabEvents } from '~/entrypoints/type
 export const GITHUB_URL = 'https://github.com/web-dahuyou/NiceTab';
 
 export const ENUM_COLORS = {
-  primary: cyan.primary || cyan[6],
-  cyan,
+  primary: blue.primary || blue[6],
   blue,
+  cyan,
   volcano,
   orange,
   red,
@@ -86,6 +86,10 @@ export const UNNAMED_TAG = 'Unnamed Tag';
 export const UNNAMED_GROUP = 'Unnamed Group';
 
 export const IS_GROUP_SUPPORT  = 'group' in browser.tabs && 'tabGroups' in browser;
+
+// 状态标识
+export const SUCCESS_KEY = 'success';
+export const FAILED_KEY = 'failed';
 
 export default {
   ENUM_COLORS,

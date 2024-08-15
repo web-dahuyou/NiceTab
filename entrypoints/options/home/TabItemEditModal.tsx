@@ -1,6 +1,6 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { Modal, Form, Input } from 'antd';
-import { InputRef } from 'antd';
+import type { InputRef } from 'antd';
 import { TabItem } from '~/entrypoints/types';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { StyledModalContent } from './TabListItem.styled';

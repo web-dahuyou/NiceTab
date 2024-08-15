@@ -2,6 +2,11 @@
 
 ![NiceTab](https://github.com/user-attachments/assets/6099f21e-fc0a-4bb5-8280-e497be3fb0ae)
 
+## 扩展安装
+- 谷歌 Chrome 应用商店：[Chrome Web Store](https://chromewebstore.google.com/detail/fonflmjnjbkigocpoommgmhljdpljain)
+- 微软 Edge 商店：[Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/ompjiaelpibiggcnanhbdblkhfdmkgnl)
+- Firefox 暂未发布。
+
 ## 基础介绍
 - 本项目是一个方便快捷管理浏览器标签页的浏览器插件。
 - 取名 `NiceTab` 是希望它是一个用起来很 nice 的 tab 标签页管理工具（不过本人的UI和交互设计太差，只能凑合凑合了）。 
@@ -29,9 +34,10 @@
 - 支持分类、标签组、标签页管理，包括一键收集保存、恢复、星标、锁定、增删改查、拖拽排序等功能。
 - 分类支持展开/收起，支持创建分类和标签组，方便移动其他标签组/标签页到新分类/新标签组。
 - 支持多种插件格式的 **导入/导出** 功能，支持导出到本地。目前支持 `NiceTab`、`OneTab` 格式的交叉导入导出（比如：可选择导入OneTab格式并导出为NiceTab格式；或者将NiceTab格式导出为OneTab格式），后续可根据需求增加其他插件格式的导入导出功能。
-- 支持皮肤主题切换，目前暂时设置了有限的几种主题色提供选择，后续可根据需求扩大选择范围。
-- 支持多语言，目前暂时支持中英文切换 (非地道英语，期待英语大佬帮忙校正)。
-- 支持回收站功能，回收站中的标签页可还原到标签列表或者彻底删除。标签列表和回收站支持根据分类和标签组归类合并，方便管理。
+- 支持**远程同步**，您可根据需求将标签页同步到自己的 github 和 gitee 账号，只需要配置自己的 access token 即可，（注意 token 权限只勾选 gists 操作）。
+- 支持**皮肤主题切换**，目前暂时设置了有限的几种主题色提供选择，后续可根据需求扩大选择范围。
+- 支持**多语言**，目前暂时支持中英文切换 (非地道英语，期待英语大佬帮忙校正)。
+- 支持**回收站功能**，回收站中的标签页可还原到标签列表或者彻底删除。标签列表和回收站支持根据分类和标签组归类合并，方便管理。
 - 支持设置 **发送标签页时-是否自动关闭标签页**。
 - 支持设置 **发送标签页时-是否打开NiceTab管理后台**。
 - 支持设置 **发送标签页时-是否发送固定标签页到NiceTab**。
@@ -96,10 +102,6 @@
 
 ![NiceTab-切换语言.png](https://github.com/web-dahuyou/NiceTab/assets/22833786/b9d4f6da-151f-460d-ac4c-4ddbcaee0a05)
 
-## 扩展安装
-- 谷歌 Chrome 应用商店：[Chrome Web Store](https://chromewebstore.google.com/detail/fonflmjnjbkigocpoommgmhljdpljain)
-- 微软 Edge 商店：[Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/ompjiaelpibiggcnanhbdblkhfdmkgnl)
-- Firefox 暂未发布。
 
 ## 使用
 - 点击扩展图标，打开popup面板，显示当前已打开的标签页列表，可快速访问扩展管理后台，快速切换主题。
@@ -120,7 +122,7 @@
 - [x] 发送标签页支持浏览器自带的标签组单独成组，打开NiceTab标签组时支持以浏览器自带标签组形式打开。
 - [x] 新增设置项：删除标签页时, 是否自动删除空标签组
 - [x] 新增设置项：发送标签组/标签页时是否去重
-- [ ] 远程同步功能：由于 Chrome Api限制，远程同步有数据大小和频次限制，大小限制 100K，频次限制 1次/2秒。所以目前暂时使用浏览器本地存储+支持导出到本地的方案。后续会添加远程存储同步功能
+- [x] 远程同步功能：由于 Chrome Api限制，远程同步有数据大小和频次限制，大小限制 100K，频次限制 1次/2秒。所以目前暂时使用浏览器本地存储+支持导出到本地的方案。后续会添加远程存储同步功能
 - [ ] 发送标签页操作添加快捷键
 - [ ] 扩展图标右键菜单支持按需配置
 - [ ] 其他
