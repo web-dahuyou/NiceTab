@@ -305,8 +305,6 @@ export default class SyncUtils {
         this.setConfigByType(remoteType, { gistId: data.id || '' });
         this.handleSyncResult(remoteType, syncType, data);
       }
-
-      // this.setSyncStatus(remoteType, 'idle');
     }
 
     this.setSyncStatus(remoteType, 'idle');

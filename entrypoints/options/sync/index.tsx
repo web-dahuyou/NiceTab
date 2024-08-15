@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { theme, message, Drawer } from 'antd';
+import dayjs from 'dayjs';
 import { classNames } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { syncUtils } from '~/entrypoints/common/storage';
@@ -21,6 +22,7 @@ export default function SyncPage() {
   const [syncConfig, setSyncConfig] = useState<SyncConfigProps>(syncUtils.config);
   const [syncStatus, setSyncStatus] = useState<SyncStatusProps>(syncUtils.syncStatus);
   const [syncResult, setSyncResult] = useState<SyncResultProps>(syncUtils.syncResult);
+  const [actionTime, setActionTime] = useState<string>(dayjs().format('YYYY-MM-DD_HH:mm:ss'));
 
   const onSyncConfigChange = (config: SyncConfigProps) => {
     setDrawerVisible(false);
@@ -29,6 +31,7 @@ export default function SyncPage() {
 
   const handleAction = async (option: RemoteOptionProps, actionType: string) => {
     setSelectedKey(option.key);
+    setActionTime(dayjs().format('YYYY-MM-DD_HH:mm:ss'));
     if (actionType === 'select') {
       setSelectedKey(option.key);
     } else if (actionType === 'setting') {
@@ -44,7 +47,7 @@ export default function SyncPage() {
       }
 
       syncUtils.setSyncStatus(option.key, 'syncing');
-      setSyncStatus(() => syncUtils.getSyncStatus());
+      setSyncStatus(syncUtils.getSyncStatus());
       await syncUtils.syncStart(option.key, actionType as SyncType);
       syncUtils.setSyncStatus(option.key, 'idle');
       getSyncInfo();

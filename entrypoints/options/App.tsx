@@ -191,12 +191,9 @@ function AppLayout() {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const { $fmt, locale } = useIntlUtls();
   const navs = useMemo(() => {
-    return navsTemplate
-      .map((item) => {
-        return { ...item, label: $fmt(item.label) };
-      })
-      // 暂时注释掉同步菜单, 发布后先测试一波
-      .filter((item) => item.key != 'sync');
+    return navsTemplate.map((item) => {
+      return { ...item, label: $fmt(item.label) };
+    });
   }, [$fmt]);
 
   // 导航菜单

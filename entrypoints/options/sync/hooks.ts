@@ -1,12 +1,4 @@
-import type {
-  SyncRemoteType,
-  SyncConfigItemProps,
-  SyncConfigProps,
-  SyncStatus,
-  SyncStatusProps,
-  SyncResultItemProps,
-  SyncResultProps,
-} from '~/entrypoints/types';
+import type { SyncType, SyncResultItemProps } from '~/entrypoints/types';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { SUCCESS_KEY } from '~/entrypoints/common/constants';
 import { syncTypeMap } from './constants';
@@ -34,6 +26,14 @@ export function useSyncResult(resultData?: SyncResultItemProps) {
     ? syncTypeTipMap[resultData.syncType]
     : $fmt('common.noData');
 
+  const getSyncTypeText = (syncType: SyncType) => {
+    return syncTypeTextMap[syncType];
+  };
+
+  const getSyncTipText = (syncType: SyncType) => {
+    return syncTypeTextMap[syncType];
+  };
+
   const successInfo = {
     variant: 'success',
     text: $fmt('common.success'),
@@ -53,14 +53,22 @@ export function useSyncResult(resultData?: SyncResultItemProps) {
       : failedInfo
     : emptyInfo;
 
+  const getVariantInfo = (syncResult?: string) => {
+    if (!syncResult) return emptyInfo;
+    return syncResult === SUCCESS_KEY ? successInfo : failedInfo;
+  };
+
   return {
     syncTypeTextMap,
     syncTypeTipMap,
     syncTypeText,
     syncTypeTipText,
-    variantInfo,
+    getSyncTypeText,
+    getSyncTipText,
     successInfo,
     failedInfo,
     emptyInfo,
+    variantInfo,
+    getVariantInfo,
   };
 }

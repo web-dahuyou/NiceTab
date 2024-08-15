@@ -84,13 +84,13 @@ export default function SyncConfigForm({ onChange }: SyncConfigFormProps) {
             }
           />
         </Form.Item>
-        <Form.Item<SyncConfigProps>
+        {/* <Form.Item<SyncConfigProps>
           label={$fmt('sync.autoSync')}
           name={['github', 'autoSync']}
           tooltip={getFormTooltipOption({ title: $fmt('common.comingSoon') })}
         >
           <Switch disabled />
-        </Form.Item>
+        </Form.Item> */}
 
         <Divider className="divider" orientation="center" style={{ marginTop: '30px' }}>
           Gitee {$fmt('common.config')}
@@ -114,13 +114,13 @@ export default function SyncConfigForm({ onChange }: SyncConfigFormProps) {
             }
           />
         </Form.Item>
-        <Form.Item<SyncConfigProps>
+        {/* <Form.Item<SyncConfigProps>
           label={$fmt('sync.autoSync')}
           name={['gitee', 'autoSync']}
           tooltip={getFormTooltipOption({ title: $fmt('common.comingSoon') })}
         >
           <Switch disabled />
-        </Form.Item>
+        </Form.Item> */}
 
         <Form.Item>
           <Button type="primary" htmlType="submit">

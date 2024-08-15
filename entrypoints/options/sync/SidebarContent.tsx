@@ -32,6 +32,17 @@ type CardItemProps = {
   onAction?: (option: RemoteOptionProps, actionType: string) => void;
 };
 
+const StyledTitle = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  .card-title {
+    font-weight: bold;
+    font-weight: 600;
+    font-size: 18px;
+  }
+`;
+
 function CardItemMarkup({
   option,
   isActive,
@@ -47,6 +58,98 @@ function CardItemMarkup({
 
   const { syncTypeText, syncTypeTipText, variantInfo } = useSyncResult(lastSyncInfo);
 
+  const cardTitle = useMemo(() => {
+    return (
+      <StyledTitle>
+        <div className="card-title">{option.label}</div>
+        {syncConfig?.accessToken ? (
+          syncStatus === 'syncing' ? (
+            <Tag icon={<SyncOutlined spin />} color="processing">
+              {$fmt('sync.syncing')}
+            </Tag>
+          ) : null
+        ) : (
+          <Tag icon={<ExclamationCircleOutlined />} color="warning">
+            {$fmt('sync.noAccessToken')}
+          </Tag>
+        )}
+      </StyledTitle>
+    );
+  }, [option, syncConfig, syncStatus]);
+
+  const description = useMemo(() => {
+    return (
+      <Flex vertical gap={6}>
+        <Typography.Text type="secondary">
+          <StyledLabel>{$fmt('sync.lastSyncTime')}: </StyledLabel>
+          {lastSyncInfo?.syncTime || $fmt('common.noData')}
+        </Typography.Text>
+        {lastSyncInfo?.syncTime && lastSyncInfo?.syncType && (
+          <>
+            <Typography.Text type="secondary">
+              <StyledLabel>{$fmt('sync.lastSyncType')}: </StyledLabel>
+              <Tooltip
+                color="#fff"
+                destroyTooltipOnHide
+                title={<Typography.Text>{syncTypeTipText}</Typography.Text>}
+              >
+                <Tag color="blue">{syncTypeText}</Tag>
+              </Tooltip>
+            </Typography.Text>
+            <Typography.Text type="secondary">
+              <StyledLabel>{$fmt('sync.lastSyncResult')}: </StyledLabel>
+              <Tag color={variantInfo.variant}>{variantInfo.text}</Tag>
+            </Typography.Text>
+            {lastSyncInfo.reason && (
+              <Typography.Text type="danger">
+                <StyledLabel>{$fmt('common.failedReason')}: </StyledLabel>
+                {lastSyncInfo.reason}
+              </Typography.Text>
+            )}
+          </>
+        )}
+      </Flex>
+    );
+  }, [lastSyncInfo, syncTypeText, syncTypeTipText, variantInfo]);
+
+  const actions = useMemo(() => {
+    return [
+      <Tooltip
+        color="#fff"
+        destroyTooltipOnHide
+        title={<Typography.Text>{$fmt('common.settings')}</Typography.Text>}
+      >
+        <div className="icon-btn-wrapper" onClick={() => onAction?.(option, 'setting')}>
+          <SettingOutlined key="setting" />
+        </div>
+      </Tooltip>,
+      <Tooltip
+        color="#fff"
+        destroyTooltipOnHide
+        title={<Typography.Text>{$fmt('sync.tip.manualPushMerge')}</Typography.Text>}
+      >
+        <div
+          className="icon-btn-wrapper"
+          onClick={() => onAction?.(option, 'manual-push-merge')}
+        >
+          <SyncOutlined key="manual-push-merge" />
+        </div>
+      </Tooltip>,
+      <Tooltip
+        color="#fff"
+        destroyTooltipOnHide
+        title={<Typography.Text>{$fmt('sync.tip.manualPushForce')}</Typography.Text>}
+      >
+        <div
+          className="icon-btn-wrapper"
+          onClick={() => onAction?.(option, 'manual-push-force')}
+        >
+          <CloudUploadOutlined key="manual-push-force" />
+        </div>
+      </Tooltip>,
+    ]
+  }, [option, onAction]);
+
   return (
     <Card
       className={classNames('card-item', isActive && 'active')}
@@ -55,88 +158,9 @@ function CardItemMarkup({
         actions: 'card-actions',
       }}
       onClick={() => onAction?.(option, 'select')}
-      actions={[
-        <Tooltip
-          color="#fff"
-          destroyTooltipOnHide
-          title={<Typography.Text>{$fmt('common.settings')}</Typography.Text>}
-        >
-          <div className="icon-btn-wrapper" onClick={() => onAction?.(option, 'setting')}>
-            <SettingOutlined key="setting" />
-          </div>
-        </Tooltip>,
-        <Tooltip
-          color="#fff"
-          destroyTooltipOnHide
-          title={<Typography.Text>{$fmt('sync.tip.manualPushMerge')}</Typography.Text>}
-        >
-          <div
-            className="icon-btn-wrapper"
-            onClick={() => onAction?.(option, 'manual-push-merge')}
-          >
-            <SyncOutlined key="manual-push-merge" />
-          </div>
-        </Tooltip>,
-        <Tooltip
-          color="#fff"
-          destroyTooltipOnHide
-          title={<Typography.Text>{$fmt('sync.tip.manualPushForce')}</Typography.Text>}
-        >
-          <div
-            className="icon-btn-wrapper"
-            onClick={() => onAction?.(option, 'manual-push-force')}
-          >
-            <CloudUploadOutlined key="manual-push-force" />
-          </div>
-        </Tooltip>,
-      ]}
+      actions={actions}
     >
-      <Card.Meta
-        title={option.label}
-        description={
-          <Flex vertical gap={6}>
-            {syncConfig?.accessToken ? (
-              syncStatus === 'syncing' ? (
-                <Tag icon={<SyncOutlined spin />} color="processing">
-                  {$fmt('sync.syncing')}
-                </Tag>
-              ) : null
-            ) : (
-              <Tag icon={<ExclamationCircleOutlined />} color="warning">
-                {$fmt('sync.noAccessToken')}
-              </Tag>
-            )}
-            <Typography.Text type="secondary">
-              <StyledLabel>{$fmt('sync.lastSyncTime')}: </StyledLabel>
-              {lastSyncInfo?.syncTime || $fmt('common.noData')}
-            </Typography.Text>
-            {lastSyncInfo?.syncTime && lastSyncInfo?.syncType && (
-              <>
-                <Typography.Text type="secondary">
-                  <StyledLabel>{$fmt('sync.lastSyncType')}: </StyledLabel>
-                  <Tooltip
-                    color="#fff"
-                    destroyTooltipOnHide
-                    title={<Typography.Text>{syncTypeTipText}</Typography.Text>}
-                  >
-                    <Tag color="blue">{syncTypeText}</Tag>
-                  </Tooltip>
-                </Typography.Text>
-                <Typography.Text type="secondary">
-                  <StyledLabel>{$fmt('sync.lastSyncResult')}: </StyledLabel>
-                  <Tag color={variantInfo.variant}>{variantInfo.text}</Tag>
-                </Typography.Text>
-                { lastSyncInfo.reason && (
-                  <Typography.Text type="danger">
-                    <StyledLabel>{$fmt('common.failedReason')}: </StyledLabel>
-                    { lastSyncInfo.reason }
-                  </Typography.Text>
-                ) }
-              </>
-            )}
-          </Flex>
-        }
-      />
+      <Card.Meta title={cardTitle} description={description} />
     </Card>
   );
 }
@@ -152,6 +176,7 @@ const StyledCard = styled.div<{ $primaryColor: string }>`
   }
 `;
 
+
 type SideBarContentProps = {
   selectedKey?: string;
   syncConfig: SyncConfigProps;
@@ -159,6 +184,7 @@ type SideBarContentProps = {
   syncResult: SyncResultProps;
   onAction?: (option: RemoteOptionProps, actionType: string) => void;
 };
+
 export default function SidebarContent({
   selectedKey,
   syncConfig,
