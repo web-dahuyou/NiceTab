@@ -1,19 +1,22 @@
 import type { SyncType, SyncResultItemProps } from '~/entrypoints/types';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { SUCCESS_KEY } from '~/entrypoints/common/constants';
-import { syncTypeMap } from './constants';
+import { SUCCESS_KEY, syncTypeMap } from '~/entrypoints/common/constants';
 
 export function useSyncResult(resultData?: SyncResultItemProps) {
   const { $fmt } = useIntlUtls();
 
   const syncTypeTextMap = {
     [syncTypeMap.AUTO]: $fmt('sync.syncType.auto'),
+    [syncTypeMap.MANUAL_PULL_MERGE]: $fmt('sync.syncType.manualPullMerge'),
+    [syncTypeMap.MANUAL_PULL_FORCE]: $fmt('sync.syncType.manualPullForce'),
     [syncTypeMap.MANUAL_PUSH_MERGE]: $fmt('sync.syncType.manualPushMerge'),
     [syncTypeMap.MANUAL_PUSH_FORCE]: $fmt('sync.syncType.manualPushForce'),
   };
 
   const syncTypeTipMap = {
     [syncTypeMap.AUTO]: $fmt('sync.tip.auto'),
+    [syncTypeMap.MANUAL_PULL_MERGE]: $fmt('sync.tip.manualPullMerge'),
+    [syncTypeMap.MANUAL_PULL_FORCE]: $fmt('sync.tip.manualPullForce'),
     [syncTypeMap.MANUAL_PUSH_MERGE]: $fmt('sync.tip.manualPushMerge'),
     [syncTypeMap.MANUAL_PUSH_FORCE]: $fmt('sync.tip.manualPushForce'),
   };

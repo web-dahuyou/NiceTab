@@ -16,7 +16,7 @@ import {
   fetchApi,
   getLocaleMessages,
 } from '~/entrypoints/common/utils';
-import { SUCCESS_KEY, FAILED_KEY } from '~/entrypoints/common/constants';
+import { SUCCESS_KEY, FAILED_KEY, syncTypeMap } from '~/entrypoints/common/constants';
 import Store from './instanceStore';
 
 type GistFilesProps = {
@@ -231,10 +231,10 @@ export default class SyncUtils {
   async handleBySyncType(
     remoteType: SyncRemoteType,
     syncType: SyncType,
-    gistData?: GistResponseItemProps
+    gistData: GistResponseItemProps
   ) {
     let result: GistResponseItemProps = {} as GistResponseItemProps;
-    if (syncType === 'manual-push-force') {
+    if (syncType === syncTypeMap.MANUAL_PUSH_FORCE) {
       result = await this.updateGist(remoteType);
     } else {
       try {
@@ -255,9 +255,17 @@ export default class SyncUtils {
         } else {
           fileContent = fileInfo?.content || '';
         }
+
+        if (syncType === syncTypeMap.MANUAL_PULL_FORCE) {
+          await Store.tabListUtils.clearAll();
+        }
         const tagList = extContentImporter.niceTab(fileContent || '');
         await Store.tabListUtils.importTags(tagList, 'merge');
-        result = await this.updateGist(remoteType);
+        if (syncType === syncTypeMap.MANUAL_PUSH_MERGE) {
+          result = await this.updateGist(remoteType);
+        } else {
+          result = { id: gistData?.id } as GistResponseItemProps;
+        }
       } catch (e) {
         console.log(e);
       }
