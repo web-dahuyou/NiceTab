@@ -574,6 +574,62 @@ export default class TabListUtils {
     await this.setTagList(tagList);
     return { targetGroupId: undefined };
   }
+  // 当前分类中所有标签组移动到（穿越）
+  async allTabGroupsMoveThrough({
+    sourceTagId,
+    targetTagId,
+    autoMerge = false,
+  }: {
+    sourceTagId: Key;
+    targetTagId: Key;
+    autoMerge?: boolean;
+  }) {
+    const tagList = await this.getTagList();
+    let isSourceFound = false,
+      isTargetFound = false,
+      sourceTagIndex = 0,
+      targetTagIndex = 0;
+    for (let tIndex = 0; tIndex < tagList.length; tIndex++) {
+      const tag = tagList[tIndex];
+      if (tag.tagId === targetTagId) {
+        isTargetFound = true;
+        targetTagIndex = tIndex;
+      }
+      if (tag.tagId === sourceTagId) {
+        isSourceFound = true;
+        sourceTagIndex = tIndex;
+      }
+
+      if (isSourceFound && isTargetFound) break;
+    }
+
+    if (isSourceFound && isTargetFound) {
+      const sourceTag = tagList?.[sourceTagIndex];
+      const allSourceGroups = sourceTag?.groupList?.splice(0);
+
+      const targetTag = tagList?.[targetTagIndex];
+
+      // 如果开启自动合并，则同名标签组会自动合并
+      if (autoMerge) {
+        targetTag.groupList = mergeGroupsAndTabs({
+          targetList: targetTag.groupList || [],
+          insertList: allSourceGroups,
+          exceptValue: UNNAMED_GROUP,
+        })
+
+        await this.setTagList(tagList);
+      } else {
+        // 穿越操作改为往队尾插入
+        targetTag.groupList = [...targetTag?.groupList, ...allSourceGroups];
+        await this.setTagList(tagList);
+      }
+
+      return { targetTagId: targetTag.tagId };
+    }
+
+    await this.setTagList(tagList);
+    return { targetTagId: undefined };
+  }
   // 标签组排序
   async groupListSort(sortType: string, tagId: Key) {
     const tagList = await this.getTagList();

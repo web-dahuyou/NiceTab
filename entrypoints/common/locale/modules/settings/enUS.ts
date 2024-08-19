@@ -17,7 +17,7 @@ export default {
   'settings.closeTabsAfterSendTabs': 'When sending tabs - whether to automatically close the tabs ?',
   'settings.closeTabsAfterSendTabs.yes': 'Automatically close',
   'settings.closeTabsAfterSendTabs.no': 'Do not',
-  'settings.deleteAfterRestore': 'When restoring tabs - whether to remove the tabs ?',
+  'settings.deleteAfterRestore': 'When opening tabs or tab groups - whether to remove the tabs ?',
   'settings.deleteAfterRestore.yes': 'Remove (pinned tabs remain)',
   'settings.deleteAfterRestore.no': 'All remain (recommended)',
   'settings.deleteUnlockedEmptyGroup': 'When clearing tabs - whether to remove the empty group ?',

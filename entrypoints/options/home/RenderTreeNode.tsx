@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { theme, Modal } from 'antd';
-import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
+import { CloseOutlined, PlusOutlined, SendOutlined } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { ENUM_COLORS, UNNAMED_TAG, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
@@ -9,6 +9,8 @@ import { RenderTreeNodeProps } from './types';
 import { dndKeys } from './constants';
 import EditInput from '../components/EditInput';
 import DropComponent from '@/entrypoints/common/components/DropComponent';
+import MoveToModal from './MoveToModal';
+import useMoveTo from './hooks/moveTo';
 
 const allowDropKey = dndKeys.tabItem;
 
@@ -20,6 +22,7 @@ export default function RenderTreeNode({
   refreshKey,
   onAction,
   onTabItemDrop, // 这个 onTabItemDrop 只是为了方便右侧面板的标签页拖拽到左侧树的标签组，左侧树中的 分类和标签组的拖拽由 antd 的 Tree 组件自带实现
+  onMoveTo
 }: RenderTreeNodeProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
@@ -30,6 +33,14 @@ export default function RenderTreeNode({
     values: { type: $fmt(`home.${node.type || 'tag'}`) },
   });
   const unnamedNodeName = node.type === 'tag' ? UNNAMED_TAG : UNNAMED_GROUP;
+
+  const {
+    modalVisible: moveToModalVisible,
+    openModal: openMoveToModal,
+    onConfirm: onMoveToConfirm,
+    onClose: onMoveToClose,
+    moveData
+  } = useMoveTo();
 
   // 是否锁定
   const isLocked = useMemo(() => {
@@ -118,7 +129,16 @@ export default function RenderTreeNode({
           )}
 
           <span className="tree-node-icon-group">
-            {node.type === 'tag' && (
+            {node.type === 'tag' && <>
+              <StyledActionIconBtn
+                className="btn-add"
+                $size="14"
+                title={$fmt('home.moveAllGroupTo')}
+                $hoverColor={token.colorPrimaryHover}
+                onClick={() => openMoveToModal?.({ tagId: node.key as string })}
+              >
+                <SendOutlined />
+              </StyledActionIconBtn>
               <StyledActionIconBtn
                 className="btn-add"
                 $size="14"
@@ -128,7 +148,8 @@ export default function RenderTreeNode({
               >
                 <PlusOutlined />
               </StyledActionIconBtn>
-            )}
+            </>
+            }
             {!isLocked && !isStaticTag && (
               <StyledActionIconBtn
                 className="btn-remove"
@@ -153,6 +174,20 @@ export default function RenderTreeNode({
           >
             <div>{removeDesc}</div>
           </Modal>
+        )}
+
+        {/* 移动到弹窗 */}
+        { moveToModalVisible && (
+          <MoveToModal
+            visible={moveToModalVisible}
+            moveData={moveData}
+            onOk={(targetData) => {
+              onMoveToConfirm(() => {
+                onMoveTo?.({ targetData });
+              });
+            }}
+            onCancel={onMoveToClose}
+          />
         )}
       </>
     </DropComponent>

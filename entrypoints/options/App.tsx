@@ -290,7 +290,7 @@ function AppLayout() {
       </div>
 
       {/* 回到顶部 */}
-      <FloatButton.Group shape="circle" style={{ right: 30 }}>
+      <FloatButton.Group shape="circle" style={{ right: 30, bottom: 70 }}>
         {/* BackTop组件自带的 tooltip 在点击按钮时会闪 */}
         <span title={$fmt('common.backToTop')}>
           <FloatButton.BackTop duration={100} visibilityHeight={400} />
