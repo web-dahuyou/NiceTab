@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState, useRef, useCallback } from 'react';
+import { ReactNode, useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { classNames } from '~/entrypoints/common/utils';
 
@@ -74,7 +74,7 @@ export function StickyBox({ children, topGap = 0, fullWidth = false, bgColor = '
       <StyledStickyInner
         ref={innerRef}
         className={classNames('sticky-box-inner', fixed && 'fixed')}
-        $width={fullWidth ? '100%' : wrapperBounds.width}
+        $width={fullWidth ? '' : wrapperBounds.width}
         $left={fullWidth ? 0 : wrapperBounds.left}
         $top={topGap}
         $bgColor={bgColor}

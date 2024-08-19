@@ -13,13 +13,6 @@ export const remoteOptions: RemoteOptionProps[] = [
   { key: 'gitee', label: 'Gitee', pageUrl: tokenSettingsPageUrls.gitee },
 ];
 
-// 同步方式枚举
-export const syncTypeMap: Record<string, SyncType> = {
-  AUTO: 'auto',
-  MANUAL_PUSH_MERGE: 'manual-push-merge',
-  MANUAL_PUSH_FORCE: 'manual-push-force',
-};
-
 export default {
   name: 'option-sync-constants',
 };

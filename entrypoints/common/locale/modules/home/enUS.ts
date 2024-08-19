@@ -13,6 +13,7 @@ export default {
   'home.recoverAll': 'Recover All',
   'home.emptyTip': 'No Data',
   'home.searchTagAndGroup': 'Search Tag/Group',
+  'home.moveAllGroupTo': 'Move All Group To ...',
   'home.createTabGroup': 'Create Tab Group',
   'home.helpInfo': 'Help Info',
   'home.removeTitle': 'Remove Reminder',

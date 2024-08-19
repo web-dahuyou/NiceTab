@@ -21,16 +21,23 @@ import {
 } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { classNames } from '~/entrypoints/common/utils';
+import { tabListUtils } from '@/entrypoints/common/storage';
 
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
-import { StyledListWrapper, StyledSidebarWrapper } from './Home.styled';
+import {
+  StyledListWrapper,
+  StyledSidebarWrapper,
+  StyledFooterWrapper,
+} from './Home.styled';
 import ToggleSidebarBtn from '../components/ToggleSidebarBtn';
 import SortingBtns from './SortingBtns';
 import RenderTreeNode from './RenderTreeNode';
 import TabGroup from './TabGroup';
 import HotkeyList from '../components/HotkeyList';
+import StickyFooter from '~/entrypoints/common/components/StickyFooter';
 import type { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
 import type {
+  TreeDataNodeTag,
   TreeDataNodeTabGroup,
   TreeDataNodeUnion,
   MoveToCallbackProps,
@@ -38,7 +45,6 @@ import type {
 import { useTreeData } from './hooks/treeData';
 import useHotkeys from './hooks/hotkeys';
 import { getTreeData } from './utils';
-import { tabListUtils } from '@/entrypoints/common/storage';
 
 export default function Home() {
   const { token } = theme.useToken();
@@ -99,6 +105,7 @@ export default function Home() {
     setConfirmModalVisible(false);
   };
 
+  // 移动单个标签组
   const handleTabGroupMoveTo = async ({
     moveData,
     targetData,
@@ -111,10 +118,15 @@ export default function Home() {
         if (!groupId) return;
         // 如果是移动标签页的话，则不需要重新选择标签组
         if (tabs && tabs?.length > 0) return;
+        if (!targetTagId) return;
 
         let group = null;
         for (let tag of treeData) {
           if (!!targetTagId && tag.key !== targetTagId) continue;
+          if (!targetGroupId) {
+            handleSelect(treeData, [targetTagId], { node: tag as TreeDataNodeTag });
+            break;
+          }
           for (let g of tag.children || []) {
             if (g.key === targetGroupId) {
               group = g;
@@ -124,6 +136,18 @@ export default function Home() {
         }
         group &&
           handleSelect(treeData, [groupId], { node: group as TreeDataNodeTabGroup });
+      }
+    });
+  };
+  // 移动所有标签组
+  const handleAllTabGroupsMoveTo = async ({ targetData }: MoveToCallbackProps) => {
+    refreshTreeData((treeData) => {
+      const { targetTagId } = targetData || {};
+      for (let tag of treeData) {
+        if (tag.key == targetTagId) {
+          handleSelect(treeData, [targetTagId], { node: tag as TreeDataNodeTag });
+          break;
+        }
       }
     });
   };
@@ -306,6 +330,7 @@ export default function Home() {
                           refreshKey={refreshKey}
                           onAction={onTreeNodeAction}
                           onTabItemDrop={handleTabItemDrop}
+                          onMoveTo={handleAllTabGroupsMoveTo}
                         ></RenderTreeNode>
                       )}
                       onExpand={(expandedKeys) => setExpandedKeys(expandedKeys)}
@@ -358,6 +383,19 @@ export default function Home() {
           )}
         </div>
       </StyledListWrapper>
+
+      {/*
+      <StickyFooter bottomGap={0} fullWidth bgColor="#fff">
+        <StyledFooterWrapper
+          className="footer-wrapper"
+          $paddingLeft={sidebarCollapsed ? 0 : 280}
+        >
+          <Button type="primary" size="small">
+            批量移动标签组
+          </Button>
+        </StyledFooterWrapper>
+      </StickyFooter>
+      */}
 
       {/* 清空全部提示 */}
       <Modal

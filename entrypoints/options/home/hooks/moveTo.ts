@@ -6,8 +6,8 @@ export default function useMoveTo() {
   const [moveData, setMoveData] = useState<MoveDataProps>();
 
   // 打开移动到弹窗
-  const openModal = ({ groupId, tabs }: MoveDataProps) => {
-    setMoveData({ groupId, tabs });
+  const openModal = ({ tagId, groupId, tabs }: MoveDataProps) => {
+    setMoveData({ tagId, groupId, tabs });
     setModalVisible(true);
   };
   const onConfirm = (callback?: () => void) => {

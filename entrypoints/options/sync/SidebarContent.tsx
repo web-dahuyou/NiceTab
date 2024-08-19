@@ -4,6 +4,7 @@ import {
   SettingOutlined,
   SyncOutlined,
   ExclamationCircleOutlined,
+  CloudDownloadOutlined,
   CloudUploadOutlined,
 } from '@ant-design/icons';
 import styled from 'styled-components';
@@ -18,6 +19,7 @@ import type {
 } from '~/entrypoints/types';
 import { classNames } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { syncTypeMap } from '~/entrypoints/common/constants';
 import type { RemoteOptionProps } from './types';
 import { remoteOptions } from './constants';
 import { StyledLabel } from './Sync.styled';
@@ -126,13 +128,25 @@ function CardItemMarkup({
       <Tooltip
         color="#fff"
         destroyTooltipOnHide
+        title={<Typography.Text>{$fmt('sync.tip.manualPullForce')}</Typography.Text>}
+      >
+        <div
+          className="icon-btn-wrapper"
+          onClick={() => onAction?.(option, syncTypeMap['MANUAL_PULL_FORCE'])}
+        >
+          <CloudDownloadOutlined key={syncTypeMap['MANUAL_PULL_FORCE']} />
+        </div>
+      </Tooltip>,
+      <Tooltip
+        color="#fff"
+        destroyTooltipOnHide
         title={<Typography.Text>{$fmt('sync.tip.manualPushMerge')}</Typography.Text>}
       >
         <div
           className="icon-btn-wrapper"
-          onClick={() => onAction?.(option, 'manual-push-merge')}
+          onClick={() => onAction?.(option, syncTypeMap['MANUAL_PUSH_MERGE'])}
         >
-          <SyncOutlined key="manual-push-merge" />
+          <SyncOutlined key={syncTypeMap['MANUAL_PUSH_MERGE']} />
         </div>
       </Tooltip>,
       <Tooltip
@@ -142,9 +156,9 @@ function CardItemMarkup({
       >
         <div
           className="icon-btn-wrapper"
-          onClick={() => onAction?.(option, 'manual-push-force')}
+          onClick={() => onAction?.(option, syncTypeMap['MANUAL_PUSH_FORCE'])}
         >
-          <CloudUploadOutlined key="manual-push-force" />
+          <CloudUploadOutlined key={syncTypeMap['MANUAL_PUSH_FORCE']} />
         </div>
       </Tooltip>,
     ]

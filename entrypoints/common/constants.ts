@@ -10,7 +10,7 @@ import {
   magenta,
   gold,
 } from '@ant-design/colors';
-import type { LanguageTypes, SettingsProps, TabEvents } from '~/entrypoints/types';
+import type { LanguageTypes, SettingsProps, TabEvents, SyncType } from '~/entrypoints/types';
 
 export const GITHUB_URL = 'https://github.com/web-dahuyou/NiceTab';
 
@@ -90,6 +90,15 @@ export const IS_GROUP_SUPPORT  = 'group' in browser.tabs && 'tabGroups' in brows
 // 状态标识
 export const SUCCESS_KEY = 'success';
 export const FAILED_KEY = 'failed';
+
+// 同步方式枚举
+export const syncTypeMap: Record<string, SyncType> = {
+  AUTO: 'auto',
+  MANUAL_PULL_MERGE: 'manual-pull-merge',
+  MANUAL_PULL_FORCE: 'manual-pull-force',
+  MANUAL_PUSH_MERGE: 'manual-push-merge',
+  MANUAL_PUSH_FORCE: 'manual-push-force',
+};
 
 export default {
   ENUM_COLORS,

@@ -32,11 +32,13 @@ export type RenderTreeNodeProps = {
   refreshKey?: string;
   onAction?: (props: RenderTreeNodeActionProps) => void;
   onTabItemDrop?: DndTabItemOnDropCallback;
+  onMoveTo?: ({moveData, targetData}: MoveToCallbackProps) => void;
 };
 
 // 需要移动的数据
 export interface MoveDataProps {
-  groupId: string;
+  tagId?: string;
+  groupId?: string;
   tabs?: TabItem[];
 }
 
@@ -49,7 +51,7 @@ export interface MoveTargetProps {
 export interface MoveToCallbackProps {
   moveData?: MoveDataProps;
   targetData: MoveTargetProps;
-  selected: boolean;
+  selected?: boolean;
 }
 
 // tagList 级联 option

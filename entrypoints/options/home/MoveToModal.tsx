@@ -45,12 +45,16 @@ export default function MoveToModal({
   // 校验级联数据
   const validInfo = useMemo(() => {
     if (!moveData) return { valid: false, type: 'tag' };
-    const { tabs } = moveData || {};
+    const { tagId, groupId, tabs } = moveData || {};
     if (!targetOptions?.length) {
       return { valid: false, type: 'tag' };
     }
 
-    if (!tabs?.length) {
+    if (!tagId && !groupId) {
+      return { valid: false, type: 'tag' };
+    }
+
+    if (tagId || !tabs?.length) {
       return { valid: targetOptions?.length > 0, type: 'tag' };
     }
 
@@ -73,20 +77,29 @@ export default function MoveToModal({
     if (!validInfo.valid) return;
     if (!targetOptions?.length) return;
 
-    if (validInfo.type === 'tag') {
+    const { tagId, groupId, tabs = [] } = moveData;
+
+    if (tagId) {
+      await tabListUtils.allTabGroupsMoveThrough({
+        sourceTagId: tagId,
+        targetTagId: targetOptions[0].value,
+        autoMerge,
+      });
+
+      onOk?.({ targetTagId: targetOptions[0].value });
+    } else if (validInfo.type === 'tag' && groupId) {
       const { targetGroupId } = await tabListUtils.tabGroupMoveThrough({
-        sourceGroupId: moveData?.groupId,
+        sourceGroupId: groupId,
         targetTagId: targetOptions[0].value,
         autoMerge,
       });
 
       onOk?.({ targetTagId: targetOptions[0].value, targetGroupId });
-    } else {
+    } else if (validInfo.type === 'tabGroup' && groupId) {
       const targetTagId = targetOptions[0].value;
       const targetGroupId = targetOptions[1].value;
-      const tabs = moveData?.tabs || [];
       await tabListUtils.tabMoveThrough({
-        sourceGroupId: moveData?.groupId,
+        sourceGroupId: groupId,
         targetTagId,
         targetGroupId,
         tabs,

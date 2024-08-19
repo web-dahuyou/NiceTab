@@ -15,6 +15,7 @@ export const StyledSidebarWrapper = styled.div<{
     position: fixed;
     top: 100px;
     transition: transform 0.2s ease-in-out;
+    border-right: 1px solid rgba(5, 5, 5, 0.06);
 
     &.collapsed {
       .sidebar-inner-content {
@@ -103,7 +104,7 @@ export const StyledListWrapper = styled.div<{
 
   .content {
     padding-left: 40px;
-    border-left: 1px solid rgba(5, 5, 5, 0.06);
+    // border-left: 1px solid rgba(5, 5, 5, 0.06);
   }
 `;
 
@@ -132,6 +133,14 @@ export const StyledTreeNodeItem = styled.div`
       pointer-eventes: unset;
     }
   }
+`;
+
+export const StyledFooterWrapper = styled.div<{ $paddingLeft?: number }>`
+  display: flex;
+  align-items: center;
+  height: 60px;
+  padding-left: ${(props) => props.$paddingLeft || 0}px;
+  transition: padding 0.2s ease-in-out;
 `;
 
 export default {

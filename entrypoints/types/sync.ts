@@ -10,7 +10,7 @@ export type SyncConfigProps = {
   gitee: SyncConfigItemProps;
   github: SyncConfigItemProps;
 };
-export type SyncType = 'auto' | 'manual-push-merge' | 'manual-push-force';
+export type SyncType = 'auto' | 'manual-pull-merge' | 'manual-pull-force' | 'manual-push-merge' | 'manual-push-force';
 // 单次同步结果类型
 export type SyncResultItemProps = {
   syncTime: string;
