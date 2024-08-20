@@ -10,6 +10,16 @@ export const capitalize = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
+// 驼峰转中划线 Hyphenate
+export const toKebabCase = (str: string = '') => {
+  return str.replace(/\B([A-Z])/g, '-$1').toLowerCase();
+};
+
+// 中划线转驼峰 Camelize
+export const toCamelCase = (str: string) => {
+  return str.replace(/-(\w)/g, (_, c) => (c ? c.toUpperCase() : ''));
+};
+
 /**
  * @description: 生成随机字符串
  * @param digit 想要生成的随机字符串长度
@@ -163,6 +173,7 @@ export const fetchApi = (
 export default {
   classNames,
   capitalize,
+  toKebabCase,
   getRandomId,
   pick,
   omit,
