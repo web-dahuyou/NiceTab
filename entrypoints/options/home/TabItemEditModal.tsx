@@ -3,8 +3,6 @@ import { Modal, Form, Input } from 'antd';
 import type { InputRef } from 'antd';
 import { TabItem } from '~/entrypoints/types';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { StyledModalContent } from './TabListItem.styled';
-
 
 type EditTabFormProps = {
   title?: string;
@@ -62,24 +60,22 @@ export default function TabItemEditModal({
       onOk={handleModalConfirm}
       onCancel={handleModalCancel}
     >
-      <StyledModalContent>
-        <Form form={form} name="edit-tab-form" initialValues={data} autoComplete="off">
-          <Form.Item<EditTabFormProps>
-            label={$fmt('common.name')}
-            name={'title'}
-            rules={[{ required: true }]}
-          >
-            <Input ref={titleInputRef} />
-          </Form.Item>
-          <Form.Item<EditTabFormProps>
-            label={$fmt('common.url')}
-            name={'url'}
-            rules={[{ required: true }]}
-          >
-            <Input />
-          </Form.Item>
-        </Form>
-      </StyledModalContent>
+      <Form form={form} name="edit-tab-form" initialValues={data} autoComplete="off">
+        <Form.Item<EditTabFormProps>
+          label={$fmt('common.name')}
+          name={'title'}
+          rules={[{ required: true }]}
+        >
+          <Input ref={titleInputRef} />
+        </Form.Item>
+        <Form.Item<EditTabFormProps>
+          label={$fmt('common.url')}
+          name={'url'}
+          rules={[{ required: true }]}
+        >
+          <Input />
+        </Form.Item>
+      </Form>
     </Modal>
   );
 }

@@ -41,10 +41,6 @@ export const StyledTabTitle = styled.span<{ $color?: string; $colorHover?: strin
   }
 `;
 
-export const StyledModalContent = styled.div`
-
-`;
-
 export default {
   name: 'option-tab-item-styled',
 }
