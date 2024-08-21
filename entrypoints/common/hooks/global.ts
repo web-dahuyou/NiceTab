@@ -1,15 +1,18 @@
 import { createContext, useState, useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
+import mitt from 'mitt';
 import { antdMap, customMap } from '~/entrypoints/common/locale';
 import type {
+  EventsEmitterProps,
   GlobalContextProps,
-  ThemeProps,
   LanguageTypes,
   IntlForamtMessageParams,
 } from '~/entrypoints/types';
 import { settingsUtils, themeUtils } from '~/entrypoints/common/storage';
 import { capitalize } from '~/entrypoints/common/utils';
 import { ENUM_COLORS, defaultLanguage } from '../constants';
+
+export const eventEmitter = mitt<EventsEmitterProps>();
 
 // global context
 export const GlobalContext = createContext<GlobalContextProps>({
@@ -106,4 +109,5 @@ export default {
   useAntdLocale,
   useCustomLocale,
   useIntlUtls,
+  eventEmitter
 };

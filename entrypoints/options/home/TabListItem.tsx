@@ -1,16 +1,17 @@
 import { useCallback, useState } from 'react';
-import { theme, Checkbox } from 'antd';
+import { theme, Checkbox, Typography, Tooltip } from 'antd';
 import { CloseOutlined, EditOutlined } from '@ant-design/icons';
 import { GroupItem, TabItem } from '~/entrypoints/types';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
-import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import {
   StyledTabItemWrapper,
   StyledTabTitle,
   StyledTabItemFavicon,
+  StyledTabItemTooltip,
 } from './TabListItem.styled';
 import TabItemEditModal from './TabItemEditModal';
 
@@ -23,10 +24,36 @@ type TabItemProps = {
 
 const { DELETE_AFTER_RESTORE } = ENUM_SETTINGS_PROPS;
 
+// 标签页tooltip内容
+function TabItemTooltipMarkup({ tab }: { tab: TabItem }) {
+  const { $fmt } = useIntlUtls();
+  return (
+    <StyledTabItemTooltip>
+      <div className="tooltip-item tooltip-title">
+        <span className="label">{$fmt('common.name')}:</span>
+        <span className="name" title={tab.title}>
+          {tab.title}
+        </span>
+      </div>
+      <div className="tooltip-item tooltip-url">
+        <span className="label">{$fmt('common.url')}:</span>
+        {/* <span className="link" title={tab.url}>
+          {tab.url}
+        </span> */}
+        <Typography.Link className="link" href={tab.url} target="_blank" title={tab.url}>
+          {tab.url}
+        </Typography.Link>
+      </div>
+    </StyledTabItemTooltip>
+  );
+}
+
 export default function TabListItem({ tab, group, onRemove, onChange }: TabItemProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const [modalVisible, setModalVisible] = useState(false);
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   // 确认编辑
   const handleModalConfirm = useCallback(
@@ -46,6 +73,13 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
       onRemove?.();
     }
   };
+
+  useEffect(() => {
+    eventEmitter.on('is-dragging', (value) => {
+      setIsDragging(value);
+      if (value) setTooltipVisible(false);
+    });
+  }, []);
 
   return (
     <>
@@ -86,9 +120,21 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
           $color={token.colorLink}
           $colorHover={token.colorLinkHover}
         >
-          <span className="tab-item-title-text" title={tab.title} onClick={onTabOpen}>
-            {tab.title}
-          </span>
+          <Tooltip
+            open={!isDragging && tooltipVisible}
+            placement="topLeft"
+            overlayStyle={{ maxWidth: '360px', width: '360px' }}
+            title={<TabItemTooltipMarkup tab={tab} />}
+            color="#fff"
+            destroyTooltipOnHide
+            mouseEnterDelay={0.4}
+            mouseLeaveDelay={0.3}
+            onOpenChange={setTooltipVisible}
+          >
+            <span className="tab-item-title-text" onClick={onTabOpen}>
+              {tab.title}
+            </span>
+          </Tooltip>
         </StyledTabTitle>
       </StyledTabItemWrapper>
 
