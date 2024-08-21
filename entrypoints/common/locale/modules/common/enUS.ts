@@ -53,4 +53,6 @@ export default {
   'common.failedReason': 'Failed Reason',
   'common.noData': 'No Data',
   'common.comingSoon': 'Coming Soon',
+  'common.CopySuccess': 'Copy Success',
+  'common.CopyFailed': 'Copy Failed',
 }

@@ -86,11 +86,7 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
           $color={token.colorLink}
           $colorHover={token.colorLinkHover}
         >
-          <span
-            className="tab-item-title-text"
-            title={tab.title}
-            onClick={onTabOpen}
-          >
+          <span className="tab-item-title-text" title={tab.title} onClick={onTabOpen}>
             {tab.title}
           </span>
         </StyledTabTitle>

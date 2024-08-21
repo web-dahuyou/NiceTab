@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { theme, Flex, Card, Tooltip, Typography, Tag } from 'antd';
+import { theme, Flex, Card, Tooltip, Typography, Tag, Modal } from 'antd';
 import {
   SettingOutlined,
   SyncOutlined,
@@ -9,9 +9,9 @@ import {
 } from '@ant-design/icons';
 import styled from 'styled-components';
 import type {
-  SyncRemoteType,
   SyncConfigItemProps,
   SyncConfigProps,
+  SyncType,
   SyncStatus,
   SyncStatusProps,
   SyncResultItemProps,
@@ -53,12 +53,32 @@ function CardItemMarkup({
   syncResult,
   onAction,
 }: CardItemProps) {
+  const [modal, modalContextHolder] = Modal.useModal();
   const { $fmt } = useIntlUtls();
   const lastSyncInfo = useMemo(() => {
     return syncResult?.[0] || {};
   }, [syncResult]);
 
   const { syncTypeText, syncTypeTipText, variantInfo } = useSyncResult(lastSyncInfo);
+  const actionConfirmTextMap: Partial<Record<SyncType, string>> = useMemo(() => {
+    return {
+      [syncTypeMap.MANUAL_PULL_FORCE]: $fmt('sync.actionTip.manualPullForce'),
+      [syncTypeMap.MANUAL_PUSH_FORCE]: $fmt('sync.actionTip.manualPushForce'),
+    };
+  }, [$fmt]);
+
+  // 操作确认
+  const handleConfirm = useCallback(
+    async (actionType: SyncType) => {
+      const modalConfig = {
+        title: $fmt('sync.actionTip'),
+        content: actionConfirmTextMap[actionType],
+      };
+      const confirmed = await modal.confirm(modalConfig);
+      if (confirmed) onAction?.(option, actionType);
+    },
+    [option, onAction]
+  );
 
   const cardTitle = useMemo(() => {
     return (
@@ -77,7 +97,7 @@ function CardItemMarkup({
         )}
       </StyledTitle>
     );
-  }, [option, syncConfig, syncStatus]);
+  }, [option, syncConfig, syncStatus, $fmt]);
 
   const description = useMemo(() => {
     return (
@@ -112,7 +132,7 @@ function CardItemMarkup({
         )}
       </Flex>
     );
-  }, [lastSyncInfo, syncTypeText, syncTypeTipText, variantInfo]);
+  }, [lastSyncInfo, syncTypeText, syncTypeTipText, variantInfo, $fmt]);
 
   const actions = useMemo(() => {
     return [
@@ -132,7 +152,8 @@ function CardItemMarkup({
       >
         <div
           className="icon-btn-wrapper"
-          onClick={() => onAction?.(option, syncTypeMap['MANUAL_PULL_FORCE'])}
+          onClick={() => handleConfirm(syncTypeMap['MANUAL_PULL_FORCE'])}
+          // onClick={() => onAction?.(option, syncTypeMap['MANUAL_PULL_FORCE'])}
         >
           <CloudDownloadOutlined key={syncTypeMap['MANUAL_PULL_FORCE']} />
         </div>
@@ -156,26 +177,30 @@ function CardItemMarkup({
       >
         <div
           className="icon-btn-wrapper"
-          onClick={() => onAction?.(option, syncTypeMap['MANUAL_PUSH_FORCE'])}
+          onClick={() => handleConfirm(syncTypeMap['MANUAL_PUSH_FORCE'])}
+          // onClick={() => onAction?.(option, syncTypeMap['MANUAL_PUSH_FORCE'])}
         >
           <CloudUploadOutlined key={syncTypeMap['MANUAL_PUSH_FORCE']} />
         </div>
       </Tooltip>,
-    ]
-  }, [option, onAction]);
+    ];
+  }, [option, onAction, $fmt]);
 
   return (
-    <Card
-      className={classNames('card-item', isActive && 'active')}
-      hoverable
-      classNames={{
-        actions: 'card-actions',
-      }}
-      onClick={() => onAction?.(option, 'select')}
-      actions={actions}
-    >
-      <Card.Meta title={cardTitle} description={description} />
-    </Card>
+    <>
+      {modalContextHolder}
+      <Card
+        className={classNames('card-item', isActive && 'active')}
+        hoverable
+        classNames={{
+          actions: 'card-actions',
+        }}
+        onClick={() => onAction?.(option, 'select')}
+        actions={actions}
+      >
+        <Card.Meta title={cardTitle} description={description} />
+      </Card>
+    </>
   );
 }
 
@@ -189,7 +214,6 @@ const StyledCard = styled.div<{ $primaryColor: string }>`
     }
   }
 `;
-
 
 type SideBarContentProps = {
   selectedKey?: string;

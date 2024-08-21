@@ -6,7 +6,7 @@ export function handleUrlWidthParams(
   const urlObject = new URL(url);
   const searchParams = new URLSearchParams(urlObject.search);
   for (const [key, value] of Object.entries(params)) {
-    searchParams.append(key, value);
+    if (!searchParams.has(key)) searchParams.append(key, value);
   }
 
   urlObject.search = searchParams.toString();

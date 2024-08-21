@@ -53,4 +53,6 @@ export default {
   'common.failedReason': '失败原因',
   'common.noData': '暂无',
   'common.comingSoon': '敬请期待',
+  'common.CopySuccess': '复制成功',
+  'common.CopyFailed': '复制失败',
 }

@@ -25,6 +25,7 @@ export default {
   'home.recoverTitle': 'Recover Reminder',
   'home.recoverDesc': 'Are you sure you want to recover the {type} ?',
   'home.recoverAllDesc': 'Are you sure you want to recover All ?',
+  'home.copyLinks': 'Copy Links',
 
   'home.tag.remove': 'Remove',
   'home.tag.recover': 'Recover',
