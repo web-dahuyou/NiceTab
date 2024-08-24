@@ -13,6 +13,7 @@ import {
 } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
 import { DropIndicator } from '@atlaskit/pragmatic-drag-and-drop-react-drop-indicator/box';
 import { ENUM_COLORS } from '~/entrypoints/common/constants';
+import { eventEmitter } from '~/entrypoints/common/hooks/global';
 
 const StyledDndWrapper = styled.div`
   position: relative;
@@ -80,10 +81,12 @@ export default function DndComponent<IncomeData extends DragData>({
         onDragStart() {
           // console.log('--------------draggable--onDragStart');
           setIsDragging(true);
+          eventEmitter.emit('is-dragging', true);
         },
         onDrop() {
           // console.log('--------------draggable--onDrop');
           setIsDragging(false);
+          eventEmitter.emit('is-dragging', false);
         },
       }),
       dropTargetForElements({

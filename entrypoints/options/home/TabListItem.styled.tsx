@@ -41,6 +41,28 @@ export const StyledTabTitle = styled.span<{ $color?: string; $colorHover?: strin
   }
 `;
 
+export const StyledTabItemTooltip = styled.div`
+  .tooltip-item {
+    display: flex;
+    // align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #666;
+
+    .label {
+      flex-shrink: 0;
+      flex-grow: 0;
+      color: #333;
+      font-weight: bold;
+    }
+    .name, .link {
+      flex: 1;
+      width: 0;
+      ${StyledEllipsis}
+    }
+  }
+`;
+
 export default {
   name: 'option-tab-item-styled',
 }

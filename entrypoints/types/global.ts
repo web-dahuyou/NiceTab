@@ -3,6 +3,11 @@ import { MessageDescriptor } from 'react-intl';
 // 扩展版本信息
 export type VersionInfo = { updateAvailable: boolean; version?: string };
 
+// 订阅事件类型
+export type EventsEmitterProps = {
+  'is-dragging': boolean;
+}
+
 // 全局 Context
 export interface GlobalContextProps {
   colorPrimary: string;
