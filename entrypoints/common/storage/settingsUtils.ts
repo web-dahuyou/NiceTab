@@ -13,6 +13,7 @@ const {
   DELETE_UNLOCKED_EMPTY_GROUP,
   ALLOW_DUPLICATE_TABS,
   ALLOW_DUPLICATE_GROUPS,
+  LINK_TEMPLATE,
 } = ENUM_SETTINGS_PROPS;
 
 // 设置工具类
@@ -28,6 +29,7 @@ export default class SettingsUtils {
     [DELETE_UNLOCKED_EMPTY_GROUP]: true, // 是否删除未锁定的空标签组
     [ALLOW_DUPLICATE_TABS]: true, // 同一个标签组中是否允许重复的标签页
     [ALLOW_DUPLICATE_GROUPS]: true, // 同一个分类中是否允许重复的标签组
+    [LINK_TEMPLATE]: '{{url}} | {{title}}', // 复制的链接模板
   };
   settings: SettingsProps = this.initialSettings;
 

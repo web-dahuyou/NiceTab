@@ -57,7 +57,22 @@ export type SettingsProps = {
   deleteUnlockedEmptyGroup?: boolean; // 是否删除未锁定的空标签组
   allowDuplicateTabs?: boolean; // 同一个标签组中是否允许重复的标签页
   allowDuplicateGroups?: boolean; // 同一个分类中是否允许重复的标签组
+  linkTemplate?: string; // 链接模板
 };
+
+export type EnumSettingsProps = {
+  LANGUAGE: 'language',
+  OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH: 'openAdminTabAfterBrowserLaunch',
+  OPEN_ADMIN_TAB_AFTER_SEND_TABS: 'openAdminTabAfterSendTabs',
+  CLOSE_TABS_AFTER_SEND_TABS: 'closeTabsAfterSendTabs',
+  AUTO_PIN_ADMIN_TAB: 'autoPinAdminTab',
+  ALLOW_SEND_PINNED_TABS: 'allowSendPinnedTabs',
+  DELETE_AFTER_RESTORE: 'deleteAfterRestore',
+  DELETE_UNLOCKED_EMPTY_GROUP: 'deleteUnlockedEmptyGroup',
+  ALLOW_DUPLICATE_TABS: 'allowDuplicateTabs',
+  ALLOW_DUPLICATE_GROUPS: 'allowDuplicateGroups',
+  LINK_TEMPLATE: 'linkTemplate',
+}
 
 export interface HotkeyOption {
   macKey: string;

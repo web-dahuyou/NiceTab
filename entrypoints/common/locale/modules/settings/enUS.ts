@@ -30,4 +30,8 @@ export default {
   'settings.allowDuplicateGroups': 'When sending tabs - retain duplicate groups ?',
   'settings.allowDuplicateGroups.yes': 'Retain',
   'settings.allowDuplicateGroups.no': 'Merge duplicate groups (sending groups merge to Staging Area groups)',
+  'settings.linkTemplate': 'Copy Links Format Template',
+  'settings.linkTemplate.placeholder': 'Default format',
+  'settings.linkTemplate.tooltip': 'Format for copy links, using the Mustache format',
+
 }

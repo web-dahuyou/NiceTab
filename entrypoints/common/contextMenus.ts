@@ -9,13 +9,13 @@ const { LANGUAGE, ALLOW_SEND_PINNED_TABS } = ENUM_SETTINGS_PROPS;
 
 const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> => {
   const settings = await settingsUtils.getSettings();
-  const language = settings[LANGUAGE] as LanguageTypes || defaultLanguage;
+  const language = settings[LANGUAGE] || defaultLanguage;
   const customMessages = getCustomLocaleMessages(language);
 
   return [
+    { id: ENUM_ACTION_NAME.OPEN_ADMIN_TAB, title: customMessages['common.openAdminPage'], contexts: ['all'] },
     { id: ENUM_ACTION_NAME.SEND_ALL_TABS, title: customMessages['common.sendAllTabs'], contexts: ['all'] },
     { id: ENUM_ACTION_NAME.SEND_CURRENT_TAB, title: customMessages['common.sendCurrentTab'], contexts: ['all'] },
-    { id: ENUM_ACTION_NAME.OPEN_ADMIN_TAB, title: customMessages['common.openAdminPage'], contexts: ['all'] },
     { id: ENUM_ACTION_NAME.SEND_OTHER_TABS, title: customMessages['common.sendOtherTabs'], contexts: ['all'] },
     { id: ENUM_ACTION_NAME.SEND_LEFT_TABS, title: customMessages['common.sendLeftTabs'], contexts: ['all'] },
     { id: ENUM_ACTION_NAME.SEND_RIGHT_TABS, title: customMessages['common.sendRightTabs'], contexts: ['all'] },

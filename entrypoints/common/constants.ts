@@ -10,7 +10,7 @@ import {
   magenta,
   gold,
 } from '@ant-design/colors';
-import type { LanguageTypes, SettingsProps, TabEvents, SyncType } from '~/entrypoints/types';
+import type { LanguageTypes, EnumSettingsProps, TabEvents, SyncType } from '~/entrypoints/types';
 
 export const GITHUB_URL = 'https://github.com/web-dahuyou/NiceTab';
 
@@ -43,7 +43,7 @@ export const ENUM_ACTION_NAME = {
   OPEN_ADMIN_TAB: 'action:openAdminTab', // 打开管理后台
 };
 // 设置项枚举
-export const ENUM_SETTINGS_PROPS: Record<string, keyof SettingsProps> = {
+export const ENUM_SETTINGS_PROPS: EnumSettingsProps = {
   LANGUAGE: 'language', // 语言
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH: 'openAdminTabAfterBrowserLaunch', // 启动浏览器时是否自动打开管理后台
   OPEN_ADMIN_TAB_AFTER_SEND_TABS: 'openAdminTabAfterSendTabs', // 发送标签页后是否打开管理后台
@@ -54,6 +54,7 @@ export const ENUM_SETTINGS_PROPS: Record<string, keyof SettingsProps> = {
   DELETE_UNLOCKED_EMPTY_GROUP: 'deleteUnlockedEmptyGroup', // 是否删除未锁定的空标签组
   ALLOW_DUPLICATE_TABS: 'allowDuplicateTabs', // 同一个标签组中是否允许重复的标签页
   ALLOW_DUPLICATE_GROUPS: 'allowDuplicateGroups', // 同一个分类中是否允许重复的标签组
+  LINK_TEMPLATE: 'linkTemplate', // 链接模板
 };
 
 // tab 事件

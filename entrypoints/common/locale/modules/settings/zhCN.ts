@@ -30,4 +30,7 @@ export default {
   'settings.allowDuplicateGroups': '发送标签页时-是否保留重复的标签组{mark}',
   'settings.allowDuplicateGroups.yes': '保留',
   'settings.allowDuplicateGroups.no': '去重（发送的标签组和中转站的标签组合并）',
+  'settings.linkTemplate': '复制链接模板格式',
+  'settings.linkTemplate.placeholder': '默认格式为',
+  'settings.linkTemplate.tooltip': '复制链接所用的模板格式, 采用 Mustache 格式',
 }

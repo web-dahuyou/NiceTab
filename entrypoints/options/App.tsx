@@ -45,7 +45,7 @@ import {
 import type { ColorItem } from '~/entrypoints/types';
 import themeIcon from '/icon/theme.svg';
 import Home from './home/index.tsx';
-import Settings from './Settings.tsx';
+import Settings from './settings/index.tsx';
 import ImportExport from './importExport/index.tsx';
 import SyncPage from './sync/index.tsx';
 import RecycleBin from './recycleBin/index.tsx';

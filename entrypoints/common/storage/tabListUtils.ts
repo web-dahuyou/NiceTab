@@ -18,8 +18,12 @@ import {
 } from '../utils';
 import Store from './instanceStore';
 
-const { DELETE_UNLOCKED_EMPTY_GROUP, ALLOW_DUPLICATE_TABS, ALLOW_DUPLICATE_GROUPS } =
-  ENUM_SETTINGS_PROPS;
+const {
+  DELETE_UNLOCKED_EMPTY_GROUP,
+  ALLOW_DUPLICATE_TABS,
+  ALLOW_DUPLICATE_GROUPS,
+  LINK_TEMPLATE,
+} = ENUM_SETTINGS_PROPS;
 
 /**
  * @description: 列表去重（新列表从队首插入）
@@ -615,7 +619,7 @@ export default class TabListUtils {
           targetList: targetTag.groupList || [],
           insertList: allSourceGroups,
           exceptValue: UNNAMED_GROUP,
-        })
+        });
 
         await this.setTagList(tagList);
       } else {
@@ -1127,5 +1131,17 @@ export default class TabListUtils {
       ) as Partial<TagItem>;
     });
     return exportTagList;
+  }
+  // 复制链接
+  copyLinks(tabs: TabItem[]): string {
+    const settings = Store.settingsUtils?.settings;
+    const linkTemplate = settings[LINK_TEMPLATE] || '{{url}} | {{title}}';
+    return tabs
+      .map((tab) => {
+        return linkTemplate
+          .replace(/\{\{\s*title\s*\}\}/g, tab.title || '')
+          .replace(/\{\{\s*url\s*\}\}/g, tab.url || '');
+      })
+      .join('\n');
   }
 }
