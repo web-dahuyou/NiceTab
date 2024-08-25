@@ -1,7 +1,6 @@
 import { PushpinOutlined, TagOutlined, ProductOutlined } from '@ant-design/icons';
-import { getRandomId, getLocaleMessages, extContentExporter } from '~/entrypoints/common/utils';
-import { tabListUtils } from '~/entrypoints/common/storage';
-import type { TagItem, TabItem } from '~/entrypoints/types';
+import { getLocaleMessages } from '~/entrypoints/common/utils';
+import type { TagItem } from '~/entrypoints/types';
 import type { TreeDataNodeUnion, MoveDataProps, CascaderOption } from './types';
 
 // 生成treeData
@@ -75,18 +74,6 @@ export const getCascaderData = async (
   }));
 };
 
-export const copyLinks = (tabs: TabItem[]) => {
-  return extContentExporter.oneTab([
-    {
-      groupList: [
-        {
-          ...tabListUtils.getInitialTabGroup(),
-          tabList: tabs,
-        },
-      ],
-    },
-  ]);
-};
 
 export default {
   getTreeData,

@@ -7,6 +7,7 @@ import { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { tabListUtils } from '@/entrypoints/common/storage';
 import DndComponent from '@/entrypoints/common/components/DndComponent';
 import DropComponent from '@/entrypoints/common/components/DropComponent';
 
@@ -18,9 +19,12 @@ import {
   StyledTabActions,
   StyledTabListWrapper,
 } from './TabGroup.styled';
-import type { DndTabItemProps, DndTabItemOnDropCallback, MoveToCallbackProps } from './types';
+import type {
+  DndTabItemProps,
+  DndTabItemOnDropCallback,
+  MoveToCallbackProps,
+} from './types';
 import { dndKeys } from './constants';
-import { copyLinks } from './utils';
 import MoveToModal from './MoveToModal';
 import useMoveTo from './hooks/moveTo';
 
@@ -54,7 +58,7 @@ const defaultGroupActions = [
   'star',
   'dedup',
   'moveTo',
-  'copyLinks'
+  'copyLinks',
 ];
 const defaultTabActions = ['remove', 'moveTo'];
 
@@ -137,7 +141,7 @@ export default function TabGroup({
   };
 
   const tabLinks = useMemo(() => {
-    return copyLinks(tabList);
+    return tabListUtils.copyLinks(tabList);
   }, [tabList]);
 
   // 复制到剪切板
@@ -147,7 +151,7 @@ export default function TabGroup({
     } else {
       messageApi.error($fmt('common.CopyFailed'));
     }
-  }
+  };
 
   useEffect(() => {
     if (selected && groupRef.current) {
@@ -256,9 +260,7 @@ export default function TabGroup({
               )}
               {allowGroupActions.includes('copyLinks') && (
                 <CopyToClipboard text={tabLinks} onCopy={handleCopy}>
-                  <span className="action-btn">
-                    {$fmt('home.copyLinks')}
-                  </span>
+                  <span className="action-btn">{$fmt('home.copyLinks')}</span>
                 </CopyToClipboard>
               )}
               {allowGroupActions.includes('dedup') && (

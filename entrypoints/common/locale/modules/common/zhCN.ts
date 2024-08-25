@@ -36,7 +36,9 @@ export default {
   'common.enableSelect': '开启选择',
   'common.disableSelect': '关闭选择',
   'common.name': '名称',
+  'common.title': '标题',
   'common.url': '网址',
+  'common.link': '链接',
   'common.goToGithub': '给个小星星吧',
   'common.update.available': '有可用的新版本',
   'common.update.upgradeNow': '立即升级',
@@ -55,4 +57,5 @@ export default {
   'common.comingSoon': '敬请期待',
   'common.CopySuccess': '复制成功',
   'common.CopyFailed': '复制失败',
+  'common.quickAction': '快捷操作',
 }

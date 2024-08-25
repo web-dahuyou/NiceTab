@@ -61,7 +61,7 @@ export async function openAdminTab(
   params?: { tagId: string; groupId: string }
 ) {
   const settings = settingsData || (await settingsUtils.getSettings());
-  const openAdminTabAfterSendTabs = settings[OPEN_ADMIN_TAB_AFTER_SEND_TABS] as boolean;
+  const openAdminTabAfterSendTabs = settings[OPEN_ADMIN_TAB_AFTER_SEND_TABS];
   await openAdminRoutePage({ path: '/home', query: params }, openAdminTabAfterSendTabs);
 
   if (!openAdminTabAfterSendTabs) {

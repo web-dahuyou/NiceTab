@@ -36,7 +36,9 @@ export default {
   'common.enableSelect': 'Enable Select',
   'common.disableSelect': 'Disable Select',
   'common.name': 'Name',
+  'common.title': 'Title',
   'common.url': 'URL',
+  'common.link': 'Link',
   'common.goToGithub': 'Give me a star',
   'common.update.available': 'New version available',
   'common.update.upgradeNow': 'Upgrade right now',
@@ -55,4 +57,5 @@ export default {
   'common.comingSoon': 'Coming Soon',
   'common.CopySuccess': 'Copy Success',
   'common.CopyFailed': 'Copy Failed',
+  'common.quickAction': 'Quick Action',
 }
