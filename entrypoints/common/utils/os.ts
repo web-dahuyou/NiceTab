@@ -1,6 +1,6 @@
 // 判断系统类型
 export function getOSInfo() {
-  const userAgent = navigator.userAgent.toLowerCase();
+  const userAgent = navigator?.userAgent?.toLowerCase();
   const isWin = userAgent.includes('win32') || userAgent.includes('windows');
   const isMac =
     userAgent.includes('macintosh') ||
