@@ -1,5 +1,4 @@
 import { Menus } from 'wxt/browser';
-import { LanguageTypes } from '~/entrypoints/types';
 import { ENUM_ACTION_NAME, ENUM_SETTINGS_PROPS, TAB_EVENTS, defaultLanguage } from './constants';
 import tabUtils from '~/entrypoints/common/tabs';
 import initStorageListener, { settingsUtils } from './storage';

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { theme, message, Drawer } from 'antd';
+import { theme, Drawer } from 'antd';
 import dayjs from 'dayjs';
 import { classNames } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -14,7 +14,6 @@ import SyncResultList from './SyncResultList';
 
 export default function SyncPage() {
   const { token } = theme.useToken();
-  const [messageApi, contextHolder] = message.useMessage();
   const { $fmt } = useIntlUtls();
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
   const [selectedKey, setSelectedKey] = useState<SyncRemoteType>('github');
@@ -37,15 +36,6 @@ export default function SyncPage() {
     } else if (actionType === 'setting') {
       setDrawerVisible(true);
     } else {
-      const { github, gitee } = syncUtils.config || {};
-      if (option.key === 'github' && !github?.accessToken) {
-        messageApi.warning($fmt('sync.noGithubToken'));
-        return;
-      } else if (option.key === 'gitee' && !gitee?.accessToken) {
-        messageApi.warning($fmt('sync.noGiteeToken'));
-        return;
-      }
-
       syncUtils.setSyncStatus(option.key, 'syncing');
       setSyncStatus(syncUtils.getSyncStatus());
       await syncUtils.syncStart(option.key, actionType as SyncType);
@@ -71,7 +61,6 @@ export default function SyncPage() {
 
   return (
     <>
-      { contextHolder }
       <StyledContainer
         className={classNames('sync-wrapper', sidebarCollapsed && 'collapsed')}
         $collapsed={sidebarCollapsed}

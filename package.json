@@ -2,7 +2,7 @@
   "name": "nice-tab",
   "description": "A nice, convenient, powerful tab manager",
   "private": true,
-  "version": "2.1.0",
+  "version": "2.1.1",
   "type": "module",
   "scripts": {
     "dev": "wxt",
@@ -26,20 +26,20 @@
     "file-saver": "^2.0.5",
     "hotkeys-js": "^3.13.7",
     "mitt": "^3.0.1",
-    "react": "~18.2.0",
+    "react": "^18.3.1",
     "react-copy-to-clipboard": "^5.1.0",
-    "react-dom": "~18.2.0",
+    "react-dom": "^18.3.1",
     "react-intl": "^6.6.8",
     "react-router-dom": "^6.23.0",
     "styled-components": "^6.1.8"
   },
   "devDependencies": {
     "@types/file-saver": "^2.0.7",
-    "@types/react": "^18.2.46",
+    "@types/react": "^18.3.3",
     "@types/react-copy-to-clipboard": "^5.0.7",
-    "@types/react-dom": "^18.2.18",
-    "@wxt-dev/module-react": "^1.0.0",
-    "typescript": "^5.4.5",
-    "wxt": "^0.18.10"
+    "@types/react-dom": "^18.3.0",
+    "@wxt-dev/module-react": "^1.1.0",
+    "typescript": "^5.5.4",
+    "wxt": "^0.19.1"
   }
 }

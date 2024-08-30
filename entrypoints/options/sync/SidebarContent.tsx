@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { theme, Flex, Card, Tooltip, Typography, Tag, Modal } from 'antd';
+import { theme, message, Flex, Card, Tooltip, Typography, Tag, Modal } from 'antd';
 import {
   SettingOutlined,
   SyncOutlined,
@@ -20,6 +20,7 @@ import type {
 import { classNames } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { syncTypeMap } from '~/entrypoints/common/constants';
+import { syncUtils } from '~/entrypoints/common/storage';
 import type { RemoteOptionProps } from './types';
 import { remoteOptions } from './constants';
 import { StyledLabel } from './Sync.styled';
@@ -54,6 +55,7 @@ function CardItemMarkup({
   onAction,
 }: CardItemProps) {
   const [modal, modalContextHolder] = Modal.useModal();
+  const [messageApi, msgContextHolder] = message.useMessage();
   const { $fmt } = useIntlUtls();
   const lastSyncInfo = useMemo(() => {
     return syncResult?.[0] || {};
@@ -67,9 +69,23 @@ function CardItemMarkup({
     };
   }, [$fmt]);
 
+  const tokenCheck = useCallback((): boolean => {
+    const { github, gitee } = syncUtils.config || {};
+    if (option.key === 'github' && !github?.accessToken) {
+      messageApi.warning($fmt('sync.noGithubToken'));
+      return false;
+    } else if (option.key === 'gitee' && !gitee?.accessToken) {
+      messageApi.warning($fmt('sync.noGiteeToken'));
+      return false;
+    }
+    return true;
+  }, [option]);
+
   // 操作确认
   const handleConfirm = useCallback(
     async (actionType: SyncType) => {
+      if (!tokenCheck()) return;
+
       const modalConfig = {
         title: $fmt('sync.actionTip'),
         content: actionConfirmTextMap[actionType],
@@ -79,6 +95,12 @@ function CardItemMarkup({
     },
     [option, onAction]
   );
+  // 合并推送
+  const handlePushMerge = useCallback(() => {
+    if (!tokenCheck()) return;
+
+    onAction?.(option, syncTypeMap['MANUAL_PUSH_MERGE']);
+  }, [option]);
 
   const cardTitle = useMemo(() => {
     return (
@@ -163,10 +185,7 @@ function CardItemMarkup({
         destroyTooltipOnHide
         title={<Typography.Text>{$fmt('sync.tip.manualPushMerge')}</Typography.Text>}
       >
-        <div
-          className="icon-btn-wrapper"
-          onClick={() => onAction?.(option, syncTypeMap['MANUAL_PUSH_MERGE'])}
-        >
+        <div className="icon-btn-wrapper" onClick={handlePushMerge}>
           <SyncOutlined key={syncTypeMap['MANUAL_PUSH_MERGE']} />
         </div>
       </Tooltip>,
@@ -188,6 +207,7 @@ function CardItemMarkup({
 
   return (
     <>
+      {msgContextHolder}
       {modalContextHolder}
       <Card
         className={classNames('card-item', isActive && 'active')}

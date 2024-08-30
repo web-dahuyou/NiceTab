@@ -48,7 +48,6 @@ export default function Settings() {
   }, [locale]);
   useEffect(() => {
     settingsUtils.getSettings().then((settings) => {
-      console.log('getSettings-settings', settings);
       form?.setFieldsValue(settings);
     });
   }, []);

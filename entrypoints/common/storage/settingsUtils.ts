@@ -1,5 +1,5 @@
 // import { storage } from 'wxt/storage';
-import type { SettingsProps } from '~/entrypoints/types';
+import type { LanguageTypes, SettingsProps } from '~/entrypoints/types';
 import { ENUM_SETTINGS_PROPS, defaultLanguage } from '../constants';
 
 const {
@@ -19,7 +19,7 @@ const {
 // 设置工具类
 export default class SettingsUtils {
   initialSettings = {
-    [LANGUAGE]: defaultLanguage || 'zh-CN',
+    [LANGUAGE]: defaultLanguage,
     [OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH]: true, // 启动浏览器时是否自动打开管理后台
     [OPEN_ADMIN_TAB_AFTER_SEND_TABS]: true, // 发送标签页后默认打开管理后台
     [CLOSE_TABS_AFTER_SEND_TABS]: true, // 发送标签页后是否关闭标签页
@@ -33,20 +33,21 @@ export default class SettingsUtils {
   };
   settings: SettingsProps = this.initialSettings;
 
-  constructor() {
-    this.getSettings();
-  }
-
   async setSettings(settings: SettingsProps) {
     this.settings = { ...this.initialSettings, ...settings };
     return await storage.setItem('local:settings', this.settings);
   }
   async getSettings() {
-    const settings = await storage.getItem<SettingsProps>('local:settings', {
-      defaultValue: this.initialSettings,
-    });
-
-    this.settings = { ...this.initialSettings, ...settings };
+    const settings = await storage.getItem<SettingsProps>('local:settings');
+    const _savedBefore = !!settings;
+    this.settings = {
+      ...this.initialSettings,
+      language: (navigator?.language as LanguageTypes) || defaultLanguage,
+      ...settings,
+    };
+    if (!_savedBefore) {
+      this.setSettings(this.settings);
+    }
     return this.settings;
   }
 }

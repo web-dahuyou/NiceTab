@@ -1,6 +1,7 @@
 import { defineConfig } from 'wxt';
 
 export default defineConfig({
+  // entrypointLoader: 'jiti',
   modules: ['@wxt-dev/module-react'],
   manifest: {
     name: 'Nice Tab Manager | 标签页管理器',
