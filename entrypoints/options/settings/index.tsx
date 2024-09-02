@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react';
-import { Space, Form, Input, Button, Radio, Typography, message } from 'antd';
+import { Space, Form, Input, Button, Radio, Typography, theme, message } from 'antd';
 import type { FormProps } from 'antd';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import type { SettingsProps } from '~/entrypoints/types';
@@ -27,6 +27,7 @@ const defaultTemplate = String.raw`{{url}} | {{title}}`;
 
 export default function Settings() {
   const NiceGlobalContext = useContext(GlobalContext);
+  const { token } = theme.useToken();
   const { $fmt, locale } = useIntlUtls();
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -231,7 +232,7 @@ export default function Settings() {
             label={$fmt(`${module}.${LINK_TEMPLATE}`)}
             // name={LINK_TEMPLATE} // 注意在嵌套的Form.item中设置了name, 这里不要设置name
             tooltip={{
-              color: '#fff',
+              color: token.colorBgElevated,
               title: (
                 <Typography.Text>{$fmt('settings.linkTemplate.tooltip')}</Typography.Text>
               ),

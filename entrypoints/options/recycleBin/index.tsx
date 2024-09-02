@@ -128,11 +128,8 @@ export default function RecycleBin() {
   }
 
   return (
-    <StyledRecycleBinWrapper
-      className="recycle-bin-wrapper"
-      $primaryColor={token.colorPrimary}
-    >
-      <StickyBox topGap={60} fullWidth>
+    <StyledRecycleBinWrapper className="recycle-bin-wrapper">
+      <StickyBox topGap={60} fullWidth bgColor={token.colorBgContainer}>
         <Space className="header-action-btns">
           {/*
           <Button type="primary" size="small" onClick={() => toggleExpand(true)}>

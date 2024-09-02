@@ -1,3 +1,4 @@
+import { ThemeConfig } from 'antd';
 import { MessageDescriptor } from 'react-intl';
 
 // 扩展版本信息
@@ -6,11 +7,13 @@ export type VersionInfo = { updateAvailable: boolean; version?: string };
 // 订阅事件类型
 export type EventsEmitterProps = {
   'is-dragging': boolean;
-}
+};
 
 // 全局 Context
 export interface GlobalContextProps {
   colorPrimary: string;
+  themeTypeConfig: ThemeTypeConfig;
+  setThemeType: (themeType: ThemeTypes) => void;
   setThemeData: (themeData: Partial<ThemeProps>) => void;
   setLocale: (language?: LanguageTypes, callback?: () => void) => Promise<void>;
 }
@@ -23,13 +26,39 @@ export type IntlForamtMessageParams = MessageDescriptor & {
   opts?: Record<string, any>;
 };
 
-// 主题相关
+// styled-components ThemeProvider
+export type StyledThemeProps = ThemeConfig['token'] & ThemeTypeConfig;
+
+// 主题类型
+export type ThemeTypes = 'light' | 'dark';
+
+export interface ThemeTypeConfig {
+  type: ThemeTypes;
+  bgColor: string;
+  algorithm: 'defaultAlgorithm' | 'darkAlgorithm';
+}
+
+// 主题token
 export interface ThemeProps {
   colorPrimary: string;
+  colorBgContainer: string;
 }
+
+export type ThemeColors =
+  | 'blue'
+  | 'cyan'
+  | 'volcano'
+  | 'orange'
+  | 'red'
+  | 'green'
+  | 'purple'
+  | 'magenta'
+  | 'gold'
+  | 'lime';
+
 // toggle theme color block item
 export interface ColorItem {
-  key: string;
+  key: ThemeColors;
   color: string;
 }
 
@@ -58,21 +87,22 @@ export type SettingsProps = {
   allowDuplicateTabs?: boolean; // 同一个标签组中是否允许重复的标签页
   allowDuplicateGroups?: boolean; // 同一个分类中是否允许重复的标签组
   linkTemplate?: string; // 链接模板
+  themeType?: ThemeTypes; // 主题类型
 };
 
 export type EnumSettingsProps = {
-  LANGUAGE: 'language',
-  OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH: 'openAdminTabAfterBrowserLaunch',
-  OPEN_ADMIN_TAB_AFTER_SEND_TABS: 'openAdminTabAfterSendTabs',
-  CLOSE_TABS_AFTER_SEND_TABS: 'closeTabsAfterSendTabs',
-  AUTO_PIN_ADMIN_TAB: 'autoPinAdminTab',
-  ALLOW_SEND_PINNED_TABS: 'allowSendPinnedTabs',
-  DELETE_AFTER_RESTORE: 'deleteAfterRestore',
-  DELETE_UNLOCKED_EMPTY_GROUP: 'deleteUnlockedEmptyGroup',
-  ALLOW_DUPLICATE_TABS: 'allowDuplicateTabs',
-  ALLOW_DUPLICATE_GROUPS: 'allowDuplicateGroups',
-  LINK_TEMPLATE: 'linkTemplate',
-}
+  LANGUAGE: 'language';
+  OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH: 'openAdminTabAfterBrowserLaunch';
+  OPEN_ADMIN_TAB_AFTER_SEND_TABS: 'openAdminTabAfterSendTabs';
+  CLOSE_TABS_AFTER_SEND_TABS: 'closeTabsAfterSendTabs';
+  AUTO_PIN_ADMIN_TAB: 'autoPinAdminTab';
+  ALLOW_SEND_PINNED_TABS: 'allowSendPinnedTabs';
+  DELETE_AFTER_RESTORE: 'deleteAfterRestore';
+  DELETE_UNLOCKED_EMPTY_GROUP: 'deleteUnlockedEmptyGroup';
+  ALLOW_DUPLICATE_TABS: 'allowDuplicateTabs';
+  ALLOW_DUPLICATE_GROUPS: 'allowDuplicateGroups';
+  LINK_TEMPLATE: 'linkTemplate';
+};
 
 export interface HotkeyOption {
   macKey: string;

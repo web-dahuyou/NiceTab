@@ -250,7 +250,6 @@ export default function Home() {
       >
         <StyledSidebarWrapper
           className="sidebar"
-          $primaryColor={token.colorPrimary}
           $collapsed={sidebarCollapsed}
         >
           <div

@@ -155,7 +155,7 @@ export default function RenderTreeNode({
                 className="btn-remove"
                 $size="14"
                 title={$fmt('common.remove')}
-                $hoverColor={ENUM_COLORS.red.primary}
+                $hoverColor={ENUM_COLORS.red}
                 onClick={(e) => onRemoveClick?.(e)}
               >
                 <CloseOutlined />

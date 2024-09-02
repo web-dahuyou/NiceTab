@@ -166,20 +166,17 @@ export default function TabGroup({
       <StyledGroupWrapper
         className="tab-group-wrapper"
         data-gid={groupId}
-        $bgColor={selected ? token.colorPrimaryBg : ''}
+        $bgColor={selected ? token.colorPrimaryBg : token.colorBgContainer}
         ref={groupRef}
       >
         {/* 标签组 header 展示、操作区域 */}
-        <StyledGroupHeader
-          className="group-header select-none"
-          $primaryColor={token.colorPrimary}
-        >
+        <StyledGroupHeader className="group-header select-none">
           {allowGroupActions.includes('remove') && !isLocked && (
             <StyledActionIconBtn
               className="btn-remove"
               $size="16"
               title={$fmt('common.remove')}
-              $hoverColor={ENUM_COLORS.red.primary}
+              $hoverColor={ENUM_COLORS.red}
               onClick={() => setModalVisible(true)}
             >
               <CloseOutlined />
@@ -212,7 +209,7 @@ export default function TabGroup({
           </div>
           <div className="group-header-right-part">
             <div className="group-info">
-              <span className="tab-count" style={{ color: ENUM_COLORS.volcano.primary }}>
+              <span className="tab-count" style={{ color: ENUM_COLORS.volcano }}>
                 {$fmt({ id: 'home.tab.count', values: { count: tabList?.length || 0 } })}
               </span>
               <span className="group-create-time">{createTime}</span>
@@ -279,7 +276,7 @@ export default function TabGroup({
 
         {/* tab 选择、操作区域 */}
         {tabList?.length > 0 && !isLocked && (
-          <StyledTabActions $primaryColor={token.colorPrimary}>
+          <StyledTabActions>
             <div className="checkall-wrapper">
               <Checkbox
                 checked={isAllChecked}
@@ -288,7 +285,7 @@ export default function TabGroup({
               ></Checkbox>
               <span
                 className="selected-count-text"
-                style={{ color: ENUM_COLORS.volcano.primary }}
+                style={{ color: ENUM_COLORS.volcano }}
               >
                 {`${selectedTabIds.length} / ${tabList?.length}`}
               </span>

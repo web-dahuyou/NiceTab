@@ -1,9 +1,8 @@
-import React from 'react';
-import styled, { css } from 'styled-components';
-import { ENUM_COLORS } from '~/entrypoints/common/constants';
+import styled from 'styled-components';
+import type { StyledThemeProps } from '~/entrypoints/types';
 import { StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
 
-export const StyledContainer = styled.div<{ $primaryColor?: string }>`
+export const StyledContainer = styled.div<{theme: StyledThemeProps}>`
   min-width: 420px;
   max-width: 520px;
   min-height: 300px;
@@ -22,7 +21,6 @@ export const StyledContainer = styled.div<{ $primaryColor?: string }>`
     border-bottom: 1px solid #0505050f;
     gap: 8px;
     .block-title {
-      color: #000;
       font-size: 14px;
       font-weight: bold;
     }
@@ -31,10 +29,10 @@ export const StyledContainer = styled.div<{ $primaryColor?: string }>`
       .action-btn {
         display: inline-flex;
         font-size: 12px;
-        color: #333;
+        color: ${props => props.theme.colorTextSecondary || '#333'};
         cursor: pointer;
         &:hover {
-          color: ${(props) => props.$primaryColor || ENUM_COLORS.primary};
+          color: ${(props) => props.theme.colorPrimary};
         }
       }
     }
@@ -45,13 +43,12 @@ export const StyledContainer = styled.div<{ $primaryColor?: string }>`
   }
   .tab-list-title {
     padding: 12px;
-    color: #000;
     font-size: 14px;
     font-weight: bold;
   }
 `;
 
-export const StyledList = styled.div<{$primaryColor?: string; $bgColor?: string}>`
+export const StyledList = styled.div<{theme: StyledThemeProps}>`
   flex: 1;
   overflow-y: auto;
   .tab-item {
@@ -61,7 +58,7 @@ export const StyledList = styled.div<{$primaryColor?: string; $bgColor?: string}
     padding: 6px 10px;
     cursor: pointer;
     &:hover, &.active {
-      background: ${props => props.$bgColor || 'rgba(0, 0, 0, 0.1)'};
+      background: ${props => props.theme.colorPrimaryBg || 'rgba(0, 0, 0, 0.1)'};
     }
     &.active:before {
       content: "";
@@ -70,13 +67,14 @@ export const StyledList = styled.div<{$primaryColor?: string; $bgColor?: string}
       top: 0;
       width: 3px;
       height: 100%;
-      background: ${props => props.$primaryColor || ENUM_COLORS.primary};
+      background: ${props => props.theme.colorPrimary};
     }
     .tab-item-title {
       flex: 1;
       overflow: hidden;
-      ${StyledEllipsis}
       font-size: 12px;
+      color: ${props => props.theme.colorText || '#000'};
+      ${StyledEllipsis}
     }
     .action-icon-btn {
       flex-shrink: 0;

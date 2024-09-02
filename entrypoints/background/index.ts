@@ -1,7 +1,7 @@
 import contextMenusRegister from '../common/contextMenus';
 import tabUtils from '~/entrypoints/common/tabs';
 import { themeUtils, settingsUtils } from '~/entrypoints/common/storage';
-import { ENUM_COLORS, TAB_EVENTS, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
+import { PRIMARY_COLOR, TAB_EVENTS, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 
 // 设置插件图标徽标
 async function setBadge() {
@@ -9,7 +9,7 @@ async function setBadge() {
   const tabs = await tabUtils.getAllTabs();
   browser.action.setBadgeText({ text: String(tabs.length || 0) });
   browser.action.setBadgeTextColor({ color: '#fff' });
-  browser.action.setBadgeBackgroundColor({ color: themeData?.colorPrimary || ENUM_COLORS.primary });
+  browser.action.setBadgeBackgroundColor({ color: themeData?.colorPrimary || PRIMARY_COLOR });
 
   browser.tabs.onCreated.addListener(setBadge);
   browser.tabs.onRemoved.addListener(setBadge);
@@ -37,7 +37,7 @@ export default defineBackground(() => {
     // console.log('browser.runtime.onMessage--background', msg);
     const { msgType, data } = msg || {};
     if (msgType === 'setPrimaryColor') {
-      const colorPrimary = data?.colorPrimary || ENUM_COLORS.primary;
+      const colorPrimary = data?.colorPrimary || PRIMARY_COLOR;
       await themeUtils.setThemeData({ colorPrimary });
       setBadge();
     } else if (msgType === 'setThemeData') {

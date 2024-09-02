@@ -1,4 +1,7 @@
-import styled, { css } from 'styled-components';
+import styled, { css, createGlobalStyle } from 'styled-components';
+import type { StyledThemeProps } from '~/entrypoints/types';
+
+export type { StyledThemeProps } from '~/entrypoints/types';
 
 // 单行超长省略
 export const StyledEllipsis = css`
@@ -19,6 +22,7 @@ export const StyledEllipsisLines = css<{$lines?: number}>`
 
 // action icon btn
 export const StyledActionIconBtn = styled.i<{
+  theme: StyledThemeProps,
   $size?: number | string,
   $color?: string,
   $hoverColor?: string,
@@ -30,12 +34,12 @@ export const StyledActionIconBtn = styled.i<{
   width: ${props => `${+(props.$size || 16) + 2}px`};
   height: ${props => `${+(props.$size || 16) + 2}px`};
   font-size: ${props => `${props.$size || 14}px`};
-  color: ${props => props.$color || '#666'};
+  color: ${props => props.$color || props.theme.colorTextSecondary || '#666'};
   transition: all 0.2s;
   cursor: pointer;
   &:hover {
     transform: scale(${props => props.$hoverScale || 1.2});
-    color: ${props => props.$hoverColor || '#666'};
+    color: ${props => props.$hoverColor || props.theme.colorTextSecondary || '#666'};
   }
 `;
 
@@ -60,3 +64,15 @@ cursor: pointer;
   }
 }
 `;
+
+
+export const GlobalStyle = createGlobalStyle`
+  :root {
+    --bg-color: ${(props) => props.theme.colorBgContainer || '#fff'};
+  }
+  html, body {
+    --bg-color: ${(props) => props.theme.colorBgContainer || '#fff'};
+    --text-color: ${(props) => props.theme.colorText || 'rgba(0, 0, 0, 0.88)'};
+    color: ${(props) => props.theme.colorText || 'rgba(0, 0, 0, 0.88)'};
+	}
+`

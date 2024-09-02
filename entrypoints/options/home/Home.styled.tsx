@@ -1,8 +1,9 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
+import type { StyledThemeProps } from '@/entrypoints/types';
 
 export const StyledSidebarWrapper = styled.div<{
-  $primaryColor?: string;
+  theme: StyledThemeProps;
   $collapsed?: boolean;
   $sidebarWidth?: number;
 }>`
@@ -15,7 +16,7 @@ export const StyledSidebarWrapper = styled.div<{
     position: fixed;
     top: 100px;
     transition: transform 0.2s ease-in-out;
-    border-right: 1px solid rgba(5, 5, 5, 0.06);
+    border-right: 1px solid ${(props) => props.theme.colorBorder || 'rgba(5, 5, 5, 0.06)'};
 
     &.collapsed {
       .sidebar-inner-content {
@@ -30,7 +31,7 @@ export const StyledSidebarWrapper = styled.div<{
       position: absolute;
       box-sizing: border-box;
       top: 0;
-      right: -32px;
+      right: -36px;
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -61,7 +62,7 @@ export const StyledSidebarWrapper = styled.div<{
       align-items: center;
       flex-wrap: wrap;
       gap: 8px;
-      color: #666;
+      color: ${props => props.theme.colorTextSecondary || '#666'};
       font-size: 12px;
     }
     .sidebar-action-btns-wrapper {

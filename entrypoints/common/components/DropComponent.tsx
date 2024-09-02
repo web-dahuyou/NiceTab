@@ -12,12 +12,12 @@ import {
   Instruction,
 } from '@atlaskit/pragmatic-drag-and-drop-hitbox/tree-item';
 import { DropIndicator } from '@atlaskit/pragmatic-drag-and-drop-react-drop-indicator/tree-item';
-import { ENUM_COLORS } from '~/entrypoints/common/constants';
+import { PRIMARY_COLOR } from '~/entrypoints/common/constants';
 
 const StyledDndWrapper = styled.div`
   position: relative;
   opacity: 1;
-  --ds-border-selected: ${ENUM_COLORS.primary};
+  --ds-border-selected: ${PRIMARY_COLOR};
   &.dragging {
     opacity: 0.4;
   }

@@ -2,7 +2,7 @@
   "name": "nice-tab",
   "description": "A nice, convenient, powerful tab manager",
   "private": true,
-  "version": "2.1.1",
+  "version": "2.2.0",
   "type": "module",
   "scripts": {
     "dev": "wxt",
