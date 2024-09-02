@@ -6,17 +6,23 @@ import type {
   EventsEmitterProps,
   GlobalContextProps,
   LanguageTypes,
+  ThemeTypeConfig,
   IntlForamtMessageParams,
+  ThemeTypes,
 } from '~/entrypoints/types';
 import { settingsUtils, themeUtils } from '~/entrypoints/common/storage';
 import { capitalize } from '~/entrypoints/common/utils';
-import { ENUM_COLORS, defaultLanguage } from '../constants';
+import { PRIMARY_COLOR, THEME_TYPE_CONFIG, defaultThemeType, defaultLanguage } from '../constants';
 
 export const eventEmitter = mitt<EventsEmitterProps>();
 
 // global context
 export const GlobalContext = createContext<GlobalContextProps>({
-  colorPrimary: ENUM_COLORS.primary,
+  colorPrimary: PRIMARY_COLOR,
+  themeTypeConfig: THEME_TYPE_CONFIG[defaultThemeType],
+  setThemeType: async (themeType = defaultThemeType) => {
+    settingsUtils.setSettings({ ...settingsUtils.settings, themeType });
+  },
   setThemeData: (themeData) => {
     themeUtils.setThemeData(themeData);
   },
@@ -73,6 +79,25 @@ export function useCustomLocale() {
     });
   }, []);
   return { messages, locale, changeLocale };
+}
+
+// theme type (light | dark)
+export function useThemeTypeConfig() {
+  const [themeTypeConfig, setThemeTypeConfig] = useState<ThemeTypeConfig>(THEME_TYPE_CONFIG.light);
+
+  const changeThemeType = async (themeType: ThemeTypes = defaultThemeType) => {
+    const settings = settingsUtils.settings;
+    await settingsUtils.setSettings({ ...settings, themeType });
+    setThemeTypeConfig({ ...THEME_TYPE_CONFIG[themeType] });
+  };
+
+  useEffect(() => {
+    settingsUtils.getSettings().then((settings) => {
+      const themeType = settings.themeType || defaultThemeType;
+      setThemeTypeConfig({ ...THEME_TYPE_CONFIG[themeType] });
+    });
+  }, []);
+  return { themeTypeConfig, changeThemeType };
 }
 
 // react-intl message hooks

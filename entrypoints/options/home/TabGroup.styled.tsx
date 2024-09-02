@@ -1,8 +1,6 @@
 import styled from 'styled-components';
-import {
-  StyledEllipsis,
-} from '~/entrypoints/common/style/Common.styled';
-import { ENUM_COLORS } from '~/entrypoints/common/constants';
+import { PRIMARY_COLOR } from '~/entrypoints/common/constants';
+import type { StyledThemeProps } from '@/entrypoints/types';
 
 export const StyledGroupWrapper = styled.div<{ $bgColor?: string }>`
   position: relative;
@@ -12,7 +10,7 @@ export const StyledGroupWrapper = styled.div<{ $bgColor?: string }>`
   border-radius: 8px;
   background: ${props => props.$bgColor || '#fff'};
 `;
-export const StyledGroupHeader = styled.div<{ $primaryColor?: string }>`
+export const StyledGroupHeader = styled.div<{ theme: StyledThemeProps }>`
   display: flex;
   align-items: center;
   gap: 12px;
@@ -20,14 +18,6 @@ export const StyledGroupHeader = styled.div<{ $primaryColor?: string }>`
     display: flex;
     align-items: center;
     gap: 4px;
-  }
-  .group-name {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 18px;
-    color: #666;
   }
   .group-header-right-part {
     flex: 1;
@@ -41,7 +31,7 @@ export const StyledGroupHeader = styled.div<{ $primaryColor?: string }>`
     }
     .group-create-time {
       font-size: 12px;
-      color: #999;
+      color: ${(props) => props.theme.colorTextTertiary || '#999'};
     }
     .group-action-btns {
       margin-top: 4px;
@@ -50,17 +40,17 @@ export const StyledGroupHeader = styled.div<{ $primaryColor?: string }>`
         display: flex;
         align-items: center;
         font-size: 12px;
-        color: #333;
+        color: ${(props) => props.theme.colorTextSecondary || '#333'};
         cursor: pointer;
         &:hover {
-          color: ${(props) => props.$primaryColor || ENUM_COLORS.primary};
+          color: ${(props) => props.theme.colorPrimary || PRIMARY_COLOR};
         }
       }
     }
   }
 `;
 
-export const StyledTabActions = styled.div<{ $primaryColor?: string }>`
+export const StyledTabActions = styled.div<{ theme: StyledThemeProps }>`
   display: flex;
   align-items: center;
   gap: 24px;
@@ -79,16 +69,16 @@ export const StyledTabActions = styled.div<{ $primaryColor?: string }>`
     .action-btn {
       display: flex;
       align-items: center;
-      color: #333;
+      color: ${(props) => props.theme.colorTextSecondary || '#333'};
       cursor: pointer;
       &:hover {
-        color: ${(props) => props.$primaryColor || ENUM_COLORS.primary};
+        color: ${(props) => props.theme.colorPrimary || PRIMARY_COLOR};
       }
     }
   }
 `;
 
-export const StyledTabListWrapper = styled.div<{ $primaryColor?: string }>`
+export const StyledTabListWrapper = styled.div`
   min-height: 24px;
   margin-top: 8px;
   padding-left: 20px;

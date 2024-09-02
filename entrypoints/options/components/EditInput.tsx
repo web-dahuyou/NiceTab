@@ -16,7 +16,6 @@ const StyledWrapper = styled.div<{$maxWidth?: string | number, $fontSize?: strin
   gap: 4px;
   .text-readonly {
     font-size: ${props => props.$fontSize || 14}px;
-    color: #666;
     ${StyledEllipsis}
   }
   input {

@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import type { ReactElement } from 'react';
-import { message, Typography, Divider, Form, Input, Switch, Button } from 'antd';
+import { theme, message, Typography, Divider, Form, Input, Switch, Button } from 'antd';
 import { LinkOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import type { InputRef, FormProps } from 'antd';
 import styled from 'styled-components';
@@ -19,6 +19,7 @@ const StyledLink = styled.div`
 `;
 
 export default function SyncConfigForm({ onChange }: SyncConfigFormProps) {
+  const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
@@ -34,7 +35,7 @@ export default function SyncConfigForm({ onChange }: SyncConfigFormProps) {
   }) => ({
     title: <Typography.Text>{title}</Typography.Text>,
     icon: icon || <InfoCircleOutlined />,
-    color: '#fff',
+    color: token.colorBgContainer,
   });
 
   const onFinish: FormProps<SyncConfigProps>['onFinish'] = async (values) => {

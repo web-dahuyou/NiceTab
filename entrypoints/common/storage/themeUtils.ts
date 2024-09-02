@@ -1,10 +1,10 @@
 // import { storage } from 'wxt/storage';
 import type { ThemeProps } from '~/entrypoints/types';
-import { ENUM_COLORS } from '../constants';
+import { PRIMARY_COLOR } from '../constants';
 
 export default class ThemeUtils {
   defaultTheme = {
-    colorPrimary: ENUM_COLORS.primary,
+    colorPrimary: PRIMARY_COLOR,
   };
   themeData = this.defaultTheme;
   async getThemeData() {

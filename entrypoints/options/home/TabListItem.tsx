@@ -104,7 +104,7 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
             className="tab-item-btn btn-remove"
             $size="16"
             title={$fmt('common.remove')}
-            $hoverColor={ENUM_COLORS.red.primary}
+            $hoverColor={ENUM_COLORS.red}
             onClick={onRemove}
           >
             <CloseOutlined />
@@ -125,7 +125,7 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
             placement="topLeft"
             overlayStyle={{ maxWidth: '360px', width: '360px' }}
             title={<TabItemTooltipMarkup tab={tab} />}
-            color="#fff"
+            color={token.colorBgElevated}
             destroyTooltipOnHide
             mouseEnterDelay={0.4}
             mouseLeaveDelay={0.3}

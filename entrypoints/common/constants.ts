@@ -1,7 +1,7 @@
 import { Tabs } from 'wxt/browser';
 import {
-  cyan,
   blue,
+  cyan,
   volcano,
   orange,
   red,
@@ -9,29 +9,72 @@ import {
   purple,
   magenta,
   gold,
+  lime,
 } from '@ant-design/colors';
-import type { LanguageTypes, EnumSettingsProps, TabEvents, SyncType } from '~/entrypoints/types';
+import type {
+  LanguageTypes,
+  EnumSettingsProps,
+  ThemeTypes,
+  ThemeTypeConfig,
+  ColorItem,
+  ThemeColors,
+  TabEvents,
+  SyncType,
+} from '~/entrypoints/types';
 
 export const GITHUB_URL = 'https://github.com/web-dahuyou/NiceTab';
 
-export const ENUM_COLORS = {
-  primary: blue.primary || blue[6],
-  blue,
-  cyan,
-  volcano,
-  orange,
-  red,
-  green,
-  purple,
-  magenta,
-  gold,
-};
 // 主题列表（供切换选择）
-export const THEME_COLORS = Object.entries(ENUM_COLORS)
-  .filter(([key]) => key !== 'primary')
-  .map(([key, color]) => {
-    return { key, color: typeof color === 'string' ? color : color.primary || color[6] };
-  });
+export const ENUM_COLORS = {
+  blue: blue.primary || blue[6],
+  cyan: cyan.primary || cyan[6],
+  volcano: volcano.primary || volcano[6],
+  orange: orange.primary || orange[6],
+  red: red.primary || red[6],
+  green: green.primary || green[6],
+  purple: purple.primary || purple[6],
+  magenta: magenta.primary || magenta[6],
+  gold: gold.primary || gold[6],
+  lime: lime.primary || lime[6],
+};
+
+export const THEME_COLOR_NAMES: ThemeColors[] = [
+  'blue',
+  'cyan',
+  'volcano',
+  'orange',
+  'red',
+  'green',
+  'purple',
+  'magenta',
+  'gold',
+  'lime',
+];
+// 主色
+export const PRIMARY_COLOR = ENUM_COLORS.blue;
+export const THEME_COLORS: ColorItem[] = THEME_COLOR_NAMES.map((name) => {
+  return {
+    key: name,
+    color: ENUM_COLORS?.[name],
+  };
+});
+
+
+// 主题类型
+export const THEME_TYPE_CONFIG: Record<ThemeTypes, ThemeTypeConfig> = {
+  light: {
+    type: 'light',
+    bgColor: '#fff',
+    algorithm: 'defaultAlgorithm',
+  },
+  dark: {
+    type: 'dark',
+    bgColor: '#2f2f2f',
+    algorithm: 'darkAlgorithm',
+  },
+};
+// 默认主题类型
+export const defaultThemeType: ThemeTypes = 'light';
 
 // action 名称枚举
 export const ENUM_ACTION_NAME = {
@@ -85,7 +128,7 @@ export const defaultLanguage: LanguageTypes = 'en-US';
 export const UNNAMED_TAG = 'Unnamed Tag';
 export const UNNAMED_GROUP = 'Unnamed Group';
 
-export const IS_GROUP_SUPPORT  = 'group' in browser.tabs && 'tabGroups' in browser;
+export const IS_GROUP_SUPPORT = 'group' in browser.tabs && 'tabGroups' in browser;
 
 // 状态标识
 export const SUCCESS_KEY = 'success';
@@ -103,11 +146,14 @@ export const syncTypeMap: Record<string, SyncType> = {
 export default {
   ENUM_COLORS,
   THEME_COLORS,
+  THEME_TYPE_CONFIG,
+  defaultThemeType,
   ENUM_ACTION_NAME,
   ENUM_SETTINGS_PROPS,
   TAB_EVENTS,
   LANGUANGE_OPTIONS,
+  defaultLanguage,
   UNNAMED_TAG,
   UNNAMED_GROUP,
-  IS_GROUP_SUPPORT
+  IS_GROUP_SUPPORT,
 };

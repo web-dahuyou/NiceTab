@@ -36,7 +36,7 @@ export default function SyncResultList({ resultList }: SyncResultListProps) {
               <Typography.Text type="secondary">
                 <StyledLabel>{$fmt('sync.syncType')}: </StyledLabel>
                 <Tooltip
-                  color="#fff"
+                  color={token.colorBgElevated}
                   destroyTooltipOnHide
                   title={
                     <Typography.Text>{syncTypeTipMap[result.syncType]}</Typography.Text>

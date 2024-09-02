@@ -73,11 +73,11 @@ export default function TagNode({
   };
 
   return (
-    <StyledTagNode $primaryColor={token.colorPrimary}>
+    <StyledTagNode>
       <TagOutlined />
       <div className="tag-name">{ tag.static ? $fmt('home.stagingArea') : tag.tagName }</div>
       <Flex align="center">
-        <span className="count" style={{ color: ENUM_COLORS.volcano.primary }}>
+        <span className="count" style={{ color: ENUM_COLORS.volcano }}>
           {$fmt({
             id: 'home.tabGroup.count',
             values: { count: tag?.groupList?.length || 0 },

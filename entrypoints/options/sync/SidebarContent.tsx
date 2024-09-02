@@ -56,6 +56,7 @@ function CardItemMarkup({
 }: CardItemProps) {
   const [modal, modalContextHolder] = Modal.useModal();
   const [messageApi, msgContextHolder] = message.useMessage();
+  const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const lastSyncInfo = useMemo(() => {
     return syncResult?.[0] || {};
@@ -133,7 +134,7 @@ function CardItemMarkup({
             <Typography.Text type="secondary">
               <StyledLabel>{$fmt('sync.lastSyncType')}: </StyledLabel>
               <Tooltip
-                color="#fff"
+                color={token.colorBgElevated}
                 destroyTooltipOnHide
                 title={<Typography.Text>{syncTypeTipText}</Typography.Text>}
               >
@@ -159,7 +160,7 @@ function CardItemMarkup({
   const actions = useMemo(() => {
     return [
       <Tooltip
-        color="#fff"
+        color={token.colorBgElevated}
         destroyTooltipOnHide
         title={<Typography.Text>{$fmt('common.settings')}</Typography.Text>}
       >
@@ -168,7 +169,7 @@ function CardItemMarkup({
         </div>
       </Tooltip>,
       <Tooltip
-        color="#fff"
+        color={token.colorBgElevated}
         destroyTooltipOnHide
         title={<Typography.Text>{$fmt('sync.tip.manualPullForce')}</Typography.Text>}
       >
@@ -181,7 +182,7 @@ function CardItemMarkup({
         </div>
       </Tooltip>,
       <Tooltip
-        color="#fff"
+        color={token.colorBgElevated}
         destroyTooltipOnHide
         title={<Typography.Text>{$fmt('sync.tip.manualPushMerge')}</Typography.Text>}
       >
@@ -190,7 +191,7 @@ function CardItemMarkup({
         </div>
       </Tooltip>,
       <Tooltip
-        color="#fff"
+        color={token.colorBgElevated}
         destroyTooltipOnHide
         title={<Typography.Text>{$fmt('sync.tip.manualPushForce')}</Typography.Text>}
       >

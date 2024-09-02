@@ -1,8 +1,6 @@
 import styled from 'styled-components';
-import {
-  StyledEllipsis,
-} from '~/entrypoints/common/style/Common.styled';
-import { ENUM_COLORS } from '~/entrypoints/common/constants';
+import { PRIMARY_COLOR } from '~/entrypoints/common/constants';
+import { StyledThemeProps } from '~/entrypoints/types';
 
 export const StyledEmptyBox = styled.div`
   display: flex;
@@ -10,7 +8,7 @@ export const StyledEmptyBox = styled.div`
   padding: 100px 0;
 `;
 
-export const StyledRecycleBinWrapper = styled.div<{ $primaryColor: string }>`
+export const StyledRecycleBinWrapper = styled.div`
   .header-action-btns {
     display: flex;
     align-items: center;
@@ -22,7 +20,7 @@ export const StyledRecycleBinWrapper = styled.div<{ $primaryColor: string }>`
   }
 `;
 
-export const StyledTagNode = styled.div<{ $primaryColor: string }>`
+export const StyledTagNode = styled.div<{ theme: StyledThemeProps }>`
   display: flex;
   align-items: center;
   padding-left: 4px;
@@ -30,7 +28,7 @@ export const StyledTagNode = styled.div<{ $primaryColor: string }>`
   .tag-name {
     flex-shrink: 0;
     font-size: 14px;
-    color: #333;
+    color: ${(props) => props.theme.colorText || '#333'};
   }
   .count {
     margin-right: 8px;
@@ -38,20 +36,20 @@ export const StyledTagNode = styled.div<{ $primaryColor: string }>`
   }
   .tag-create-time {
     font-size: 12px;
-    color: #999;
+    color: ${(props) => props.theme.colorTextTertiary || '#999'};
   }
   .action-btns {
     padding: 0 8px;
     border-radius: 4px;
-    background: #fff;
+    background: ${(props) => props.theme.colorBgContainer || '#fff'};
     .action-btn {
       display: flex;
       align-items: center;
       font-size: 12px;
-      color: #333;
+      color: ${(props) => props.theme.colorTextSecondary || '#333'};
       cursor: pointer;
       &:hover {
-        color: ${(props) => props.$primaryColor || ENUM_COLORS.primary};
+        color: ${(props) => props.theme.colorPrimary || PRIMARY_COLOR};
       }
     }
   }

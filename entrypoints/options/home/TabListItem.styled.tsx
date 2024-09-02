@@ -1,8 +1,7 @@
 import styled from 'styled-components';
-import {
-  StyledEllipsis,
-} from '~/entrypoints/common/style/Common.styled';
-import { ENUM_COLORS } from '~/entrypoints/common/constants';
+import { blue } from '@ant-design/colors';
+import { StyledThemeProps, StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
+import { PRIMARY_COLOR } from '~/entrypoints/common/constants';
 
 export const StyledTabItemWrapper = styled.div<{ $bgColor?: string }>`
   position: relative;
@@ -32,30 +31,30 @@ export const StyledTabTitle = styled.span<{ $color?: string; $colorHover?: strin
   ${StyledEllipsis}
   .tab-item-title-text {
     font-size: 14px;
-    color: ${(props) => props.$color || ENUM_COLORS.blue.primary};
+    color: ${(props) => props.$color || blue.primary};
     text-decoration: underline;
     cursor: pointer;
     &:hover {
-      color: ${(props) => props.$colorHover || ENUM_COLORS.primary};
+      color: ${(props) => props.$colorHover || PRIMARY_COLOR};
     }
   }
 `;
 
-export const StyledTabItemTooltip = styled.div`
+export const StyledTabItemTooltip = styled.div<{ theme: StyledThemeProps }>`
   .tooltip-item {
     display: flex;
-    // align-items: center;
     gap: 8px;
     font-size: 14px;
-    color: #666;
+    color: ${(props) => props.theme.colorTextSecondary || '#666'};
 
     .label {
       flex-shrink: 0;
       flex-grow: 0;
-      color: #333;
+      color: ${(props) => props.theme.colorTextSecondary || '#333'};
       font-weight: bold;
     }
-    .name, .link {
+    .name,
+    .link {
       flex: 1;
       width: 0;
       ${StyledEllipsis}
@@ -65,4 +64,4 @@ export const StyledTabItemTooltip = styled.div`
 
 export default {
   name: 'option-tab-item-styled',
-}
+};

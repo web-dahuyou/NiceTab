@@ -58,4 +58,6 @@ export default {
   'common.CopySuccess': 'Copy Success',
   'common.CopyFailed': 'Copy Failed',
   'common.quickAction': 'Quick Action',
+  'common.toggleThemeType': 'Toggle Light / Dark',
 }
+

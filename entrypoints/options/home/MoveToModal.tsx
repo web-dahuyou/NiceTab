@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Checkbox, Modal, Cascader, Typography, Flex, Space, Tooltip } from 'antd';
+import { theme, Checkbox, Modal, Cascader, Typography, Flex, Space, Tooltip } from 'antd';
 import type { CheckboxProps } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
@@ -36,6 +36,7 @@ export default function MoveToModal({
   listData,
   moveData,
 }: MoveToModalProps) {
+  const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const [options, setOptions] = useState<CascaderOption[]>([]); // 级联数据
   const [targetValue, setTargetValue] = useState<string[]>([]); // 选中的目标值
@@ -144,8 +145,7 @@ export default function MoveToModal({
             {$fmt('home.moveTo.mergeLabel')}
           </Checkbox>
           <Tooltip
-            trigger="click"
-            color="#fff"
+            color={token.colorBgContainer}
             title={
               <Flex vertical>
                 <Typography.Text>{$fmt('home.moveTo.mergeTip.1')}</Typography.Text>

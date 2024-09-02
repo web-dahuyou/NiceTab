@@ -24,11 +24,14 @@ import {
   TranslationOutlined,
   RestOutlined,
   GithubOutlined,
+  MoonOutlined,
+  SunOutlined,
 } from '@ant-design/icons';
-import styled from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
 import '~/assets/css/reset.css';
 import '~/assets/css/index.css';
-import './style.css';
+import { IconTheme } from '~/entrypoints/common/components/icon/CustomIcon';
+import ColorList from '~/entrypoints/common/components/ColorList.tsx';
 import { classNames, pick, sendBrowserMessage } from '~/entrypoints/common/utils';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import useUpdate from '~/entrypoints/common/hooks/update';
@@ -36,49 +39,21 @@ import {
   GITHUB_URL,
   LANGUANGE_OPTIONS,
   THEME_COLORS,
+  defaultThemeType,
 } from '~/entrypoints/common/constants';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import {
   StyledActionIconBtn,
-  StyledColorItem,
+  GlobalStyle,
 } from '~/entrypoints/common/style/Common.styled';
-import type { ColorItem } from '~/entrypoints/types';
-import themeIcon from '/icon/theme.svg';
+import type { StyledThemeProps } from '~/entrypoints/types';
 import Home from './home/index.tsx';
 import Settings from './settings/index.tsx';
 import ImportExport from './importExport/index.tsx';
 import SyncPage from './sync/index.tsx';
 import RecycleBin from './recycleBin/index.tsx';
 
-// 主题色分组
-function ColorListMarkup({
-  list,
-  onItemClick,
-}: {
-  list: ColorItem[];
-  onItemClick?: (item: ColorItem) => void;
-}) {
-  const { token } = theme.useToken();
-  return (
-    <Flex className="color-list" wrap="wrap" gap={12}>
-      {list.map((item) => (
-        <StyledColorItem
-          className={classNames(
-            'color-item',
-            item?.color?.toLowerCase() === token?.colorPrimary?.toLowerCase() && 'active'
-          )}
-          key={item.key}
-          style={{ background: item.color }}
-          onClick={() => onItemClick?.(item)}
-        ></StyledColorItem>
-      ))}
-    </Flex>
-  );
-}
-
-const StyledPageContainer = styled.div`
-  background: #fff;
-
+const StyledPageContainer = styled.div<{ theme: StyledThemeProps }>`
   .header-navbar {
     position: fixed;
     top: 0;
@@ -89,8 +64,10 @@ const StyledPageContainer = styled.div`
     display: flex;
     align-items: center;
     height: 60px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    background: #fff;
+    // box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: ${(props) => props.theme.boxShadow || '0 4px 15px rgba(0, 0, 0, 0.1)'};
+    background: ${(props) => props.theme.colorBgContainer || '#fff'};
+
     .logo {
       width: 100px;
       height: 100%;
@@ -186,10 +163,12 @@ const router = createHashRouter([
 function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { token } = theme.useToken();
   const NiceGlobalContext = useContext(GlobalContext);
   const { updateDetail, updateReload } = useUpdate();
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const { $fmt, locale } = useIntlUtls();
+  const { themeTypeConfig } = NiceGlobalContext;
   const navs = useMemo(() => {
     return navsTemplate.map((item) => {
       return { ...item, label: $fmt(item.label) };
@@ -203,9 +182,16 @@ function AppLayout() {
       nav && navigate(nav.path);
     }
   }, []);
+  // 切换主题类型
+  const handleThemeTypeChange = () => {
+    const currThemeType = themeTypeConfig.type || defaultThemeType;
+    const themeType = currThemeType === 'light' ? 'dark' : 'light';
+    NiceGlobalContext.setThemeType(themeType);
+    sendBrowserMessage('setThemeType', { themeType });
+  };
   // 切换主题
-  const handleThemeChange = (item: ColorItem) => {
-    const themeData = { colorPrimary: item.color };
+  const handleThemeChange = (color: string) => {
+    const themeData = { colorPrimary: color };
     NiceGlobalContext.setThemeData(themeData);
     sendBrowserMessage('setPrimaryColor', themeData);
   };
@@ -223,80 +209,96 @@ function AppLayout() {
   }, [location.pathname]);
 
   return (
-    <StyledPageContainer className="page-container">
-      <div className="header-navbar select-none">
-        {/* <div className="logo"></div> */}
-        <Menu
-          className="navbar-menu"
-          theme="light"
-          mode="horizontal"
-          defaultSelectedKeys={['home']}
-          selectedKeys={selectedKeys}
-          items={navs}
-          onSelect={onSelect}
-        />
+    <ThemeProvider theme={{ ...themeTypeConfig, ...token }}>
+      <StyledPageContainer className="page-container">
+        <GlobalStyle />
+        <div className="header-navbar select-none">
+          {/* <div className="logo"></div> */}
+          <Menu
+            className="navbar-menu"
+            theme="light"
+            mode="horizontal"
+            defaultSelectedKeys={['home']}
+            selectedKeys={selectedKeys}
+            items={navs}
+            onSelect={onSelect}
+          />
 
-        {updateDetail?.updateAvailable && (
-          <Space className="header-tip select-none" style={{ margin: '0 12px' }}>
-            <Typography.Text type="warning">
-              {$fmt('common.update.available')}:
-            </Typography.Text>
-            <Typography.Link href="javascript:void(0);" onClick={updateReload}>
-              {$fmt('common.update.upgradeNow')}
-            </Typography.Link>
+          {updateDetail?.updateAvailable && (
+            <Space className="header-tip select-none" style={{ margin: '0 12px' }}>
+              <Typography.Text type="warning">
+                {$fmt('common.update.available')}:
+              </Typography.Text>
+              <Typography.Link href="javascript:void(0);" onClick={updateReload}>
+                {$fmt('common.update.upgradeNow')}
+              </Typography.Link>
+            </Space>
+          )}
+
+          <Space className="menu-right select-none" align="center" size="middle">
+            {/* theme */}
+            <Tooltip
+              placement="bottom"
+              color={token.colorBgElevated}
+              title={
+                <ColorList
+                  colors={THEME_COLORS}
+                  gap={12}
+                  style={{ padding: '6px' }}
+                  onItemClick={handleThemeChange}
+                />
+              }
+              arrow={false}
+              fresh
+            >
+              <StyledActionIconBtn $size={18} title={$fmt('common.theme')}>
+                <IconTheme></IconTheme>
+              </StyledActionIconBtn>
+            </Tooltip>
+            {/* theme type */}
+            <StyledActionIconBtn
+              $size={18}
+              title={$fmt('common.toggleThemeType')}
+              onClick={handleThemeTypeChange}
+            >
+              {themeTypeConfig.type === 'light' ? <SunOutlined /> : <MoonOutlined />}
+            </StyledActionIconBtn>
+            {/* languange */}
+            <Dropdown
+              menu={{
+                items: LANGUANGE_OPTIONS,
+                selectedKeys: [locale],
+                onClick: handleLocaleChange,
+              }}
+              placement="bottomRight"
+            >
+              <StyledActionIconBtn $size={18} title={$fmt('common.language')}>
+                <TranslationOutlined />
+              </StyledActionIconBtn>
+            </Dropdown>
+            {/* github */}
+            <StyledActionIconBtn
+              $size={18}
+              title={$fmt('common.goToGithub')}
+              onClick={() => openNewTab(GITHUB_URL, true)}
+            >
+              <GithubOutlined />
+            </StyledActionIconBtn>
           </Space>
-        )}
+        </div>
+        <div className="main-content">
+          <Outlet></Outlet>
+        </div>
 
-        <Space className="menu-right select-none" align="center" size="middle">
-          {/* theme */}
-          <Tooltip
-            placement="bottomLeft"
-            color="#fff"
-            title={
-              <ColorListMarkup list={THEME_COLORS} onItemClick={handleThemeChange} />
-            }
-            arrow={false}
-            fresh
-          >
-            <StyledActionIconBtn $size={18} title={$fmt('common.theme')}>
-              <img src={themeIcon} alt="" />
-            </StyledActionIconBtn>
-          </Tooltip>
-          {/* languange */}
-          <Dropdown
-            menu={{
-              items: LANGUANGE_OPTIONS,
-              selectedKeys: [locale],
-              onClick: handleLocaleChange,
-            }}
-            placement="bottomRight"
-          >
-            <StyledActionIconBtn $size={18} title={$fmt('common.language')}>
-              <TranslationOutlined />
-            </StyledActionIconBtn>
-          </Dropdown>
-          {/* github */}
-          <StyledActionIconBtn
-            $size={18}
-            title={$fmt('common.goToGithub')}
-            onClick={() => openNewTab(GITHUB_URL, true)}
-          >
-            <GithubOutlined />
-          </StyledActionIconBtn>
-        </Space>
-      </div>
-      <div className="main-content">
-        <Outlet></Outlet>
-      </div>
-
-      {/* 回到顶部 */}
-      <FloatButton.Group shape="circle" style={{ right: 30, bottom: 70 }}>
-        {/* BackTop组件自带的 tooltip 在点击按钮时会闪 */}
-        <span title={$fmt('common.backToTop')}>
-          <FloatButton.BackTop duration={100} visibilityHeight={400} />
-        </span>
-      </FloatButton.Group>
-    </StyledPageContainer>
+        {/* 回到顶部 */}
+        <FloatButton.Group shape="circle" style={{ right: 30, bottom: 70 }}>
+          {/* BackTop组件自带的 tooltip 在点击按钮时会闪 */}
+          <span title={$fmt('common.backToTop')}>
+            <FloatButton.BackTop duration={100} visibilityHeight={400} />
+          </span>
+        </FloatButton.Group>
+      </StyledPageContainer>
+    </ThemeProvider>
   );
 }
 
