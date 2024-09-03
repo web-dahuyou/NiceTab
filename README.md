@@ -63,52 +63,66 @@
 - popup面板，可快捷切换主题色。
 - popup面板，可快捷访问和关闭当前打开的标签页。
 
-![NiceTab-扩展图标点击](https://github.com/web-dahuyou/NiceTab/assets/22833786/00ffecc1-da89-4a27-b769-1e645db4f216)
+![NiceTab-扩展图标点击](https://github.com/user-attachments/assets/cf65a363-3a2b-465a-936c-8fc8274856dc)
+
+![NiceTab-扩展图标点击](https://github.com/user-attachments/assets/899bfd01-c426-4c5b-af5e-0beb52882edf)
 
 ### 右键菜单
 右击扩展图标，展示右键菜单，可打开扩展管理后台页面。支持 一键发送 所有标签页、当前标签页、其他标签页、左侧标签页、右侧标签页。
 
-![NiceTab-扩展图标右键菜单.png](https://github.com/web-dahuyou/NiceTab/assets/22833786/120e9c7d-5732-4b31-8adb-1c532d905eae)
+![NiceTab-扩展图标右键菜单](https://github.com/user-attachments/assets/2fe82628-9dde-4cba-b336-6ca59b2ec5eb)
 
 ### 扩展管理后台-列表页
 - 管理发送到NiceTab的标签页，支持分类，标签组管理。
 - 左侧列表支持拖拽和快捷键排序，右侧面板展示当前分类中的所有标签组和标签页，可进行相应的操作。
 - 支持标签组删除和跨分类移动，以及多选标签页删除和跨标签组移动。
 
-![NiceTab-列表页](https://github.com/web-dahuyou/NiceTab/assets/22833786/98b4413c-f36a-4e9f-a429-19dc8bd75520)
+![NiceTab-列表页](https://github.com/user-attachments/assets/03a534d0-c034-4b9a-98fd-2d8d084ebcd3)
 
 ### 扩展管理后台-偏好设置页
 您可根据自己的喜好，作相应的偏好设置。
 
-![NiceTab-偏好设置页.png](https://github.com/web-dahuyou/NiceTab/assets/22833786/d1f06a16-bc68-49e5-8396-97d1adb687af)
+![NiceTab-偏好设置页](https://github.com/user-attachments/assets/90e19998-206b-42de-9329-410e553955a4)
 
 ### 扩展管理后台-导入导出
 导入导出功能目前支持 `NiceTab` 和 `OneTab` 格式的交叉导入导出。
 - 可导入 `OneTab` 格式的列表并解析为 `NiceTab` 格式。
 - 可将 `NiceTab`格式的列表导出为 `NiceTab` 或 `OneTab` 格式。
 
-![NiceTab-导入导出.png](https://github.com/web-dahuyou/NiceTab/assets/22833786/3d819f9a-60a7-4420-afe0-1c3239f2458a)
+![NiceTab-导入导出](https://github.com/user-attachments/assets/e2ea4b00-3531-4819-b67a-e45f09b4e948)
 
-### 扩展管理后台-回收站
-- 分类、标签组、标签页删除后，会保留到回收站，您可将回收站的分类、标签组等还原到列表页或者彻底删除。
+### 远程同步功能
+您可根据需求将标签页同步到自己的 github 和 gitee 账号，只需要配置自己的 access token 即可。    
+**注意**：token 权限只勾选 gists 操作，后期看看能否扩展配置其他平台方案
 
-![NiceTab-回收站.png](https://github.com/web-dahuyou/NiceTab/assets/22833786/92fb10cc-49f3-4009-b9df-c7898d46529c)
+![NiceTab-远程同步功能](https://github.com/user-attachments/assets/1d082c8f-4660-4f8e-9ac9-7cf468178ee1)
 
-### 切换主题色
-插件支持主题切换，您可以在扩展管理后台页或者 popup 弹窗中进行切换。
+### 主题色切换
+插件支持主题色切换，您可以在扩展管理后台页或者 popup 弹窗中进行切换。
 
-![NiceTab-切换主题色.png](https://github.com/web-dahuyou/NiceTab/assets/22833786/7b36493f-fcfb-4441-a8d5-3a228b2374c7)
+![NiceTab-主题色切换](https://github.com/user-attachments/assets/9e6dce98-8b6e-4fe7-846d-d5a00f410e6d)
+
+### 亮色/暗黑主题切换
+插件支持亮色/暗黑主题切换，您可以在扩展管理后台页中进行切换。
+
+![NiceTab-亮色-黑暗主题切换](https://github.com/user-attachments/assets/8d7a6f02-9feb-4289-b9f8-f066ab02f32e)
 
 ### 切换语言
 插件支持语言切换，您可以在扩展管理后台页进行切换。
 
-![NiceTab-切换语言.png](https://github.com/web-dahuyou/NiceTab/assets/22833786/b9d4f6da-151f-460d-ac4c-4ddbcaee0a05)
+![NiceTab-切换语言](https://github.com/user-attachments/assets/2d6b2348-a666-4996-bdd9-8653dfabf1d4)
+
+### 扩展管理后台-回收站
+- 分类、标签组、标签页删除后，会保留到回收站，您可将回收站的分类、标签组等还原到列表页或者彻底删除。
+
+![NiceTab-回收站](https://github.com/user-attachments/assets/016cb266-fe12-4063-b786-c979288f01fb)
 
 
 ## 使用
 - 点击扩展图标，打开popup面板，显示当前已打开的标签页列表，可快速访问扩展管理后台，快速切换主题。
 - 右击扩展图标，展示快捷操作菜单，可发送标签页到扩展管理后台。
 - 打开**管理后台**，可进行语言切换和主题切换。
+- 打开**管理后台**，可进行亮色/暗黑主题切换。
 - 打开**管理后台 > 标签列表**页，查看已发送的标签页列表，支持分类和标签组管理。
 - 打开**管理后台 > 设置**页，可保存扩展的偏好设置。
 - 打开**管理后台 > 导入导出**页，可进行NiceTab和OneTab格式的标签页导入导出操作。
