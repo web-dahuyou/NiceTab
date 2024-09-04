@@ -22,6 +22,7 @@ export default {
   'importExport.importFailed': 'Import Failed! Please check whether the format is correct ?',
 
   'importExport.exportContent': 'Content to Export:',
+  'importExport.getContent': 'Get Content',
   'importExport.copy': 'Copy to Clipboard',
   'importExport.exportToFile': 'Export to Local File',
   'importExport.CopySuccess': 'Copy Success',

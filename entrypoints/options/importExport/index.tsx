@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Form, Button, Radio, Input, Divider, Space, Upload, message } from 'antd';
-import type { FormProps, UploadProps } from 'antd';
+import type { FormProps, UploadProps, RadioChangeEvent } from 'antd';
 import styled from 'styled-components';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { saveAs } from 'file-saver';
@@ -9,7 +9,6 @@ import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { tabListUtils } from '~/entrypoints/common/storage';
 import { extContentImporter, extContentExporter } from '~/entrypoints/common/utils';
 import { initialValues, formatTypeOptions, importModeOptions } from './constants';
-
 
 const StyledWrapper = styled.div`
   .module-title {
@@ -33,16 +32,18 @@ export default function ImportExport() {
   const [formatType, setFormatType] = useState(1);
   const [importMode, setImportMode] = useState('append');
   const [exportFormatType, setExportFormatType] = useState(1);
+  const [exportLoading, setExportLoading] = useState(false);
+  const [downloadLoading, setDownloadLoading] = useState(false);
 
   // 导入操作
   const handleImport: FormProps<CustomImportProps>['onFinish'] = async (values) => {
     const { formatType, importContent } = values;
-    const formatOption = formatTypeOptions.find(option => option.type === formatType);
+    const formatOption = formatTypeOptions.find((option) => option.type === formatType);
     const funcName = formatOption?.funcName || 'niceTab';
     try {
       const tagList = extContentImporter?.[funcName]?.(importContent);
       await tabListUtils.importTags(tagList, importMode);
-      getExportContent();
+
       messageApi.success($fmt('importExport.importSuccess'));
       form.setFieldValue('importContent', '');
     } catch {
@@ -55,22 +56,34 @@ export default function ImportExport() {
     reader.onload = () => {
       const content = reader.result as string;
       handleImport({ formatType: 1, importContent: content });
-    }
+    };
     reader.readAsText(file);
     return false;
-  }
+  };
+
+  const onExportFormatTypeChange = (e: RadioChangeEvent) => {
+    setExportFormatType(e.target.value);
+    setExportContent('');
+  };
+  const handlePreview = async () => {
+    setExportLoading(true);
+    await getExportContent();
+    setExportLoading(false);
+  };
   // 获取导出文本内容
   const getExportContent = useCallback(async () => {
     const formatType = exportFormatType || 1;
     const exportTagList = await tabListUtils.exportTags();
-    const formatOption = formatTypeOptions.find(option => option.type === formatType);
+    const formatOption = formatTypeOptions.find((option) => option.type === formatType);
     const funcName = formatOption?.funcName || 'niceTab';
     try {
       const content = extContentExporter?.[funcName]?.(exportTagList);
       setExportContent(content);
+      return content;
     } catch (err) {
       console.error(err);
-    };
+      return '';
+    }
   }, [exportFormatType]);
   // 复制到剪切板
   const handleCopy = (text: string, result: boolean) => {
@@ -79,29 +92,28 @@ export default function ImportExport() {
     } else {
       messageApi.error($fmt('importExport.CopyFailed'));
     }
-  }
+  };
   // 导出文件
-  const handleDownload = useCallback(() => {
+  const handleDownload = useCallback(async () => {
+    setDownloadLoading(true);
     const now = dayjs().format('YYYY-MM-DD_HHmmss');
     const ext = exportFormatType == 1 ? 'json' : 'txt';
     const fileType = exportFormatType == 1 ? 'application/json' : 'text/plain';
-    const fileName = `export_${exportFormatType == 1 ? 'nice-tab' : 'one-tab'}_${now}.${ext}`;
-    saveAs(new Blob([exportContent], { type: `${fileType};charset=utf-8` }), fileName);
-  }, [exportFormatType, exportContent]);
-
-  useEffect(() => {
-    getExportContent();
+    const fileName = `export_${
+      exportFormatType == 1 ? 'nice-tab' : 'one-tab'
+    }_${now}.${ext}`;
+    const content = exportContent || (await getExportContent());
+    saveAs(new Blob([content], { type: `${fileType};charset=utf-8` }), fileName);
+    setDownloadLoading(false);
   }, [exportFormatType]);
-
-  useEffect(() => {
-    getExportContent();
-  }, []);
 
   return (
     <>
       {contextHolder}
       <StyledWrapper>
-        <Divider>{$fmt({ id: 'importExport.moduleTitle', values: {action: 'import'}})}</Divider>
+        <Divider>
+          {$fmt({ id: 'importExport.moduleTitle', values: { action: 'import' } })}
+        </Divider>
         <Form
           form={form}
           name="imports"
@@ -110,52 +122,63 @@ export default function ImportExport() {
           onFinish={handleImport}
           autoComplete="off"
         >
-          <Form.Item label={$fmt({ id: 'importExport.formatType', values: {action: 'import'}})} name="formatType">
-            <Radio.Group onChange={(e) => setFormatType(e.target.value) }>
+          <Form.Item
+            label={$fmt({ id: 'importExport.formatType', values: { action: 'import' } })}
+            name="formatType"
+          >
+            <Radio.Group onChange={(e) => setFormatType(e.target.value)}>
               {formatTypeOptions.map((item) => (
                 <Radio value={item.type} key={item.type}>
-                  {$fmt({ id: 'importExport.formatType.optionLabel', values: {label: item.label}})}
+                  {$fmt({
+                    id: 'importExport.formatType.optionLabel',
+                    values: { label: item.label },
+                  })}
                 </Radio>
               ))}
             </Radio.Group>
           </Form.Item>
           <Form.Item label={$fmt('importExport.importMode')} name="importMode">
-            <Radio.Group onChange={(e) => setImportMode(e.target.value) }>
+            <Radio.Group onChange={(e) => setImportMode(e.target.value)}>
               {importModeOptions.map((item) => (
                 <Radio value={item.type} key={item.type}>
-                  {$fmt({ id: 'importExport.importMode.optionLabel', values: {label: item.label}})}
+                  {$fmt({
+                    id: 'importExport.importMode.optionLabel',
+                    values: { label: item.label },
+                  })}
                 </Radio>
               ))}
             </Radio.Group>
           </Form.Item>
           <Form.Item label={$fmt('importExport.importContent')} name="importContent">
-            <Input.TextArea
-              autoSize={{ minRows: 8, maxRows: 16 }}
-            />
+            <Input.TextArea autoSize={{ minRows: 8, maxRows: 16 }} />
           </Form.Item>
           <Form.Item>
             <Space size={12} align="center">
               <Button type="primary" htmlType="submit">
                 {$fmt('importExport.importFromText')}
               </Button>
-              { +formatType === 1 && (
-                <Upload accept=".json" showUploadList={false} beforeUpload={handleSelectFile}>
+              {+formatType === 1 && (
+                <Upload
+                  accept=".json"
+                  showUploadList={false}
+                  beforeUpload={handleSelectFile}
+                >
                   <Button type="primary"> {$fmt('importExport.importFromFile')} </Button>
                 </Upload>
-              ) }
+              )}
             </Space>
           </Form.Item>
         </Form>
 
         {/* 导出模块 */}
-        <Divider>{$fmt({ id: 'importExport.moduleTitle', values: {action: 'export'}})}</Divider>
-        <Form
-          name="exports"
-          layout="vertical"
-          autoComplete="off"
-        >
-          <Form.Item label={$fmt({ id: 'importExport.formatType', values: {action: 'export'}})}>
-            <Radio.Group value={exportFormatType} onChange={(e) => setExportFormatType(e.target.value) }>
+        <Divider>
+          {$fmt({ id: 'importExport.moduleTitle', values: { action: 'export' } })}
+        </Divider>
+        <Form name="exports" layout="vertical" autoComplete="off">
+          <Form.Item
+            label={$fmt({ id: 'importExport.formatType', values: { action: 'export' } })}
+          >
+            <Radio.Group value={exportFormatType} onChange={onExportFormatTypeChange}>
               {formatTypeOptions.map((item) => (
                 <Radio value={item.type} key={item.type}>
                   {item.label}
@@ -173,10 +196,17 @@ export default function ImportExport() {
           </Form.Item>
           <Form.Item>
             <Space size={12} align="center">
-              <CopyToClipboard text={exportContent} onCopy={handleCopy}>
-                <Button type="primary">{$fmt('importExport.copy')}</Button>
-              </CopyToClipboard>
-              <Button type="primary" onClick={handleDownload}>{$fmt('importExport.exportToFile')}</Button>
+              <Button type="primary" loading={exportLoading} onClick={handlePreview}>
+                {$fmt('importExport.getContent')}
+              </Button>
+              {exportContent && (
+                <CopyToClipboard text={exportContent} onCopy={handleCopy}>
+                  <Button type="primary">{$fmt('importExport.copy')}</Button>
+                </CopyToClipboard>
+              )}
+              <Button type="primary" loading={downloadLoading} onClick={handleDownload}>
+                {$fmt('importExport.exportToFile')}
+              </Button>
             </Space>
           </Form.Item>
         </Form>
