@@ -360,7 +360,8 @@ export function useTreeData() {
     setLoading(false);
     // console.log('init-treeData', treeData);
     setCountInfo(tabListUtils.countInfo);
-    setExpandedKeys(treeData.map((tag) => tag.key));
+    // 考虑到数据量大，默认不展开列表了
+    // setExpandedKeys(treeData.map((tag) => tag.key));
 
     const tag =
       treeData?.find(

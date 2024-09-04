@@ -69,7 +69,7 @@ export const StyledSidebarWrapper = styled.div<{
       flex-shrink: 0;
       display: flex;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       margin-bottom: 10px;
       gap: 8px;
       button {

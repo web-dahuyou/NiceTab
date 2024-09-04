@@ -90,15 +90,15 @@ export default function Home() {
   const [confirmModalVisible, setConfirmModalVisible] = useState<boolean>(false);
   const [helpDrawerVisible, setHelpDrawerVisible] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>('');
-  const moreItems: MenuProps['items'] = [
-    {
-      key: 'clear',
-      label: (
-        <span onClick={() => setConfirmModalVisible(true)}>{$fmt('home.clearAll')}</span>
-      ),
-      icon: <ClearOutlined />,
-    },
-  ];
+  // const moreItems: MenuProps['items'] = [
+  //   {
+  //     key: 'clear',
+  //     label: (
+  //       <span onClick={() => setConfirmModalVisible(true)}>{$fmt('home.clearAll')}</span>
+  //     ),
+  //     icon: <ClearOutlined />,
+  //   },
+  // ];
   // 确认清空全部
   const handleClearConfirm = () => {
     handleMoreItemClick('clear');
@@ -284,20 +284,25 @@ export default function Home() {
               </ul>
               {/* 顶部操作按钮组 */}
               <div className="sidebar-action-btns-wrapper">
-                <Button type="primary" size="small" onClick={() => toggleExpand(true)}>
-                  {$fmt('home.expandAll')}
-                </Button>
+                {/* 隐藏展开全部按钮，自己主动打开吧
+                  <Button type="primary" size="small" onClick={() => toggleExpand(true)}>
+                    {$fmt('home.expandAll')}
+                  </Button>
+                */}
                 <Button type="primary" size="small" onClick={() => toggleExpand(false)}>
                   {$fmt('home.collapseAll')}
                 </Button>
                 <Button type="primary" size="small" onClick={handleTagCreate}>
                   {$fmt('home.addTag')}
                 </Button>
-                <Dropdown menu={{ items: moreItems }} placement="bottomLeft">
+                <Button type="primary" size="small" onClick={() => setConfirmModalVisible(true)}>
+                  {$fmt('home.clearAll')}
+                </Button>
+                {/* <Dropdown menu={{ items: moreItems }} placement="bottomLeft">
                   <StyledActionIconBtn className="btn-more" $size="20" title="更多">
                     <MoreOutlined />
                   </StyledActionIconBtn>
-                </Dropdown>
+                </Dropdown> */}
               </div>
               {/* 列表搜索框 */}
               <Input.Search
