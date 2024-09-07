@@ -45,26 +45,22 @@ export const extContentImporter: ExtContentImporterProps = {
     return [newTag];
   },
   niceTab(content: string): TagItem[] {
-    try {
-      const tagList = JSON.parse(content || '[]') as TagItem[];
-      const createTime = newCreateTime();
-      tagList.forEach((tag) => {
-        tag.tagId = tag.static ? '0' : getRandomId();
-        tag.createTime = createTime;
-        tag?.groupList?.forEach((group) => {
-          group.groupId = getRandomId();
-          group.createTime = createTime;
-          group?.tabList?.forEach((tab) => {
-            const { favIconUrl } = tab;
-            tab.tabId = getRandomId();
-            tab.favIconUrl = favIconUrl?.startsWith('data:image/') ? '' : favIconUrl;
-          });
+    const tagList = JSON.parse(content || '[]') as TagItem[];
+    const createTime = newCreateTime();
+    tagList.forEach((tag) => {
+      tag.tagId = tag.static ? '0' : getRandomId();
+      tag.createTime = createTime;
+      tag?.groupList?.forEach((group) => {
+        group.groupId = getRandomId();
+        group.createTime = createTime;
+        group?.tabList?.forEach((tab) => {
+          const { favIconUrl } = tab;
+          tab.tabId = getRandomId();
+          tab.favIconUrl = favIconUrl?.startsWith('data:image/') ? '' : favIconUrl;
         });
       });
-      return tagList;
-    } catch {
-      return [];
-    }
+    });
+    return tagList;
   },
 };
 

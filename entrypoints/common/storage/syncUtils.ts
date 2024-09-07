@@ -233,6 +233,11 @@ export default class SyncUtils {
     syncType: SyncType,
     gistData: GistResponseItemProps
   ) {
+    // 如果没有gist数据，则直接输出失败结构
+    if (!gistData?.id) {
+      this.handleSyncResult(remoteType, syncType, gistData);
+      return;
+    }
     let result: GistResponseItemProps = {} as GistResponseItemProps;
     if (syncType === syncTypeMap.MANUAL_PUSH_FORCE) {
       result = await this.updateGist(remoteType);
@@ -256,7 +261,7 @@ export default class SyncUtils {
           fileContent = fileInfo?.content || '';
         }
 
-        if (syncType === syncTypeMap.MANUAL_PULL_FORCE) {
+        if (!!fileContent && syncType === syncTypeMap.MANUAL_PULL_FORCE) {
           await Store.tabListUtils.clearAll();
         }
         const tagList = extContentImporter.niceTab(fileContent || '');
