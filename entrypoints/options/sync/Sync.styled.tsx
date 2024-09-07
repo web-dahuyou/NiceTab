@@ -56,7 +56,7 @@ export const StyledContainer = styled.div<{$collapsed?: boolean; $sidebarWidth?:
 
   .content {
     padding-left: 40px;
-    border-left: 1px solid rgba(5, 5, 5, 0.06);
+    border-left: 1px solid ${(props) => props.theme.colorBorder || 'rgba(5, 5, 5, 0.06)'};
   }
 `;
 

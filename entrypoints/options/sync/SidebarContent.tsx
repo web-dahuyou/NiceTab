@@ -225,10 +225,11 @@ function CardItemMarkup({
   );
 }
 
-const StyledCard = styled.div<{ $primaryColor: string }>`
+const StyledCard = styled.div`
   .card-item {
+    border-color: ${(props) => props.theme.colorBorder};
     &.active {
-      border-color: ${(props) => props.$primaryColor};
+      border-color: ${(props) => props.theme.colorPrimary};
     }
     .icon-btn-wrapper {
       padding: 4px;
@@ -263,7 +264,7 @@ export default function SidebarContent({
   return (
     <Flex vertical gap={12}>
       {remoteOptions.map((option) => (
-        <StyledCard key={option.key} $primaryColor={token.colorPrimary}>
+        <StyledCard key={option.key}>
           <CardItemMarkup
             option={option}
             isActive={selectedKey === option.key}

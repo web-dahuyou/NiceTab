@@ -112,7 +112,7 @@ export function mergeGroupsAndTabs({
       resultList = [];
     for (let item of list) {
       if (exceptValue != undefined && item[key] === exceptValue) {
-        exceptList.push(item);
+        exceptList.push({ ...item, groupName: `group_${getRandomId()}` });
       } else {
         resultList.push(item);
       }
@@ -1106,10 +1106,25 @@ export default class TabListUtils {
       await this.setTagList(newTagList);
     } else {
       // append mode
-      // await this.setTagList([...tags, ...tagList]);
-      const insertIndex = tagList?.[0]?.static ? 1 : 0;
-      tagList.splice(insertIndex, 0, ...tags);
-      await this.setTagList(tagList);
+      let stagingAreaTag = this.createStagingAreaTag();
+      const stagingAreaIndex = tagList?.findIndex((tag) => tag?.static);
+      if (~stagingAreaIndex) {
+        stagingAreaTag = tagList.splice(stagingAreaIndex, 1)?.[0] || stagingAreaTag;
+      }
+
+      const stagingAreaInsertIndex = tags?.findIndex((tag) => tag?.static);
+
+      if (~stagingAreaInsertIndex) {
+        stagingAreaTag.groupList = mergeGroupsAndTabs({
+          targetList: stagingAreaTag.groupList,
+          insertList: tags?.[stagingAreaInsertIndex].groupList,
+          exceptValue: UNNAMED_GROUP,
+        })
+        tags.splice(stagingAreaInsertIndex, 1);
+      }
+
+      const newTagList = [stagingAreaTag, ...tags, ...tagList];
+      await this.setTagList(newTagList);
     }
   }
   // 导出

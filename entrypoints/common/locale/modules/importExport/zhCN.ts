@@ -27,6 +27,7 @@ export default {
   'importExport.importFailed': '导入失败，请检查格式是否正确',
 
   'importExport.exportContent': '导出内容：',
+  'importExport.getContent': '生成内容',
   'importExport.copy': '复制到剪贴板',
   'importExport.exportToFile': '导出到本地',
   'importExport.CopySuccess': '复制成功',

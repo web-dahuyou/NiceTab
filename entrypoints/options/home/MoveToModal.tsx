@@ -10,6 +10,9 @@ import type { MoveDataProps, MoveTargetProps, CascaderOption } from './types';
 import { getCascaderData } from './utils';
 
 const StyledCascaderWrapper = styled.div`
+  .ant-cascader-panel {
+    overflow-x: visible;
+  }
   .ant-cascader-menu {
     min-height: 180px;
     max-height: 360px;
