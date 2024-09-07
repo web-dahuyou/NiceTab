@@ -10,61 +10,59 @@ export const StyledEllipsis = css`
   white-space: nowrap;
 `;
 // 多行超长省略
-export const StyledEllipsisLines = css<{$lines?: number}>`
+export const StyledEllipsisLines = css<{ $lines?: number }>`
   overflow: hidden;
   text-overflow: ellipsis;
   word-break: break-all;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: ${props => props.$lines || 2};
+  -webkit-line-clamp: ${(props) => props.$lines || 2};
 `;
-
 
 // action icon btn
 export const StyledActionIconBtn = styled.i<{
-  theme: StyledThemeProps,
-  $size?: number | string,
-  $color?: string,
-  $hoverColor?: string,
-  $hoverScale?: number
+  theme: StyledThemeProps;
+  $size?: number | string;
+  $color?: string;
+  $hoverColor?: string;
+  $hoverScale?: number;
 }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: ${props => `${+(props.$size || 16) + 2}px`};
-  height: ${props => `${+(props.$size || 16) + 2}px`};
-  font-size: ${props => `${props.$size || 14}px`};
-  color: ${props => props.$color || props.theme.colorTextSecondary || '#666'};
+  width: ${(props) => `${+(props.$size || 16) + 2}px`};
+  height: ${(props) => `${+(props.$size || 16) + 2}px`};
+  font-size: ${(props) => `${props.$size || 14}px`};
+  color: ${(props) => props.$color || props.theme.colorTextSecondary || '#666'};
   transition: all 0.2s;
   cursor: pointer;
   &:hover {
-    transform: scale(${props => props.$hoverScale || 1.2});
-    color: ${props => props.$hoverColor || props.theme.colorTextSecondary || '#666'};
+    transform: scale(${(props) => props.$hoverScale || 1.2});
+    color: ${(props) => props.$hoverColor || props.theme.colorTextSecondary || '#666'};
   }
 `;
 
 // toogle theme color block item
 export const StyledColorItem = styled.div`
-position: relative;
-width: 24px;
-height: 24px;
-border-radius: 4px;
-cursor: pointer;
-&.active {
-  &:after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: -6px;
-    width: 4px;
-    height: 4px;
-    border-radius: 2px;
-    background: red;
+  position: relative;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  &.active {
+    &:after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: -6px;
+      width: 4px;
+      height: 4px;
+      border-radius: 2px;
+      background: red;
+    }
   }
-}
 `;
-
 
 export const GlobalStyle = createGlobalStyle`
   :root {
@@ -75,4 +73,24 @@ export const GlobalStyle = createGlobalStyle`
     --text-color: ${(props) => props.theme.colorText || 'rgba(0, 0, 0, 0.88)'};
     color: ${(props) => props.theme.colorText || 'rgba(0, 0, 0, 0.88)'};
 	}
-`
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    border-radius: 5px;
+    background: var(--bg-color, #fff);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background: ${(props) => props.theme.type === 'light' ? '#d9d9d9' : '#555'};
+    box-shadow:inset 0 0 4px rgba(0, 0, 0, .3);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: ${(props) => props.theme.type === 'light' ? '#bfbfbf' : '#888'};
+  }
+`;
