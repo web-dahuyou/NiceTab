@@ -112,7 +112,7 @@ export function mergeGroupsAndTabs({
       resultList = [];
     for (let item of list) {
       if (exceptValue != undefined && item[key] === exceptValue) {
-        exceptList.push(item);
+        exceptList.push({ ...item, groupName: `group_${getRandomId()}` });
       } else {
         resultList.push(item);
       }

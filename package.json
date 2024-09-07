@@ -1,6 +1,6 @@
 {
   "name": "nice-tab",
-  "description": "A nice, convenient, powerful tab manager",
+  "description": "A nice, convenient, powerful tab manager [open source]",
   "private": true,
   "version": "2.2.0",
   "type": "module",
@@ -40,6 +40,6 @@
     "@types/react-dom": "^18.3.0",
     "@wxt-dev/module-react": "^1.1.0",
     "typescript": "^5.5.4",
-    "wxt": "^0.19.1"
+    "wxt": "^0.19.9"
   }
 }

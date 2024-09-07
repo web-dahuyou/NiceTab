@@ -1,6 +1,9 @@
 import type { TagItem, TabItem } from '~/entrypoints/types';
 import { tabListUtils } from '~/entrypoints/common/storage';
-import type { ExtContentImporterProps, ExtContentExporterProps } from '~/entrypoints/types';
+import type {
+  ExtContentImporterProps,
+  ExtContentExporterProps,
+} from '~/entrypoints/types';
 import { getRandomId, newCreateTime } from '~/entrypoints/common/utils';
 
 // 解析 NiceTab、OneTab等 插件的导入内容
@@ -12,7 +15,11 @@ export const extContentImporter: ExtContentImporterProps = {
       if (!line.trim()) {
         if (tabList?.length > 0) {
           const newGroupItem = tabListUtils.getInitialTabGroup();
-          groupList.push({ ...newGroupItem, tabList: [...tabList] });
+          groupList.push({
+            ...newGroupItem,
+            groupName: `oneTab-${getRandomId()}`,
+            tabList: [...tabList],
+          });
           tabList = [];
         }
         continue;
@@ -24,7 +31,11 @@ export const extContentImporter: ExtContentImporterProps = {
 
     if (tabList?.length > 0) {
       const newGroupItem = tabListUtils.getInitialTabGroup();
-      groupList.push({ ...newGroupItem, tabList: [...tabList] });
+      groupList.push({
+        ...newGroupItem,
+        groupName: `oneTab-${getRandomId()}`,
+        tabList: [...tabList],
+      });
       tabList = [];
     }
 
@@ -37,34 +48,34 @@ export const extContentImporter: ExtContentImporterProps = {
     try {
       const tagList = JSON.parse(content || '[]') as TagItem[];
       const createTime = newCreateTime();
-      tagList.forEach(tag => {
+      tagList.forEach((tag) => {
         tag.tagId = tag.static ? '0' : getRandomId();
         tag.createTime = createTime;
-        tag?.groupList?.forEach(group => {
+        tag?.groupList?.forEach((group) => {
           group.groupId = getRandomId();
           group.createTime = createTime;
-          group?.tabList?.forEach(tab => {
+          group?.tabList?.forEach((tab) => {
             const { favIconUrl } = tab;
             tab.tabId = getRandomId();
-            tab.favIconUrl = favIconUrl?.startsWith('data:image/') ? '' : favIconUrl
-          })
+            tab.favIconUrl = favIconUrl?.startsWith('data:image/') ? '' : favIconUrl;
+          });
         });
-      })
+      });
       return tagList;
     } catch {
       return [];
     }
-  }
-}
+  },
+};
 
 // 将内容导出为 NiceTab、OneTab 等格式
 export const extContentExporter: ExtContentExporterProps = {
   oneTab(tagList): string {
     let resultList: string[] = [];
     try {
-      tagList.forEach(tag => {
-        tag?.groupList?.forEach(group => {
-          group?.tabList?.forEach(tab => {
+      tagList.forEach((tag) => {
+        tag?.groupList?.forEach((group) => {
+          group?.tabList?.forEach((tab) => {
             resultList.push(`${tab.url} | ${tab.title}\n`);
           });
           resultList.push('\n');
@@ -81,13 +92,10 @@ export const extContentExporter: ExtContentExporterProps = {
     } catch {
       return '';
     }
-  }
-}
-
+  },
+};
 
 export default {
   extContentImporter,
-  extContentExporter
+  extContentExporter,
 };
-
-
