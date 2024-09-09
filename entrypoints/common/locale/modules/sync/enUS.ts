@@ -26,7 +26,9 @@ export default {
   'sync.tip.manualPushForce': 'Push local data to remote (force overwrite).',
   'sync.tip.tokenChange': 'Change the access token will clear the local {type} sync history',
   'sync.tip.contentTooLarge': 'The remote file content is too large, truncated by gist API, cancel merge to local',
+  'sync.tip.syncHistory': 'Sync history only retains the last 50 records, you can also clear the history manually.',
   'sync.getYourToken': 'Get/Set your access token',
   'sync.syncHistory': 'Sync History',
   'sync.noSyncHistory': 'No Sync History',
+  'sync.clearSyncHistory': 'Clear Sync History',
 }

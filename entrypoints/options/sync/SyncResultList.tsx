@@ -1,4 +1,5 @@
 import { theme, Flex, Space, Alert, Empty, Tooltip, Typography } from 'antd';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 import type { SyncResultItemProps } from '~/entrypoints/types';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { SUCCESS_KEY } from '~/entrypoints/common/constants';
@@ -25,8 +26,18 @@ export default function SyncResultList({ resultList }: SyncResultListProps) {
 
   return (
     <Flex vertical gap={12}>
-      <Space>
-        <Typography.Title level={5}>{$fmt('sync.syncHistory')}</Typography.Title>
+      <Space align="center">
+        <Typography.Title level={5} style={{ margin: 0 }}>{$fmt('sync.syncHistory')}</Typography.Title>
+        <Tooltip
+          color={token.colorBgElevated}
+          placement="bottom"
+          destroyTooltipOnHide
+          title={
+            <Typography.Text>{ $fmt('sync.tip.syncHistory') }</Typography.Text>
+          }
+        >
+          <QuestionCircleOutlined />
+        </Tooltip>
       </Space>
       {resultList.map((result) => (
         <Alert

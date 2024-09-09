@@ -123,7 +123,9 @@ export default class SyncUtils {
     return result;
   }
   async addSyncResult(remoteType: SyncRemoteType, currResult: SyncResultItemProps) {
-    this.syncResult[remoteType] = [currResult, ...(this.syncResult[remoteType] || [])];
+    const _syncResultList = [currResult, ...(this.syncResult[remoteType] || [])];
+    // 最多保留 50 条
+    this.syncResult[remoteType] = _syncResultList.slice(0, 50);
     return await storage.setItem<SyncResultProps>(this.storageResultKey, this.syncResult);
   }
   async clearSyncResult(remoteType: SyncRemoteType) {
