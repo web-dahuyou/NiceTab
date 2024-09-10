@@ -22,11 +22,12 @@ const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> => {
 };
 
 // 创建 contextMenus
-async function createContextMenus() {
+async function createContextMenus(callback?: () => void) {
   const menus = await getMenus();
-  menus.forEach((menu) => {
-    browser.contextMenus.create(menu);
-  });
+  for (let menu of menus) {
+    await browser.contextMenus.create(menu);
+  }
+  callback?.();
 }
 
 // 根据标签页状态更新 contextMenus
@@ -35,7 +36,7 @@ async function handleContextMenusUpdate() {
   const currTab = tabs?.find((tab) => tab.highlighted);
 
   // 获取插件设置
-  const settings = settingsUtils.settings;
+  const settings = await settingsUtils.getSettings();
   const filteredTabs = await tabUtils.getFilteredTabs(tabs, settings);
 
   browser.contextMenus.update(ENUM_ACTION_NAME.SEND_CURRENT_TAB, {
@@ -56,18 +57,24 @@ async function handleContextMenusUpdate() {
 }
 
 export default function contextMenusRegister() {
-  browser.runtime.onInstalled.addListener(() => {
-    browser.contextMenus.removeAll();
-    createContextMenus();
+  browser.runtime.onInstalled.addListener(async () => {
+    await browser.contextMenus.removeAll();
+    createContextMenus(() => {
+      TAB_EVENTS.forEach((event) => {
+        browser.tabs[event]?.removeListener(handleContextMenusUpdate);
+        browser.tabs[event]?.addListener(handleContextMenusUpdate);
+      });
+    });
   });
-  initStorageListener(() => {
-    browser.contextMenus.removeAll();
-    createContextMenus();
+  initStorageListener(async () => {
+    await browser.contextMenus.removeAll();
+    createContextMenus(() => {
+      TAB_EVENTS.forEach((event) => {
+        browser.tabs[event]?.removeListener(handleContextMenusUpdate);
+        browser.tabs[event]?.addListener(handleContextMenusUpdate);
+      });
+    });
   });
-
-  TAB_EVENTS.forEach((event) =>
-    browser.tabs[event]?.addListener(handleContextMenusUpdate)
-  );
 
   browser.contextMenus.onClicked.addListener((info, tab) => {
     // console.log('info', info);
