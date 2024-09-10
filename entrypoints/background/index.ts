@@ -1,4 +1,4 @@
-import contextMenusRegister from '../common/contextMenus';
+import contextMenusRegister from '~/entrypoints/common/contextMenus';
 import tabUtils from '~/entrypoints/common/tabs';
 import { themeUtils, settingsUtils } from '~/entrypoints/common/storage';
 import { PRIMARY_COLOR, TAB_EVENTS, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
