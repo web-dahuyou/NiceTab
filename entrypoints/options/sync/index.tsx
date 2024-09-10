@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { theme, Drawer } from 'antd';
+import { theme, Drawer, Button } from 'antd';
+import { ClearOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { classNames } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -44,6 +45,11 @@ export default function SyncPage() {
     }
   };
 
+  const clearSyncResult = async () => {
+    await syncUtils.clearSyncResult(selectedKey);
+    getSyncInfo();
+  }
+
   const getSyncInfo = async () => {
     syncUtils.getSyncStatus();
     setSyncStatus(syncUtils.syncStatus);
@@ -73,9 +79,16 @@ export default function SyncPage() {
           <div
             className={classNames('sidebar-inner-box', sidebarCollapsed && 'collapsed')}
           >
-            {/* <div className="sidebar-action-box">
-              <ToggleSidebarBtn onCollapseChange={setSidebarCollapsed}></ToggleSidebarBtn>
-            </div> */}
+            <div className="sidebar-action-box">
+              {/* <ToggleSidebarBtn onCollapseChange={setSidebarCollapsed}></ToggleSidebarBtn> */}
+              <div
+                className="action-icon"
+                title={$fmt('sync.clearSyncHistory')}
+                onClick={clearSyncResult}
+              >
+                <Button icon={<ClearOutlined />}></Button>
+              </div>
+            </div>
             <div className="sidebar-inner-content">
               <SidebarContent
                 selectedKey={selectedKey}

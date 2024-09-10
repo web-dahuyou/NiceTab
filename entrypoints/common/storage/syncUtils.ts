@@ -123,7 +123,9 @@ export default class SyncUtils {
     return result;
   }
   async addSyncResult(remoteType: SyncRemoteType, currResult: SyncResultItemProps) {
-    this.syncResult[remoteType] = [currResult, ...(this.syncResult[remoteType] || [])];
+    const _syncResultList = [currResult, ...(this.syncResult[remoteType] || [])];
+    // 最多保留 50 条
+    this.syncResult[remoteType] = _syncResultList.slice(0, 50);
     return await storage.setItem<SyncResultProps>(this.storageResultKey, this.syncResult);
   }
   async clearSyncResult(remoteType: SyncRemoteType) {
@@ -233,7 +235,7 @@ export default class SyncUtils {
     syncType: SyncType,
     gistData: GistResponseItemProps
   ) {
-    // 如果没有gist数据，则直接输出失败结构
+    // 如果没有gist数据，则直接输出失败结果
     if (!gistData?.id) {
       this.handleSyncResult(remoteType, syncType, gistData);
       return;
@@ -311,8 +313,11 @@ export default class SyncUtils {
       const isExist = gistData && gistData.id;
 
       if (isExist) {
-        this.setConfigByType(remoteType, { gistId: gistData.id });
-        await this.handleBySyncType(remoteType, syncType, gistData);
+        await this.setConfigByType(remoteType, { gistId: gistData.id });
+        // 这里需要注意，github API 列表中并不返回文件内容（gitee API 在列表中依然返回content内容）
+        // 因此为了保持逻辑一致性，全都通过id来手动获取一遍内容
+        const gistDataById = await this.getGistById(remoteType);
+        await this.handleBySyncType(remoteType, syncType, gistDataById);
       } else {
         const data = await this.createGist(remoteType);
         this.setConfigByType(remoteType, { gistId: data.id || '' });

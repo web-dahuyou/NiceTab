@@ -25,7 +25,7 @@ export const StyledSidebarWrapper = styled.div<{ $primaryColor?: string; $collap
       position: absolute;
       box-sizing: border-box;
       top: 0;
-      right: -32px;
+      right: -36px;
       display: flex;
       flex-direction: column;
       gap: 6px;

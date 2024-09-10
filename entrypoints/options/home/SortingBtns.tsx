@@ -1,10 +1,8 @@
-import { useState, useCallback } from 'react';
-import { theme, Button } from 'antd';
+import { Button } from 'antd';
 import { SortAscendingOutlined, SortDescendingOutlined } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 
 export default function SortingBtns({ onSort }: { onSort?: (type: string) => void }) {
-  const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
 
   return <>
