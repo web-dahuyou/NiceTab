@@ -39,41 +39,37 @@ async function handleContextMenusUpdate() {
   const settings = await settingsUtils.getSettings();
   const filteredTabs = await tabUtils.getFilteredTabs(tabs, settings);
 
-  browser.contextMenus.update(ENUM_ACTION_NAME.SEND_CURRENT_TAB, {
-    enabled: !!currTab?.id && !(currTab?.pinned && !settings[ALLOW_SEND_PINNED_TABS]),
-  });
-  browser.contextMenus.update(ENUM_ACTION_NAME.SEND_OTHER_TABS, {
-    enabled: !!currTab?.id,
-  });
-  browser.contextMenus.update(ENUM_ACTION_NAME.SEND_LEFT_TABS, {
-    enabled: !!currTab?.id && currTab?.index > 0,
-  });
-  browser.contextMenus.update(ENUM_ACTION_NAME.SEND_RIGHT_TABS, {
-    enabled: !!currTab?.id && currTab?.index < tabs.length - 1,
-  });
-  browser.contextMenus.update(ENUM_ACTION_NAME.SEND_ALL_TABS, {
-    enabled: filteredTabs?.length > 0,
-  });
+  try {
+    browser.contextMenus.update(ENUM_ACTION_NAME.SEND_CURRENT_TAB, {
+      enabled: !!currTab?.id && !(currTab?.pinned && !settings[ALLOW_SEND_PINNED_TABS]),
+    });
+    browser.contextMenus.update(ENUM_ACTION_NAME.SEND_OTHER_TABS, {
+      enabled: !!currTab?.id,
+    });
+    browser.contextMenus.update(ENUM_ACTION_NAME.SEND_LEFT_TABS, {
+      enabled: !!currTab?.id && currTab?.index > 0,
+    });
+    browser.contextMenus.update(ENUM_ACTION_NAME.SEND_RIGHT_TABS, {
+      enabled: !!currTab?.id && currTab?.index < tabs.length - 1,
+    });
+    browser.contextMenus.update(ENUM_ACTION_NAME.SEND_ALL_TABS, {
+      enabled: filteredTabs?.length > 0,
+    });
+  } catch {}
 }
 
 export default function contextMenusRegister() {
   browser.runtime.onInstalled.addListener(async () => {
     await browser.contextMenus.removeAll();
-    createContextMenus(() => {
-      TAB_EVENTS.forEach((event) => {
-        browser.tabs[event]?.removeListener(handleContextMenusUpdate);
-        browser.tabs[event]?.addListener(handleContextMenusUpdate);
-      });
-    });
+    createContextMenus();
   });
   initStorageListener(async () => {
     await browser.contextMenus.removeAll();
-    createContextMenus(() => {
-      TAB_EVENTS.forEach((event) => {
-        browser.tabs[event]?.removeListener(handleContextMenusUpdate);
-        browser.tabs[event]?.addListener(handleContextMenusUpdate);
-      });
-    });
+    createContextMenus();
+  });
+
+  TAB_EVENTS.forEach((event) => {
+    browser.tabs[event]?.addListener(handleContextMenusUpdate);
   });
 
   browser.contextMenus.onClicked.addListener((info, tab) => {
