@@ -32,23 +32,28 @@ export default function ImportExport() {
   const [formatType, setFormatType] = useState(1);
   const [importMode, setImportMode] = useState('append');
   const [exportFormatType, setExportFormatType] = useState(1);
+  const [importLoading, setImportLoading] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
   const [downloadLoading, setDownloadLoading] = useState(false);
 
   // 导入操作
   const handleImport: FormProps<CustomImportProps>['onFinish'] = async (values) => {
-    const { formatType, importContent } = values;
-    const formatOption = formatTypeOptions.find((option) => option.type === formatType);
-    const funcName = formatOption?.funcName || 'niceTab';
-    try {
-      const tagList = extContentImporter?.[funcName]?.(importContent);
-      await tabListUtils.importTags(tagList, importMode);
+    setImportLoading(true);
+    setTimeout(async () => {
+      const { formatType, importContent } = values;
+      const formatOption = formatTypeOptions.find((option) => option.type === formatType);
+      const funcName = formatOption?.funcName || 'niceTab';
+      try {
+        const tagList = extContentImporter?.[funcName]?.(importContent);
+        await tabListUtils.importTags(tagList, importMode);
 
-      messageApi.success($fmt('importExport.importSuccess'));
-      form.setFieldValue('importContent', '');
-    } catch {
-      messageApi.error($fmt('importExport.importFailed'));
-    }
+        messageApi.success($fmt('importExport.importSuccess'));
+        form.setFieldValue('importContent', '');
+      } catch {
+        messageApi.error($fmt('importExport.importFailed'));
+      }
+      setImportLoading(false);
+    }, 500);
   };
   // 选择文件导入
   const handleSelectFile: UploadProps['beforeUpload'] = (file) => {
@@ -67,8 +72,10 @@ export default function ImportExport() {
   };
   const handlePreview = async () => {
     setExportLoading(true);
-    await getExportContent();
-    setExportLoading(false);
+    setTimeout(async () => {
+      await getExportContent();
+      setExportLoading(false);
+    }, 500);
   };
   // 获取导出文本内容
   const getExportContent = useCallback(async () => {
@@ -96,15 +103,17 @@ export default function ImportExport() {
   // 导出文件
   const handleDownload = useCallback(async () => {
     setDownloadLoading(true);
-    const now = dayjs().format('YYYY-MM-DD_HHmmss');
-    const ext = exportFormatType == 1 ? 'json' : 'txt';
-    const fileType = exportFormatType == 1 ? 'application/json' : 'text/plain';
-    const fileName = `export_${
-      exportFormatType == 1 ? 'nice-tab' : 'one-tab'
-    }_${now}.${ext}`;
-    const content = exportContent || (await getExportContent());
-    saveAs(new Blob([content], { type: `${fileType};charset=utf-8` }), fileName);
-    setDownloadLoading(false);
+    setTimeout(async () => {
+      const now = dayjs().format('YYYY-MM-DD_HHmmss');
+      const ext = exportFormatType == 1 ? 'json' : 'txt';
+      const fileType = exportFormatType == 1 ? 'application/json' : 'text/plain';
+      const fileName = `export_${
+        exportFormatType == 1 ? 'nice-tab' : 'one-tab'
+      }_${now}.${ext}`;
+      const content = exportContent || (await getExportContent());
+      saveAs(new Blob([content], { type: `${fileType};charset=utf-8` }), fileName);
+      setDownloadLoading(false);
+    }, 500);
   }, [exportFormatType]);
 
   return (
@@ -154,7 +163,7 @@ export default function ImportExport() {
           </Form.Item>
           <Form.Item>
             <Space size={12} align="center">
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" loading={importLoading}>
                 {$fmt('importExport.importFromText')}
               </Button>
               {+formatType === 1 && (
@@ -163,7 +172,9 @@ export default function ImportExport() {
                   showUploadList={false}
                   beforeUpload={handleSelectFile}
                 >
-                  <Button type="primary"> {$fmt('importExport.importFromFile')} </Button>
+                  <Button type="primary" loading={importLoading}>
+                    {$fmt('importExport.importFromFile')}
+                  </Button>
                 </Upload>
               )}
             </Space>

@@ -74,23 +74,23 @@ export const GlobalStyle = createGlobalStyle`
     color: ${(props) => props.theme.colorText || 'rgba(0, 0, 0, 0.88)'};
 	}
 
-  ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+  ::-webkit-scrollbar, .ant-tree-list-scrollbar {
+    width: 8px !important;
+    height: 8px !important;
   }
 
   ::-webkit-scrollbar-track {
-    border-radius: 5px;
-    background: var(--bg-color, #fff);
+    border-radius: 4px;
+    background: var(--bg-color, #fff) !important;
   }
 
-  ::-webkit-scrollbar-thumb {
-    border-radius: 5px;
-    background: ${(props) => props.theme.type === 'light' ? '#d9d9d9' : '#555'};
+  ::-webkit-scrollbar-thumb, .ant-tree-list-scrollbar-thumb {
+    border-radius: 4px;
+    background: ${(props) => `${props.theme.type === 'light' ? '#d9d9d9' : '#555'} !important`};
     box-shadow:inset 0 0 4px rgba(0, 0, 0, .3);
   }
 
-  ::-webkit-scrollbar-thumb:hover {
-    background: ${(props) => props.theme.type === 'light' ? '#bfbfbf' : '#888'};
+  ::-webkit-scrollbar-thumb:hover, .ant-tree-list-scrollbar-thumb:hover {
+    background: ${(props) => `${props.theme.type === 'light' ? '#bfbfbf' : '#888'} !important`};
   }
 `;

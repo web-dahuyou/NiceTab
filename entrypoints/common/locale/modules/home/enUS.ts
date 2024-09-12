@@ -53,14 +53,17 @@ export default {
   'home.tab.name': 'Name',
   'home.tab.url': 'URL',
 
-  'home.help.content.1': '1. The left side list displays the tags, and the secondary menus represent the tab groups. The list supports searching for both tags and tab groups. The right-side panel displays all the tab groups and the tabs within each tab group.',
-  'home.help.content.2': '2、The Staging Area is a special category, fixed at the top of the list. When sending tabs, they will be saved to the Staging Area.',
-  'home.help.content.3': '3. When a tab group is locked, the group and its tabs cannot be removed or moved out. However, tabs from other tab groups can be moved into the locked group. To remove a tab group, you need to first unlock it.',
-  'home.help.content.4': '4. When a tab group is starred, it will be placed at the top of the current category. Moving other tab groups to a position before the starred tab group will automatically star them as well. If a starred tab group is moved to a position after a non-starred tab group, the star status will be automatically released.',
-  'home.help.content.5': '5. When restoring a tab group, each of the tabs within the tab group will be opened in browser. If the "Automatically remove tabs from list when restoring" setting is enabled, the tabs will be removed from the list after they are opened.',
-  'home.help.content.6': '6. The "Restore" action means opening the tabs in the browser, while the "Recover" action means recover the tags / tab groups / tabs from the "Recycle Bin" to the "List" home.',
-  'home.help.content.7': '7. The "Ascending" and "Descending" only work for unstarred tab groups in the current category.',
-  'home.help.content.8': '8. Tags / tab groups / tabs support drag-and-drop sorting. When a category/tab group is selected, it can be sorted using shortcut keys. The shortcut key mapping is shown in the table below:',
+  'home.help.content': `
+    <li>The left-side list displays the tags, and the secondary menus represent the tab groups. The list supports searching for both tags and tab groups. The right-side panel displays all the tab groups and the tabs within each tab group.</li>
+    <li>The tabs in the right-side panel support drag-and-drop sorting and cross-group movement. You can also drag the tabs from the right-side panel to the groups in the left-side list. Additionally, you can click the “Move To” button to move tab group and tabs.</li>
+    <li>When a tab group is locked, the group and its tabs cannot be removed or moved out. However, tabs from other tab groups can be moved into the locked group. To remove a tab group, you need to first unlock it.</li>
+    <li>When a tab group is starred, it will be placed at the top of the current category. Moving other tab groups to a position before the starred tab group will automatically star them as well. If a starred tab group is moved to a position after a non-starred tab group, the star status will be automatically released.</li>
+    <li>The Staging Area is a special category, fixed at the top of the list. When sending tabs, they will be saved to the Staging Area.</li>
+    <li>When opening a tab group, each of the tabs within the tab group will be opened in browser. If the "Automatically remove tabs from list when opening tabs or tab group" setting is enabled, the tabs will be removed from the list after they are opened.</li>
+    <li>The "Recover" action means recover the tags / tab groups / tabs from the "Recycle Bin" to the "List" home.</li>
+    <li>The "Ascending" and "Descending" only work for unstarred tab groups in the current category.</li>
+    <li>Tags / tab groups / tabs support drag-and-drop sorting. When a category/tab group is selected, it can be sorted using shortcut keys. The shortcut key mapping is shown in the table below:</li>
+  `,
 
   'home.moveTo.missingTip': 'Please select a {type}',
   'home.moveTo.mergeLabel': 'Merge Duplicate Items ?',

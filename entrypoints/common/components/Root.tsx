@@ -70,6 +70,12 @@ export default function Root({ children }: { children: React.ReactNode }) {
             colorPrimary: primaryColor || PRIMARY_COLOR,
             colorBgContainer: themeTypeConfig.bgColor || '#fff',
           },
+          components: {
+            Tree: {
+              motion: false,
+              algorithm: true,
+            },
+          },
         }}
       >
         <GlobalContext.Provider
