@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import {
   theme,
   Flex,
@@ -28,6 +28,7 @@ import {
   StyledListWrapper,
   StyledSidebarWrapper,
   StyledFooterWrapper,
+  StyledHelpInfoBox,
 } from './Home.styled';
 import ToggleSidebarBtn from '../components/ToggleSidebarBtn';
 import SortingBtns from './SortingBtns';
@@ -50,6 +51,7 @@ export default function Home() {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const listRef = useRef<HTMLDivElement>(null);
+  const treeRef = useRef(null);
   const {
     loading,
     countInfo,
@@ -86,6 +88,7 @@ export default function Home() {
 
   const { hotkeyList } = useHotkeys({ onAction: handleHotkeyAction });
 
+  const [treeBoxHeight, setTreeBoxHeight] = useState<number>(400);
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState<boolean>(false);
   const [helpDrawerVisible, setHelpDrawerVisible] = useState<boolean>(false);
@@ -158,6 +161,11 @@ export default function Home() {
       toggleExpand(true);
     }, 30);
   };
+
+  // 是否开启虚拟滚动（数据量大时开启虚拟滚动）
+  const virtual = useMemo(() => {
+    return (countInfo?.groupCount || 0) > 100 || (countInfo?.tabCount || 0) > 1200;
+  }, [countInfo]);
 
   // 搜索过滤后的 treeData
   const searchTreeData = useMemo(() => {
@@ -242,16 +250,18 @@ export default function Home() {
     [selectedTagKey]
   );
 
+  useEffect(() => {
+    const listHeight = listRef.current?.offsetHeight || 400;
+    setTreeBoxHeight(listHeight);
+  }, []);
+
   return (
     <>
       <StyledListWrapper
         className={classNames('home-wrapper', sidebarCollapsed && 'collapsed')}
         $collapsed={sidebarCollapsed}
       >
-        <StyledSidebarWrapper
-          className="sidebar"
-          $collapsed={sidebarCollapsed}
-        >
+        <StyledSidebarWrapper className="sidebar" $collapsed={sidebarCollapsed}>
           <div
             className={classNames('sidebar-inner-box', sidebarCollapsed && 'collapsed')}
           >
@@ -295,7 +305,11 @@ export default function Home() {
                 <Button type="primary" size="small" onClick={handleTagCreate}>
                   {$fmt('home.addTag')}
                 </Button>
-                <Button type="primary" size="small" onClick={() => setConfirmModalVisible(true)}>
+                <Button
+                  type="primary"
+                  size="small"
+                  onClick={() => setConfirmModalVisible(true)}
+                >
                   {$fmt('home.clearAll')}
                 </Button>
                 {/* <Dropdown menu={{ items: moreItems }} placement="bottomLeft">
@@ -316,7 +330,9 @@ export default function Home() {
                 <Spin spinning={loading} size="large">
                   {searchTreeData?.length > 0 ? (
                     <Tree
-                      // draggable
+                      ref={treeRef}
+                      virtual={virtual}
+                      height={treeBoxHeight}
                       draggable={{ icon: false, nodeDraggable: isNodeDraggable }}
                       allowDrop={checkAllowDrop}
                       blockNode
@@ -330,7 +346,7 @@ export default function Home() {
                         <RenderTreeNode
                           node={node}
                           selected={selectedKeys.includes(node.key)}
-                          container={listRef.current}
+                          container={treeRef.current}
                           refreshKey={refreshKey}
                           onAction={onTreeNodeAction}
                           onTabItemDrop={handleTabItemDrop}
@@ -419,21 +435,14 @@ export default function Home() {
         onClose={() => setHelpDrawerVisible(false)}
         width={500}
       >
-        <Flex vertical gap="8px">
-          <p>{$fmt('home.help.content.1')}</p>
-          <p>{$fmt('home.help.content.2')}</p>
-          <p>{$fmt('home.help.content.3')}</p>
-          <p>{$fmt('home.help.content.4')}</p>
-          <p>{$fmt('home.help.content.5')}</p>
-          <p>{$fmt('home.help.content.6')}</p>
-          <p>{$fmt('home.help.content.7')}</p>
-          <p>{$fmt('home.help.content.8')}</p>
+        <StyledHelpInfoBox>
+          <ul dangerouslySetInnerHTML={{ __html: $fmt('home.help.content') }}></ul>
 
-          <p style={{ marginTop: '8px' }}>
+          <p style={{ marginBottom: '8px' }}>
             <strong>{$fmt('common.hotkeys')}</strong>
           </p>
           <HotkeyList list={hotkeyList}></HotkeyList>
-        </Flex>
+        </StyledHelpInfoBox>
       </Drawer>
     </>
   );

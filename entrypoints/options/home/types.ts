@@ -28,11 +28,14 @@ export type RenderTreeNodeActionProps = {
 export type RenderTreeNodeProps = {
   node: TreeDataNodeUnion;
   selected?: boolean;
-  container?: HTMLElement | null;
+  container?:
+    | (HTMLElement & { scrollTo?: (props: { key: React.Key; offset?: number }) => void })
+    | null;
   refreshKey?: string;
+  virtual?: boolean;
   onAction?: (props: RenderTreeNodeActionProps) => void;
   onTabItemDrop?: DndTabItemOnDropCallback;
-  onMoveTo?: ({moveData, targetData}: MoveToCallbackProps) => void;
+  onMoveTo?: ({ moveData, targetData }: MoveToCallbackProps) => void;
 };
 
 // 需要移动的数据

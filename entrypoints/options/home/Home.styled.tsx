@@ -8,7 +8,6 @@ export const StyledSidebarWrapper = styled.div<{
   $sidebarWidth?: number;
 }>`
   position: relative;
-  height: calc(100vh - 180px);
 
   .sidebar-inner-box {
     width: ${(props) => props.$sidebarWidth || 280}px;
@@ -79,8 +78,8 @@ export const StyledSidebarWrapper = styled.div<{
     .sidebar-tree-wrapper {
       flex: 1;
       height: 0;
-      padding: 10px 0;
-      overflow: auto;
+      // padding: 10px 0;
+      // overflow: auto;
       .no-data {
         padding: 16px 0;
         button {
@@ -112,6 +111,7 @@ export const StyledListWrapper = styled.div<{
 export const StyledTreeNodeItem = styled.div`
   display: flex;
   align-items: center;
+  padding-right: 8px;
   cursor: pointer;
   .tree-node-title {
     width: 0;
@@ -142,6 +142,15 @@ export const StyledFooterWrapper = styled.div<{ $paddingLeft?: number }>`
   height: 60px;
   padding-left: ${(props) => props.$paddingLeft || 0}px;
   transition: padding 0.2s ease-in-out;
+`;
+
+export const StyledHelpInfoBox = styled.div`
+  ul {
+    list-style-type: disc;
+    li {
+      margin-bottom: 8px;
+    }
+  }
 `;
 
 export default {
