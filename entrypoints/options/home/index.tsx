@@ -1,6 +1,5 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
 import {
-  theme,
   Flex,
   Tree,
   Button,
@@ -10,6 +9,7 @@ import {
   Drawer,
   Empty,
   Spin,
+  Typography,
 } from 'antd';
 import type { MenuProps, TreeDataNode, TreeProps } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
@@ -18,6 +18,7 @@ import {
   MoreOutlined,
   ClearOutlined,
   QuestionCircleOutlined,
+  LoadingOutlined,
 } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { classNames } from '~/entrypoints/common/utils';
@@ -45,13 +46,13 @@ import type {
 } from './types';
 import { useTreeData } from './hooks/treeData';
 import useHotkeys from './hooks/hotkeys';
-import { getTreeData } from './utils';
+import { getTreeData, getSelectedCounts } from './utils';
+import { VIRTUAL_MAX_TAB_COUNT } from './constants';
 
 export default function Home() {
-  const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const listRef = useRef<HTMLDivElement>(null);
-  const treeRef = useRef(null);
+  const treeRef = useRef<any>(null);
   const {
     loading,
     countInfo,
@@ -93,6 +94,81 @@ export default function Home() {
   const [confirmModalVisible, setConfirmModalVisible] = useState<boolean>(false);
   const [helpDrawerVisible, setHelpDrawerVisible] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>('');
+  const [currGroupList, setCurrGroupList] = useState<TreeDataNodeTabGroup[]>([]);
+  const [computing, setComputing] = useState<boolean>(false);
+
+  // 是否开启虚拟滚动（数据量大时开启虚拟滚动）
+  const virtualMap = useMemo(() => {
+    const { groupCount = 0, tabCount = 0 } = getSelectedCounts(selectedTag.originData);
+    // console.log('virtualMap', groupCount, tabCount);
+    return {
+      tree: (countInfo?.groupCount || 0) > 200 || groupCount > 30,
+      tabList: tabCount > VIRTUAL_MAX_TAB_COUNT,
+    };
+  }, [selectedTag, countInfo?.groupCount]);
+
+  const getCurrGroupList = useCallback(() => {
+    if (!virtualMap.tabList) {
+      return selectedTag?.children || [];
+    }
+    if (selectedTag) {
+      let result = selectedTag?.children?.slice(0, 1) || [];
+      if (!selectedTabGroupKey) return result;
+      const selectedGroup = selectedTag?.children?.find(
+        (group) => group.key === selectedTabGroupKey
+      );
+      return selectedGroup ? [selectedGroup] : result;
+    } else {
+      return treeData[0]?.children?.slice(0, 1) || [];
+    }
+  }, [virtualMap.tabList, selectedTabGroupKey, selectedTag, treeData]);
+
+  useEffect(() => {
+    setComputing(true);
+    if (!virtualMap.tabList) {
+      setCurrGroupList(selectedTag?.children as TreeDataNodeTabGroup[]);
+      setComputing(false);
+      return;
+    }
+    setTimeout(() => {
+      const groupList = getCurrGroupList() || [];
+      setCurrGroupList(groupList as TreeDataNodeTabGroup[]);
+      setComputing(false);
+    }, 100);
+  }, [virtualMap.tabList, selectedTabGroupKey, selectedTag, treeData]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      treeRef.current?.scrollTo({ key: selectedKeys[0], offset: 80 });
+    }, 100);
+  }, [refreshKey, selectedKeys]);
+
+  // 搜索过滤后的 treeData
+  const searchTreeData = useMemo(() => {
+    if (!searchValue) return treeData;
+    const value = searchValue?.trim().toLowerCase();
+    const searchTagList =
+      tagList.reduce<TagItem[]>((result, tag): TagItem[] => {
+        if (tag?.tagName?.toLowerCase().includes(value)) {
+          return [...result, tag];
+        }
+
+        const groupList =
+          tag?.groupList?.reduce<GroupItem[]>((list, group: GroupItem): GroupItem[] => {
+            if (group?.groupName?.toLowerCase().includes(value)) {
+              return [...list, group];
+            }
+            return list;
+          }, []) || [];
+        if (groupList?.length > 0) {
+          return [...result, { ...tag, groupList }];
+        } else {
+          return result;
+        }
+      }, []) || [];
+    return getTreeData(searchTagList);
+  }, [tagList, searchValue]);
+
   // const moreItems: MenuProps['items'] = [
   //   {
   //     key: 'clear',
@@ -161,37 +237,6 @@ export default function Home() {
       toggleExpand(true);
     }, 30);
   };
-
-  // 是否开启虚拟滚动（数据量大时开启虚拟滚动）
-  const virtual = useMemo(() => {
-    return (countInfo?.groupCount || 0) > 100 || (countInfo?.tabCount || 0) > 1200;
-  }, [countInfo]);
-
-  // 搜索过滤后的 treeData
-  const searchTreeData = useMemo(() => {
-    if (!searchValue) return treeData;
-    const value = searchValue?.trim().toLowerCase();
-    const searchTagList =
-      tagList.reduce<TagItem[]>((result, tag): TagItem[] => {
-        if (tag?.tagName?.toLowerCase().includes(value)) {
-          return [...result, tag];
-        }
-
-        const groupList =
-          tag?.groupList?.reduce<GroupItem[]>((list, group: GroupItem): GroupItem[] => {
-            if (group?.groupName?.toLowerCase().includes(value)) {
-              return [...list, group];
-            }
-            return list;
-          }, []) || [];
-        if (groupList?.length > 0) {
-          return [...result, { ...tag, groupList }];
-        } else {
-          return result;
-        }
-      }, []) || [];
-    return getTreeData(searchTagList);
-  }, [tagList, searchValue]);
 
   // 判断节点是否可拖拽
   const isNodeDraggable = useCallback((node: TreeDataNode) => {
@@ -268,6 +313,11 @@ export default function Home() {
             <div className="sidebar-action-box">
               <ToggleSidebarBtn onCollapseChange={setSidebarCollapsed}></ToggleSidebarBtn>
               {selectedTagKey ? <SortingBtns onSort={onSort}></SortingBtns> : null}
+              {computing && (
+                <div className="computing-icon">
+                  <LoadingOutlined style={{ fontSize: 20 }} />
+                </div>
+              )}
             </div>
 
             <div className="sidebar-inner-content">
@@ -331,7 +381,8 @@ export default function Home() {
                   {searchTreeData?.length > 0 ? (
                     <Tree
                       ref={treeRef}
-                      virtual={virtual}
+                      virtual={virtualMap.tree}
+                      // virtual={false}
                       height={treeBoxHeight}
                       draggable={{ icon: false, nodeDraggable: isNodeDraggable }}
                       allowDrop={checkAllowDrop}
@@ -347,7 +398,7 @@ export default function Home() {
                           node={node}
                           selected={selectedKeys.includes(node.key)}
                           container={treeRef.current}
-                          refreshKey={refreshKey}
+                          // refreshKey={refreshKey}
                           onAction={onTreeNodeAction}
                           onTabItemDrop={handleTabItemDrop}
                           onMoveTo={handleAllTabGroupsMoveTo}
@@ -374,13 +425,21 @@ export default function Home() {
         </StyledSidebarWrapper>
         {/* 单个标签组（标签列表） */}
         <div className="content">
-          {selectedTag?.children?.map(
+          {virtualMap.tabList && (
+            <div className="tip">
+              <Typography.Text type="warning">
+                分类中标签页数量超过预定值, 将只展示单个标签组
+              </Typography.Text>
+            </div>
+          )}
+          {(currGroupList as TreeDataNodeTabGroup[])?.map(
             (tabGroup: TreeDataNodeTabGroup) =>
               tabGroup?.originData && (
                 <TabGroup
                   key={tabGroup.key}
                   selected={tabGroup.key === selectedTabGroupKey}
-                  refreshKey={refreshKey}
+                  // refreshKey={refreshKey}
+                  refreshKey={tabGroup.key === selectedTabGroupKey ? refreshKey : undefined}
                   tagList={tagList}
                   {...tabGroup.originData}
                   onChange={(data) => handleTabGroupChange(tabGroup, data)}

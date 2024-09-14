@@ -1,7 +1,21 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { theme, message, Modal, Space, Divider, Tag, Checkbox } from 'antd';
+import {
+  theme,
+  message,
+  Skeleton,
+  Modal,
+  Space,
+  Divider,
+  Tag,
+  Checkbox,
+} from 'antd';
 import type { CheckboxProps } from 'antd';
-import { LockOutlined, StarOutlined, CloseOutlined } from '@ant-design/icons';
+import {
+  LockOutlined,
+  StarOutlined,
+  CloseOutlined,
+  DownOutlined,
+} from '@ant-design/icons';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
@@ -27,6 +41,7 @@ import type {
 import { dndKeys } from './constants';
 import MoveToModal from './MoveToModal';
 import useMoveTo from './hooks/moveTo';
+import useRest from './hooks/showRest';
 
 const dndKey = dndKeys.tabItem;
 
@@ -91,6 +106,7 @@ export default function TabGroup({
   const [messageApi, messageContextHolder] = message.useMessage();
   const { $fmt } = useIntlUtls();
   const groupRef = useRef<HTMLDivElement>(null);
+  const [rendering, setRendering] = useState(true);
   const [selectedTabIds, setSelectedTabIds] = useState<string[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [dedupModalVisible, setDedupModalVisible] = useState(false);
@@ -103,6 +119,11 @@ export default function TabGroup({
     onClose: onMoveToClose,
     moveData,
   } = useMoveTo();
+
+  const { showRest, defaultList, restList, handleShowRest } = useRest<TabItem>({
+    list: tabList,
+    totalCount: tabList?.length,
+  });
 
   // 已选择的tabItem数组
   const selectedTabs = useMemo(() => {
@@ -121,6 +142,7 @@ export default function TabGroup({
   const handleSelectAll: CheckboxProps['onChange'] = (e) => {
     const checked = e.target.checked;
     if (checked) {
+      handleShowRest();
       setSelectedTabIds(tabList.map((tab) => tab.tabId));
     } else {
       setSelectedTabIds([]);
@@ -153,13 +175,58 @@ export default function TabGroup({
     }
   };
 
-  useEffect(() => {
+  const handleScroll = (behavior: ScrollBehavior = 'instant') => {
     if (selected && groupRef.current) {
       // console.log('groupRef.current', groupRef.current)
       const offsetTop = groupRef.current?.offsetTop || 0;
-      window.scrollTo({ top: offsetTop - 100, behavior: 'instant' });
+      window.scrollTo({ top: offsetTop - 100, behavior });
     }
-  }, [refreshKey, selected]);
+  };
+  useEffect(() => {
+    handleScroll();
+  }, [selected]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      handleScroll();
+    }, 300);
+  }, [refreshKey]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setRendering(false);
+    })
+  }, []);
+
+  function TabListMarkup({ tab, index }: { tab: TabItem; index: number }) {
+    return (
+      <DndComponent<DndTabItemProps>
+        canDrag={canDrag && !isLocked && selectedTabIds.length === 0}
+        key={tab.tabId || index}
+        data={{ ...tab, index, groupId, dndKey }}
+        dndKey={dndKey}
+        onDrop={(...props) => {
+          onDrop?.(...props);
+          setTimeout(() => {
+            handleShowRest();
+          }, 100);
+        }}
+      >
+        <TabListItem
+          key={tab.tabId || index}
+          group={{ groupId, isLocked, isStarred }}
+          tab={tab}
+          onRemove={async () => {
+            await onTabRemove?.(groupId, [tab]);
+            setSelectedTabIds(selectedTabIds.filter((id) => id !== tab.tabId));
+          }}
+          onChange={onTabChange}
+        />
+      </DndComponent>
+    );
+  }
+
+  if (rendering) return <Skeleton />;
 
   return (
     <>
@@ -334,26 +401,28 @@ export default function TabGroup({
               value={selectedTabIds}
               onChange={setSelectedTabIds}
             >
-              {tabList.map((tab, index) => (
-                <DndComponent<DndTabItemProps>
-                  canDrag={canDrag && !isLocked && selectedTabIds.length === 0}
-                  key={tab.tabId || index}
-                  data={{ ...tab, index, groupId, dndKey }}
-                  dndKey={dndKey}
-                  onDrop={onDrop}
-                >
-                  <TabListItem
-                    key={tab.tabId || index}
-                    group={{ groupId, isLocked, isStarred }}
-                    tab={tab}
-                    onRemove={async () => {
-                      await onTabRemove?.(groupId, [tab]);
-                      setSelectedTabIds(selectedTabIds.filter((id) => id !== tab.tabId));
-                    }}
-                    onChange={onTabChange}
-                  />
-                </DndComponent>
+              {defaultList.map((tab, index) => (
+                <TabListMarkup key={tab.tabId} tab={tab} index={index}></TabListMarkup>
               ))}
+              {showRest ? (
+                restList.map((tab, index) => (
+                  <TabListMarkup
+                    key={tab.tabId}
+                    tab={tab}
+                    index={index + defaultList.length}
+                  ></TabListMarkup>
+                ))
+              ) : (
+                <div className="show-rest-btn">
+                  <Space onClick={handleShowRest}>
+                    展示更多
+                    <DownOutlined />
+                  </Space>
+                </div>
+              )}
+              {/* {tabList.map((tab, index) => (
+                <TabListMarkup key={tab.tabId} tab={tab} index={index}></TabListMarkup>
+              ))} */}
             </Checkbox.Group>
           </StyledTabListWrapper>
         </DropComponent>
