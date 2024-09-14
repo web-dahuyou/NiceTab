@@ -3,7 +3,7 @@ import { useState } from 'react';
 export default function useRest<T>({
   list = [],
   totalCount = 0,
-  defaultCount = 8,
+  defaultCount = 10,
 }: {
   list: T[];
   totalCount?: number;

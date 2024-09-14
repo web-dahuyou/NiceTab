@@ -70,4 +70,5 @@ export default {
   'home.moveTo.mergeLabel': 'Merge Duplicate Items ?',
   'home.moveTo.mergeTip.1': '1. If Checked, when moving tabs, the tabs will be de-duplicated with the same URL in the target group.',
   'home.moveTo.mergeTip.2': '2. If Checked, when moving a tab group, it will be merged to the group of the same name in the target category (tag).',
+  'home.tip.tooManyTabs': 'The number of tabs exceeds the predetermined value, only show a single tab group.',
 }

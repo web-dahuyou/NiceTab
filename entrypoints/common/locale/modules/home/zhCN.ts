@@ -62,4 +62,5 @@ export default {
   'home.moveTo.mergeLabel': '是否合并重复项',
   'home.moveTo.mergeTip.1': '1、勾选后，如果移动标签页，则与目标分组中相同 url 的标签页合并（去重）。',
   'home.moveTo.mergeTip.2': '2、勾选后，如果移动标签组，则与目标分类中同名的标签组合并，标签页去重。',
+  'home.tip.tooManyTabs': '分类中标签页数量超过预定值, 将只展示单个标签组',
 }

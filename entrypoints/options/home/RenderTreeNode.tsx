@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import { theme, Modal } from 'antd';
 import { CloseOutlined, PlusOutlined, SendOutlined } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -17,10 +17,10 @@ const allowDropKey = dndKeys.tabItem;
 // 渲染 treeNode 节点
 export default function RenderTreeNode({
   node,
-  selected,
-  container,
-  refreshKey,
-  virtual = false,
+  // selected,
+  // container,
+  // refreshKey,
+  // virtual = false,
   onAction,
   onTabItemDrop, // 这个 onTabItemDrop 只是为了方便右侧面板的标签页拖拽到左侧树的标签组，左侧树中的 分类和标签组的拖拽由 antd 的 Tree 组件自带实现
   onMoveTo,
@@ -53,6 +53,10 @@ export default function RenderTreeNode({
     return node.type === 'tag' && !!node?.originData?.static;
   }, [node]);
 
+  const onMoveToClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    openMoveToModal?.({ tagId: node.key as string });
+  };
   const onRemoveClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setModalVisible(true);
@@ -120,7 +124,7 @@ export default function RenderTreeNode({
                   $size="14"
                   title={$fmt('home.moveAllGroupTo')}
                   $hoverColor={token.colorPrimaryHover}
-                  onClick={() => openMoveToModal?.({ tagId: node.key as string })}
+                  onClick={onMoveToClick}
                 >
                   <SendOutlined />
                 </StyledActionIconBtn>
@@ -129,7 +133,7 @@ export default function RenderTreeNode({
                   $size="14"
                   title={$fmt('home.createTabGroup')}
                   $hoverColor={token.colorPrimaryHover}
-                  onClick={(e) => handleGroupCreate?.(e)}
+                  onClick={handleGroupCreate}
                 >
                   <PlusOutlined />
                 </StyledActionIconBtn>
@@ -141,7 +145,7 @@ export default function RenderTreeNode({
                 $size="14"
                 title={$fmt('common.remove')}
                 $hoverColor={ENUM_COLORS.red}
-                onClick={(e) => onRemoveClick?.(e)}
+                onClick={onRemoveClick}
               >
                 <CloseOutlined />
               </StyledActionIconBtn>

@@ -2,9 +2,9 @@ import { useCallback, useState } from 'react';
 import { Form, Button, Radio, Input, Divider, Space, Upload, message } from 'antd';
 import type { FormProps, UploadProps, RadioChangeEvent } from 'antd';
 import styled from 'styled-components';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { saveAs } from 'file-saver';
 import dayjs from 'dayjs';
+// import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { saveAs } from 'file-saver';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { tabListUtils } from '~/entrypoints/common/storage';
 import { extContentImporter, extContentExporter } from '~/entrypoints/common/utils';
@@ -33,7 +33,7 @@ export default function ImportExport() {
   const [importMode, setImportMode] = useState('append');
   const [exportFormatType, setExportFormatType] = useState(1);
   const [importLoading, setImportLoading] = useState(false);
-  const [exportLoading, setExportLoading] = useState(false);
+  // const [exportLoading, setExportLoading] = useState(false);
   const [downloadLoading, setDownloadLoading] = useState(false);
 
   // 导入操作
@@ -60,7 +60,7 @@ export default function ImportExport() {
     const reader = new FileReader();
     reader.onload = () => {
       const content = reader.result as string;
-      handleImport({ formatType: 1, importContent: content });
+      handleImport({ formatType, importContent: content });
     };
     reader.readAsText(file);
     return false;
@@ -68,15 +68,14 @@ export default function ImportExport() {
 
   const onExportFormatTypeChange = (e: RadioChangeEvent) => {
     setExportFormatType(e.target.value);
-    setExportContent('');
   };
-  const handlePreview = async () => {
-    setExportLoading(true);
-    setTimeout(async () => {
-      await getExportContent();
-      setExportLoading(false);
-    }, 500);
-  };
+  // const handlePreview = async () => {
+  //   setExportLoading(true);
+  //   setTimeout(async () => {
+  //     await getExportContent();
+  //     setExportLoading(false);
+  //   }, 500);
+  // };
   // 获取导出文本内容
   const getExportContent = useCallback(async () => {
     const formatType = exportFormatType || 1;
@@ -115,6 +114,12 @@ export default function ImportExport() {
       setDownloadLoading(false);
     }, 500);
   }, [exportFormatType]);
+
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     getExportContent();
+  //   }, 300);
+  // }, [exportFormatType]);
 
   return (
     <>
@@ -166,17 +171,15 @@ export default function ImportExport() {
               <Button type="primary" htmlType="submit" loading={importLoading}>
                 {$fmt('importExport.importFromText')}
               </Button>
-              {+formatType === 1 && (
-                <Upload
-                  accept=".json"
-                  showUploadList={false}
-                  beforeUpload={handleSelectFile}
-                >
-                  <Button type="primary" loading={importLoading}>
-                    {$fmt('importExport.importFromFile')}
-                  </Button>
-                </Upload>
-              )}
+              <Upload
+                accept={formatType === 1 ? '.json' : '.txt'}
+                showUploadList={false}
+                beforeUpload={handleSelectFile}
+              >
+                <Button type="primary" loading={importLoading}>
+                  {$fmt('importExport.importFromFile')}
+                </Button>
+              </Upload>
             </Space>
           </Form.Item>
         </Form>
@@ -197,24 +200,24 @@ export default function ImportExport() {
               ))}
             </Radio.Group>
           </Form.Item>
-          <Form.Item label={$fmt('importExport.exportContent')}>
+          {/* <Form.Item label={$fmt('importExport.exportContent')}>
             <Input.TextArea
               readOnly
               autoSize={{ minRows: 6, maxRows: 16 }}
               value={exportContent}
               style={{ color: '#999' }}
             />
-          </Form.Item>
+          </Form.Item> */}
           <Form.Item>
             <Space size={12} align="center">
-              <Button type="primary" loading={exportLoading} onClick={handlePreview}>
+              {/* <Button type="primary" loading={exportLoading} onClick={handlePreview}>
                 {$fmt('importExport.getContent')}
               </Button>
               {exportContent && (
                 <CopyToClipboard text={exportContent} onCopy={handleCopy}>
                   <Button type="primary">{$fmt('importExport.copy')}</Button>
                 </CopyToClipboard>
-              )}
+              )} */}
               <Button type="primary" loading={downloadLoading} onClick={handleDownload}>
                 {$fmt('importExport.exportToFile')}
               </Button>

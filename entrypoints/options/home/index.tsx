@@ -397,7 +397,7 @@ export default function Home() {
                         <RenderTreeNode
                           node={node}
                           selected={selectedKeys.includes(node.key)}
-                          container={treeRef.current}
+                          // container={treeRef.current}
                           // refreshKey={refreshKey}
                           onAction={onTreeNodeAction}
                           onTabItemDrop={handleTabItemDrop}
@@ -428,7 +428,7 @@ export default function Home() {
           {virtualMap.tabList && (
             <div className="tip">
               <Typography.Text type="warning">
-                分类中标签页数量超过预定值, 将只展示单个标签组
+                {$fmt('home.tip.tooManyTabs')}
               </Typography.Text>
             </div>
           )}
@@ -439,7 +439,9 @@ export default function Home() {
                   key={tabGroup.key}
                   selected={tabGroup.key === selectedTabGroupKey}
                   // refreshKey={refreshKey}
-                  refreshKey={tabGroup.key === selectedTabGroupKey ? refreshKey : undefined}
+                  refreshKey={
+                    tabGroup.key === selectedTabGroupKey ? refreshKey : undefined
+                  }
                   tagList={tagList}
                   {...tabGroup.originData}
                   onChange={(data) => handleTabGroupChange(tabGroup, data)}

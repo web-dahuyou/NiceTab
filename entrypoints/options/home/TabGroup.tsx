@@ -175,22 +175,33 @@ export default function TabGroup({
     }
   };
 
-  const handleScroll = (behavior: ScrollBehavior = 'instant') => {
-    if (selected && groupRef.current) {
-      // console.log('groupRef.current', groupRef.current)
-      const offsetTop = groupRef.current?.offsetTop || 0;
-      window.scrollTo({ top: offsetTop - 100, behavior });
-    }
-  };
-  useEffect(() => {
-    handleScroll();
-  }, [selected]);
+  // const handleScroll = (behavior: ScrollBehavior = 'instant') => {
+  //   if (selected && groupRef.current) {
+  //     // console.log('groupRef.current', groupRef.current)
+  //     const offsetTop = groupRef.current?.offsetTop || 0;
+  //     window.scrollTo({ top: offsetTop - 100, behavior });
+  //   }
+  // };
+  // useEffect(() => {
+  //   handleScroll();
+  // }, [selected]);
 
   useEffect(() => {
     setTimeout(() => {
-      handleScroll();
+      // handleScroll('smooth');
+      if (selected && groupRef.current) {
+        const pagePaddingTop = 100
+        const body = document.documentElement || document.body;
+        const scrollTop = body.scrollTop;
+        const groupTop = groupRef.current?.offsetTop || 0;
+        if (groupTop < scrollTop + pagePaddingTop) {
+          body.scrollTo(0, groupTop - pagePaddingTop - 60);
+        } else if (groupTop + pagePaddingTop + 80 > window.innerHeight + scrollTop) {
+          body.scrollTo(0, groupTop + pagePaddingTop - window.innerHeight + 300);
+        }
+      }
     }, 300);
-  }, [refreshKey]);
+  }, [refreshKey, selected]);
 
   useEffect(() => {
     setTimeout(() => {
