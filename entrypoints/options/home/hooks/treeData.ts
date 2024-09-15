@@ -98,8 +98,8 @@ export function useTreeData() {
     ) => {
       if (node.type === 'tag') {
         setSelectedTagKey(node.key);
-        // setSelectedTabGroupKey(node?.children?.[0]?.key);
-        setSelectedTabGroupKey('');
+        setSelectedTabGroupKey(node?.children?.[0]?.key || '');
+        // setSelectedTabGroupKey('');
         setExpandedKeys((keys) => {
           return [...new Set([...keys, node.key])];
         });

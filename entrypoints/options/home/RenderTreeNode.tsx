@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import { theme, Modal } from 'antd';
 import { CloseOutlined, PlusOutlined, SendOutlined } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -17,13 +17,13 @@ const allowDropKey = dndKeys.tabItem;
 // 渲染 treeNode 节点
 export default function RenderTreeNode({
   node,
-  selected,
-  container,
-  refreshKey,
-  virtual = false,
+  // selected,
+  // container,
+  // refreshKey,
+  // virtual = false,
   onAction,
   onTabItemDrop, // 这个 onTabItemDrop 只是为了方便右侧面板的标签页拖拽到左侧树的标签组，左侧树中的 分类和标签组的拖拽由 antd 的 Tree 组件自带实现
-  onMoveTo
+  onMoveTo,
 }: RenderTreeNodeProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
@@ -40,7 +40,7 @@ export default function RenderTreeNode({
     openModal: openMoveToModal,
     onConfirm: onMoveToConfirm,
     onClose: onMoveToClose,
-    moveData
+    moveData,
   } = useMoveTo();
 
   // 是否锁定
@@ -53,6 +53,10 @@ export default function RenderTreeNode({
     return node.type === 'tag' && !!node?.originData?.static;
   }, [node]);
 
+  const onMoveToClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    openMoveToModal?.({ tagId: node.key as string });
+  };
   const onRemoveClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setModalVisible(true);
@@ -81,33 +85,6 @@ export default function RenderTreeNode({
     e.stopPropagation();
     setModalVisible(false);
   };
-
-  /* 直接采用antd Tree的scrollTo方法 */
-  useEffect(() => {
-    setTimeout(() => {
-      if (selected && container && nodeRef.current) {
-        container?.scrollTo({ key: node.key, offset: 80 })
-      }
-    }, 100);
-  }, [container, refreshKey, selected]);
-
-  /* 非虚拟滚动模式可以采用这个方法 */
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     if (selected && container && nodeRef.current) {
-  //         const containerRect = container.getBoundingClientRect();
-  //         const nodeRect = nodeRef.current.getBoundingClientRect();
-
-  //         const scrollTop = container.scrollTop;
-
-  //         if (nodeRect.top < containerRect.top) {
-  //           container.scrollTo(0, scrollTop - 80);
-  //         } else if (nodeRect.bottom > containerRect.bottom) {
-  //           container.scrollTo(0, scrollTop + 80);
-  //         }
-  //       }
-  //     }, 300);
-  // }, [container, refreshKey, selected]);
 
   return (
     // 这个 DropComponent 只是为了方便右侧面板的标签页拖拽到左侧树的标签组，左侧树中的 分类和标签组的拖拽由 antd 的 Tree 组件自带实现
@@ -140,34 +117,35 @@ export default function RenderTreeNode({
           )}
 
           <span className="tree-node-icon-group">
-            {node.type === 'tag' && <>
-              <StyledActionIconBtn
-                className="btn-add"
-                $size="14"
-                title={$fmt('home.moveAllGroupTo')}
-                $hoverColor={token.colorPrimaryHover}
-                onClick={() => openMoveToModal?.({ tagId: node.key as string })}
-              >
-                <SendOutlined />
-              </StyledActionIconBtn>
-              <StyledActionIconBtn
-                className="btn-add"
-                $size="14"
-                title={$fmt('home.createTabGroup')}
-                $hoverColor={token.colorPrimaryHover}
-                onClick={(e) => handleGroupCreate?.(e)}
-              >
-                <PlusOutlined />
-              </StyledActionIconBtn>
-            </>
-            }
+            {node.type === 'tag' && (
+              <>
+                <StyledActionIconBtn
+                  className="btn-add"
+                  $size="14"
+                  title={$fmt('home.moveAllGroupTo')}
+                  $hoverColor={token.colorPrimaryHover}
+                  onClick={onMoveToClick}
+                >
+                  <SendOutlined />
+                </StyledActionIconBtn>
+                <StyledActionIconBtn
+                  className="btn-add"
+                  $size="14"
+                  title={$fmt('home.createTabGroup')}
+                  $hoverColor={token.colorPrimaryHover}
+                  onClick={handleGroupCreate}
+                >
+                  <PlusOutlined />
+                </StyledActionIconBtn>
+              </>
+            )}
             {!isLocked && !isStaticTag && (
               <StyledActionIconBtn
                 className="btn-remove"
                 $size="14"
                 title={$fmt('common.remove')}
                 $hoverColor={ENUM_COLORS.red}
-                onClick={(e) => onRemoveClick?.(e)}
+                onClick={onRemoveClick}
               >
                 <CloseOutlined />
               </StyledActionIconBtn>
@@ -188,7 +166,7 @@ export default function RenderTreeNode({
         )}
 
         {/* 移动到弹窗 */}
-        { moveToModalVisible && (
+        {moveToModalVisible && (
           <MoveToModal
             visible={moveToModalVisible}
             moveData={moveData}

@@ -86,6 +86,14 @@ export const StyledTabListWrapper = styled.div`
     width: 100%;
     display: block;
   }
+  .show-rest-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 12px;
+    cursor: pointer;
+    color: ${(props) => props.theme.colorTextSecondary || '#666'};
+  }
 `;
 
 export default {

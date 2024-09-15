@@ -37,6 +37,9 @@ export const StyledSidebarWrapper = styled.div<{
       align-items: center;
       justify-content: center;
       visibility: visible;
+      .computing-icon {
+        margin-top: 10px;
+      }
     }
   }
 
@@ -104,7 +107,9 @@ export const StyledListWrapper = styled.div<{
 
   .content {
     padding-left: 40px;
-    // border-left: 1px solid rgba(5, 5, 5, 0.06);
+    .tip {
+      margin-bottom: 20px;
+    }
   }
 `;
 

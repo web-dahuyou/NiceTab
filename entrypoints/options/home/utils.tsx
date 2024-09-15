@@ -26,6 +26,16 @@ export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
   }));
 };
 
+// 获取当前分类下的标签组和标签组页数量
+export const getSelectedCounts = (tag: TagItem) => {
+  const groupCount = tag?.groupList?.length || 0;
+  let tabCount = 0;
+  tag?.groupList?.forEach(group => {
+    tabCount += group.tabList?.length || 0;
+  });
+  return { groupCount, tabCount };
+}
+
 // 生成Cascader级联数据
 export const getCascaderData = async (
   tagList: TagItem[],
