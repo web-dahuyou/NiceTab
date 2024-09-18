@@ -125,6 +125,16 @@ export default function TabGroup({
     totalCount: tabList?.length,
   });
 
+  const removeDesc = useMemo(() => {
+    const typeName = $fmt(`home.tabGroup`);
+    return $fmt({
+      id: 'home.removeDesc',
+      values: {
+        type: `${typeName}${` <strong>[${groupName}]</strong>`}`,
+      },
+    });
+  }, [$fmt]);
+
   // 已选择的tabItem数组
   const selectedTabs = useMemo(() => {
     return tabList.filter((tab) => selectedTabIds.includes(tab.tabId));
@@ -426,7 +436,7 @@ export default function TabGroup({
               ) : (
                 <div className="show-rest-btn">
                   <Space onClick={handleShowRest}>
-                    展示更多
+                    {$fmt('common.showMore')}
                     <DownOutlined />
                   </Space>
                 </div>
@@ -449,8 +459,8 @@ export default function TabGroup({
           onOk={handleTabGroupRemove}
           onCancel={() => setModalVisible(false)}
         >
-          <div>
-            {$fmt({ id: 'home.removeDesc', values: { type: $fmt(`home.tabGroup`) } })}
+          <div dangerouslySetInnerHTML={{ __html: removeDesc }}>
+            {/* {$fmt({ id: 'home.removeDesc', values: { type: $fmt(`home.tabGroup`) } })} */}
           </div>
         </Modal>
       )}

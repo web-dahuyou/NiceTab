@@ -30,11 +30,11 @@ export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
 export const getSelectedCounts = (tag: TagItem) => {
   const groupCount = tag?.groupList?.length || 0;
   let tabCount = 0;
-  tag?.groupList?.forEach(group => {
+  tag?.groupList?.forEach((group) => {
     tabCount += group.tabList?.length || 0;
   });
   return { groupCount, tabCount };
-}
+};
 
 // 生成Cascader级联数据
 export const getCascaderData = async (
@@ -42,11 +42,12 @@ export const getCascaderData = async (
   moveData?: MoveDataProps
 ): Promise<CascaderOption[]> => {
   const localeMessage = await getLocaleMessages();
-  const { groupId, tabs } = moveData || {};
-  const moveType = tabs && tabs?.length > 0 ? 'tab' : 'tabGroup';
-
+  const { tagId, groupId, tabs } = moveData || {};
+  const moveType = tagId ? 'tag' : tabs && tabs?.length > 0 ? 'tab' : 'tabGroup';
   const tagDisabled = (tag: TagItem) => {
-    if (moveType === 'tabGroup') {
+    if (moveType === 'tag') {
+      return tag.tagId === tagId;
+    } else if (moveType === 'tabGroup') {
       return tag?.groupList.some((g) => g.groupId === groupId);
     } else {
       return tag?.groupList?.length === 0;
@@ -75,7 +76,7 @@ export const getCascaderData = async (
             <span>{group.groupName}</span>
           </div>
         ),
-        disabled: moveType === 'tabGroup' || group.groupId === groupId,
+        disabled: moveType !== 'tab' || group.groupId === groupId,
         parentKey: tag.tagId,
         isLeaf: true,
         originData: { ...group },
@@ -83,7 +84,6 @@ export const getCascaderData = async (
     }),
   }));
 };
-
 
 export default {
   getTreeData,

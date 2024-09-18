@@ -48,6 +48,11 @@ import { useTreeData } from './hooks/treeData';
 import useHotkeys from './hooks/hotkeys';
 import { getTreeData, getSelectedCounts } from './utils';
 import { VIRTUAL_MAX_TAB_COUNT } from './constants';
+import {
+  useTreeNodeAction,
+  RemoveActionModal,
+  MoveToActionModal,
+} from './TreeNodeActionModals';
 
 export default function Home() {
   const { $fmt } = useIntlUtls();
@@ -88,6 +93,14 @@ export default function Home() {
   } = useTreeData();
 
   const { hotkeyList } = useHotkeys({ onAction: handleHotkeyAction });
+
+  const {
+    onAction: handleTreeNodeAction,
+    actionParams: treeNodeActionParams,
+    removeModalVisible,
+    moveToModalVisible,
+    closeModal,
+  } = useTreeNodeAction(onTreeNodeAction);
 
   const [treeBoxHeight, setTreeBoxHeight] = useState<number>(400);
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
@@ -399,9 +412,8 @@ export default function Home() {
                           selected={selectedKeys.includes(node.key)}
                           // container={treeRef.current}
                           // refreshKey={refreshKey}
-                          onAction={onTreeNodeAction}
+                          onAction={handleTreeNodeAction}
                           onTabItemDrop={handleTabItemDrop}
-                          onMoveTo={handleAllTabGroupsMoveTo}
                         ></RenderTreeNode>
                       )}
                       onExpand={(expandedKeys) => setExpandedKeys(expandedKeys)}
@@ -505,6 +517,32 @@ export default function Home() {
           <HotkeyList list={hotkeyList}></HotkeyList>
         </StyledHelpInfoBox>
       </Drawer>
+
+      {/* 左侧列表分类和标签组删除 */}
+      { removeModalVisible && (
+        <RemoveActionModal
+          open={removeModalVisible}
+          actionParams={treeNodeActionParams}
+          onOk={(...props) => {
+            closeModal('remove');
+            onTreeNodeAction(...props);
+          }}
+          onCancel={() => closeModal('remove')}
+        ></RemoveActionModal>
+      )}
+
+      {/* 移动到弹窗 */}
+      { moveToModalVisible && (
+        <MoveToActionModal
+          open={moveToModalVisible}
+          actionParams={treeNodeActionParams}
+          onOk={(...props) => {
+            closeModal('moveTo');
+            handleAllTabGroupsMoveTo(...props);
+          }}
+          onCancel={() => closeModal('moveTo')}
+        ></MoveToActionModal>
+      )}
     </>
   );
 }

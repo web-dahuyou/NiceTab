@@ -618,7 +618,7 @@ export default class TabListUtils {
         targetTag.groupList = mergeGroupsAndTabs({
           targetList: targetTag.groupList || [],
           insertList: allSourceGroups,
-          exceptValue: UNNAMED_GROUP,
+          // exceptValue: UNNAMED_GROUP,
         });
 
         await this.setTagList(tagList);

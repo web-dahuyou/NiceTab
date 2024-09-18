@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useRef } from 'react';
-import { theme, Modal } from 'antd';
+import { theme } from 'antd';
 import { CloseOutlined, PlusOutlined, SendOutlined } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { ENUM_COLORS, UNNAMED_TAG, UNNAMED_GROUP } from '~/entrypoints/common/constants';
@@ -9,8 +9,6 @@ import { RenderTreeNodeProps } from './types';
 import { dndKeys } from './constants';
 import EditInput from '../components/EditInput';
 import DropComponent from '@/entrypoints/common/components/DropComponent';
-import MoveToModal from './MoveToModal';
-import useMoveTo from './hooks/moveTo';
 
 const allowDropKey = dndKeys.tabItem;
 
@@ -23,25 +21,11 @@ export default function RenderTreeNode({
   // virtual = false,
   onAction,
   onTabItemDrop, // 这个 onTabItemDrop 只是为了方便右侧面板的标签页拖拽到左侧树的标签组，左侧树中的 分类和标签组的拖拽由 antd 的 Tree 组件自带实现
-  onMoveTo,
 }: RenderTreeNodeProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const nodeRef = useRef<HTMLDivElement>(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const removeDesc = $fmt({
-    id: 'home.removeDesc',
-    values: { type: $fmt(`home.${node.type || 'tag'}`) },
-  });
   const unnamedNodeName = node.type === 'tag' ? UNNAMED_TAG : UNNAMED_GROUP;
-
-  const {
-    modalVisible: moveToModalVisible,
-    openModal: openMoveToModal,
-    onConfirm: onMoveToConfirm,
-    onClose: onMoveToClose,
-    moveData,
-  } = useMoveTo();
 
   // 是否锁定
   const isLocked = useMemo(() => {
@@ -55,11 +39,11 @@ export default function RenderTreeNode({
 
   const onMoveToClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    openMoveToModal?.({ tagId: node.key as string });
+    onAction?.({ actionType: node.type, node, actionName: 'moveTo' });
   };
   const onRemoveClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setModalVisible(true);
+    onAction?.({ actionType: node.type, node, actionName: 'remove' });
   };
   const handleGroupCreate = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -74,16 +58,6 @@ export default function RenderTreeNode({
       actionName: 'rename',
       data: { [fieldKey]: value || unnamedNodeName },
     });
-  };
-
-  const handleRemove = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onAction?.({ actionType: node.type, node, actionName: 'remove' });
-    setModalVisible(false);
-  };
-  const handleModalCancel = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setModalVisible(false);
   };
 
   return (
@@ -119,15 +93,17 @@ export default function RenderTreeNode({
           <span className="tree-node-icon-group">
             {node.type === 'tag' && (
               <>
-                <StyledActionIconBtn
-                  className="btn-add"
-                  $size="14"
-                  title={$fmt('home.moveAllGroupTo')}
-                  $hoverColor={token.colorPrimaryHover}
-                  onClick={onMoveToClick}
-                >
-                  <SendOutlined />
-                </StyledActionIconBtn>
+                { node.children?.length ? (
+                  <StyledActionIconBtn
+                    className="btn-add"
+                    $size="14"
+                    title={$fmt('home.moveAllGroupTo')}
+                    $hoverColor={token.colorPrimaryHover}
+                    onClick={onMoveToClick}
+                  >
+                    <SendOutlined />
+                  </StyledActionIconBtn>
+                ) : null}
                 <StyledActionIconBtn
                   className="btn-add"
                   $size="14"
@@ -152,32 +128,6 @@ export default function RenderTreeNode({
             )}
           </span>
         </StyledTreeNodeItem>
-
-        {modalVisible && (
-          <Modal
-            title={$fmt('home.removeTitle')}
-            width={400}
-            open={modalVisible}
-            onOk={handleRemove}
-            onCancel={handleModalCancel}
-          >
-            <div>{removeDesc}</div>
-          </Modal>
-        )}
-
-        {/* 移动到弹窗 */}
-        {moveToModalVisible && (
-          <MoveToModal
-            visible={moveToModalVisible}
-            moveData={moveData}
-            onOk={(targetData) => {
-              onMoveToConfirm(() => {
-                onMoveTo?.({ targetData });
-              });
-            }}
-            onCancel={onMoveToClose}
-          />
-        )}
       </>
     </DropComponent>
   );
