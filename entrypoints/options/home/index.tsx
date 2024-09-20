@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useRef } from 'react';
+import { useState, useMemo, useCallback, useRef, useLayoutEffect } from 'react';
 import {
   Flex,
   Tree,
@@ -113,7 +113,7 @@ export default function Home() {
   // 是否开启虚拟滚动（数据量大时开启虚拟滚动）
   const virtualMap = useMemo(() => {
     const { groupCount = 0, tabCount = 0 } = getSelectedCounts(selectedTag.originData);
-    // console.log('virtualMap', groupCount, tabCount);
+    console.log('virtualMap', groupCount, tabCount);
     return {
       tree: (countInfo?.groupCount || 0) > 200 || groupCount > 30,
       tabList: tabCount > VIRTUAL_MAX_TAB_COUNT,
@@ -150,7 +150,7 @@ export default function Home() {
     }, 100);
   }, [virtualMap.tabList, selectedTabGroupKey, selectedTag, treeData]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setTimeout(() => {
       treeRef.current?.scrollTo({ key: selectedKeys[0], offset: 80 });
     }, 100);

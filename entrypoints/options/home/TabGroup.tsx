@@ -6,7 +6,6 @@ import {
   Modal,
   Space,
   Divider,
-  Tag,
   Checkbox,
 } from 'antd';
 import type { CheckboxProps } from 'antd';
@@ -14,7 +13,6 @@ import {
   LockOutlined,
   StarOutlined,
   CloseOutlined,
-  DownOutlined,
 } from '@ant-design/icons';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
@@ -41,7 +39,6 @@ import type {
 import { dndKeys } from './constants';
 import MoveToModal from './MoveToModal';
 import useMoveTo from './hooks/moveTo';
-import useRest from './hooks/showRest';
 
 const dndKey = dndKeys.tabItem;
 
@@ -120,11 +117,6 @@ export default function TabGroup({
     moveData,
   } = useMoveTo();
 
-  const { showRest, defaultList, restList, handleShowRest } = useRest<TabItem>({
-    list: tabList,
-    totalCount: tabList?.length,
-  });
-
   const removeDesc = useMemo(() => {
     const typeName = $fmt(`home.tabGroup`);
     return $fmt({
@@ -152,7 +144,6 @@ export default function TabGroup({
   const handleSelectAll: CheckboxProps['onChange'] = (e) => {
     const checked = e.target.checked;
     if (checked) {
-      handleShowRest();
       setSelectedTabIds(tabList.map((tab) => tab.tabId));
     } else {
       setSelectedTabIds([]);
@@ -210,7 +201,7 @@ export default function TabGroup({
           body.scrollTo(0, groupTop + pagePaddingTop - window.innerHeight + 300);
         }
       }
-    }, 300);
+    }, 100);
   }, [refreshKey, selected]);
 
   useEffect(() => {
@@ -226,12 +217,7 @@ export default function TabGroup({
         key={tab.tabId || index}
         data={{ ...tab, index, groupId, dndKey }}
         dndKey={dndKey}
-        onDrop={(...props) => {
-          onDrop?.(...props);
-          setTimeout(() => {
-            handleShowRest();
-          }, 100);
-        }}
+        onDrop={onDrop}
       >
         <TabListItem
           key={tab.tabId || index}
@@ -422,28 +408,9 @@ export default function TabGroup({
               value={selectedTabIds}
               onChange={setSelectedTabIds}
             >
-              {defaultList.map((tab, index) => (
+              {tabList.map((tab, index) => (
                 <TabListMarkup key={tab.tabId} tab={tab} index={index}></TabListMarkup>
               ))}
-              {showRest ? (
-                restList.map((tab, index) => (
-                  <TabListMarkup
-                    key={tab.tabId}
-                    tab={tab}
-                    index={index + defaultList.length}
-                  ></TabListMarkup>
-                ))
-              ) : (
-                <div className="show-rest-btn">
-                  <Space onClick={handleShowRest}>
-                    {$fmt('common.showMore')}
-                    <DownOutlined />
-                  </Space>
-                </div>
-              )}
-              {/* {tabList.map((tab, index) => (
-                <TabListMarkup key={tab.tabId} tab={tab} index={index}></TabListMarkup>
-              ))} */}
             </Checkbox.Group>
           </StyledTabListWrapper>
         </DropComponent>
