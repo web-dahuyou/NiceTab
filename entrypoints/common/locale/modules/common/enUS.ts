@@ -60,5 +60,6 @@ export default {
   'common.quickAction': 'Quick Action',
   'common.toggleThemeType': 'Toggle Light / Dark',
   'common.showMore': 'Show More',
+  'common.qrcode': 'QRCode',
 }
 

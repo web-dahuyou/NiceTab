@@ -78,9 +78,6 @@ importers:
       typescript:
         specifier: ^5.5.4
         version: 5.5.4
-      virtua:
-        specifier: ^0.34.2
-        version: 0.34.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       wxt:
         specifier: ^0.19.9
         version: 0.19.9(@types/node@22.5.1)(rollup@4.21.2)
@@ -2961,26 +2958,6 @@ packages:
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
     hasBin: true
-
-  virtua@0.34.2:
-    resolution: {integrity: sha512-r43hQsryJRqVChrf6Go52rScyc89szl/IxFclOJRXF5qd6fv1Lzb68K51htI1NhtaPk+GQxuS2Gd21YL5ZGeDg==}
-    peerDependencies:
-      react: '>=16.14.0'
-      react-dom: '>=16.14.0'
-      solid-js: '>=1.0'
-      svelte: '>=4.0'
-      vue: '>=3.2'
-    peerDependenciesMeta:
-      react:
-        optional: true
-      react-dom:
-        optional: true
-      solid-js:
-        optional: true
-      svelte:
-        optional: true
-      vue:
-        optional: true
 
   vite-node@2.0.5:
     resolution: {integrity: sha512-LdsW4pxj0Ot69FAoXZ1yTnA9bjGohr2yNBU7QKRxpz8ITSkhuDl6h3zS/tvgz4qrNjeRnvrWeXQ8ZF7Um4W00Q==}
@@ -6189,11 +6166,6 @@ snapshots:
   util-deprecate@1.0.2: {}
 
   uuid@8.3.2: {}
-
-  virtua@0.34.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
-    optionalDependencies:
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
 
   vite-node@2.0.5(@types/node@22.5.1):
     dependencies:
