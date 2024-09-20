@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useContext, useMemo, useState, useEffect } from 'react';
 import { theme, Checkbox, Modal, Cascader, Typography, Flex, Space, Tooltip } from 'antd';
 import type { CheckboxProps } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
@@ -7,6 +7,7 @@ import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { tabListUtils } from '~/entrypoints/common/storage';
 import type { TagItem } from '~/entrypoints/types';
 import type { MoveDataProps, MoveTargetProps, CascaderOption } from './types';
+import { HomeContext } from './hooks/treeData';
 import { getCascaderData } from './utils';
 
 const StyledCascaderWrapper = styled.div`
@@ -41,6 +42,7 @@ export default function MoveToModal({
 }: MoveToModalProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
+  const { treeDataHook } = useContext(HomeContext);
   const [options, setOptions] = useState<CascaderOption[]>([]); // 级联数据
   const [targetValue, setTargetValue] = useState<string[]>([]); // 选中的目标值
   const [targetOptions, setTargetOptions] = useState<CascaderOption[]>([]); // 选中的目标选项
@@ -118,7 +120,7 @@ export default function MoveToModal({
   };
 
   const initData = async () => {
-    const tagList = listData || (await tabListUtils.getTagList());
+    const tagList = treeDataHook?.tagList || listData || (await tabListUtils.getTagList());
     const cascaderData = await getCascaderData(tagList, moveData);
     setOptions(cascaderData);
   };
@@ -129,10 +131,6 @@ export default function MoveToModal({
       setTargetOptions([]);
     }
   }, [listData, visible]);
-
-  useEffect(() => {
-    initData();
-  }, []);
 
   return (
     <Modal

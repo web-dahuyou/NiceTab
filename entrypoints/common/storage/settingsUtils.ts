@@ -14,6 +14,7 @@ const {
   ALLOW_DUPLICATE_TABS,
   ALLOW_DUPLICATE_GROUPS,
   LINK_TEMPLATE,
+  TAB_COUNT_THRESHOLD,
 } = ENUM_SETTINGS_PROPS;
 
 // 设置工具类
@@ -30,6 +31,7 @@ export default class SettingsUtils {
     [ALLOW_DUPLICATE_TABS]: true, // 同一个标签组中是否允许重复的标签页
     [ALLOW_DUPLICATE_GROUPS]: true, // 同一个分类中是否允许重复的标签组
     [LINK_TEMPLATE]: '{{url}} | {{title}}', // 复制的链接模板
+    [TAB_COUNT_THRESHOLD]: 500, // 分类中标签页超过该数量时，则右侧面板只展示单个分组
   };
   settings: SettingsProps = this.initialSettings;
 

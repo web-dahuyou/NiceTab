@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useRef } from 'react';
+import React, { useMemo, useState, useRef, memo } from 'react';
 import { theme } from 'antd';
 import { CloseOutlined, PlusOutlined, SendOutlined } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -13,7 +13,7 @@ import DropComponent from '@/entrypoints/common/components/DropComponent';
 const allowDropKey = dndKeys.tabItem;
 
 // 渲染 treeNode 节点
-export default function RenderTreeNode({
+function RenderTreeNode({
   node,
   // selected,
   // container,
@@ -132,3 +132,5 @@ export default function RenderTreeNode({
     </DropComponent>
   );
 }
+
+export default memo(RenderTreeNode);

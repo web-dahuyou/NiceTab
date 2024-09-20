@@ -109,7 +109,17 @@ export const StyledListWrapper = styled.div<{
   .content {
     padding-left: 40px;
     .tip {
-      margin-bottom: 20px;
+      padding: 0 16px;
+      margin-bottom: 8px;
+    }
+    .count-info {
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      margin-bottom: 24px;
+      .count-item {
+        margin-right: 8px;
+      }
     }
   }
 `;

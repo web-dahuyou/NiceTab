@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react';
-import { Space, Form, Input, Button, Radio, Typography, theme, message } from 'antd';
+import { Space, Form, Input, InputNumber, Button, Radio, Typography, theme, message } from 'antd';
 import type { FormProps } from 'antd';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import type { SettingsProps } from '~/entrypoints/types';
@@ -20,6 +20,7 @@ const {
   ALLOW_DUPLICATE_TABS,
   ALLOW_DUPLICATE_GROUPS,
   LINK_TEMPLATE,
+  TAB_COUNT_THRESHOLD
 } = ENUM_SETTINGS_PROPS;
 
 const module = 'settings'; // locale module name
@@ -227,6 +228,29 @@ export default function Settings() {
             </Radio.Group>
           </Form.Item>
 
+          {/* 是否允许重复的标签页 */}
+          <Form.Item<SettingsProps>
+            label={$fmt({
+              id: `${module}.${TAB_COUNT_THRESHOLD}`,
+              values: { mark: '：' },
+            })}
+            name={TAB_COUNT_THRESHOLD}
+            tooltip={{
+              color: token.colorBgElevated,
+              title: (
+                <Typography.Text>{$fmt(`${module}.${TAB_COUNT_THRESHOLD}.tooltip`)}</Typography.Text>
+              ),
+            }}
+          >
+            <InputNumber
+              min={100}
+              max={800}
+              step={10}
+              keyboard={true}
+              style={{ width: '300px' }}
+            />
+          </Form.Item>
+
           {/* 复制链接的格式 */}
           <Form.Item<SettingsProps>
             label={$fmt(`${module}.${LINK_TEMPLATE}`)}
@@ -234,7 +258,7 @@ export default function Settings() {
             tooltip={{
               color: token.colorBgElevated,
               title: (
-                <Typography.Text>{$fmt('settings.linkTemplate.tooltip')}</Typography.Text>
+                <Typography.Text>{$fmt(`${module}.${LINK_TEMPLATE}.tooltip`)}</Typography.Text>
               ),
             }}
           >
@@ -243,7 +267,7 @@ export default function Settings() {
                 <Input
                   style={{ width: '300px' }}
                   placeholder={`${$fmt(
-                    'settings.linkTemplate.placeholder'
+                    `${module}.${LINK_TEMPLATE}.placeholder`
                   )}: ${defaultTemplate}`}
                 />
               </Form.Item>

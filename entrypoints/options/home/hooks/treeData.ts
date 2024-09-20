@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import React, { createContext, useCallback, useEffect, useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { TreeProps } from 'antd';
 import { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
@@ -16,6 +16,14 @@ import {
 import { getTreeData } from '../utils';
 
 const { DELETE_AFTER_RESTORE } = ENUM_SETTINGS_PROPS;
+
+type TreeDataHookProps = ReturnType<typeof useTreeData>;
+interface HomeContextProps {
+  treeDataHook: TreeDataHookProps,
+}
+export const HomeContext = createContext<HomeContextProps>({
+  treeDataHook: {} as TreeDataHookProps,
+});
 
 export function useTreeData() {
   const [searchParams, setSearchParams] = useSearchParams();
