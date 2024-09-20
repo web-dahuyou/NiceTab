@@ -29,6 +29,7 @@ export default {
 
   'home.tag.remove': 'Remove',
   'home.tag.recover': 'Recover',
+  'home.tag.countInfo': 'Current Counts',
 
   'home.tabGroup.add': 'Create Tab Group',
   'home.tabGroup.remove': 'Remove',
@@ -62,7 +63,7 @@ export default {
     <li>When opening a tab group, each of the tabs within the tab group will be opened in browser. If the "Automatically remove tabs from list when opening tabs or tab group" setting is enabled, the tabs will be removed from the list after they are opened.</li>
     <li>The "Recover" action means recover the tags / tab groups / tabs from the "Recycle Bin" to the "List" home.</li>
     <li>The "Ascending" and "Descending" only work for unstarred tab groups in the current category.</li>
-    <li><strong>Note</strong>: To ensure performance, when the number of tabs in the category exceeds a certain threshold, the right panel will only display the selected tab group from the left panel, rather than all tag groups under the category.</li>
+    <li><strong>Note</strong>: To ensure performance, when the number of tabs in the category exceeds a certain threshold, the right panel will only display the selected tab group, not all tab groups under the category.</li>
     <li>Tags / tab groups / tabs support drag-and-drop sorting. When a category/tab group is selected, it can be sorted using shortcut keys. The shortcut key mapping is shown in the table below:</li>
   `,
 
@@ -70,5 +71,5 @@ export default {
   'home.moveTo.mergeLabel': 'Merge Duplicate Items ?',
   'home.moveTo.mergeTip.1': '1. If Checked, when moving tabs, the tabs will be de-duplicated with the same URL in the target group.',
   'home.moveTo.mergeTip.2': '2. If Checked, when moving a tab group, it will be merged to the group of the same name in the target category (tag).',
-  'home.tip.tooManyTabs': 'The number of tabs exceeds the predetermined value, only show a single tab group.',
+  'home.tip.tooManyTabs': 'The number of tabs in the selected category exceeds the predetermined value, only show a single tab group.',
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo, memo } from 'react';
 import {
   theme,
   message,
@@ -6,7 +6,6 @@ import {
   Modal,
   Space,
   Divider,
-  Tag,
   Checkbox,
 } from 'antd';
 import type { CheckboxProps } from 'antd';
@@ -14,10 +13,9 @@ import {
   LockOutlined,
   StarOutlined,
   CloseOutlined,
-  DownOutlined,
 } from '@ant-design/icons';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
+import { GroupItem, TabItem } from '~/entrypoints/types';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -25,6 +23,7 @@ import { tabListUtils } from '@/entrypoints/common/storage';
 import DndComponent from '@/entrypoints/common/components/DndComponent';
 import DropComponent from '@/entrypoints/common/components/DropComponent';
 
+import { HomeContext } from './hooks/treeData';
 import EditInput from '../components/EditInput';
 import TabListItem from './TabListItem';
 import {
@@ -41,12 +40,10 @@ import type {
 import { dndKeys } from './constants';
 import MoveToModal from './MoveToModal';
 import useMoveTo from './hooks/moveTo';
-import useRest from './hooks/showRest';
 
 const dndKey = dndKeys.tabItem;
 
 type TabGroupProps = GroupItem & {
-  tagList?: TagItem[];
   refreshKey?: string;
   canDrag?: boolean;
   canDrop?: boolean;
@@ -77,8 +74,7 @@ const defaultGroupActions = [
 ];
 const defaultTabActions = ['remove', 'moveTo'];
 
-export default function TabGroup({
-  tagList,
+function TabGroup({
   refreshKey,
   groupId,
   groupName,
@@ -119,11 +115,17 @@ export default function TabGroup({
     onClose: onMoveToClose,
     moveData,
   } = useMoveTo();
+  const { treeDataHook } = useContext(HomeContext);
 
-  const { showRest, defaultList, restList, handleShowRest } = useRest<TabItem>({
-    list: tabList,
-    totalCount: tabList?.length,
-  });
+  const removeDesc = useMemo(() => {
+    const typeName = $fmt(`home.tabGroup`);
+    return $fmt({
+      id: 'home.removeDesc',
+      values: {
+        type: `${typeName}${` <strong>[${groupName}]</strong>`}`,
+      },
+    });
+  }, [$fmt]);
 
   // 已选择的tabItem数组
   const selectedTabs = useMemo(() => {
@@ -142,7 +144,6 @@ export default function TabGroup({
   const handleSelectAll: CheckboxProps['onChange'] = (e) => {
     const checked = e.target.checked;
     if (checked) {
-      handleShowRest();
       setSelectedTabIds(tabList.map((tab) => tab.tabId));
     } else {
       setSelectedTabIds([]);
@@ -175,16 +176,16 @@ export default function TabGroup({
     }
   };
 
-  // const handleScroll = (behavior: ScrollBehavior = 'instant') => {
-  //   if (selected && groupRef.current) {
-  //     // console.log('groupRef.current', groupRef.current)
-  //     const offsetTop = groupRef.current?.offsetTop || 0;
-  //     window.scrollTo({ top: offsetTop - 100, behavior });
-  //   }
-  // };
-  // useEffect(() => {
-  //   handleScroll();
-  // }, [selected]);
+  const handleScroll = (behavior: ScrollBehavior = 'instant') => {
+    if (selected && groupRef.current) {
+      // console.log('groupRef.current', groupRef.current)
+      const offsetTop = groupRef.current?.offsetTop || 0;
+      window.scrollTo({ top: offsetTop - 100, behavior });
+    }
+  };
+  useEffect(() => {
+    handleScroll();
+  }, [selected]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -203,10 +204,11 @@ export default function TabGroup({
     }, 300);
   }, [refreshKey, selected]);
 
+  console.log('tabGroup Effect')
   useEffect(() => {
     setTimeout(() => {
       setRendering(false);
-    })
+    });
   }, []);
 
   function TabListMarkup({ tab, index }: { tab: TabItem; index: number }) {
@@ -216,12 +218,7 @@ export default function TabGroup({
         key={tab.tabId || index}
         data={{ ...tab, index, groupId, dndKey }}
         dndKey={dndKey}
-        onDrop={(...props) => {
-          onDrop?.(...props);
-          setTimeout(() => {
-            handleShowRest();
-          }, 100);
-        }}
+        onDrop={onDrop}
       >
         <TabListItem
           key={tab.tabId || index}
@@ -412,28 +409,9 @@ export default function TabGroup({
               value={selectedTabIds}
               onChange={setSelectedTabIds}
             >
-              {defaultList.map((tab, index) => (
+              {tabList.map((tab, index) => (
                 <TabListMarkup key={tab.tabId} tab={tab} index={index}></TabListMarkup>
               ))}
-              {showRest ? (
-                restList.map((tab, index) => (
-                  <TabListMarkup
-                    key={tab.tabId}
-                    tab={tab}
-                    index={index + defaultList.length}
-                  ></TabListMarkup>
-                ))
-              ) : (
-                <div className="show-rest-btn">
-                  <Space onClick={handleShowRest}>
-                    展示更多
-                    <DownOutlined />
-                  </Space>
-                </div>
-              )}
-              {/* {tabList.map((tab, index) => (
-                <TabListMarkup key={tab.tabId} tab={tab} index={index}></TabListMarkup>
-              ))} */}
             </Checkbox.Group>
           </StyledTabListWrapper>
         </DropComponent>
@@ -449,8 +427,8 @@ export default function TabGroup({
           onOk={handleTabGroupRemove}
           onCancel={() => setModalVisible(false)}
         >
-          <div>
-            {$fmt({ id: 'home.removeDesc', values: { type: $fmt(`home.tabGroup`) } })}
+          <div dangerouslySetInnerHTML={{ __html: removeDesc }}>
+            {/* {$fmt({ id: 'home.removeDesc', values: { type: $fmt(`home.tabGroup`) } })} */}
           </div>
         </Modal>
       )}
@@ -484,7 +462,7 @@ export default function TabGroup({
       {moveToModalVisible && (
         <MoveToModal
           visible={moveToModalVisible}
-          listData={tagList}
+          listData={treeDataHook.tagList}
           moveData={moveData}
           onOk={(targetData) => {
             onMoveToConfirm(() => {
@@ -498,3 +476,5 @@ export default function TabGroup({
     </>
   );
 }
+
+export default memo(TabGroup)

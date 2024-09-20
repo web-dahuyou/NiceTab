@@ -81,13 +81,14 @@ export const StyledSidebarWrapper = styled.div<{
     .sidebar-tree-wrapper {
       flex: 1;
       height: 0;
-      // padding: 10px 0;
-      // overflow: auto;
       .no-data {
         padding: 16px 0;
         button {
           font-size: 12px;
         }
+      }
+      .ant-tree {
+        background: transparent;
       }
     }
   }
@@ -108,7 +109,17 @@ export const StyledListWrapper = styled.div<{
   .content {
     padding-left: 40px;
     .tip {
-      margin-bottom: 20px;
+      padding: 0 16px;
+      margin-bottom: 8px;
+    }
+    .count-info {
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      margin-bottom: 24px;
+      .count-item {
+        margin-right: 8px;
+      }
     }
   }
 `;

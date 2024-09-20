@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import React, { createContext, useCallback, useEffect, useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { TreeProps } from 'antd';
 import { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
@@ -16,6 +16,14 @@ import {
 import { getTreeData } from '../utils';
 
 const { DELETE_AFTER_RESTORE } = ENUM_SETTINGS_PROPS;
+
+type TreeDataHookProps = ReturnType<typeof useTreeData>;
+interface HomeContextProps {
+  treeDataHook: TreeDataHookProps,
+}
+export const HomeContext = createContext<HomeContextProps>({
+  treeDataHook: {} as TreeDataHookProps,
+});
 
 export function useTreeData() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -60,6 +68,7 @@ export function useTreeData() {
           remove: () => handleTagRemove(node.key, selectedTagKey),
           rename: () =>
             handleTagChange(node as TreeDataNodeTag, (data as Partial<TagItem>) || {}),
+          moveTo: () => {}, // 在index.tsx中实现
         },
         tabGroup: {
           create: () => handleTabGroupCreate(node.key),
@@ -74,6 +83,7 @@ export function useTreeData() {
               node as TreeDataNodeTabGroup,
               (data as Partial<GroupItem>) || {}
             ),
+          moveTo: () => {}, // 在index.tsx中实现
         },
       };
       const handler = handlerMap[actionType][actionName];
@@ -253,10 +263,6 @@ export function useTreeData() {
       const tagKey = tabGroup.parentKey;
       const tag = treeData.find((tag) => tag.key === tagKey) as TreeDataNodeTag;
       const settings = settingsUtils.settings;
-      // 打开标签组 (标签页单独打开)
-      // tabGroup?.originData?.tabList.forEach((tab) => {
-      //   openNewTab(tab.url);
-      // });
       // 打开标签组 (保持标签组形式)
       openNewGroup(
         tabGroup.originData.groupName,

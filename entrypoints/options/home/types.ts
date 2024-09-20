@@ -22,7 +22,7 @@ export type TreeDataNodeUnion = TreeDataNodeTag | TreeDataNodeTabGroup;
 export type RenderTreeNodeActionProps = {
   actionType: 'tag' | 'tabGroup';
   node: TreeDataNodeUnion;
-  actionName: 'create' | 'remove' | 'rename';
+  actionName: 'create' | 'remove' | 'rename' | 'moveTo';
   data?: Partial<TagItem | GroupItem>;
 };
 export type RenderTreeNodeProps = {

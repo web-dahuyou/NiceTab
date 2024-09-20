@@ -33,5 +33,6 @@ export default {
   'settings.linkTemplate': 'Copy Links Format Template',
   'settings.linkTemplate.placeholder': 'Default format',
   'settings.linkTemplate.tooltip': 'Format for copy links, using the Mustache format',
-
+  'settings.tabCountThreshold': 'Threshold setting for current category:',
+  'settings.tabCountThreshold.tooltip': 'To ensure performance, when the number of tabs in the category exceeds a certain threshold, the right panel will only display the selected tab group, not all tab groups under the category.',
 }
