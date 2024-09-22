@@ -58,7 +58,7 @@ export default function Home() {
     // console.log('virtualMap', groupCount, tabCount);
     return {
       tree: (countInfo?.groupCount || 0) > 200 || groupCount > 30,
-      tabList: tabCount > (settings?.[TAB_COUNT_THRESHOLD] || 500),
+      tabList: tabCount > (settings?.[TAB_COUNT_THRESHOLD] || 360),
     };
   }, [selectedTag.originData, countInfo?.groupCount]);
 
