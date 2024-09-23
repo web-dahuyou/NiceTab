@@ -2,7 +2,7 @@
   "name": "nice-tab",
   "description": "A nice, convenient, powerful tab manager [open source]",
   "private": true,
-  "version": "2.2.7",
+  "version": "2.2.8",
   "type": "module",
   "scripts": {
     "dev": "wxt",
@@ -39,8 +39,8 @@
     "@types/react-copy-to-clipboard": "^5.0.7",
     "@types/react-dom": "^18.3.0",
     "@wxt-dev/module-react": "^1.1.0",
+    "react-virtuoso": "^4.10.4",
     "typescript": "^5.5.4",
-    "virtua": "^0.34.2",
     "wxt": "^0.19.9"
   }
 }

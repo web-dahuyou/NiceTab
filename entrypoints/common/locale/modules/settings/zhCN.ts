@@ -34,5 +34,5 @@ export default {
   'settings.linkTemplate.placeholder': '默认格式为',
   'settings.linkTemplate.tooltip': '复制链接所用的模板格式, 采用 Mustache 格式',
   'settings.tabCountThreshold': '当前分类中标签页数量阈值设置：',
-  'settings.tabCountThreshold.tooltip': '为了保证交互性能，分类中标签页数量超过设定值时（建议不要太大），右侧面板将只展示选中的标签组，而不是分类下的所有标签组。',
+  'settings.tabCountThreshold.tooltip': '为了保证交互性能，当前分类中标签页数量超过设定值时，右侧面板将开启虚拟滚动，根据滚动位置展示部分标签组。',
 }

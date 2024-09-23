@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
-import { theme, Checkbox, Typography, Tooltip } from 'antd';
-import { CloseOutlined, EditOutlined } from '@ant-design/icons';
+import { theme, Checkbox, Typography, Tooltip, Popover, QRCode } from 'antd';
+import { CloseOutlined, EditOutlined, QrcodeOutlined } from '@ant-design/icons';
 import { GroupItem, TabItem } from '~/entrypoints/types';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import { settingsUtils } from '~/entrypoints/common/storage';
@@ -87,6 +87,25 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
         {/* checkbox */}
         {!group?.isLocked && (
           <Checkbox className="checkbox-item" value={tab.tabId}></Checkbox>
+        )}
+        {/* icon tab qrcode */}
+        {tab.url && (
+          <Popover
+            color="#fbfbfb"
+            destroyTooltipOnHide
+            content={
+              <QRCode value={tab.url} color="#000" bordered={false} />
+            }
+          >
+            <StyledActionIconBtn
+              className="tab-item-btn btn-qrcode"
+              $size="16"
+              title={$fmt('common.qrcode')}
+              $hoverColor={token.colorPrimary}
+            >
+              <QrcodeOutlined />
+            </StyledActionIconBtn>
+          </Popover>
         )}
         {/* icon tab edit */}
         <StyledActionIconBtn

@@ -60,4 +60,5 @@ export default {
   'common.quickAction': '快捷操作',
   'common.toggleThemeType': '切换亮色/暗黑模式',
   'common.showMore': '展示更多',
+  'common.qrcode': '二维码',
 };
