@@ -34,9 +34,9 @@ const StyledListItem = styled.div`
   .group-name {
     flex: 0 0 auto;
     cursor: pointer;
-    &:hover {
-      background: ${props => props.theme.colorInfoHover || '#e6f4ff'};
-    }
+    // &:hover {
+    //   background: ${props => props.theme.colorInfoHover || '#e6f4ff'};
+    // }
   }
   .divider {
     flex: 0 0 auto;

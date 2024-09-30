@@ -162,7 +162,7 @@ export default function Home() {
         title={$fmt('home.helpInfo')}
         open={helpDrawerVisible}
         onClose={() => setHelpDrawerVisible(false)}
-        width={500}
+        width={600}
       >
         <StyledHelpInfoBox>
           <ul dangerouslySetInnerHTML={{ __html: $fmt('home.help.content') }}></ul>
