@@ -61,5 +61,6 @@ export default {
   'common.toggleThemeType': 'Toggle Light / Dark',
   'common.showMore': 'Show More',
   'common.qrcode': 'QRCode',
+  'common.open': 'Open',
 }
 

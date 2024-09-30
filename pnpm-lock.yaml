@@ -23,6 +23,9 @@ importers:
       '@atlaskit/pragmatic-drag-and-drop-react-drop-indicator':
         specifier: ^1.1.1
         version: 1.1.2(@types/react@18.3.4)(react@18.3.1)
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       antd:
         specifier: ^5.16.4
         version: 5.20.3(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -38,6 +41,9 @@ importers:
       hotkeys-js:
         specifier: ^3.13.7
         version: 3.13.7
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
       mitt:
         specifier: ^3.0.1
         version: 3.0.1
@@ -56,6 +62,9 @@ importers:
       react-router-dom:
         specifier: ^6.23.0
         version: 6.26.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-virtuoso:
+        specifier: ^4.10.4
+        version: 4.10.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       styled-components:
         specifier: ^6.1.8
         version: 6.1.13(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -75,9 +84,6 @@ importers:
       '@wxt-dev/module-react':
         specifier: ^1.1.0
         version: 1.1.1(vite@5.4.2(@types/node@22.5.1))(wxt@0.19.9(@types/node@22.5.1)(rollup@4.21.2))
-      react-virtuoso:
-        specifier: ^4.10.4
-        version: 4.10.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       typescript:
         specifier: ^5.5.4
         version: 5.5.4
@@ -878,6 +884,12 @@ packages:
 
   '@types/http-cache-semantics@4.0.4':
     resolution: {integrity: sha512-1m0bIFVc7eJWyve9S0RnuRgcQqF/Xd5QsUZAZeQFr1Q3/p9JWoQQEqmVy+DPTNpGXwhgIetAoYF8JSc33q29QA==}
+
+  '@types/lodash-es@4.17.12':
+    resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
+
+  '@types/lodash@4.17.9':
+    resolution: {integrity: sha512-w9iWudx1XWOHW5lQRS9iKpK/XuRhnN+0T7HvdCCd802FYkT1AMTnxndJHGrNJwRoRHkslGr4S29tjm1cT7x/7w==}
 
   '@types/minimatch@3.0.5':
     resolution: {integrity: sha512-Klz949h02Gz2uZCMGwDUSDS1YBlTdDDgbWHi+81l29tQALUtvz4rAYi5uoVhE5Lagoq6DeqAUlbrHvW/mXDgdQ==}
@@ -1909,6 +1921,9 @@ packages:
   local-pkg@0.5.0:
     resolution: {integrity: sha512-ok6z3qlYyCDS4ZEU27HaU6x/xZa9Whf8jD4ptH5UZTQYZVYeb9bnZ3ojVhiJNLiXK1Hfc0GNbLXcmZ5plLDDBg==}
     engines: {node: '>=14'}
+
+  lodash-es@4.17.21:
+    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
 
   lodash.camelcase@4.3.0:
     resolution: {integrity: sha512-TwuEnCnxbc3rAvhf/LbG7tJUDzhqXyFnv3dtzLOPgCG/hODL7WFnsbwktkD7yUV0RrreP/l1PALq/YSg6VvjlA==}
@@ -3887,6 +3902,12 @@ snapshots:
 
   '@types/http-cache-semantics@4.0.4': {}
 
+  '@types/lodash-es@4.17.12':
+    dependencies:
+      '@types/lodash': 4.17.9
+
+  '@types/lodash@4.17.9': {}
+
   '@types/minimatch@3.0.5': {}
 
   '@types/node@22.5.1':
@@ -4999,6 +5020,8 @@ snapshots:
     dependencies:
       mlly: 1.7.1
       pkg-types: 1.2.0
+
+  lodash-es@4.17.21: {}
 
   lodash.camelcase@4.3.0: {}
 

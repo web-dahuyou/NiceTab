@@ -1,12 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
-import {
-  Button,
-  Modal,
-  Drawer,
-} from 'antd';
-import {
-  QuestionCircleOutlined,
-} from '@ant-design/icons';
+import { Button, Modal, Drawer } from 'antd';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { classNames } from '~/entrypoints/common/utils';
 import { tabListUtils, settingsUtils } from '@/entrypoints/common/storage';
@@ -16,20 +10,20 @@ import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import {
   StyledListWrapper,
   StyledSidebarWrapper,
-  StyledFooterWrapper,
   StyledHelpInfoBox,
 } from './Home.styled';
 import ToggleSidebarBtn from '../components/ToggleSidebarBtn';
 import SortingBtns from './SortingBtns';
 import HotkeyList from '../components/HotkeyList';
 import StickyFooter from '~/entrypoints/common/components/StickyFooter';
+import Footer from './footer/index';
 import { useTreeData, HomeContext } from './hooks/treeData';
 import useHotkeys from './hooks/hotkeys';
 import { getSelectedCounts } from './utils';
 import TreeBox from './TreeBox';
 import TabGroupList from './TabGroupList';
 
-const  { TAB_COUNT_THRESHOLD } = ENUM_SETTINGS_PROPS;
+const { TAB_COUNT_THRESHOLD } = ENUM_SETTINGS_PROPS;
 
 export default function Home() {
   const { $fmt } = useIntlUtls();
@@ -147,18 +141,10 @@ export default function Home() {
         <TabGroupList virtual={virtualMap.tabList}></TabGroupList>
       </StyledListWrapper>
 
-      {/*
-      <StickyFooter bottomGap={0} fullWidth bgColor="#fff">
-        <StyledFooterWrapper
-          className="footer-wrapper"
-          $paddingLeft={sidebarCollapsed ? 0 : 280}
-        >
-          <Button type="primary" size="small">
-            批量移动标签组
-          </Button>
-        </StyledFooterWrapper>
+      {/* 吸底footer */}
+      <StickyFooter bottomGap={0} fullWidth>
+        <Footer></Footer>
       </StickyFooter>
-      */}
 
       {/* 清空全部提示 */}
       <Modal

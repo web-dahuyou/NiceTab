@@ -151,7 +151,7 @@ async function sendCurrentTab() {
   const settings = await settingsUtils.getSettings();
   let filteredTabs = await getFilteredTabs(tabs, settings);
   // 发送当前选中的标签页时，选中的标签页成组，不考虑原生标签组（即多选时，选中的非标签组的标签页和标签组中的标签页合并到一个组）
-  filteredTabs = filteredTabs.map(tab => ({ ...tab, groupId: -1 }));
+  filteredTabs = filteredTabs.map((tab) => ({ ...tab, groupId: -1 }));
   const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs);
   openAdminTab(settings, { tagId, groupId });
   if (settings[CLOSE_TABS_AFTER_SEND_TABS]) {
@@ -224,11 +224,25 @@ async function sendRightTabs(currTab?: Tabs.Tab) {
   cancelHighlightTabs();
 }
 
-// 打开标签页
-export function openNewTab(url?: string, active: boolean = false) {
+/*
+打开新标签页
+active：打开标签页是否激活
+openToNext：是否紧随管理后台页之后打开
+*/
+export async function openNewTab(
+  url?: string,
+  { active = false, openToNext = false }: { active?: boolean; openToNext?: boolean } = {}
+) {
+  if (!openToNext) {
+    url && browser.tabs.create({ url, active });
+    return;
+  }
+
+  const { tab } = await getAdminTabInfo();
+  const newTabIndex = (tab?.index || 0) + 1;
   // 注意：如果打开标签页不想 active, 则 active 必须设置默认值为 false，
   // create 方法 active参数传 undefined 也会激活 active
-  url && browser.tabs.create({ url, active });
+  url && browser.tabs.create({ url, active, index: newTabIndex });
 }
 
 // 打开标签组
@@ -240,13 +254,17 @@ export async function openNewGroup(groupName: string, urls: Array<string | undef
     return;
   }
 
-  Promise.all(urls.map(url => {
-    return browser.tabs.create({ url, active: false });
-  })).then(async tabs => {
+  Promise.all(
+    urls.map((url) => {
+      return browser.tabs.create({ url, active: false });
+    })
+  ).then(async (tabs) => {
     const filteredTabs = tabs.filter((tab) => !!tab.id);
-    const bsGroupId = await browser.tabs.group({ tabIds: filteredTabs.map(tab => tab.id!) });
+    const bsGroupId = await browser.tabs.group({
+      tabIds: filteredTabs.map((tab) => tab.id!),
+    });
     browser.tabGroups?.update(bsGroupId, { title: groupName });
-  })
+  });
 }
 
 export default {

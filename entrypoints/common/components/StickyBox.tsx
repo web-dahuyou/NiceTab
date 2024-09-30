@@ -11,14 +11,14 @@ const StyledStickyInner = styled.div<{
 }>`
   position: relative;
   width: 100%;
-  background: ${(props) => props.$bgColor || '#fff'};
+  background: ${(props) => props.$bgColor || props?.theme?.colorBgContainer || '#fff'};
   &.fixed {
     position: fixed;
     width: ${(props) => props.$width ? `${props.$width}px` : '100%'};
     top: ${(props) => `${props.$top || 0}px`};
     left: ${(props) => `${props.$left || 0}px`};
     padding: ${(props) => `0 ${props.$paddingX || 0}px`};
-    box-shadow: 0 2px 12px 1px rgba(0, 0, 0, 0.1);
+    box-shadow: ${(props) => props.theme.boxShadow || '0 2px 12px 3px rgba(0, 0, 0, 0.1)'};
     z-index: 10;
   }
 `;
@@ -64,8 +64,10 @@ export function StickyBox({ children, topGap = 0, fullWidth = false, bgColor = '
     setWrapperBounds({ top, left, width, height });
 
     window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
     return () => {
       window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
     };
   }, []);
 

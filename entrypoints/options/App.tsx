@@ -65,7 +65,7 @@ const StyledPageContainer = styled.div<{ theme: StyledThemeProps }>`
     align-items: center;
     height: 60px;
     // box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    box-shadow: ${(props) => props.theme.boxShadow || '0 4px 15px rgba(0, 0, 0, 0.1)'};
+    box-shadow: ${(props) => props.theme.boxShadow || '0 2px 12px 3px rgba(0, 0, 0, 0.1)'};
     background: ${(props) => props.theme.colorBgContainer || '#fff'};
 
     .logo {
@@ -86,7 +86,7 @@ const StyledPageContainer = styled.div<{ theme: StyledThemeProps }>`
   .main-content {
     position: relative;
     width: 1200px;
-    padding: 100px 32px 60px;
+    padding: 100px 32px 40px;
     margin: 0 auto;
   }
   @media screen and (max-width: 1199px) {
@@ -280,7 +280,7 @@ function AppLayout() {
             <StyledActionIconBtn
               $size={18}
               title={$fmt('common.goToGithub')}
-              onClick={() => openNewTab(GITHUB_URL, true)}
+              onClick={() => openNewTab(GITHUB_URL, { active: true, openToNext: true })}
             >
               <GithubOutlined />
             </StyledActionIconBtn>
