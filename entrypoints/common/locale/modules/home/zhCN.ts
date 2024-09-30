@@ -13,6 +13,7 @@ export default {
   'home.recoverAll': '全部还原',
   'home.emptyTip': '暂无数据',
   'home.searchTagAndGroup': '搜索分类/标签组',
+  'home.searchTabAndUrl': '搜索标签页和链接',
   'home.moveAllGroupTo': '移动所有标签组到...',
   'home.createTabGroup': '创建标签组',
   'home.helpInfo': '帮助信息',

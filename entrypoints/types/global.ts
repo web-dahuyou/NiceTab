@@ -7,6 +7,7 @@ export type VersionInfo = { updateAvailable: boolean; version?: string };
 // 订阅事件类型
 export type EventsEmitterProps = {
   'is-dragging': boolean;
+  'home:set-tree-searchValue': string;
 };
 
 // 全局 Context

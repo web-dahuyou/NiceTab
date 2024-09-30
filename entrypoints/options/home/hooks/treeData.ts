@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import type { TreeProps } from 'antd';
 import { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
 import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
-import { openNewTab, openNewGroup } from '~/entrypoints/common/tabs';
+import { openNewGroup } from '~/entrypoints/common/tabs';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { getRandomId } from '@/entrypoints/common/utils';
 import {
@@ -108,8 +108,8 @@ export function useTreeData() {
     ) => {
       if (node.type === 'tag') {
         setSelectedTagKey(node.key);
-        setSelectedTabGroupKey(node?.children?.[0]?.key || '');
-        // setSelectedTabGroupKey('');
+        // setSelectedTabGroupKey(node?.children?.[0]?.key || '');
+        setSelectedTabGroupKey('');
         setExpandedKeys((keys) => {
           return [...new Set([...keys, node.key])];
         });
@@ -133,6 +133,13 @@ export function useTreeData() {
     [treeData]
   );
 
+  const selectedKeyChange = useCallback(({ type, key, parentKey }: Partial<TreeDataNodeUnion>, callback?: () => void) => {
+    if (!key) return;
+    handleSelect(treeData, [key], { node: { type, key, parentKey } as TreeDataNodeUnion });
+    setTimeout(() => {
+      callback?.();
+    }, 300);
+  }, [treeData]);
 
 
   // 删除分类
@@ -467,7 +474,8 @@ export function useTreeData() {
     handleTabItemDrop,
     handleTabItemChange,
     handleTabItemRemove,
-    handleHotkeyAction
+    handleHotkeyAction,
+    selectedKeyChange
   }
 }
 

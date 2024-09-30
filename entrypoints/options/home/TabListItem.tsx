@@ -74,11 +74,16 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
     }
   };
 
+  const draggingListener = (value: boolean) => {
+    setIsDragging(value);
+    if (value) setTooltipVisible(false);
+  };
+
   useEffect(() => {
-    eventEmitter.on('is-dragging', (value) => {
-      setIsDragging(value);
-      if (value) setTooltipVisible(false);
-    });
+    eventEmitter.on('is-dragging', draggingListener);
+    return () => {
+      eventEmitter.off('is-dragging', draggingListener);
+    }
   }, []);
 
   return (

@@ -3,7 +3,7 @@ import { Tree, Button, Input, Empty, Spin } from 'antd';
 import type { TreeDataNode, TreeProps } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
 import { DownOutlined } from '@ant-design/icons';
-import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import type { TagItem, GroupItem } from '~/entrypoints/types';
 import type {
   TreeDataNodeTag,
@@ -61,16 +61,23 @@ function TreeBox() {
   }, [refreshKey, selectedKeys]);
 
   const onSearch: SearchProps['onSearch'] = (value) => {
-    setSearchValue(value);
+    const text = value?.trim().toLowerCase();
+    setSearchValue(text);
     setTimeout(() => {
-      toggleExpand(true);
+      toggleExpand(!!text);
     }, 30);
   };
+  const onSearchTextChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const text = e.target?.value?.trim().toLowerCase();
+    if (!text) {
+      onSearch?.(text);
+    }
+  }, []);
 
   // 搜索过滤后的 treeData
   const searchTreeData = useMemo(() => {
-    if (!searchValue) return treeData;
     const value = searchValue?.trim().toLowerCase();
+    if (!value) return treeData;
     const searchTagList =
       tagList.reduce<TagItem[]>((result, tag): TagItem[] => {
         if (tag?.tagName?.toLowerCase().includes(value)) {
@@ -156,6 +163,10 @@ function TreeBox() {
   useEffect(() => {
     const listHeight = listRef.current?.offsetHeight || 400;
     setTreeBoxHeight(listHeight);
+    eventEmitter.on('home:set-tree-searchValue', setSearchValue);
+    return () => {
+      eventEmitter.off('home:set-tree-searchValue', setSearchValue);
+    }
   }, []);
 
   return (
@@ -165,6 +176,7 @@ function TreeBox() {
         style={{ marginBottom: 8 }}
         placeholder={$fmt('home.searchTagAndGroup')}
         allowClear
+        onChange={onSearchTextChange}
         onSearch={onSearch}
       />
       <div ref={listRef} className="sidebar-tree-wrapper">
