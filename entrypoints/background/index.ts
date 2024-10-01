@@ -18,6 +18,10 @@ async function setBadge() {
   browser.action.setBadgeTextColor({ color: '#fff' });
   browser.action.setBadgeBackgroundColor({ color: themeData?.colorPrimary || PRIMARY_COLOR });
 
+  browser.tabs.onCreated.removeListener(setBadge);
+  browser.tabs.onRemoved.removeListener(setBadge);
+  browser.tabs.onActivated.removeListener(setBadge);
+  browser.runtime.onInstalled.removeListener(setBadge);
   browser.tabs.onCreated.addListener(setBadge);
   browser.tabs.onRemoved.addListener(setBadge);
   browser.tabs.onActivated.addListener(setBadge);
@@ -27,8 +31,9 @@ async function setBadge() {
 
 export default defineBackground(() => {
   // console.log('Hello background!', { id: browser.runtime.id });
+  // 设置插件图标徽标
+  setBadge();
   initStorageListener(async () => {
-    // 设置插件图标徽标
     setBadge();
   });
 

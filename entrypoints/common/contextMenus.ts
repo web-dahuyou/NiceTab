@@ -58,18 +58,17 @@ async function handleContextMenusUpdate() {
   } catch {}
 }
 
-export default function contextMenusRegister() {
-  browser.runtime.onInstalled.addListener(async () => {
-    await browser.contextMenus.removeAll();
-    createContextMenus();
-  });
+export default async function contextMenusRegister() {
   initStorageListener(async () => {
     await browser.contextMenus.removeAll();
     createContextMenus();
   });
 
-  TAB_EVENTS.forEach((event) => {
-    browser.tabs[event]?.addListener(handleContextMenusUpdate);
+  await browser.contextMenus.removeAll();
+  createContextMenus(() => {
+    TAB_EVENTS.forEach((event) => {
+      browser.tabs[event]?.addListener(handleContextMenusUpdate);
+    });
   });
 
   browser.contextMenus.onClicked.addListener((info, tab) => {
