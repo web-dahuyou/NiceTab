@@ -15,6 +15,7 @@ const {
   ALLOW_DUPLICATE_GROUPS,
   LINK_TEMPLATE,
   TAB_COUNT_THRESHOLD,
+  SHOW_OPENED_TAB_COUNT,
 } = ENUM_SETTINGS_PROPS;
 
 // 设置工具类
@@ -31,7 +32,8 @@ export default class SettingsUtils {
     [ALLOW_DUPLICATE_TABS]: true, // 同一个标签组中是否允许重复的标签页
     [ALLOW_DUPLICATE_GROUPS]: true, // 同一个分类中是否允许重复的标签组
     [LINK_TEMPLATE]: '{{url}} | {{title}}', // 复制的链接模板
-    [TAB_COUNT_THRESHOLD]: 360, // 分类中标签页超过该数量时，则右侧面板开启虚拟滚动
+    [TAB_COUNT_THRESHOLD]: 300, // 分类中标签页超过该数量时，则右侧面板开启虚拟滚动
+    [SHOW_OPENED_TAB_COUNT]: true, // 扩展图标上是否显示打开的标签页数量
   };
   settings: SettingsProps = this.initialSettings;
 

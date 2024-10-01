@@ -90,6 +90,7 @@ export type SettingsProps = {
   linkTemplate?: string; // 链接模板
   themeType?: ThemeTypes; // 主题类型
   tabCountThreshold?: number; // 分类中标签页超过该数量时，则右侧面板只展示单个分组
+  showOpenedTabCount?: boolean; // 扩展图标上是否显示打开的标签页数量
 };
 
 export type EnumSettingsProps = {
@@ -105,6 +106,7 @@ export type EnumSettingsProps = {
   ALLOW_DUPLICATE_GROUPS: 'allowDuplicateGroups';
   LINK_TEMPLATE: 'linkTemplate';
   TAB_COUNT_THRESHOLD: 'tabCountThreshold';
+  SHOW_OPENED_TAB_COUNT: 'showOpenedTabCount';
 };
 
 export interface HotkeyOption {

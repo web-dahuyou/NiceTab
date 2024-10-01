@@ -62,4 +62,6 @@ export default {
   'common.showMore': '展示更多',
   'common.qrcode': '二维码',
   'common.open': '打开',
+  'common.yes': '是',
+  'common.no': '否',
 };

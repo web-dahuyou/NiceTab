@@ -1,13 +1,20 @@
 import contextMenusRegister from '~/entrypoints/common/contextMenus';
 import tabUtils from '~/entrypoints/common/tabs';
-import { themeUtils, settingsUtils } from '~/entrypoints/common/storage';
+import initStorageListener, { themeUtils, settingsUtils } from '~/entrypoints/common/storage';
 import { PRIMARY_COLOR, TAB_EVENTS, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
+
+const { OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH, SHOW_OPENED_TAB_COUNT } = ENUM_SETTINGS_PROPS;
 
 // 设置插件图标徽标
 async function setBadge() {
+  const settings = await settingsUtils.getSettings();
   const themeData = await themeUtils.getThemeData();
   const tabs = await tabUtils.getAllTabs();
-  browser.action.setBadgeText({ text: String(tabs.length || 0) });
+  if (!settings[SHOW_OPENED_TAB_COUNT]) {
+    browser.action.setBadgeText({ text: '' });
+  } else {
+    browser.action.setBadgeText({ text: String(tabs.length || 0) });
+  }
   browser.action.setBadgeTextColor({ color: '#fff' });
   browser.action.setBadgeBackgroundColor({ color: themeData?.colorPrimary || PRIMARY_COLOR });
 
@@ -20,14 +27,16 @@ async function setBadge() {
 
 export default defineBackground(() => {
   // console.log('Hello background!', { id: browser.runtime.id });
-  // 设置插件图标徽标
-  setBadge();
+  initStorageListener(async () => {
+    // 设置插件图标徽标
+    setBadge();
+  });
+
   // 注册 contextMenus
   contextMenusRegister();
 
   browser.runtime.onInstalled.addListener(async () => {
     const settings = await settingsUtils.getSettings();
-    const { OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH } = ENUM_SETTINGS_PROPS;
     if (settings[OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH]) {
       tabUtils.openAdminRoutePage({ path: '/home' });
     }

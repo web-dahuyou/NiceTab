@@ -30,9 +30,13 @@ export default {
   'settings.allowDuplicateGroups': '发送标签页时-是否保留重复的标签组{mark}',
   'settings.allowDuplicateGroups.yes': '保留',
   'settings.allowDuplicateGroups.no': '去重（发送的标签组和中转站的标签组合并）',
-  'settings.linkTemplate': '复制链接模板格式',
+  'settings.linkTemplate': '标签组-复制链接模板格式',
   'settings.linkTemplate.placeholder': '默认格式为',
   'settings.linkTemplate.tooltip': '复制链接所用的模板格式, 采用 Mustache 格式',
   'settings.tabCountThreshold': '当前分类中标签页数量阈值设置：',
   'settings.tabCountThreshold.tooltip': '为了保证交互性能，当前分类中标签页数量超过设定值时，右侧面板将开启虚拟滚动，根据滚动位置展示部分标签组。',
+
+  'settings.showOpenedTabCount': '是否在扩展图标上显示打开的标签页数量：',
+  'settings.showOpenedTabCount.yes': '是',
+  'settings.showOpenedTabCount.no': '否',
 }

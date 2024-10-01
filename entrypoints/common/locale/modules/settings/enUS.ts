@@ -30,9 +30,13 @@ export default {
   'settings.allowDuplicateGroups': 'When sending tabs - retain duplicate groups ?',
   'settings.allowDuplicateGroups.yes': 'Retain',
   'settings.allowDuplicateGroups.no': 'Merge duplicate groups (sending groups merge to Staging Area groups)',
-  'settings.linkTemplate': 'Copy Links Format Template',
+  'settings.linkTemplate': 'Tab group - copy links format template',
   'settings.linkTemplate.placeholder': 'Default format',
   'settings.linkTemplate.tooltip': 'Format for copy links, using the Mustache format',
   'settings.tabCountThreshold': 'Threshold setting for current category:',
   'settings.tabCountThreshold.tooltip': 'To ensure performance, when the number of tabs in the category exceeds a certain threshold, the right panel will enable virtual scrolling, displaying partial tab groups based on the scrolling position.',
+
+  'settings.showOpenedTabCount': 'Whether to display the number of open tabs on the extension icon ?',
+  'settings.showOpenedTabCount.yes': 'Yes',
+  'settings.showOpenedTabCount.no': 'No',
 }

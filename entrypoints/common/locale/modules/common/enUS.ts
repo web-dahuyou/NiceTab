@@ -62,5 +62,7 @@ export default {
   'common.showMore': 'Show More',
   'common.qrcode': 'QRCode',
   'common.open': 'Open',
+  'common.yes': 'Yes',
+  'common.no': 'No',
 }
 

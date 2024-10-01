@@ -1,5 +1,15 @@
 import { useContext, useEffect } from 'react';
-import { Space, Form, Input, InputNumber, Button, Radio, Typography, theme, message } from 'antd';
+import {
+  Space,
+  Form,
+  Input,
+  InputNumber,
+  Button,
+  Radio,
+  Typography,
+  theme,
+  message,
+} from 'antd';
 import type { FormProps } from 'antd';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import type { SettingsProps } from '~/entrypoints/types';
@@ -20,7 +30,8 @@ const {
   ALLOW_DUPLICATE_TABS,
   ALLOW_DUPLICATE_GROUPS,
   LINK_TEMPLATE,
-  TAB_COUNT_THRESHOLD
+  TAB_COUNT_THRESHOLD,
+  SHOW_OPENED_TAB_COUNT,
 } = ENUM_SETTINGS_PROPS;
 
 const module = 'settings'; // locale module name
@@ -84,12 +95,10 @@ export default function Settings() {
           >
             <Radio.Group>
               <Radio value={true}>
-                {' '}
-                {$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH}.yes`)}{' '}
+                {$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH}.yes`)}
               </Radio>
               <Radio value={false}>
-                {' '}
-                {$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH}.no`)}{' '}
+                {$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH}.no`)}
               </Radio>
             </Radio.Group>
           </Form.Item>
@@ -102,8 +111,8 @@ export default function Settings() {
             name={AUTO_PIN_ADMIN_TAB}
           >
             <Radio.Group>
-              <Radio value={true}> {$fmt(`${module}.${AUTO_PIN_ADMIN_TAB}.yes`)}</Radio>
-              <Radio value={false}> {$fmt(`${module}.${AUTO_PIN_ADMIN_TAB}.no`)} </Radio>
+              <Radio value={true}>{$fmt(`${module}.${AUTO_PIN_ADMIN_TAB}.yes`)}</Radio>
+              <Radio value={false}>{$fmt(`${module}.${AUTO_PIN_ADMIN_TAB}.no`)}</Radio>
             </Radio.Group>
           </Form.Item>
           {/* 是否发送固定标签页 */}
@@ -116,12 +125,10 @@ export default function Settings() {
           >
             <Radio.Group>
               <Radio value={true}>
-                {' '}
                 {$fmt(`${module}.${ALLOW_SEND_PINNED_TABS}.yes`)}
               </Radio>
               <Radio value={false}>
-                {' '}
-                {$fmt(`${module}.${ALLOW_SEND_PINNED_TABS}.no`)}{' '}
+                {$fmt(`${module}.${ALLOW_SEND_PINNED_TABS}.no`)}
               </Radio>
             </Radio.Group>
           </Form.Item>
@@ -132,8 +139,8 @@ export default function Settings() {
           style={{ display: 'none' }}
         >
           <Radio.Group>
-            <Radio value={true}> {$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_SEND_TABS}.yes`)}</Radio>
-            <Radio value={false}> {$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_SEND_TABS}.no`)} </Radio>
+            <Radio value={true}>{$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_SEND_TABS}.yes`)}</Radio>
+            <Radio value={false}>{$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_SEND_TABS}.no`)}</Radio>
           </Radio.Group>
         </Form.Item> */}
           {/* 发送标签页后是否关闭标签页 */}
@@ -146,12 +153,10 @@ export default function Settings() {
           >
             <Radio.Group>
               <Radio value={true}>
-                {' '}
                 {$fmt(`${module}.${CLOSE_TABS_AFTER_SEND_TABS}.yes`)}
               </Radio>
               <Radio value={false}>
-                {' '}
-                {$fmt(`${module}.${CLOSE_TABS_AFTER_SEND_TABS}.no`)}{' '}
+                {$fmt(`${module}.${CLOSE_TABS_AFTER_SEND_TABS}.no`)}
               </Radio>
             </Radio.Group>
           </Form.Item>
@@ -164,11 +169,8 @@ export default function Settings() {
             name={DELETE_AFTER_RESTORE}
           >
             <Radio.Group>
-              <Radio value={false}>
-                {' '}
-                {$fmt(`${module}.${DELETE_AFTER_RESTORE}.no`)}{' '}
-              </Radio>
-              <Radio value={true}> {$fmt(`${module}.${DELETE_AFTER_RESTORE}.yes`)}</Radio>
+              <Radio value={false}>{$fmt(`${module}.${DELETE_AFTER_RESTORE}.no`)}</Radio>
+              <Radio value={true}>{$fmt(`${module}.${DELETE_AFTER_RESTORE}.yes`)}</Radio>
             </Radio.Group>
           </Form.Item>
           {/* 是否删除未锁定的空标签组 */}
@@ -181,12 +183,10 @@ export default function Settings() {
           >
             <Radio.Group>
               <Radio value={true}>
-                {' '}
                 {$fmt(`${module}.${DELETE_UNLOCKED_EMPTY_GROUP}.yes`)}
               </Radio>
               <Radio value={false}>
-                {' '}
-                {$fmt(`${module}.${DELETE_UNLOCKED_EMPTY_GROUP}.no`)}{' '}
+                {$fmt(`${module}.${DELETE_UNLOCKED_EMPTY_GROUP}.no`)}
               </Radio>
             </Radio.Group>
           </Form.Item>
@@ -201,12 +201,10 @@ export default function Settings() {
           >
             <Radio.Group>
               <Radio value={true}>
-                {' '}
                 {$fmt(`${module}.${ALLOW_DUPLICATE_GROUPS}.yes`)}
               </Radio>
               <Radio value={false}>
-                {' '}
-                {$fmt(`${module}.${ALLOW_DUPLICATE_GROUPS}.no`)}{' '}
+                {$fmt(`${module}.${ALLOW_DUPLICATE_GROUPS}.no`)}
               </Radio>
             </Radio.Group>
           </Form.Item>
@@ -220,15 +218,12 @@ export default function Settings() {
             name={ALLOW_DUPLICATE_TABS}
           >
             <Radio.Group>
-              <Radio value={true}> {$fmt(`${module}.${ALLOW_DUPLICATE_TABS}.yes`)}</Radio>
-              <Radio value={false}>
-                {' '}
-                {$fmt(`${module}.${ALLOW_DUPLICATE_TABS}.no`)}{' '}
-              </Radio>
+              <Radio value={true}>{$fmt(`${module}.${ALLOW_DUPLICATE_TABS}.yes`)}</Radio>
+              <Radio value={false}>{$fmt(`${module}.${ALLOW_DUPLICATE_TABS}.no`)}</Radio>
             </Radio.Group>
           </Form.Item>
 
-          {/* 是否允许重复的标签页 */}
+          {/* 单个分类中标签页数量超过预定值则开启虚拟滚动 */}
           <Form.Item<SettingsProps>
             label={$fmt({
               id: `${module}.${TAB_COUNT_THRESHOLD}`,
@@ -238,7 +233,9 @@ export default function Settings() {
             tooltip={{
               color: token.colorBgElevated,
               title: (
-                <Typography.Text>{$fmt(`${module}.${TAB_COUNT_THRESHOLD}.tooltip`)}</Typography.Text>
+                <Typography.Text>
+                  {$fmt(`${module}.${TAB_COUNT_THRESHOLD}.tooltip`)}
+                </Typography.Text>
               ),
             }}
           >
@@ -258,7 +255,9 @@ export default function Settings() {
             tooltip={{
               color: token.colorBgElevated,
               title: (
-                <Typography.Text>{$fmt(`${module}.${LINK_TEMPLATE}.tooltip`)}</Typography.Text>
+                <Typography.Text>
+                  {$fmt(`${module}.${LINK_TEMPLATE}.tooltip`)}
+                </Typography.Text>
               ),
             }}
           >
@@ -278,6 +277,17 @@ export default function Settings() {
                 }}
               ></QuickActions>
             </Space>
+          </Form.Item>
+
+          {/* 扩展图标上是否展示当前打开的标签页数 */}
+          <Form.Item<SettingsProps>
+            label={$fmt(`${module}.${SHOW_OPENED_TAB_COUNT}`)}
+            name={SHOW_OPENED_TAB_COUNT}
+          >
+            <Radio.Group>
+              <Radio value={true}>{$fmt('common.yes')}</Radio>
+              <Radio value={false}>{$fmt('common.no')}</Radio>
+            </Radio.Group>
           </Form.Item>
 
           <Form.Item>
