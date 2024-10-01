@@ -78,6 +78,7 @@ export type TabEvents =
 // 管理后台-设置信息
 export type SettingsProps = {
   language?: LanguageTypes; // 语言
+  themeType?: ThemeTypes; // 主题类型
   openAdminTabAfterBrowserLaunch?: boolean; // 启动浏览器时是否自动打开管理后台
   autoPinAdminTab?: boolean; // 是否固定管理后台
   allowSendPinnedTabs?: boolean; // 是否发送固定标签页
@@ -88,13 +89,13 @@ export type SettingsProps = {
   allowDuplicateTabs?: boolean; // 同一个标签组中是否允许重复的标签页
   allowDuplicateGroups?: boolean; // 同一个分类中是否允许重复的标签组
   linkTemplate?: string; // 链接模板
-  themeType?: ThemeTypes; // 主题类型
   tabCountThreshold?: number; // 分类中标签页超过该数量时，则右侧面板只展示单个分组
   showOpenedTabCount?: boolean; // 扩展图标上是否显示打开的标签页数量
 };
 
 export type EnumSettingsProps = {
   LANGUAGE: 'language';
+  THEME_TYPE: 'themeType';
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH: 'openAdminTabAfterBrowserLaunch';
   OPEN_ADMIN_TAB_AFTER_SEND_TABS: 'openAdminTabAfterSendTabs';
   CLOSE_TABS_AFTER_SEND_TABS: 'closeTabsAfterSendTabs';
@@ -108,6 +109,10 @@ export type EnumSettingsProps = {
   TAB_COUNT_THRESHOLD: 'tabCountThreshold';
   SHOW_OPENED_TAB_COUNT: 'showOpenedTabCount';
 };
+// 状态相关
+export interface StateProps {
+  'home:sidebarCollapsed'?: boolean;
+}
 
 export interface HotkeyOption {
   macKey: string;

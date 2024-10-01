@@ -1,19 +1,18 @@
-import { useState, useCallback } from 'react';
-import { theme, Button } from 'antd';
+import { useCallback } from 'react';
+import { Button } from 'antd';
 import { DoubleRightOutlined, DoubleLeftOutlined } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 
 export default function ToggleSidebarBtn({
+  collapsed = false,
   onCollapseChange,
 }: {
+  collapsed?: boolean;
   onCollapseChange?: (status: boolean) => void;
 }) {
-  const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
-  const [collapsed, setCollapsed] = useState<boolean>(false);
 
   const handleToggle = useCallback(() => {
-    setCollapsed(!collapsed);
     onCollapseChange?.(!collapsed);
   }, [collapsed]);
 

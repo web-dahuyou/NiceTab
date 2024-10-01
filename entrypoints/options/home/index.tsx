@@ -1,9 +1,9 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useLayoutEffect } from 'react';
 import { Button, Modal, Drawer } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { classNames } from '~/entrypoints/common/utils';
-import { tabListUtils, settingsUtils } from '@/entrypoints/common/storage';
+import { tabListUtils, settingsUtils, stateUtils } from '@/entrypoints/common/storage';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
@@ -41,7 +41,8 @@ export default function Home() {
 
   const { hotkeyList } = useHotkeys({ onAction: handleHotkeyAction });
 
-  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
+  const state = stateUtils.getState();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(state['home:sidebarCollapsed'] || false);
   const [confirmModalVisible, setConfirmModalVisible] = useState<boolean>(false);
   const [helpDrawerVisible, setHelpDrawerVisible] = useState<boolean>(false);
 
@@ -72,6 +73,11 @@ export default function Home() {
     [selectedTagKey]
   );
 
+  const onCollapseChange = (status: boolean) => {
+    setSidebarCollapsed(status);
+    stateUtils.setState({ 'home:sidebarCollapsed': status });
+  };
+
   return (
     <HomeContext.Provider value={{ treeDataHook }}>
       <StyledListWrapper
@@ -83,7 +89,7 @@ export default function Home() {
             className={classNames('sidebar-inner-box', sidebarCollapsed && 'collapsed')}
           >
             <div className="sidebar-action-box">
-              <ToggleSidebarBtn onCollapseChange={setSidebarCollapsed}></ToggleSidebarBtn>
+              <ToggleSidebarBtn collapsed={sidebarCollapsed} onCollapseChange={onCollapseChange}></ToggleSidebarBtn>
               {selectedTagKey ? <SortingBtns onSort={onSort}></SortingBtns> : null}
             </div>
 
