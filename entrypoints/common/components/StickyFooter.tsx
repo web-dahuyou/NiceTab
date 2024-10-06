@@ -73,7 +73,7 @@ export default function StickyFooter({
         $left={fullWidth ? 0 : wrapperBounds.left}
         $bottom={bottomGap}
         $bgColor={bgColor}
-        $paddingX={fullWidth ? wrapperBounds.left : paddingX}
+        $paddingX={fullWidth ? 24 : paddingX}
       >
         {children}
       </StyledStickyInner>
