@@ -62,6 +62,10 @@ export default {
     <li>When a tab group is starred, it will be placed at the top of the current category. Moving other tab groups to a position before the starred tab group will automatically star them as well. If a starred tab group is moved to a position after a non-starred tab group, the star status will be automatically released.</li>
     <li>The Staging Area is a special category, fixed at the top of the list. When sending tabs, they will be saved to the Staging Area.</li>
     <li>When opening a tab group, each of the tabs within the tab group will be opened in browser. If the "Automatically remove tabs from list when opening tabs or tab group" setting is enabled, the tabs will be removed from the list after they are opened.</li>
+    <li>
+      <strong>Left Click</strong>: this will open a new tab and jump to it.<br>
+      <strong>Alt + Left Click</strong>：this will silently open a new tab and stay on the NiceTab page.
+    </li>
     <li>The "Recover" action means recover the tags / tab groups / tabs from the "Recycle Bin" to the "List" home.</li>
     <li>The "Ascending" and "Descending" only work for unstarred tab groups in the current category.</li>
     <li><strong>Note</strong>: To ensure performance, when the number of tabs in the category exceeds a certain threshold, the right panel will enable virtual scrolling, displaying partial tab groups based on the scrolling position.</li>
@@ -73,4 +77,5 @@ export default {
   'home.moveTo.mergeTip.1': '1. If Checked, when moving tabs, the tabs will be de-duplicated with the same URL in the target group.',
   'home.moveTo.mergeTip.2': '2. If Checked, when moving a tab group, it will be merged to the group of the same name in the target category (tag).',
   'home.tip.tooManyTabs': 'The number of tabs exceeds the set value, the virtual scrolling is enabled.',
+  'home.tip.addScope': 'The next version will add new features, which require additional authorization. After the new version is released, it will be automatically disabled. If you wish to continue using it, please manually enable it.',
 }

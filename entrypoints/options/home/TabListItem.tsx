@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { theme, Checkbox, Typography, Tooltip, Popover, QRCode } from 'antd';
 import { CloseOutlined, EditOutlined, QrcodeOutlined } from '@ant-design/icons';
 import { GroupItem, TabItem } from '~/entrypoints/types';
+import clickDecorator from '~/entrypoints/common/utils/click';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
@@ -65,14 +66,15 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
   );
 
   // 点击打开标签页
-  const onTabOpen = () => {
+  const onTabOpen = clickDecorator(({ isMatched }) => {
     const settings = settingsUtils.settings;
-    openNewTab(tab.url);
+    // 如果直接单击未按下alt键，则打开新标签页并激活(active: true)，如果按下了alt键，则后台静默打开新标签页(active: false)
+    openNewTab(tab.url, { active: !isMatched });
 
     if (settings[DELETE_AFTER_RESTORE]) {
       onRemove?.();
     }
-  };
+  }, { allowMissMatch: true, alt: true });
 
   const draggingListener = (value: boolean) => {
     setIsDragging(value);

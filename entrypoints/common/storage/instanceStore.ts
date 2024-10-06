@@ -3,12 +3,14 @@ import ThemeUtils from './themeUtils';
 import TabListUtils from './tabListUtils';
 import RecycleBinUtils from './recycleBinUtils';
 import SyncUtils from './syncUtils';
+import StateUtils from './stateUtils';
 
 let _settingsUtils: SettingsUtils;
 let _themeUtils: ThemeUtils;
 let _tabListUtils: TabListUtils;
 let _recycleBinUtils: RecycleBinUtils;
 let _syncUtils: SyncUtils;
+let _stateUtils: StateUtils;
 
 export default class Store {
   static get settingsUtils() {
@@ -26,6 +28,9 @@ export default class Store {
   static get syncUtils() {
     return _syncUtils;
   }
+  static get stateUtils() {
+    return _stateUtils;
+  }
 
   static set settingsUtils(utils: SettingsUtils) {
     _settingsUtils = utils;
@@ -41,5 +46,8 @@ export default class Store {
   }
   static set syncUtils(utils: SyncUtils) {
     _syncUtils = utils;
+  }
+  static set stateUtils(utils: StateUtils) {
+    _stateUtils = utils;
   }
 }

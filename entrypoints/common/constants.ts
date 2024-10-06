@@ -88,6 +88,7 @@ export const ENUM_ACTION_NAME = {
 // 设置项枚举
 export const ENUM_SETTINGS_PROPS: EnumSettingsProps = {
   LANGUAGE: 'language', // 语言
+  THEME_TYPE: 'themeType', // 主题类型
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH: 'openAdminTabAfterBrowserLaunch', // 启动浏览器时是否自动打开管理后台
   OPEN_ADMIN_TAB_AFTER_SEND_TABS: 'openAdminTabAfterSendTabs', // 发送标签页后是否打开管理后台
   CLOSE_TABS_AFTER_SEND_TABS: 'closeTabsAfterSendTabs', // 发送标签页后是否关闭标签页
@@ -99,6 +100,7 @@ export const ENUM_SETTINGS_PROPS: EnumSettingsProps = {
   ALLOW_DUPLICATE_GROUPS: 'allowDuplicateGroups', // 同一个分类中是否允许重复的标签组
   LINK_TEMPLATE: 'linkTemplate', // 链接模板
   TAB_COUNT_THRESHOLD: 'tabCountThreshold', // 分类中标签页超过该数量时，则右侧面板开启虚拟滚动
+  SHOW_OPENED_TAB_COUNT: 'showOpenedTabCount', // 扩展图标上是否显示打开的标签页数量
 };
 
 // tab 事件

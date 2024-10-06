@@ -1,9 +1,9 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useLayoutEffect } from 'react';
 import { Button, Modal, Drawer } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { classNames } from '~/entrypoints/common/utils';
-import { tabListUtils, settingsUtils } from '@/entrypoints/common/storage';
+import { tabListUtils, settingsUtils, stateUtils } from '@/entrypoints/common/storage';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
@@ -41,7 +41,8 @@ export default function Home() {
 
   const { hotkeyList } = useHotkeys({ onAction: handleHotkeyAction });
 
-  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
+  const state = stateUtils.getState();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(state['home:sidebarCollapsed'] || false);
   const [confirmModalVisible, setConfirmModalVisible] = useState<boolean>(false);
   const [helpDrawerVisible, setHelpDrawerVisible] = useState<boolean>(false);
 
@@ -52,7 +53,7 @@ export default function Home() {
     // console.log('virtualMap', groupCount, tabCount);
     return {
       tree: (countInfo?.groupCount || 0) > 200 || groupCount > 30,
-      tabList: tabCount > (settings?.[TAB_COUNT_THRESHOLD] || 360),
+      tabList: tabCount > (settings?.[TAB_COUNT_THRESHOLD] || 300),
     };
   }, [selectedTag.originData, countInfo?.groupCount]);
 
@@ -72,6 +73,11 @@ export default function Home() {
     [selectedTagKey]
   );
 
+  const onCollapseChange = (status: boolean) => {
+    setSidebarCollapsed(status);
+    stateUtils.setState({ 'home:sidebarCollapsed': status });
+  };
+
   return (
     <HomeContext.Provider value={{ treeDataHook }}>
       <StyledListWrapper
@@ -83,7 +89,7 @@ export default function Home() {
             className={classNames('sidebar-inner-box', sidebarCollapsed && 'collapsed')}
           >
             <div className="sidebar-action-box">
-              <ToggleSidebarBtn onCollapseChange={setSidebarCollapsed}></ToggleSidebarBtn>
+              <ToggleSidebarBtn collapsed={sidebarCollapsed} onCollapseChange={onCollapseChange}></ToggleSidebarBtn>
               {selectedTagKey ? <SortingBtns onSort={onSort}></SortingBtns> : null}
             </div>
 
@@ -162,7 +168,7 @@ export default function Home() {
         title={$fmt('home.helpInfo')}
         open={helpDrawerVisible}
         onClose={() => setHelpDrawerVisible(false)}
-        width={500}
+        width={600}
       >
         <StyledHelpInfoBox>
           <ul dangerouslySetInnerHTML={{ __html: $fmt('home.help.content') }}></ul>

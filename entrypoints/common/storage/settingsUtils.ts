@@ -1,9 +1,10 @@
 // import { storage } from 'wxt/storage';
 import type { LanguageTypes, SettingsProps } from '~/entrypoints/types';
-import { ENUM_SETTINGS_PROPS, defaultLanguage } from '../constants';
+import { ENUM_SETTINGS_PROPS, defaultLanguage, defaultThemeType } from '../constants';
 
 const {
   LANGUAGE,
+  THEME_TYPE,
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
   OPEN_ADMIN_TAB_AFTER_SEND_TABS,
   CLOSE_TABS_AFTER_SEND_TABS,
@@ -15,12 +16,14 @@ const {
   ALLOW_DUPLICATE_GROUPS,
   LINK_TEMPLATE,
   TAB_COUNT_THRESHOLD,
+  SHOW_OPENED_TAB_COUNT,
 } = ENUM_SETTINGS_PROPS;
 
 // 设置工具类
 export default class SettingsUtils {
   initialSettings = {
     [LANGUAGE]: defaultLanguage,
+    [THEME_TYPE]: defaultThemeType,
     [OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH]: true, // 启动浏览器时是否自动打开管理后台
     [OPEN_ADMIN_TAB_AFTER_SEND_TABS]: true, // 发送标签页后默认打开管理后台
     [CLOSE_TABS_AFTER_SEND_TABS]: true, // 发送标签页后是否关闭标签页
@@ -31,7 +34,9 @@ export default class SettingsUtils {
     [ALLOW_DUPLICATE_TABS]: true, // 同一个标签组中是否允许重复的标签页
     [ALLOW_DUPLICATE_GROUPS]: true, // 同一个分类中是否允许重复的标签组
     [LINK_TEMPLATE]: '{{url}} | {{title}}', // 复制的链接模板
-    [TAB_COUNT_THRESHOLD]: 360, // 分类中标签页超过该数量时，则右侧面板开启虚拟滚动
+
+    [TAB_COUNT_THRESHOLD]: 300, // 分类中标签页超过该数量时，则右侧面板开启虚拟滚动
+    [SHOW_OPENED_TAB_COUNT]: true, // 扩展图标上是否显示打开的标签页数量
   };
   settings: SettingsProps = this.initialSettings;
 
