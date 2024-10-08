@@ -133,16 +133,15 @@ export default function Settings() {
             </Radio.Group>
           </Form.Item>
           {/* 发送标签页后是否打开管理后台 */}
-          {/* <Form.Item<SettingsProps>
-          label={<div>{$fmt({ id: `${module}.${OPEN_ADMIN_TAB_AFTER_SEND_TABS}`, values: {mark: '：'}})}：</div>}
-          name={OPEN_ADMIN_TAB_AFTER_SEND_TABS}
-          style={{ display: 'none' }}
-        >
-          <Radio.Group>
-            <Radio value={true}>{$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_SEND_TABS}.yes`)}</Radio>
-            <Radio value={false}>{$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_SEND_TABS}.no`)}</Radio>
-          </Radio.Group>
-        </Form.Item> */}
+          <Form.Item<SettingsProps>
+            label={<div>{$fmt({ id: `${module}.${OPEN_ADMIN_TAB_AFTER_SEND_TABS}`, values: {mark: '：'}})}：</div>}
+            name={OPEN_ADMIN_TAB_AFTER_SEND_TABS}
+          >
+            <Radio.Group>
+              <Radio value={true}>{$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_SEND_TABS}.yes`)}</Radio>
+              <Radio value={false}>{$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_SEND_TABS}.no`)}</Radio>
+            </Radio.Group>
+          </Form.Item>
           {/* 发送标签页后是否关闭标签页 */}
           <Form.Item<SettingsProps>
             label={$fmt({

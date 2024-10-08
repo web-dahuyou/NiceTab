@@ -1,4 +1,5 @@
 import contextMenusRegister from '~/entrypoints/common/contextMenus';
+import commandsRegister from '~/entrypoints/common/commands';
 import tabUtils from '~/entrypoints/common/tabs';
 import initStorageListener, { themeUtils, settingsUtils } from '~/entrypoints/common/storage';
 import { PRIMARY_COLOR, TAB_EVENTS, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
@@ -39,6 +40,8 @@ export default defineBackground(() => {
 
   // 注册 contextMenus
   contextMenusRegister();
+  // 注册 commands
+  commandsRegister();
 
   browser.runtime.onInstalled.addListener(async () => {
     const settings = await settingsUtils.getSettings();

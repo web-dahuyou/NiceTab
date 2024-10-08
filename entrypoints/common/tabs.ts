@@ -1,10 +1,16 @@
 import { Tabs } from 'wxt/browser';
 import { settingsUtils, tabListUtils } from './storage';
 import type { SettingsProps } from '~/entrypoints/types';
-import { ENUM_SETTINGS_PROPS, IS_GROUP_SUPPORT } from '~/entrypoints/common/constants';
+import {
+  ENUM_SETTINGS_PROPS,
+  IS_GROUP_SUPPORT,
+  defaultLanguage,
+} from '~/entrypoints/common/constants';
 import { objectToUrlParams, getRandomId } from '~/entrypoints/common/utils';
+import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 
 const {
+  LANGUAGE,
   OPEN_ADMIN_TAB_AFTER_SEND_TABS,
   CLOSE_TABS_AFTER_SEND_TABS,
   AUTO_PIN_ADMIN_TAB,
@@ -12,6 +18,71 @@ const {
 } = ENUM_SETTINGS_PROPS;
 
 // const matchUrls: string[] = ['https://*/*', 'http://*/*', 'chrome://*/*', 'file://*/*'];
+
+// 向tab页发送小徐
+export async function sendTabMessage({
+  msgType,
+  data,
+  onlyCurrentTab = false,
+}: {
+  msgType: string;
+  data: Record<string, any>;
+  onlyCurrentTab?: boolean;
+}) {
+  const { tab: adminTab } = await getAdminTabInfo();
+  if (onlyCurrentTab) {
+    const currentTabs = await browser.tabs.query({ active: true, currentWindow: true });
+    const currentTab = currentTabs?.[0];
+    if (currentTab.id === adminTab?.id) return;
+
+    currentTab?.id && browser.tabs.sendMessage(currentTab?.id, { msgType, data });
+    return;
+  }
+
+  const allTabs = await getAllTabs();
+  const filteredTabs = allTabs.filter((tab) => {
+    if (!tab?.id) return false;
+    if (adminTab && adminTab.id === tab.id) return false;
+    return true;
+  });
+
+  filteredTabs.forEach((tab) => {
+    browser.tabs.sendMessage(tab.id!, { msgType, data });
+  });
+}
+// 执行contentScript展示message提示
+export async function executeContentScript(
+  actionName: string,
+  resultType: 'success' | 'error' = 'success'
+) {
+  const settings = await settingsUtils.getSettings();
+  const language = settings[LANGUAGE] || defaultLanguage;
+  const customMessages = getCustomLocaleMessages(language);
+  const openAdminTabAfterSendTabs = settings[OPEN_ADMIN_TAB_AFTER_SEND_TABS];
+  const closeTabsAfterSendTabs = settings[CLOSE_TABS_AFTER_SEND_TABS];
+
+  const tabs = await browser.tabs.query({
+    active: true,
+    currentWindow: true,
+  });
+  const currentTab = tabs?.[0];
+
+  if (currentTab?.id && !openAdminTabAfterSendTabs && !closeTabsAfterSendTabs) {
+    const _actionName = actionName.replace('action:', '');
+    const status = resultType === 'success' ? 'success' : 'failed';
+
+    sendTabMessage({
+      msgType: 'action:callback-message',
+      data: {
+        type: resultType,
+        content: `${customMessages[`common.${status}`]}: ${
+          customMessages[`common.${_actionName}` as keyof typeof customMessages]
+        }`,
+      },
+      onlyCurrentTab: true,
+    });
+  }
+}
 
 export async function getAdminTabInfo() {
   const adminTabUrl = browser.runtime.getURL('/options.html');
@@ -63,16 +134,6 @@ export async function openAdminTab(
   const settings = settingsData || (await settingsUtils.getSettings());
   const openAdminTabAfterSendTabs = settings[OPEN_ADMIN_TAB_AFTER_SEND_TABS];
   await openAdminRoutePage({ path: '/home', query: params }, openAdminTabAfterSendTabs);
-
-  if (!openAdminTabAfterSendTabs) {
-    // 如果设置了 发送标签页后不打开管理后台，则可以发送通知提醒
-    // browser.notifications.create(undefined, {
-    //   type: 'basic',
-    //   title: '标签页发送成功',
-    //   message: '标签页已发送到管理后台，可在管理后台查看',
-    //   iconUrl: browser.runtime.getURL('/icon/logo.png'),
-    // });
-  }
 }
 // 获取过滤后的标签页
 async function getFilteredTabs(
@@ -185,7 +246,7 @@ async function sendLeftTabs(currTab?: Tabs.Tab) {
   let leftTabs = [];
   for (let i = 0; i < tabs.length; i++) {
     const tab = tabs[i];
-    if (tab.id === currTab?.id) break;
+    if ((currTab && tab.id === currTab?.id) || tab.active) break;
     leftTabs.push(tab);
   }
 
@@ -208,7 +269,7 @@ async function sendRightTabs(currTab?: Tabs.Tab) {
   let rightTabs = [];
   for (let i = tabs.length - 1; i >= 0; i--) {
     const tab = tabs[i];
-    if (tab.id === currTab?.id) break;
+    if (tab.id === currTab?.id || tab.active) break;
     rightTabs.unshift(tab);
   }
 
@@ -268,6 +329,7 @@ export async function openNewGroup(groupName: string, urls: Array<string | undef
 }
 
 export default {
+  executeContentScript,
   getAdminTabInfo,
   openAdminRoutePage,
   openAdminTab,

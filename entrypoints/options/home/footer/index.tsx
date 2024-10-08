@@ -11,12 +11,12 @@ export default function Footer() {
       // $paddingLeft={sidebarCollapsed ? 0 : 280}
     >
       <SearchList></SearchList>
-      <Alert
+      {/* <Alert
         className="next-version-tip"
         type="warning"
         showIcon
         message={$fmt('home.tip.addScope')}
-      />
+      /> */}
     </StyledFooterWrapper>
   )
 }

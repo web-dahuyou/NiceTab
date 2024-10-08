@@ -128,7 +128,7 @@ export function getMergedList<T, K extends keyof T>(
   return [...resultMap.values()];
 }
 
-// 发送消息
+// 向插件发送消息
 export function sendBrowserMessage(msgType: string, data: Record<string, any>) {
   browser.runtime.sendMessage({ msgType, data });
 }
