@@ -47,7 +47,9 @@ export default function ImportExport() {
         const tagList = extContentImporter?.[funcName]?.(importContent);
         await tabListUtils.importTags(tagList, importMode);
 
-        messageApi.success($fmt('importExport.importSuccess'));
+        messageApi.success(
+          $fmt({ id: 'common.actionSuccess', values: { action: $fmt('common.import') } })
+        );
         form.setFieldValue('importContent', '');
       } catch {
         messageApi.error($fmt('importExport.importFailed'));

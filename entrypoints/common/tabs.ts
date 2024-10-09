@@ -1,6 +1,6 @@
 import { Tabs } from 'wxt/browser';
 import { settingsUtils, tabListUtils } from './storage';
-import type { SettingsProps } from '~/entrypoints/types';
+import type { SettingsProps, ActionNames } from '~/entrypoints/types';
 import {
   ENUM_SETTINGS_PROPS,
   IS_GROUP_SUPPORT,
@@ -80,7 +80,7 @@ export async function executeContentScript(
   const currentTab = tabs?.[0];
 
   if (currentTab?.id && !openAdminTabAfterSendTabs && !closeTabsAfterSendTabs) {
-    const _actionName = actionName.replace('action:', '');
+    const _actionName: ActionNames = actionName.replace('action:', '') as ActionNames;
     const status = resultType === 'success' ? 'success' : 'failed';
 
     sendTabMessage({

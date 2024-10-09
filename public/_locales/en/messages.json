@@ -1,20 +1,20 @@
 {
 	"action_openAdminTab": {
-		"message": "NiceTab -> Open NiceTab-Admin-Page"
+		"message": "Open NiceTab-Admin-Page"
 	},
 	"action_sendAllTabs": {
-		"message": "NiceTab -> Send All Tabs"
+		"message": "Send All Tabs"
 	},
 	"action_sendCurrentTab": {
-		"message": "NiceTab -> Send Current Tab"
+		"message": "Send Current Tab"
 	},
   "action_sendOtherTabs": {
-		"message": "NiceTab -> Send Other Tabs"
+		"message": "Send Other Tabs"
 	},
 	"action_sendLeftTabs": {
-		"message": "NiceTab -> Send Left Tabs"
+		"message": "Send Left Tabs"
 	},
 	"action_sendRightTabs": {
-		"message": "NiceTab -> Send Right Tabs"
+		"message": "Send Right Tabs"
 	}
 }

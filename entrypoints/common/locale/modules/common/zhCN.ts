@@ -14,6 +14,8 @@ export default {
   'common.openAdminTab': '打开NiceTab管理后台',
   'common.save': '保存',
   'common.saveSuccess': '保存成功',
+  'common.actionSuccess': '{action}成功',
+  'common.actionFailed': '{action}失败',
   'common.submit': '提交',
   'common.ok': '确定',
   'common.confirm': '确认',
@@ -64,4 +66,8 @@ export default {
   'common.open': '打开',
   'common.yes': '是',
   'common.no': '否',
+  'common.copy': '复制',
+  'common.import': '导入',
+  'common.export': '导出',
+  'common.none': '无',
 };

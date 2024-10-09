@@ -13,7 +13,9 @@ export default {
   'common.sendPinnedTabs': 'Send Pinned Tabs',
   'common.openAdminTab': 'Open NiceTab-Admin-Page',
   'common.save': 'Save',
-  'common.saveSuccess': 'Save Success',
+  'common.saveSuccess': 'Save successfully',
+  'common.actionSuccess': '{action} successfully',
+  'common.actionFailed': '{action} failed',
   'common.submit': 'Submit',
   'common.ok': 'OK',
   'common.confirm': 'Confirm',
@@ -64,5 +66,9 @@ export default {
   'common.open': 'Open',
   'common.yes': 'Yes',
   'common.no': 'No',
+  'common.copy': 'Copy',
+  'common.import': 'Import',
+  'common.export': 'Export',
+  'common.none': 'None',
 }
 

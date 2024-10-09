@@ -1,20 +1,20 @@
 {
-	"action_openAdminTab": {
-		"message": "NiceTab -> 打开NiceTab管理后台"
+  "action_openAdminTab": {
+		"message": "打开NiceTab管理后台"
 	},
 	"action_sendAllTabs": {
-		"message": "NiceTab -> 发送所有标签页"
+		"message": "发送所有标签页"
 	},
 	"action_sendCurrentTab": {
-		"message": "NiceTab -> 发送当前标签页"
+		"message": "发送当前标签页"
 	},
 	"action_sendOtherTabs": {
-		"message": "NiceTab -> 发送其他标签页"
+		"message": "发送其他标签页"
 	},
 	"action_sendLeftTabs": {
-		"message": "NiceTab -> 发送左侧标签页"
+		"message": "发送左侧标签页"
 	},
 	"action_sendRightTabs": {
-		"message": "NiceTab -> 发送右侧标签页"
+		"message": "发送右侧标签页"
 	}
 }

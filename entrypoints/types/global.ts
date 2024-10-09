@@ -75,6 +75,9 @@ export type TabEvents =
   | 'onUpdated'
   | 'onHighlighted';
 
+// 操作名称
+export type ActionNames = 'openAdminTab' | 'sendAllTabs' | 'sendCurrentTab' | 'sendOtherTabs' | 'sendLeftTabs' | 'sendRightTabs';
+
 // 管理后台-设置信息
 export type SettingsProps = {
   language?: LanguageTypes; // 语言

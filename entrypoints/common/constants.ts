@@ -19,6 +19,7 @@ import type {
   ColorItem,
   ThemeColors,
   TabEvents,
+  ActionNames,
   SyncType,
 } from '~/entrypoints/types';
 
@@ -77,7 +78,7 @@ export const THEME_TYPE_CONFIG: Record<ThemeTypes, ThemeTypeConfig> = {
 export const defaultThemeType: ThemeTypes = 'light';
 
 // action 名称枚举
-export const ENUM_ACTION_NAME = {
+export const ENUM_ACTION_NAME: Record<string, `action:${ActionNames}`> = {
   SEND_ALL_TABS: 'action:sendAllTabs', // 发送全部标签页
   SEND_CURRENT_TAB: 'action:sendCurrentTab', // 发送当前标签页
   SEND_OTHER_TABS: 'action:sendOtherTabs', // 发送其他标签页

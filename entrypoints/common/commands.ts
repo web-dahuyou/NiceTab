@@ -46,11 +46,10 @@ export default async function commandsRegister() {
 export async function getCommandsHotkeys() {
   const commands = await browser.commands.getAll();
 
-  const hotkeysMap = new Map<Commands.Command['name'], string>();
+  const hotkeysMap = new Map<Commands.Command['name'], string | undefined>();
   commands.forEach((command) => {
-    const hotkey = command.shortcut?.split('').join('+') || 'None';
     if (command.name) {
-      hotkeysMap.set(command.name, hotkey);
+      hotkeysMap.set(command.name, command.shortcut);
     }
   });
 
