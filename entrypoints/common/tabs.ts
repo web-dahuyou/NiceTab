@@ -35,7 +35,14 @@ export async function sendTabMessage({
     const currentTab = currentTabs?.[0];
     if (currentTab.id === adminTab?.id) return;
 
-    currentTab?.id && browser.tabs.sendMessage(currentTab?.id, { msgType, data });
+    if (currentTab?.id) {
+      try {
+        const res = await browser.tabs.sendMessage(currentTab?.id, { msgType, data });
+        console.log('browser.tabs.sendMessage__result', res);
+      } catch (error) {
+        console.log('browser.tabs.sendMessage__error', error)
+      }
+    }
     return;
   }
 
@@ -46,8 +53,13 @@ export async function sendTabMessage({
     return true;
   });
 
-  filteredTabs.forEach((tab) => {
-    browser.tabs.sendMessage(tab.id!, { msgType, data });
+  filteredTabs.forEach(async (tab) => {
+    try {
+      const res = await browser.tabs.sendMessage(tab.id!, { msgType, data });
+      console.log('browser.tabs.sendMessage__result', res);
+    } catch (error) {
+      console.log('browser.tabs.sendMessage__error', error)
+    }
   });
 }
 // 执行contentScript展示message提示

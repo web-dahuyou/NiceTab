@@ -51,7 +51,7 @@ export default defineBackground(() => {
   });
 
   browser.runtime.onMessage.addListener(async (msg, msgSender, sendResponse) => {
-    // console.log('browser.runtime.onMessage--background', msg);
+    // console.log('browser.runtime.onMessage--background', msg, msgSender);
     const { msgType, data } = msg || {};
     if (msgType === 'setPrimaryColor') {
       const colorPrimary = data?.colorPrimary || PRIMARY_COLOR;

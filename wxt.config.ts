@@ -41,6 +41,15 @@ export default defineConfig({
         },
         description: '__MSG_action_sendCurrentTab__',
       },
+      'action:sendOtherTabs': {
+        description: '__MSG_action_sendOtherTabs__',
+      },
+      'action:sendLeftTabs': {
+        description: '__MSG_action_sendLeftTabs__',
+      },
+      'action:sendRightTabs': {
+        description: '__MSG_action_sendRightTabs__',
+      },
       // 激活option面板
       _execute_action: {
         suggested_key: {
