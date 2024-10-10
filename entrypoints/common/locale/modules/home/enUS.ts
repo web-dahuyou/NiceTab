@@ -74,7 +74,7 @@ export default {
   'home.help.hotkey.1': `The above shortcuts are only available for home page. In addition, the extension also registers browser shortcuts for several commonly used actions, (such as`,
   'home.help.hotkey.2': `); You can also go to the extension page by yourself and `,
   'home.help.hotkey.modify': `modify the shortcuts`,
-  'home.help.hotkey.modifyTip': 'After modifying the shortcuts, they will take effect immediately. The shortcut key names in the contextmenu will automatically update after switching browser tab.',
+  'home.help.hotkey.modifyTip': 'After modifying the shortcuts, they will take effect immediately. The shortcut key names in the ContextMenu will automatically update after switching browser tab.',
 
   'home.moveTo.missingTip': 'Please select a {type}',
   'home.moveTo.mergeLabel': 'Merge Duplicate Items ?',

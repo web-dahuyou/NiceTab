@@ -37,6 +37,5 @@ export default {
   'settings.tabCountThreshold.tooltip': '为了保证交互性能，当前分类中标签页数量超过设定值时，右侧面板将开启虚拟滚动，根据滚动位置展示部分标签组。',
 
   'settings.showOpenedTabCount': '是否在扩展图标上显示打开的标签页数量：',
-  'settings.showOpenedTabCount.yes': '是',
-  'settings.showOpenedTabCount.no': '否',
+  'settings.showPageContextMenus': '是否在网页中显示NiceTab右键菜单：',
 }

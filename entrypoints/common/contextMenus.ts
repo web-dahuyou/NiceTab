@@ -11,7 +11,7 @@ import initStorageListener, { settingsUtils } from './storage';
 import { getCommandsHotkeys } from './commands';
 import { pick } from './utils';
 
-const { LANGUAGE, ALLOW_SEND_PINNED_TABS } = ENUM_SETTINGS_PROPS;
+const { LANGUAGE, ALLOW_SEND_PINNED_TABS, SHOW_PAGE_CONTEXT_MENUS } = ENUM_SETTINGS_PROPS;
 
 export type ContextMenuHotKeys = Record<string, string>;
 
@@ -46,13 +46,16 @@ const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> => {
   const filteredTabs = await tabUtils.getFilteredTabs(tabs, settings);
 
   const hotkeysMap = await getMenuHotkeys();
+  const contexts: Menus.ContextType[] = settings[SHOW_PAGE_CONTEXT_MENUS]
+    ? ['all']
+    : ['action'];
 
   const _openAdminTab: Menus.CreateCreatePropertiesType = {
     id: ENUM_ACTION_NAME.OPEN_ADMIN_TAB,
     title:
       customMessages['common.openAdminTab'] +
       ` (${hotkeysMap?.[ENUM_ACTION_NAME.OPEN_ADMIN_TAB]})`,
-    contexts: ['all'],
+    contexts,
   };
 
   const _sendAllTabs: Menus.CreateCreatePropertiesType = {
@@ -60,7 +63,7 @@ const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> => {
     title:
       customMessages['common.sendAllTabs'] +
       ` (${hotkeysMap?.[ENUM_ACTION_NAME.SEND_ALL_TABS]})`,
-    contexts: ['all'],
+    contexts,
     enabled: filteredTabs?.length > 0,
   };
 
@@ -69,7 +72,7 @@ const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> => {
     title:
       customMessages['common.sendCurrentTab'] +
       ` (${hotkeysMap?.[ENUM_ACTION_NAME.SEND_CURRENT_TAB]})`,
-    contexts: ['all'],
+    contexts,
     enabled:
       !!currTab?.id &&
       currTab?.id != adminTab?.id &&
@@ -81,7 +84,7 @@ const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> => {
     title:
       customMessages['common.sendOtherTabs'] +
       ` (${hotkeysMap?.[ENUM_ACTION_NAME.SEND_OTHER_TABS]})`,
-    contexts: ['all'],
+    contexts,
     enabled: !!currTab?.id,
   };
 
@@ -90,7 +93,7 @@ const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> => {
     title:
       customMessages['common.sendLeftTabs'] +
       ` (${hotkeysMap?.[ENUM_ACTION_NAME.SEND_LEFT_TABS]})`,
-    contexts: ['all'],
+    contexts,
     enabled: !!currTab?.id && currTab?.index > 0,
   };
 
@@ -99,7 +102,7 @@ const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> => {
     title:
       customMessages['common.sendRightTabs'] +
       ` (${hotkeysMap?.[ENUM_ACTION_NAME.SEND_RIGHT_TABS]})`,
-    contexts: ['all'],
+    contexts,
     enabled: !!currTab?.id && currTab?.index < tabs.length - 1,
   };
 
@@ -126,7 +129,7 @@ async function createContextMenus(callback?: () => void) {
 async function handleContextMenusUpdate() {
   const menus = await getMenus();
   for (let menu of menus) {
-    if (menu.id) browser.contextMenus.update(menu.id, pick(menu, ['title', 'enabled']));
+    if (menu.id) browser.contextMenus.update(menu.id, pick(menu, ['title', 'enabled', 'contexts']));
   }
 }
 

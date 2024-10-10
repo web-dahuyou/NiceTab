@@ -32,6 +32,7 @@ const {
   LINK_TEMPLATE,
   TAB_COUNT_THRESHOLD,
   SHOW_OPENED_TAB_COUNT,
+  SHOW_PAGE_CONTEXT_MENUS,
 } = ENUM_SETTINGS_PROPS;
 
 const module = 'settings'; // locale module name
@@ -282,6 +283,17 @@ export default function Settings() {
           <Form.Item<SettingsProps>
             label={$fmt(`${module}.${SHOW_OPENED_TAB_COUNT}`)}
             name={SHOW_OPENED_TAB_COUNT}
+          >
+            <Radio.Group>
+              <Radio value={true}>{$fmt('common.yes')}</Radio>
+              <Radio value={false}>{$fmt('common.no')}</Radio>
+            </Radio.Group>
+          </Form.Item>
+
+          {/* 网页中是否显示NiceTab右键菜单 */}
+          <Form.Item<SettingsProps>
+            label={$fmt(`${module}.${SHOW_PAGE_CONTEXT_MENUS}`)}
+            name={SHOW_PAGE_CONTEXT_MENUS}
           >
             <Radio.Group>
               <Radio value={true}>{$fmt('common.yes')}</Radio>

@@ -37,6 +37,5 @@ export default {
   'settings.tabCountThreshold.tooltip': 'To ensure performance, when the number of tabs in the category exceeds a certain threshold, the right panel will enable virtual scrolling, displaying partial tab groups based on the scrolling position.',
 
   'settings.showOpenedTabCount': 'Whether to display the number of open tabs on the extension icon ?',
-  'settings.showOpenedTabCount.yes': 'Yes',
-  'settings.showOpenedTabCount.no': 'No',
+  'settings.showPageContextMenus': 'Whether to display the ContextMenu on your webpage?',
 }

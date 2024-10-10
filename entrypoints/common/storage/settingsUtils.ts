@@ -17,6 +17,7 @@ const {
   LINK_TEMPLATE,
   TAB_COUNT_THRESHOLD,
   SHOW_OPENED_TAB_COUNT,
+  SHOW_PAGE_CONTEXT_MENUS,
 } = ENUM_SETTINGS_PROPS;
 
 // 设置工具类
@@ -37,6 +38,7 @@ export default class SettingsUtils {
 
     [TAB_COUNT_THRESHOLD]: 300, // 分类中标签页超过该数量时，则右侧面板开启虚拟滚动
     [SHOW_OPENED_TAB_COUNT]: true, // 扩展图标上是否显示打开的标签页数量
+    [SHOW_PAGE_CONTEXT_MENUS]: true, // 网页中是否显示NiceTab右键菜单
   };
   settings: SettingsProps = this.initialSettings;
 

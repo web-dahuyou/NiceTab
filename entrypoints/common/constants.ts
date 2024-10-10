@@ -102,6 +102,7 @@ export const ENUM_SETTINGS_PROPS: EnumSettingsProps = {
   LINK_TEMPLATE: 'linkTemplate', // 链接模板
   TAB_COUNT_THRESHOLD: 'tabCountThreshold', // 分类中标签页超过该数量时，则右侧面板开启虚拟滚动
   SHOW_OPENED_TAB_COUNT: 'showOpenedTabCount', // 扩展图标上是否显示打开的标签页数量
+  SHOW_PAGE_CONTEXT_MENUS: 'showPageContextMenus', // 网页中是否显示NiceTab右键菜单
 };
 
 // tab 事件
