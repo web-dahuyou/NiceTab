@@ -1,10 +1,11 @@
-import { useState, useMemo, useCallback, useLayoutEffect } from 'react';
-import { Button, Modal, Drawer } from 'antd';
+import { useState, useMemo, useCallback } from 'react';
+import { theme, Flex, Button, Modal, Drawer, Space, Typography, Tooltip } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { classNames } from '~/entrypoints/common/utils';
 import { tabListUtils, settingsUtils, stateUtils } from '@/entrypoints/common/storage';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
+import { openNewTab } from '@/entrypoints/common/tabs';
 
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import {
@@ -26,6 +27,7 @@ import TabGroupList from './TabGroupList';
 const { TAB_COUNT_THRESHOLD } = ENUM_SETTINGS_PROPS;
 
 export default function Home() {
+  const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const treeDataHook = useTreeData();
   const {
@@ -42,7 +44,9 @@ export default function Home() {
   const { hotkeyList } = useHotkeys({ onAction: handleHotkeyAction });
 
   const state = stateUtils.getState();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(state['home:sidebarCollapsed'] || false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(
+    state['home:sidebarCollapsed'] || false
+  );
   const [confirmModalVisible, setConfirmModalVisible] = useState<boolean>(false);
   const [helpDrawerVisible, setHelpDrawerVisible] = useState<boolean>(false);
 
@@ -89,7 +93,10 @@ export default function Home() {
             className={classNames('sidebar-inner-box', sidebarCollapsed && 'collapsed')}
           >
             <div className="sidebar-action-box">
-              <ToggleSidebarBtn collapsed={sidebarCollapsed} onCollapseChange={onCollapseChange}></ToggleSidebarBtn>
+              <ToggleSidebarBtn
+                collapsed={sidebarCollapsed}
+                onCollapseChange={onCollapseChange}
+              ></ToggleSidebarBtn>
               {selectedTagKey ? <SortingBtns onSort={onSort}></SortingBtns> : null}
             </div>
 
@@ -177,6 +184,47 @@ export default function Home() {
             <strong>{$fmt('common.hotkeys')}</strong>
           </p>
           <HotkeyList list={hotkeyList}></HotkeyList>
+
+          <ul style={{ marginTop: '8px' }}>
+            <li>
+              {$fmt('home.help.hotkey.1')}
+              <Space>
+                <strong>"{$fmt('common.openAdminTab')}",</strong>
+                <strong>"{$fmt('common.sendAllTabs')}",</strong>
+                <strong>"{$fmt('common.sendCurrentTab')}"</strong>
+              </Space>
+              {$fmt('home.help.hotkey.2')}
+              <Typography.Link
+                onClick={() =>
+                  openNewTab('chrome://extensions/shortcuts', {
+                    active: true,
+                    openToNext: true,
+                  })
+                }
+              >
+                {$fmt('home.help.hotkey.modify')}
+              </Typography.Link>
+              <Tooltip
+                color={token.colorBgContainer}
+                title={
+                  <Flex vertical>
+                    <Typography.Text>
+                      <strong>Chrome</strong>: chrome://extensions/shortcuts
+                    </Typography.Text>
+                    <Typography.Text>
+                      <strong>Edge</strong>: edge://extensions/shortcuts
+                    </Typography.Text>
+                    <Typography.Text>
+                      {$fmt('home.help.hotkey.modifyTip')}
+                    </Typography.Text>
+                  </Flex>
+                }
+                overlayStyle={{ maxWidth: '300px', width: '300px' }}
+              >
+                <QuestionCircleOutlined style={{ marginLeft: '4px' }} />
+              </Tooltip>
+            </li>
+          </ul>
         </StyledHelpInfoBox>
       </Drawer>
     </HomeContext.Provider>

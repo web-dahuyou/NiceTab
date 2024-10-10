@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react';
-import { theme, Drawer, Button } from 'antd';
+import { theme, message, Drawer, Button } from 'antd';
 import { ClearOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { classNames } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { syncUtils } from '~/entrypoints/common/storage';
-import type { SyncRemoteType, SyncConfigProps, SyncStatusProps, SyncResultProps, SyncType } from '~/entrypoints/types';
+import type {
+  SyncRemoteType,
+  SyncConfigProps,
+  SyncStatusProps,
+  SyncResultProps,
+  SyncType,
+} from '~/entrypoints/types';
 import type { RemoteOptionProps } from './types';
 import { StyledContainer, StyledSidebarWrapper } from './Sync.styled';
 import ToggleSidebarBtn from '../components/ToggleSidebarBtn';
@@ -15,6 +21,7 @@ import SyncResultList from './SyncResultList';
 
 export default function SyncPage() {
   const { token } = theme.useToken();
+  const [messageApi, contextHolder] = message.useMessage();
   const { $fmt } = useIntlUtls();
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
   const [selectedKey, setSelectedKey] = useState<SyncRemoteType>('github');
@@ -22,11 +29,16 @@ export default function SyncPage() {
   const [syncConfig, setSyncConfig] = useState<SyncConfigProps>(syncUtils.config);
   const [syncStatus, setSyncStatus] = useState<SyncStatusProps>(syncUtils.syncStatus);
   const [syncResult, setSyncResult] = useState<SyncResultProps>(syncUtils.syncResult);
-  const [actionTime, setActionTime] = useState<string>(dayjs().format('YYYY-MM-DD_HH:mm:ss'));
+  const [actionTime, setActionTime] = useState<string>(
+    dayjs().format('YYYY-MM-DD_HH:mm:ss')
+  );
 
   const onSyncConfigChange = (config: SyncConfigProps) => {
     setDrawerVisible(false);
     setSyncConfig(config);
+    messageApi.success(
+      $fmt({ id: 'common.actionSuccess', values: { action: $fmt('common.save') } })
+    );
   };
 
   const handleAction = async (option: RemoteOptionProps, actionType: string) => {
@@ -48,7 +60,7 @@ export default function SyncPage() {
   const clearSyncResult = async () => {
     await syncUtils.clearSyncResult(selectedKey);
     getSyncInfo();
-  }
+  };
 
   const getSyncInfo = async () => {
     syncUtils.getSyncStatus();
@@ -59,7 +71,7 @@ export default function SyncPage() {
 
     await syncUtils.getSyncResult();
     setSyncResult(syncUtils.syncResult);
-  }
+  };
 
   useEffect(() => {
     getSyncInfo();
@@ -67,6 +79,7 @@ export default function SyncPage() {
 
   return (
     <>
+      {contextHolder}
       <StyledContainer
         className={classNames('sync-wrapper', sidebarCollapsed && 'collapsed')}
         $collapsed={sidebarCollapsed}
@@ -105,7 +118,7 @@ export default function SyncPage() {
         </div>
       </StyledContainer>
 
-      { drawerVisible && (
+      {drawerVisible && (
         <Drawer
           title={$fmt('sync.settings')}
           open={drawerVisible}

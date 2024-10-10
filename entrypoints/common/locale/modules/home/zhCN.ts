@@ -63,6 +63,10 @@ export default {
     <li><strong>注意</strong>：为了保证交互性能，当前分类中标签页数量超过设定值时，右侧面板将开启虚拟滚动，根据滚动位置展示部分标签组。</li>
     <li>分类/标签组/标签页支持拖拽排序，当分类/标签组处在选中状态时，可通过快捷键进行排序，快捷键映射见下表：</li>
   `,
+  'home.help.hotkey.1': `上述的快捷键，只限在本页使用，另外扩展插件还针对常用的几个操作注册了浏览器快捷键，(如`,
+  'home.help.hotkey.2': `)；您还可以自行前往扩展程序页面`,
+  'home.help.hotkey.modify': `修改快捷键`,
+  'home.help.hotkey.modifyTip': '快捷键修改完后，会立即生效，但右键菜单中的快捷键按键名需在切换浏览器tab后自动更新。',
 
   'home.moveTo.missingTip': '请选择{type}',
   'home.moveTo.mergeLabel': '是否合并重复项',

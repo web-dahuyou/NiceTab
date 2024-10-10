@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import type { ReactElement } from 'react';
-import { theme, message, Typography, Divider, Form, Input, Switch, Button } from 'antd';
+import { theme, Typography, Divider, Form, Input, Switch, Button } from 'antd';
 import { LinkOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import type { InputRef, FormProps } from 'antd';
 import styled from 'styled-components';
@@ -21,7 +21,6 @@ const StyledLink = styled.div`
 export default function SyncConfigForm({ onChange }: SyncConfigFormProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
-  const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
   const giteeTokenInputRef = useRef<InputRef>(null);
   const githubTokenInputRef = useRef<InputRef>(null);
@@ -44,7 +43,6 @@ export default function SyncConfigForm({ onChange }: SyncConfigFormProps) {
 
     onChange?.(newConfig);
     syncUtils.setConfig(values);
-    messageApi.success($fmt('common.saveSuccess'));
   };
 
   useEffect(() => {
@@ -55,7 +53,6 @@ export default function SyncConfigForm({ onChange }: SyncConfigFormProps) {
 
   return (
     <>
-      {contextHolder}
       <Form
         form={form}
         name="sync-config-form"
