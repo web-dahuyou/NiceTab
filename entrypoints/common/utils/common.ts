@@ -156,16 +156,16 @@ export const fetchApi = (
     _options.body = JSON.stringify(params);
   }
 
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     fetch(_url, _options)
       .then((res) => {
         if (res.ok) {
           resolve(res.json());
         }
-        resolve(null);
+        reject(res);
       })
       .catch((e) => {
-        resolve(null);
+        reject(e);
       });
   });
 };
