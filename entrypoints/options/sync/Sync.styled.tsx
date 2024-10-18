@@ -41,8 +41,8 @@ export const StyledSidebarWrapper = styled.div<{ $primaryColor?: string; $collap
     display: flex;
     flex-direction: column;
     padding-right: 10px;
-
-
+    padding-bottom: 30px;
+    overflow: auto;
   }
 `;
 
@@ -57,6 +57,29 @@ export const StyledContainer = styled.div<{$collapsed?: boolean; $sidebarWidth?:
   .content {
     padding-left: 40px;
     border-left: 1px solid ${(props) => props.theme.colorBorder || 'rgba(5, 5, 5, 0.06)'};
+  }
+`;
+
+export const StyledCard = styled.div`
+  .card-item {
+    border-color: ${(props) => props.theme.colorBorder};
+    &.active {
+      border-color: ${(props) => props.theme.colorPrimary};
+    }
+    .icon-btn-wrapper {
+      padding: 4px;
+    }
+  }
+`;
+
+export const StyledCardTitle = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  .card-title {
+    font-weight: bold;
+    font-weight: 600;
+    font-size: 14px;
   }
 `;
 

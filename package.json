@@ -33,7 +33,8 @@
     "react-intl": "^6.6.8",
     "react-router-dom": "^6.23.0",
     "react-virtuoso": "^4.10.4",
-    "styled-components": "^6.1.8"
+    "styled-components": "^6.1.8",
+    "webdav": "^5.7.1"
   },
   "devDependencies": {
     "@types/file-saver": "^2.0.7",
