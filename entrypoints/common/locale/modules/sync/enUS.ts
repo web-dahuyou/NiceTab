@@ -25,10 +25,22 @@ export default {
   'sync.tip.manualPushMerge': 'Pull remote data, merge to local data, and then push to remote.',
   'sync.tip.manualPushForce': 'Push local data to remote (force overwrite).',
   'sync.tip.tokenChange': 'Change the access token will clear the local {type} sync history',
-  'sync.tip.contentTooLarge': 'The remote file content is too large, truncated by gist API, cancel merge to local',
+  // 'sync.tip.contentTooLarge': 'The remote file content is too large, truncated by gist API, cancel merge to local',
   'sync.tip.syncHistory': 'Sync history only retains the last 50 records, you can also clear the history manually.',
   'sync.getYourToken': 'Get/Set your access token',
   'sync.syncHistory': 'Sync History',
   'sync.noSyncHistory': 'No Sync History',
   'sync.clearSyncHistory': 'Clear Sync History',
+  'sync.removeDesc': 'Are you sure you want to remove the item ?',
+  'sync.noWebdavConnectionUrl': 'No WebDAV Connection URL',
+
+  'sync.reason.contentTooLarge': 'The remote file content is too large, truncated by gist API, cancel merge to local',
+  'sync.reason.authFailed': 'Authentication Failed',
+
+  'sync.connectionName': 'WebDAV Name',
+  'sync.connectionUrl': 'WebDAV URL',
+  'sync.username': 'WebDAV Username',
+  'sync.password': 'WebDAV Password',
+  'sync.addConfig': 'Add New Config',
+  'sync.tip.connectionName': 'Used to distinguish different webDAV configs',
 }

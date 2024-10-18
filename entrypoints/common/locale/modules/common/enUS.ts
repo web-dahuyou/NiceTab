@@ -70,5 +70,6 @@ export default {
   'common.import': 'Import',
   'common.export': 'Export',
   'common.none': 'None',
+  'common.pleaseInput': 'Please input {label}.',
 }
 

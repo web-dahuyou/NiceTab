@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ConfigProvider, theme } from 'antd';
 import { IntlProvider } from 'react-intl';
-import { PRIMARY_COLOR } from '../constants';
+import { PRIMARY_COLOR, defaultLanguage } from '../constants';
 import {
   GlobalContext,
   useAntdLocale,
@@ -39,6 +39,10 @@ export default function Root({ children }: { children: React.ReactNode }) {
     setPrimaryColor(theme.colorPrimary);
     setHasReady(true);
   };
+
+  useEffect(() => {
+    document.documentElement.lang = localeCustom || defaultLanguage;
+  }, [localeCustom]);
 
   useEffect(() => {
     initThemeData();

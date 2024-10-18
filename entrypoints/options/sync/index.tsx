@@ -1,133 +1,133 @@
-import { useEffect, useState } from 'react';
-import { theme, message, Drawer, Button } from 'antd';
+import { useEffect, useState, useRef } from 'react';
+import { theme, Flex, Button } from 'antd';
 import { ClearOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
 import { classNames } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { syncUtils } from '~/entrypoints/common/storage';
+import { syncUtils, syncWebDAVUtils } from '~/entrypoints/common/storage';
 import type {
+  SyncTargetType,
   SyncRemoteType,
-  SyncConfigProps,
-  SyncStatusProps,
   SyncResultProps,
-  SyncType,
+  SyncConfigWebDAVProps,
 } from '~/entrypoints/types';
-import type { RemoteOptionProps } from './types';
 import { StyledContainer, StyledSidebarWrapper } from './Sync.styled';
 import ToggleSidebarBtn from '../components/ToggleSidebarBtn';
-import SyncConfigForm from './SyncConfigForm';
-import SidebarContent from './SidebarContent';
+import SidebarContentModuleGist from './components/gist/SidebarContentModule';
+import SidebarContentModuleWebDAV from './components/webdav/SidebarContentModule';
 import SyncResultList from './SyncResultList';
+
+interface ChildComponentHandle {
+  getSyncInfo: () => void;
+}
 
 export default function SyncPage() {
   const { token } = theme.useToken();
-  const [messageApi, contextHolder] = message.useMessage();
   const { $fmt } = useIntlUtls();
+  const gistRef = useRef<ChildComponentHandle>(null);
+  const webDAVRef = useRef<ChildComponentHandle>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
-  const [selectedKey, setSelectedKey] = useState<SyncRemoteType>('github');
-  const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
-  const [syncConfig, setSyncConfig] = useState<SyncConfigProps>(syncUtils.config);
-  const [syncStatus, setSyncStatus] = useState<SyncStatusProps>(syncUtils.syncStatus);
+  const [selectedTargetType, setSelectedTargetType] = useState<SyncTargetType>('gist');
+  const [selectedKey, setSelectedKey] = useState<string>('github');
   const [syncResult, setSyncResult] = useState<SyncResultProps>(syncUtils.syncResult);
-  const [actionTime, setActionTime] = useState<string>(
-    dayjs().format('YYYY-MM-DD_HH:mm:ss')
-  );
+  const [configWevDAV, setConfigWevDAV] = useState<SyncConfigWebDAVProps>(syncWebDAVUtils.config || {});
 
-  const onSyncConfigChange = (config: SyncConfigProps) => {
-    setDrawerVisible(false);
-    setSyncConfig(config);
-    messageApi.success(
-      $fmt({ id: 'common.actionSuccess', values: { action: $fmt('common.save') } })
-    );
-  };
-
-  const handleAction = async (option: RemoteOptionProps, actionType: string) => {
-    setSelectedKey(option.key);
-    setActionTime(dayjs().format('YYYY-MM-DD_HH:mm:ss'));
-    if (actionType === 'select') {
-      setSelectedKey(option.key);
-    } else if (actionType === 'setting') {
-      setDrawerVisible(true);
+  const resultList = useMemo(() => {
+    if (selectedTargetType === 'gist') {
+      return syncResult?.[selectedKey] || [];
+    } else if (selectedTargetType === 'webdav') {
+      const configItem = syncWebDAVUtils.getConfigItem(selectedKey);
+      return configItem?.syncResult || [];
     } else {
-      syncUtils.setSyncStatus(option.key, 'syncing');
-      setSyncStatus(syncUtils.getSyncStatus());
-      await syncUtils.syncStart(option.key, actionType as SyncType);
-      syncUtils.setSyncStatus(option.key, 'idle');
-      getSyncInfo();
+      return [];
     }
+  }, [selectedTargetType, selectedKey, syncResult, configWevDAV]);
+
+  const onSelect = (targetType: SyncTargetType, key: string) => {
+    setSelectedTargetType(targetType);
+    setSelectedKey(key);
   };
+  const onAction = useCallback((targetType: SyncTargetType) => {
+    setSelectedTargetType(targetType);
+    if (targetType === 'gist') {
+      getSyncInfo();
+    } else if (targetType === 'webdav') {
+      getWebDavConfig();
+    }
+  }, []);
 
   const clearSyncResult = async () => {
-    await syncUtils.clearSyncResult(selectedKey);
-    getSyncInfo();
+    if (selectedTargetType === 'gist') {
+      await syncUtils.clearSyncResult(selectedKey as SyncRemoteType);
+      getSyncInfo();
+      gistRef.current?.getSyncInfo();
+    } else if (selectedTargetType === 'webdav') {
+      await syncWebDAVUtils.clearSyncResult(selectedKey);
+      getWebDavConfig();
+      webDAVRef.current?.getSyncInfo();
+    }
+
   };
 
   const getSyncInfo = async () => {
-    syncUtils.getSyncStatus();
-    setSyncStatus(syncUtils.syncStatus);
-
-    await syncUtils.getConfig();
-    setSyncConfig(syncUtils.config);
-
     await syncUtils.getSyncResult();
     setSyncResult(syncUtils.syncResult);
   };
 
+  const getWebDavConfig = async () => {
+    const config = await syncWebDAVUtils.getConfig();
+    setConfigWevDAV(config || {});
+  }
+
   useEffect(() => {
     getSyncInfo();
+    getWebDavConfig();
   }, []);
 
   return (
-    <>
-      {contextHolder}
-      <StyledContainer
-        className={classNames('sync-wrapper', sidebarCollapsed && 'collapsed')}
+    <StyledContainer
+      className={classNames('sync-wrapper', sidebarCollapsed && 'collapsed')}
+      $collapsed={sidebarCollapsed}
+    >
+      <StyledSidebarWrapper
+        className="sidebar"
+        $primaryColor={token.colorPrimary}
         $collapsed={sidebarCollapsed}
       >
-        <StyledSidebarWrapper
-          className="sidebar"
-          $primaryColor={token.colorPrimary}
-          $collapsed={sidebarCollapsed}
-        >
-          <div
-            className={classNames('sidebar-inner-box', sidebarCollapsed && 'collapsed')}
-          >
-            <div className="sidebar-action-box">
-              {/* <ToggleSidebarBtn onCollapseChange={setSidebarCollapsed}></ToggleSidebarBtn> */}
-              <div
-                className="action-icon"
-                title={$fmt('sync.clearSyncHistory')}
-                onClick={clearSyncResult}
-              >
-                <Button icon={<ClearOutlined />}></Button>
-              </div>
-            </div>
-            <div className="sidebar-inner-content">
-              <SidebarContent
-                selectedKey={selectedKey}
-                syncConfig={syncConfig}
-                syncStatus={syncStatus}
-                syncResult={syncResult}
-                onAction={handleAction}
-              ></SidebarContent>
+        <div className={classNames('sidebar-inner-box', sidebarCollapsed && 'collapsed')}>
+          <div className="sidebar-action-box">
+            {/* <ToggleSidebarBtn onCollapseChange={setSidebarCollapsed}></ToggleSidebarBtn> */}
+            <div
+              className="action-icon"
+              title={$fmt('sync.clearSyncHistory')}
+              onClick={clearSyncResult}
+            >
+              <Button icon={<ClearOutlined />}></Button>
             </div>
           </div>
-        </StyledSidebarWrapper>
-        <div className="content">
-          <SyncResultList resultList={syncResult[selectedKey] || []}></SyncResultList>
-        </div>
-      </StyledContainer>
+          <div className="sidebar-inner-content">
+            <Flex vertical gap={12}>
+              <SidebarContentModuleGist
+                ref={gistRef}
+                targetType={selectedTargetType}
+                selectedKey={selectedKey}
+                onSelect={(key) => onSelect('gist', key)}
+                onAction={() => onAction?.('gist')}
+              />
 
-      {drawerVisible && (
-        <Drawer
-          title={$fmt('sync.settings')}
-          open={drawerVisible}
-          onClose={() => setDrawerVisible(false)}
-          width={500}
-        >
-          <SyncConfigForm onChange={onSyncConfigChange}></SyncConfigForm>
-        </Drawer>
-      )}
-    </>
+              <SidebarContentModuleWebDAV
+                ref={webDAVRef}
+                targetType={selectedTargetType}
+                selectedKey={selectedKey}
+                onSelect={(key) => onSelect('webdav', key)}
+                onAction={() => onAction?.('webdav')}
+              />
+            </Flex>
+          </div>
+        </div>
+      </StyledSidebarWrapper>
+      <div className="content">
+        <SyncResultList resultList={resultList}></SyncResultList>
+      </div>
+    </StyledContainer>
   );
 }

@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { theme, message, Flex, Card, Tooltip, Typography, Tag, Modal } from 'antd';
+import { theme, message, Flex, Divider, Card, Button, Tooltip, Typography, Tag, Modal } from 'antd';
 import {
   SettingOutlined,
   SyncOutlined,
@@ -21,19 +21,13 @@ import { classNames } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { syncTypeMap } from '~/entrypoints/common/constants';
 import { syncUtils } from '~/entrypoints/common/storage';
-import type { RemoteOptionProps } from './types';
+import type { RemoteOptionProps, BaseCardItemProps } from './types';
 import { remoteOptions } from './constants';
 import { StyledLabel } from './Sync.styled';
-import { useSyncResult } from './hooks';
+import { useSyncResult } from './hooks/syncResult';
 
-type CardItemProps = {
-  option: RemoteOptionProps;
-  isActive?: boolean;
-  syncConfig: SyncConfigItemProps;
-  syncStatus: SyncStatus;
-  syncResult: SyncResultItemProps[];
-  onAction?: (option: RemoteOptionProps, actionType: string) => void;
-};
+import { AuthType, createClient } from "webdav";
+import type { FileStat } from "webdav";
 
 const StyledTitle = styled.div`
   display: flex;
@@ -42,7 +36,7 @@ const StyledTitle = styled.div`
   .card-title {
     font-weight: bold;
     font-weight: 600;
-    font-size: 18px;
+    font-size: 14px;
   }
 `;
 
@@ -53,7 +47,7 @@ function CardItemMarkup({
   syncStatus,
   syncResult,
   onAction,
-}: CardItemProps) {
+}: BaseCardItemProps) {
   const [modal, modalContextHolder] = Modal.useModal();
   const [messageApi, msgContextHolder] = message.useMessage();
   const { token } = theme.useToken();
@@ -252,8 +246,6 @@ export default function SidebarContent({
   syncResult,
   onAction,
 }: SideBarContentProps) {
-  const { token } = theme.useToken();
-
   const handleAction = useCallback(
     (option: RemoteOptionProps, actionType: string) => {
       onAction?.(option, actionType);
@@ -261,20 +253,109 @@ export default function SidebarContent({
     [onAction]
   );
 
+  const handleDavAction = async (action: string) => {
+    console.log('handleDavAction');
+    const serverUrl = 'https://gima.teracloud.jp/dav/';
+    const username = 'wwwppp';
+    const password = 'gUgnNGBAk2r9YtU9';
+    // const directory = '/nicetab';
+
+    // const fileName = `${directory?.replace(/\/$/, '') || ''}/${syncUtils.gistFileName}`;
+    const directory = '/test/a';
+
+    const fileName = `${directory?.replace(/\/$/, '') || ''}/github-hosts`;
+    console.log('fileName', fileName);
+
+    // const recursiveHandler = async (path: string, handler: (pathStr: string) => Promise<boolean>) => {
+    //   const pathList = path.split('/').filter(Boolean);
+    //   let _path = '';
+    //   for (let i = 0; i < pathList.length; i++) {
+    //     _path += `/${pathList[i]}`;
+    //     const result = await handler(_path);
+    //     if (!result) return false;
+    //   }
+    //   return true;
+    // }
+    const recursiveHandler = async (path: string, handler: (pre: string, curr: string) => Promise<boolean>) => {
+      const pathList = path.split('/').filter(Boolean);
+      let _path = '/';
+      for (let i = 0; i < pathList.length; i++) {
+        const result = await handler(_path, pathList[i]);
+        console.log('result-inner', result);
+        if (!result) return false;
+        _path += `${pathList[i]}/`;
+      }
+      return true;
+    }
+
+    const client = createClient(serverUrl, {
+      authType: AuthType.Auto,
+      username,
+      password
+    });
+
+    const isDirExists = await recursiveHandler(directory, async (pre, curr) => {
+      console.log('recursiveHandler-traverse-handler', pre, curr);
+      const contentList = await client.getDirectoryContents(pre) as FileStat[];
+      console.log('recursiveHandler-traverse-contentList', contentList);
+      return contentList.some((item) => item.basename === curr);
+    });
+    // let isDirExists = await client.exists(directory);
+    console.log('isDirExists', isDirExists);
+    return
+    if (!isDirExists) {
+      const createDirectoryres =  await client.createDirectory(directory, { recursive : true });
+      console.log('createDirectoryres', createDirectoryres);
+    }
+
+    const isFileExists = await client.exists(fileName);
+    console.log('isFileExists', isFileExists);
+    if (!isFileExists) {
+      const putFileContentsRes = await client.putFileContents(fileName, 'default content');
+      console.log('putFileContentsRes--1', putFileContentsRes);
+    }
+
+    if (action === 'delete') {
+      const deleteFileRes = await client.deleteFile(directory);
+      console.log('deleteFileRes', deleteFileRes);
+    } else if (action === 'getFileContents') {
+      console.log('getFileContents');
+      const fileContent = await client.getFileContents(fileName, { format: "text" }) as string;
+      console.log('fileContent', fileContent);
+    } else if (action === 'putFileContents') {
+      const putFileContentsRes = await client.putFileContents(fileName, '{a: 1, b: 2}');
+      console.log('putFileContentsRes', putFileContentsRes);
+    }
+  };
+
   return (
-    <Flex vertical gap={12}>
-      {remoteOptions.map((option) => (
-        <StyledCard key={option.key}>
-          <CardItemMarkup
-            option={option}
-            isActive={selectedKey === option.key}
-            syncConfig={syncConfig?.[option.key] || {}}
-            syncStatus={syncStatus?.[option.key] || {}}
-            syncResult={syncResult?.[option.key] || []}
-            onAction={handleAction}
-          ></CardItemMarkup>
-        </StyledCard>
-      ))}
+    <Flex vertical gap={24}>
+      <Flex vertical>
+        <Divider><Typography.Text strong>Gists</Typography.Text></Divider>
+        <Flex vertical gap={12}>
+          {remoteOptions.map((option) => (
+            <StyledCard key={option.key}>
+              <CardItemMarkup
+                option={option}
+                isActive={selectedKey === option.key}
+                syncConfig={syncConfig?.[option.key] || {}}
+                syncStatus={syncStatus?.[option.key] || {}}
+                syncResult={syncResult?.[option.key] || []}
+                onAction={handleAction}
+              ></CardItemMarkup>
+            </StyledCard>
+          ))}
+        </Flex>
+      </Flex>
+
+      <Flex vertical>
+        <Divider><Typography.Text strong>webDAV</Typography.Text></Divider>
+        <div>
+          <Button onClick={() => handleDavAction('delete')}>delete dir</Button>
+          <Button onClick={() => handleDavAction('getFileContents')}>getFileContents</Button>
+          <Button onClick={() => handleDavAction('putFileContents')}>putFileContents</Button>
+        </div>
+      </Flex>
     </Flex>
   );
 }

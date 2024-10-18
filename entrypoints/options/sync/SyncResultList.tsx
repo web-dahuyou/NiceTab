@@ -4,7 +4,7 @@ import type { SyncResultItemProps } from '~/entrypoints/types';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { SUCCESS_KEY } from '~/entrypoints/common/constants';
 import { StyledLabel } from './Sync.styled';
-import { useSyncResult } from './hooks';
+import { useSyncResult } from './hooks/syncResult';
 
 type SyncResultListProps = {
   resultList: SyncResultItemProps[];
@@ -65,7 +65,7 @@ export default function SyncResultList({ resultList }: SyncResultListProps) {
               {result.reason && (
                 <Typography.Text type="danger">
                   <StyledLabel>{$fmt('common.failedReason')}: </StyledLabel>
-                  {result.reason}
+                  {$fmt(`sync.reason.${result.reason}`)}
                 </Typography.Text>
               )}
             </Flex>
