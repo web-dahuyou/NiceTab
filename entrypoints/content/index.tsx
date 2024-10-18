@@ -1,10 +1,12 @@
 import ReactDOM from 'react-dom/client';
+import '~/assets/css/reset.css';
+import '~/assets/css/index.css';
 import App from './App';
 
 export default defineContentScript({
   // "matches": ['<all_urls>'],
   matches: ["*://*/*"],
-  // cssInjectionMode: "ui",
+  cssInjectionMode: "ui",
   // cssInjectionMode: 'manual',
 
   async main(ctx) {
@@ -14,7 +16,7 @@ export default defineContentScript({
       name: "nicetab-message",
       position: "inline",
       anchor: "body",
-      append: "first",
+      // append: "first",
       onMount: (container) => {
         const wrapper = document.createElement("div");
         container.append(wrapper);
