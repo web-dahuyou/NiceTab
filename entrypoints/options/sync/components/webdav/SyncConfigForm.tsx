@@ -2,8 +2,12 @@ import { useEffect } from 'react';
 import { Form, Button } from 'antd';
 import type { FormProps } from 'antd';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
-import type { SyncConfigWebDAVProps } from '~/entrypoints/types';
+import type {
+  SyncConfigWebDAVProps,
+  SyncConfigItemWebDAVProps,
+} from '~/entrypoints/types';
 import { syncWebDAVUtils } from '~/entrypoints/common/storage';
+import { omit } from '~/entrypoints/common/utils';
 
 import SyncConfigFormItems from './SyncConfigFormItems';
 
@@ -17,11 +21,33 @@ export default function SyncConfigForm({ onChange }: SyncConfigFormProps) {
   const [form] = Form.useForm();
 
   const onFinish: FormProps<SyncConfigWebDAVProps>['onFinish'] = async (values) => {
-    console.log('Save Success:', values);
-    const newConfig = { ...syncWebDAVUtils.initialConfig, ...values };
+    const oldConfigListMap = syncWebDAVUtils?.config?.configList?.reduce<
+      Record<string, SyncConfigItemWebDAVProps>
+    >((result, item) => {
+      result[item.key] = item;
+      return result;
+    }, {});
+
+    let newConfigList = values?.configList?.map((item) => {
+      const newItem = {
+        ...syncWebDAVUtils.createConfigItem(),
+        ...(item.key ? item : omit(item, ['key'])),
+      };
+      return {
+        ...oldConfigListMap[newItem.key],
+        ...newItem,
+      };
+    });
+
+    const newConfig = {
+      ...syncWebDAVUtils.initialConfig,
+      ...values,
+      configList: newConfigList,
+    };
 
     onChange?.(newConfig);
-    syncWebDAVUtils.setConfig(values);
+    syncWebDAVUtils.setConfig(newConfig);
+    console.log('Save Success:', newConfig);
   };
 
   useEffect(() => {

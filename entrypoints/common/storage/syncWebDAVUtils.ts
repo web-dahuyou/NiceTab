@@ -45,17 +45,20 @@ export default class syncWebDAVUtils {
       this.config
     );
   }
-  async addConfigItem(configItem?: SyncConfigItemWebDAVProps) {
-    this.config.configList?.push({
+  createConfigItem(configItem?: SyncConfigItemWebDAVProps) {
+    return {
       key: `webdav_${getRandomId()}`,
       label: '',
       webdavConnectionUrl: '',
       username: '',
       password: '',
       ...configItem,
-      syncStatus: 'idle',
+      syncStatus: 'idle' as SyncStatus,
       syncResult: [],
-    });
+    }
+  }
+  async addConfigItem(configItem?: SyncConfigItemWebDAVProps) {
+    this.config.configList?.push(this.createConfigItem(configItem));
     return await this.setConfig(this.config);
   }
 

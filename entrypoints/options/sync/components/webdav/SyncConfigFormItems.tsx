@@ -108,31 +108,32 @@ export default function SyncConfigFormItem({ form }: SyncConfigFormItemProps) {
                       >
                         <Input type="password" placeholder={$fmt('sync.password')} />
                       </Form.Item>
+                      <Form.Item name={[field.name, 'key']} hidden>
+                        <Input />
+                      </Form.Item>
                     </Form.Item>
                   </div>
                   <div className="config-item-action-box">
-                    {fields.length > 1 ? (
-                      <StyledActionIconBtn
-                        className="dynamic-delete-button"
-                        title={$fmt('common.delete')}
-                        $size={18}
-                        $hoverColor={ENUM_COLORS.red}
-                        onClick={() => {
-                          const item = form?.getFieldValue('configList')?.[field.name];
-                          if (!item.label && !item.webdavConnectionUrl) {
-                            remove(field.name);
-                          } else {
-                            modal.confirm({
-                              title: $fmt('home.removeTitle'),
-                              content: $fmt('sync.removeDesc'),
-                              onOk: () => remove(field.name),
-                            });
-                          }
-                        }}
-                      >
-                        <MinusCircleOutlined />
-                      </StyledActionIconBtn>
-                    ) : null}
+                    <StyledActionIconBtn
+                      className="dynamic-delete-button"
+                      title={$fmt('common.delete')}
+                      $size={18}
+                      $hoverColor={ENUM_COLORS.red}
+                      onClick={() => {
+                        const item = form?.getFieldValue('configList')?.[field.name];
+                        if (!item.label && !item.webdavConnectionUrl) {
+                          remove(field.name);
+                        } else {
+                          modal.confirm({
+                            title: $fmt('home.removeTitle'),
+                            content: $fmt('sync.removeDesc'),
+                            onOk: () => remove(field.name),
+                          });
+                        }
+                      }}
+                    >
+                      <MinusCircleOutlined />
+                    </StyledActionIconBtn>
                   </div>
                 </StyledConfigItem>
               ))}
