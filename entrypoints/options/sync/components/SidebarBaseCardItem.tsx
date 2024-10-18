@@ -1,61 +1,29 @@
 import { useCallback, useMemo } from 'react';
-import { theme, message, Flex, Card, Tooltip, Typography, Tag, Modal } from 'antd';
+import { theme, Flex, Card, Tooltip, Typography, Tag, Modal } from 'antd';
 import {
   SettingOutlined,
   SyncOutlined,
-  ExclamationCircleOutlined,
   CloudDownloadOutlined,
   CloudUploadOutlined,
 } from '@ant-design/icons';
-import styled from 'styled-components';
-import type {
-  SyncConfigItemProps,
-  SyncConfigProps,
-  SyncType,
-  SyncStatus,
-  SyncStatusProps,
-  SyncResultItemProps,
-  SyncResultProps,
-} from '~/entrypoints/types';
+import type { SyncType } from '~/entrypoints/types';
 import { classNames } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { syncTypeMap } from '~/entrypoints/common/constants';
-import { syncUtils } from '~/entrypoints/common/storage';
-import type { RemoteOptionProps } from './types';
-import { remoteOptions } from './constants';
-import { StyledLabel } from './Sync.styled';
-import { useSyncResult } from './hooks';
+import type { RemoteOptionProps, BaseCardItemProps } from '../types';
+import { StyledCardTitle, StyledLabel } from '../Sync.styled';
+import { useSyncResult } from '../hooks/syncResult';
 
-type CardItemProps = {
-  option: RemoteOptionProps;
-  isActive?: boolean;
-  syncConfig: SyncConfigItemProps;
-  syncStatus: SyncStatus;
-  syncResult: SyncResultItemProps[];
-  onAction?: (option: RemoteOptionProps, actionType: string) => void;
-};
-
-const StyledTitle = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  .card-title {
-    font-weight: bold;
-    font-weight: 600;
-    font-size: 18px;
-  }
-`;
-
-function CardItemMarkup({
+export default function BaseCardItem<T extends { label: string } = RemoteOptionProps>({
   option,
   isActive,
-  syncConfig,
   syncStatus,
   syncResult,
+  cardTitle,
   onAction,
-}: CardItemProps) {
+  validator = () => true,
+}: BaseCardItemProps<T>) {
   const [modal, modalContextHolder] = Modal.useModal();
-  const [messageApi, msgContextHolder] = message.useMessage();
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const lastSyncInfo = useMemo(() => {
@@ -70,22 +38,10 @@ function CardItemMarkup({
     };
   }, [$fmt]);
 
-  const tokenCheck = useCallback((): boolean => {
-    const { github, gitee } = syncUtils.config || {};
-    if (option.key === 'github' && !github?.accessToken) {
-      messageApi.warning($fmt('sync.noGithubToken'));
-      return false;
-    } else if (option.key === 'gitee' && !gitee?.accessToken) {
-      messageApi.warning($fmt('sync.noGiteeToken'));
-      return false;
-    }
-    return true;
-  }, [option]);
-
   // 操作确认
   const handleConfirm = useCallback(
     async (actionType: SyncType) => {
-      if (!tokenCheck()) return;
+      if (!validator?.(option)) return;
 
       const modalConfig = {
         title: $fmt('sync.actionTip'),
@@ -98,29 +54,23 @@ function CardItemMarkup({
   );
   // 合并推送
   const handlePushMerge = useCallback(() => {
-    if (!tokenCheck()) return;
+    if (!validator?.(option)) return;
 
     onAction?.(option, syncTypeMap['MANUAL_PUSH_MERGE']);
   }, [option]);
 
-  const cardTitle = useMemo(() => {
+  const defaultCardTitle = useMemo(() => {
     return (
-      <StyledTitle>
+      <StyledCardTitle>
         <div className="card-title">{option.label}</div>
-        {syncConfig?.accessToken ? (
-          syncStatus === 'syncing' ? (
-            <Tag icon={<SyncOutlined spin />} color="processing">
-              {$fmt('sync.syncing')}
-            </Tag>
-          ) : null
-        ) : (
-          <Tag icon={<ExclamationCircleOutlined />} color="warning">
-            {$fmt('sync.noAccessToken')}
+        {syncStatus === 'syncing' && (
+          <Tag icon={<SyncOutlined spin />} color="processing">
+            {$fmt('sync.syncing')}
           </Tag>
         )}
-      </StyledTitle>
+      </StyledCardTitle>
     );
-  }, [option, syncConfig, syncStatus, $fmt]);
+  }, [option, syncStatus, $fmt]);
 
   const description = useMemo(() => {
     return (
@@ -148,7 +98,7 @@ function CardItemMarkup({
             {lastSyncInfo.reason && (
               <Typography.Text type="danger">
                 <StyledLabel>{$fmt('common.failedReason')}: </StyledLabel>
-                {lastSyncInfo.reason}
+                {$fmt(`sync.reason.${lastSyncInfo.reason}`)}
               </Typography.Text>
             )}
           </>
@@ -176,7 +126,6 @@ function CardItemMarkup({
         <div
           className="icon-btn-wrapper"
           onClick={() => handleConfirm(syncTypeMap['MANUAL_PULL_FORCE'])}
-          // onClick={() => onAction?.(option, syncTypeMap['MANUAL_PULL_FORCE'])}
         >
           <CloudDownloadOutlined key={syncTypeMap['MANUAL_PULL_FORCE']} />
         </div>
@@ -198,7 +147,6 @@ function CardItemMarkup({
         <div
           className="icon-btn-wrapper"
           onClick={() => handleConfirm(syncTypeMap['MANUAL_PUSH_FORCE'])}
-          // onClick={() => onAction?.(option, syncTypeMap['MANUAL_PUSH_FORCE'])}
         >
           <CloudUploadOutlined key={syncTypeMap['MANUAL_PUSH_FORCE']} />
         </div>
@@ -208,7 +156,6 @@ function CardItemMarkup({
 
   return (
     <>
-      {msgContextHolder}
       {modalContextHolder}
       <Card
         className={classNames('card-item', isActive && 'active')}
@@ -219,62 +166,8 @@ function CardItemMarkup({
         onClick={() => onAction?.(option, 'select')}
         actions={actions}
       >
-        <Card.Meta title={cardTitle} description={description} />
+        <Card.Meta title={cardTitle || defaultCardTitle} description={description} />
       </Card>
     </>
-  );
-}
-
-const StyledCard = styled.div`
-  .card-item {
-    border-color: ${(props) => props.theme.colorBorder};
-    &.active {
-      border-color: ${(props) => props.theme.colorPrimary};
-    }
-    .icon-btn-wrapper {
-      padding: 4px;
-    }
-  }
-`;
-
-type SideBarContentProps = {
-  selectedKey?: string;
-  syncConfig: SyncConfigProps;
-  syncStatus: SyncStatusProps;
-  syncResult: SyncResultProps;
-  onAction?: (option: RemoteOptionProps, actionType: string) => void;
-};
-
-export default function SidebarContent({
-  selectedKey,
-  syncConfig,
-  syncStatus,
-  syncResult,
-  onAction,
-}: SideBarContentProps) {
-  const { token } = theme.useToken();
-
-  const handleAction = useCallback(
-    (option: RemoteOptionProps, actionType: string) => {
-      onAction?.(option, actionType);
-    },
-    [onAction]
-  );
-
-  return (
-    <Flex vertical gap={12}>
-      {remoteOptions.map((option) => (
-        <StyledCard key={option.key}>
-          <CardItemMarkup
-            option={option}
-            isActive={selectedKey === option.key}
-            syncConfig={syncConfig?.[option.key] || {}}
-            syncStatus={syncStatus?.[option.key] || {}}
-            syncResult={syncResult?.[option.key] || []}
-            onAction={handleAction}
-          ></CardItemMarkup>
-        </StyledCard>
-      ))}
-    </Flex>
   );
 }

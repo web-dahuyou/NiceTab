@@ -70,4 +70,5 @@ export default {
   'common.import': '导入',
   'common.export': '导出',
   'common.none': '无',
+  'common.pleaseInput': '请输入 {label}',
 };

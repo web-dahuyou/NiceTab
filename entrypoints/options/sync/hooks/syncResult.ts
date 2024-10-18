@@ -2,6 +2,7 @@ import type { SyncType, SyncResultItemProps } from '~/entrypoints/types';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { SUCCESS_KEY, syncTypeMap } from '~/entrypoints/common/constants';
 
+// 同步结果
 export function useSyncResult(resultData?: SyncResultItemProps) {
   const { $fmt } = useIntlUtls();
 

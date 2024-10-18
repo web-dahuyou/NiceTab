@@ -1,4 +1,3 @@
-// import { storage } from 'wxt/storage';
 import dayjs from 'dayjs';
 import emojiRegex from 'emoji-regex';
 import type {
@@ -14,7 +13,6 @@ import type {
 import {
   extContentImporter,
   fetchApi,
-  getLocaleMessages,
 } from '~/entrypoints/common/utils';
 import { SUCCESS_KEY, FAILED_KEY, syncTypeMap } from '~/entrypoints/common/constants';
 import Store from './instanceStore';
@@ -41,7 +39,6 @@ type GistResponseItemProps = {
 export default class SyncUtils {
   storageConfigKey: `local:${string}` = 'local:syncConfig';
   storageResultKey: `local:${string}` = 'local:syncResult';
-  storageKey: `local:${string}` = 'local:syncConfig';
   initialConfig: SyncConfigProps = {
     gitee: {
       accessToken: '',
@@ -77,7 +74,7 @@ export default class SyncUtils {
   async getConfig() {
     let config = await storage.getItem<SyncConfigProps>(this.storageConfigKey);
     this.config = { ...this.initialConfig, ...config };
-    return config;
+    return { ...this.initialConfig, ...config };
   }
   async setConfig(config: SyncConfigProps) {
     const { gitee, github } = this.config || {};
@@ -120,7 +117,9 @@ export default class SyncUtils {
   async getSyncResult() {
     let result = await storage.getItem<SyncResultProps>(this.storageResultKey);
     this.syncResult = result || {};
-    return result;
+    console.log('getSyncResult', this.syncResult);
+
+    return this.syncResult;
   }
   async addSyncResult(remoteType: SyncRemoteType, currResult: SyncResultItemProps) {
     const _syncResultList = [currResult, ...(this.syncResult[remoteType] || [])];
@@ -244,37 +243,31 @@ export default class SyncUtils {
     if (syncType === syncTypeMap.MANUAL_PUSH_FORCE) {
       result = await this.updateGist(remoteType);
     } else {
-      try {
-        const { files } = gistData || {};
-        let fileContent = '';
-        const fileInfo = files?.[this.gistFileName];
-        // https://docs.github.com/en/rest/gists/gists#truncation
-        // 通过 raw_url 获取的文件内容小于 10M
-        if (fileInfo?.truncated && fileInfo?.raw_url) {
-          // 如果内容大小超过 10M，则取消合并到本地
-          if (fileInfo.size && fileInfo.size > 10 * 1024 * 1024) {
-            const localeMessage = getLocaleMessages();
-            const reason = localeMessage['sync.tip.contentTooLarge'];
-            this.handleSyncResult(remoteType, syncType, result, reason);
-            return;
-          }
-          fileContent = await fetchApi(fileInfo?.raw_url) as string || '';
-        } else {
-          fileContent = fileInfo?.content || '';
+      const { files } = gistData || {};
+      let fileContent = '';
+      const fileInfo = files?.[this.gistFileName];
+      // https://docs.github.com/en/rest/gists/gists#truncation
+      // 通过 raw_url 获取的文件内容小于 10M
+      if (fileInfo?.truncated && fileInfo?.raw_url) {
+        // 如果内容大小超过 10M，则取消合并到本地
+        if (fileInfo.size && fileInfo.size > 10 * 1024 * 1024) {
+          this.handleSyncResult(remoteType, syncType, result, 'contentTooLarge');
+          return;
         }
+        fileContent = await fetchApi(fileInfo?.raw_url) as string || '';
+      } else {
+        fileContent = fileInfo?.content || '';
+      }
 
-        if (!!fileContent && syncType === syncTypeMap.MANUAL_PULL_FORCE) {
-          await Store.tabListUtils.clearAll();
-        }
-        const tagList = extContentImporter.niceTab(fileContent || '');
-        await Store.tabListUtils.importTags(tagList, 'merge');
-        if (syncType === syncTypeMap.MANUAL_PUSH_MERGE) {
-          result = await this.updateGist(remoteType);
-        } else {
-          result = { id: gistData?.id } as GistResponseItemProps;
-        }
-      } catch (e) {
-        console.log(e);
+      if (!!fileContent && syncType === syncTypeMap.MANUAL_PULL_FORCE) {
+        await Store.tabListUtils.clearAll();
+      }
+      const tagList = extContentImporter.niceTab(fileContent || '');
+      await Store.tabListUtils.importTags(tagList, 'merge');
+      if (syncType === syncTypeMap.MANUAL_PUSH_MERGE) {
+        result = await this.updateGist(remoteType);
+      } else {
+        result = { id: gistData?.id } as GistResponseItemProps;
       }
     }
 
@@ -304,24 +297,33 @@ export default class SyncUtils {
     if (!accessToken) return;
     this.setSyncStatus(remoteType, 'syncing');
 
-    if (gistId) {
-      const gistData = await this.getGistById(remoteType);
-      await this.handleBySyncType(remoteType, syncType, gistData);
-    } else {
-      const allGists = await this.getGistsList(remoteType);
-      const gistData = allGists.find((gist) => gist.description === this.gistDescKey);
-      const isExist = gistData && gistData.id;
-
-      if (isExist) {
-        await this.setConfigByType(remoteType, { gistId: gistData.id });
-        // 这里需要注意，github API 列表中并不返回文件内容（gitee API 在列表中依然返回content内容）
-        // 因此为了保持逻辑一致性，全都通过id来手动获取一遍内容
-        const gistDataById = await this.getGistById(remoteType);
-        await this.handleBySyncType(remoteType, syncType, gistDataById);
+    try {
+      if (gistId) {
+        const gistData = await this.getGistById(remoteType);
+        await this.handleBySyncType(remoteType, syncType, gistData);
       } else {
-        const data = await this.createGist(remoteType);
-        this.setConfigByType(remoteType, { gistId: data.id || '' });
-        this.handleSyncResult(remoteType, syncType, data);
+        const allGists = await this.getGistsList(remoteType);
+        const gistData = allGists.find((gist) => gist.description === this.gistDescKey);
+        const isExist = gistData && gistData.id;
+
+        if (isExist) {
+          await this.setConfigByType(remoteType, { gistId: gistData.id });
+          // 这里需要注意，github API 列表中并不返回文件内容（gitee API 在列表中依然返回content内容）
+          // 因此为了保持逻辑一致性，全都通过id来手动获取一遍内容
+          const gistDataById = await this.getGistById(remoteType);
+          await this.handleBySyncType(remoteType, syncType, gistDataById);
+        } else {
+          const data = await this.createGist(remoteType);
+          this.setConfigByType(remoteType, { gistId: data.id || '' });
+          this.handleSyncResult(remoteType, syncType, data);
+        }
+      }
+    } catch (error: any) {
+      console.log(error);
+      if (error?.status == 401) {
+        await this.handleSyncResult(remoteType, syncType, {} as GistResponseItemProps, 'authFailed');
+      } else {
+        await this.handleSyncResult(remoteType, syncType, {} as GistResponseItemProps);
       }
     }
 
