@@ -154,6 +154,12 @@
 - [ ] 扩展图标右键菜单支持按需配置。
 - [ ] 其他
 
+## 沟通交流
+
+### QQ群: 924270240
+
+<img width="300" alt="NiceTab交流群" src="https://github.com/user-attachments/assets/f773c96e-8f4f-4e53-9ffa-20c11690675a">
+
 ## 参考链接
 - [Chrome for Developers - Extensions > API 参考](https://developer.chrome.com/docs/extensions/reference/api?hl=zh-cn)
 - [WXT 官网](https://wxt.dev/)
