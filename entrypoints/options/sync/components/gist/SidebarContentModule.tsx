@@ -162,15 +162,17 @@ export default forwardRef(
                 ></SidebarBaseCardItem>
               </StyledCard>
             ))}
-            <Flex justify="center">
-              <Button
-                type="dashed"
-                icon={<PlusOutlined />}
-                onClick={() => setDrawerVisible(true)}
-              >
-                {$fmt('sync.addConfig')}
-              </Button>
-            </Flex>
+            { configList.length < remoteOptions.length && (
+              <Flex justify="center">
+                <Button
+                  type="dashed"
+                  icon={<PlusOutlined />}
+                  onClick={() => setDrawerVisible(true)}
+                >
+                  {$fmt('sync.addConfig')}
+                </Button>
+              </Flex>
+            ) }
           </Flex>
         </Flex>
 
