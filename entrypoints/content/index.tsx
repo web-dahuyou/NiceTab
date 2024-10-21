@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom/client';
 import '~/assets/css/reset.css';
-import '~/assets/css/index.css';
+import './style.css';
 import App from './App';
 
 export default defineContentScript({
@@ -14,7 +14,7 @@ export default defineContentScript({
     // createShadowRootUi 方式
     const ui = await createShadowRootUi(ctx, {
       name: "nicetab-message",
-      position: "inline",
+      position: "modal",
       anchor: "body",
       // append: "first",
       onMount: (container) => {
