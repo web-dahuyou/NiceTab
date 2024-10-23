@@ -52,6 +52,7 @@ function TreeBox() {
   const treeRef = useRef<any>(null);
 
   const [searchValue, setSearchValue] = useState<string>('');
+  const [isEditing, setIsediting] = useState<boolean>(false);
   const [treeBoxHeight, setTreeBoxHeight] = useState<number>(400);
 
   useLayoutEffect(() => {
@@ -105,6 +106,7 @@ function TreeBox() {
     const _node = node as TreeDataNodeUnion;
     // 中转站分类不可拖拽
     if (_node.type === 'tag' && _node?.originData?.static) return false;
+    if (isEditing) return false;
     return true;
   }, []);
 
@@ -164,8 +166,10 @@ function TreeBox() {
     const listHeight = listRef.current?.offsetHeight || 400;
     setTreeBoxHeight(listHeight);
     eventEmitter.on('home:set-tree-searchValue', setSearchValue);
+    eventEmitter.on('home:set-editing-status', setIsediting);
     return () => {
       eventEmitter.off('home:set-tree-searchValue', setSearchValue);
+      eventEmitter.off('home:set-editing-status', setIsediting);
     }
   }, []);
 
@@ -198,9 +202,6 @@ function TreeBox() {
               titleRender={(node) => (
                 <RenderTreeNode
                   node={node}
-                  // selected={selectedKeys.includes(node.key)}
-                  // container={treeRef.current}
-                  // refreshKey={refreshKey}
                   onAction={handleTreeNodeAction}
                   onTabItemDrop={handleTabItemDrop}
                 ></RenderTreeNode>

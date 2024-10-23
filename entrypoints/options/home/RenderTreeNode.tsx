@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useRef, memo } from 'react';
 import { theme } from 'antd';
 import { CloseOutlined, PlusOutlined, SendOutlined } from '@ant-design/icons';
-import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { ENUM_COLORS, UNNAMED_TAG, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { StyledTreeNodeItem } from './Home.styled';
@@ -15,10 +15,6 @@ const allowDropKey = dndKeys.tabItem;
 // 渲染 treeNode 节点
 function RenderTreeNode({
   node,
-  // selected,
-  // container,
-  // refreshKey,
-  // virtual = false,
   onAction,
   onTabItemDrop, // 这个 onTabItemDrop 只是为了方便右侧面板的标签页拖拽到左侧树的标签组，左侧树中的 分类和标签组的拖拽由 antd 的 Tree 组件自带实现
 }: RenderTreeNodeProps) {
@@ -60,6 +56,14 @@ function RenderTreeNode({
     });
   };
 
+  // 编辑状态禁止node节点拖拽
+  const handleEditingStatusChange = useCallback((status: boolean) => {
+    // console.log('handleEditingStatusChange', status);
+    const draggableTreeNode = nodeRef.current?.closest('.ant-tree-treenode-draggable');
+    draggableTreeNode?.setAttribute('draggable', status ? 'false' : 'true');
+    eventEmitter.emit('home:set-editing-status', status);
+  }, []);
+
   return (
     // 这个 DropComponent 只是为了方便右侧面板的标签页拖拽到左侧树的标签组，左侧树中的 分类和标签组的拖拽由 antd 的 Tree 组件自带实现
     <DropComponent
@@ -86,6 +90,7 @@ function RenderTreeNode({
                 fontSize={14}
                 iconSize={14}
                 onValueChange={handleRenameChange}
+                onEditingStatusChange={handleEditingStatusChange}
               ></EditInput>
             </span>
           )}

@@ -8,6 +8,7 @@ export type VersionInfo = { updateAvailable: boolean; version?: string };
 export type EventsEmitterProps = {
   'is-dragging': boolean;
   'home:set-tree-searchValue': string;
+  'home:set-editing-status': boolean;
 };
 
 // 全局 Context
