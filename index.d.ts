@@ -1,4 +1,4 @@
-import type { AugmentedBrowser as WxtBrowser, Tabs as WxtTabs } from 'wxt/browser';
+import type { AugmentedBrowser as WxtBrowser, WxtRuntime as WxtRuntimeBase, Tabs as WxtTabs } from 'wxt/browser';
 
 // 目前 webextension-polyfill 中没有 group 相关的类型定义, 但是新版浏览器有相关的 API
 enum Color {
@@ -21,6 +21,7 @@ interface TabGroup {
 }
 
 declare module 'wxt/browser' {
+  export type PublicPath = WxtBrowser.PublicPath | '/_favicon/';
   export interface TabGroup {
     collapsed: boolean;
     color: Color;

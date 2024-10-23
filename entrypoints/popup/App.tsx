@@ -9,11 +9,16 @@ import {
   ImportOutlined,
   RestOutlined,
 } from '@ant-design/icons';
-import { classNames, sendBrowserMessage } from '~/entrypoints/common/utils';
+import {
+  classNames,
+  sendBrowserMessage,
+  getFaviconURL,
+} from '~/entrypoints/common/utils';
 import '~/assets/css/reset.css';
 import '~/assets/css/index.css';
 import './App.css';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { getAdminTabInfo } from '~/entrypoints/common/tabs';
 import ColorList from '~/entrypoints/common/components/ColorList.tsx';
 import { THEME_COLORS } from '~/entrypoints/common/constants';
 import {
@@ -73,8 +78,11 @@ export default function App() {
   }, []);
 
   const handleDelete = useCallback(
-    (event: React.MouseEvent<HTMLElement, MouseEvent>, tab: Tabs.Tab) => {
-      const newTabs = tabs.filter((t) => t.id !== tab.id);
+    async (event: React.MouseEvent<HTMLElement, MouseEvent>, tab: Tabs.Tab) => {
+      const { tab: adminTab } = await getAdminTabInfo();
+      const newTabs = tabs.filter(
+        (t) => t.id !== tab.id && t.id !== adminTab?.id && !t.pinned
+      );
       setTabs(newTabs);
       tab.id && browser.tabs.remove(tab.id);
       event.stopPropagation();
@@ -83,8 +91,9 @@ export default function App() {
   );
 
   useEffect(() => {
-    browser.tabs.query({ currentWindow: true }).then((allTabs) => {
-      setTabs(allTabs);
+    browser.tabs.query({ currentWindow: true }).then(async (allTabs) => {
+      const { tab: adminTab } = await getAdminTabInfo();
+      setTabs(allTabs?.filter((t) => t.id !== adminTab?.id && !t.pinned));
     });
   }, []);
 
@@ -124,9 +133,10 @@ export default function App() {
               title={tab.title}
               onClick={() => handleTabItemClick(index)}
             >
-              {tab.favIconUrl && (
-                <StyledFavIcon className="tab-item-icon" $icon={tab.favIconUrl} />
-              )}
+              <StyledFavIcon
+                className="tab-item-icon"
+                $icon={tab.favIconUrl || getFaviconURL(tab.url!)}
+              />
               <span className="tab-item-title">{tab.title}</span>
               <StyledActionIconBtn
                 className="action-icon-btn"
