@@ -10,6 +10,7 @@ const {
   CLOSE_TABS_AFTER_SEND_TABS,
   AUTO_PIN_ADMIN_TAB,
   ALLOW_SEND_PINNED_TABS,
+  RESTORE_IN_NEW_WINDOW,
   DELETE_AFTER_RESTORE,
   DELETE_UNLOCKED_EMPTY_GROUP,
   ALLOW_DUPLICATE_TABS,
@@ -30,6 +31,7 @@ export default class SettingsUtils {
     [CLOSE_TABS_AFTER_SEND_TABS]: true, // 发送标签页后是否关闭标签页
     [AUTO_PIN_ADMIN_TAB]: true, // 是否固定管理后台
     [ALLOW_SEND_PINNED_TABS]: false, // 是否发送固定标签页
+    [RESTORE_IN_NEW_WINDOW]: false, // 是否在新窗口打开标签组
     [DELETE_AFTER_RESTORE]: false, // 恢复标签页/标签组时是否从列表中删除
     [DELETE_UNLOCKED_EMPTY_GROUP]: true, // 是否删除未锁定的空标签组
     [ALLOW_DUPLICATE_TABS]: true, // 同一个标签组中是否允许重复的标签页

@@ -25,6 +25,7 @@ const {
   CLOSE_TABS_AFTER_SEND_TABS,
   AUTO_PIN_ADMIN_TAB,
   ALLOW_SEND_PINNED_TABS,
+  RESTORE_IN_NEW_WINDOW,
   DELETE_AFTER_RESTORE,
   DELETE_UNLOCKED_EMPTY_GROUP,
   ALLOW_DUPLICATE_TABS,
@@ -160,7 +161,20 @@ export default function Settings() {
               </Radio>
             </Radio.Group>
           </Form.Item>
-          {/* 恢复标签页/标签组时是否从列表中删除 */}
+          {/* 是否在新窗口打开标签组 */}
+          <Form.Item<SettingsProps>
+            label={$fmt({
+              id: `${module}.${RESTORE_IN_NEW_WINDOW}`,
+              values: { mark: '：' },
+            })}
+            name={RESTORE_IN_NEW_WINDOW}
+          >
+            <Radio.Group>
+              <Radio value={true}>{$fmt('common.yes')}</Radio>
+              <Radio value={false}>{$fmt('common.no')}</Radio>
+            </Radio.Group>
+          </Form.Item>
+          {/* 打开标签页/标签组时是否从列表中删除 */}
           <Form.Item<SettingsProps>
             label={$fmt({
               id: `${module}.${DELETE_AFTER_RESTORE}`,
