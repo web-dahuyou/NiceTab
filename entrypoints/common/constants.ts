@@ -13,7 +13,6 @@ import {
 } from '@ant-design/colors';
 import type {
   LanguageTypes,
-  EnumSettingsProps,
   ThemeTypes,
   ThemeTypeConfig,
   ColorItem,
@@ -87,22 +86,23 @@ export const ENUM_ACTION_NAME: Record<string, `action:${ActionNames}`> = {
   OPEN_ADMIN_TAB: 'action:openAdminTab', // 打开管理后台
 };
 // 设置项枚举
-export const ENUM_SETTINGS_PROPS: EnumSettingsProps = {
-  LANGUAGE: 'language', // 语言
-  THEME_TYPE: 'themeType', // 主题类型
-  OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH: 'openAdminTabAfterBrowserLaunch', // 启动浏览器时是否自动打开管理后台
-  OPEN_ADMIN_TAB_AFTER_SEND_TABS: 'openAdminTabAfterSendTabs', // 发送标签页后是否打开管理后台
-  CLOSE_TABS_AFTER_SEND_TABS: 'closeTabsAfterSendTabs', // 发送标签页后是否关闭标签页
-  AUTO_PIN_ADMIN_TAB: 'autoPinAdminTab', // 是否固定管理后台
-  ALLOW_SEND_PINNED_TABS: 'allowSendPinnedTabs', // 是否发送固定标签页
-  DELETE_AFTER_RESTORE: 'deleteAfterRestore', // 恢复标签页/标签组时是否从列表中删除
-  DELETE_UNLOCKED_EMPTY_GROUP: 'deleteUnlockedEmptyGroup', // 是否删除未锁定的空标签组
-  ALLOW_DUPLICATE_TABS: 'allowDuplicateTabs', // 同一个标签组中是否允许重复的标签页
-  ALLOW_DUPLICATE_GROUPS: 'allowDuplicateGroups', // 同一个分类中是否允许重复的标签组
-  LINK_TEMPLATE: 'linkTemplate', // 链接模板
-  TAB_COUNT_THRESHOLD: 'tabCountThreshold', // 分类中标签页超过该数量时，则右侧面板开启虚拟滚动
-  SHOW_OPENED_TAB_COUNT: 'showOpenedTabCount', // 扩展图标上是否显示打开的标签页数量
-  SHOW_PAGE_CONTEXT_MENUS: 'showPageContextMenus', // 网页中是否显示NiceTab右键菜单
+export enum ENUM_SETTINGS_PROPS {
+  LANGUAGE = 'language', // 语言
+  THEME_TYPE = 'themeType', // 主题类型
+  OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH = 'openAdminTabAfterBrowserLaunch', // 启动浏览器时是否自动打开管理后台
+  OPEN_ADMIN_TAB_AFTER_SEND_TABS = 'openAdminTabAfterSendTabs', // 发送标签页后是否打开管理后台
+  CLOSE_TABS_AFTER_SEND_TABS = 'closeTabsAfterSendTabs', // 发送标签页后是否关闭标签页
+  AUTO_PIN_ADMIN_TAB = 'autoPinAdminTab', // 是否固定管理后台
+  ALLOW_SEND_PINNED_TABS = 'allowSendPinnedTabs', // 是否发送固定标签页
+  RESTORE_IN_NEW_WINDOW = 'restoreInNewWindow', // 是否在新窗口打开标签组
+  DELETE_AFTER_RESTORE = 'deleteAfterRestore', // 恢复标签页/标签组时是否从列表中删除
+  DELETE_UNLOCKED_EMPTY_GROUP = 'deleteUnlockedEmptyGroup', // 是否删除未锁定的空标签组
+  ALLOW_DUPLICATE_TABS = 'allowDuplicateTabs', // 同一个标签组中是否允许重复的标签页
+  ALLOW_DUPLICATE_GROUPS = 'allowDuplicateGroups', // 同一个分类中是否允许重复的标签组
+  LINK_TEMPLATE = 'linkTemplate', // 链接模板
+  TAB_COUNT_THRESHOLD = 'tabCountThreshold', // 分类中标签页超过该数量时，则右侧面板开启虚拟滚动
+  SHOW_OPENED_TAB_COUNT = 'showOpenedTabCount', // 扩展图标上是否显示打开的标签页数量
+  SHOW_PAGE_CONTEXT_MENUS = 'showPageContextMenus', // 网页中是否显示NiceTab右键菜单
 };
 
 // tab 事件

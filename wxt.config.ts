@@ -13,6 +13,7 @@ export default defineConfig({
       'contextMenus',
       'unlimitedStorage',
       'commands',
+      'favicon',
     ],
     homepage_url: 'https://github.com/web-dahuyou/NiceTab',
     host_permissions: ['<all_urls>'],

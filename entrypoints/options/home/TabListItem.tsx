@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { theme, Checkbox, Typography, Tooltip, Popover, QRCode } from 'antd';
 import { CloseOutlined, EditOutlined, QrcodeOutlined } from '@ant-design/icons';
 import { GroupItem, TabItem } from '~/entrypoints/types';
+import { getFaviconURL } from '~/entrypoints/common/utils';
 import clickDecorator from '~/entrypoints/common/utils/click';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import { settingsUtils } from '~/entrypoints/common/storage';
@@ -66,15 +67,18 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
   );
 
   // 点击打开标签页
-  const onTabOpen = clickDecorator(({ isMatched }) => {
-    const settings = settingsUtils.settings;
-    // 如果直接单击未按下alt键，则打开新标签页并激活(active: true)，如果按下了alt键，则后台静默打开新标签页(active: false)
-    openNewTab(tab.url, { active: !isMatched });
+  const onTabOpen = clickDecorator(
+    ({ isMatched }) => {
+      const settings = settingsUtils.settings;
+      // 如果直接单击未按下alt键，则打开新标签页并激活(active: true)，如果按下了alt键，则后台静默打开新标签页(active: false)
+      openNewTab(tab.url, { active: !isMatched });
 
-    if (settings[DELETE_AFTER_RESTORE]) {
-      onRemove?.();
-    }
-  }, { allowMissMatch: true, alt: true });
+      if (settings[DELETE_AFTER_RESTORE]) {
+        onRemove?.();
+      }
+    },
+    { allowMissMatch: true, alt: true }
+  );
 
   const draggingListener = (value: boolean) => {
     setIsDragging(value);
@@ -85,7 +89,7 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
     eventEmitter.on('is-dragging', draggingListener);
     return () => {
       eventEmitter.off('is-dragging', draggingListener);
-    }
+    };
   }, []);
 
   return (
@@ -100,9 +104,7 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
           <Popover
             color="#fbfbfb"
             destroyTooltipOnHide
-            content={
-              <QRCode value={tab.url} color="#000" bordered={false} />
-            }
+            content={<QRCode value={tab.url} color="#000" bordered={false} />}
           >
             <StyledActionIconBtn
               className="tab-item-btn btn-qrcode"
@@ -137,9 +139,10 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
           </StyledActionIconBtn>
         )}
         {/* icon tab favicon */}
-        {tab.favIconUrl && (
-          <StyledTabItemFavicon className="tab-item-favicon" $bgUrl={tab.favIconUrl} />
-        )}
+        <StyledTabItemFavicon
+          className="tab-item-favicon"
+          $bgUrl={tab.favIconUrl || getFaviconURL(tab.url!)}
+        />
         {/* tab title */}
         <StyledTabTitle
           className="tab-item-title"

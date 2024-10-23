@@ -117,7 +117,6 @@ export default class SyncUtils {
   async getSyncResult() {
     let result = await storage.getItem<SyncResultProps>(this.storageResultKey);
     this.syncResult = result || {};
-    console.log('getSyncResult', this.syncResult);
 
     return this.syncResult;
   }

@@ -38,6 +38,19 @@ export function objectToUrlParams(params: Record<string, any>): string {
   return searchParams.toString();
 }
 
+// 获取网站 favicon
+export function getFaviconURL(pageUrl: string, size: number = 16) {
+  const pageOrigin = new URL(pageUrl)?.origin || pageUrl;
+  // 通过 favicon api 获取网站图标 (官方文档: https://developer.chrome.com/docs/extensions/how-to/ui/favicons?hl=en)
+  if (pageOrigin.includes('extension://')) {
+    const apiUrl = browser.runtime.getURL('/_favicon/');
+    return handleUrlWidthParams(apiUrl, { pageUrl: pageOrigin, size });
+  }
+
+  // 通过 t3.gstatic.com/faviconV2 获取网站图标
+  return `https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${pageOrigin}&size=${size}`;
+}
+
 export default {
   handleUrlWidthParams,
   getUrlParams,

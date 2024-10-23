@@ -15,6 +15,7 @@ const {
   CLOSE_TABS_AFTER_SEND_TABS,
   AUTO_PIN_ADMIN_TAB,
   ALLOW_SEND_PINNED_TABS,
+  RESTORE_IN_NEW_WINDOW,
 } = ENUM_SETTINGS_PROPS;
 
 // const matchUrls: string[] = ['https://*/*', 'http://*/*', 'chrome://*/*', 'file://*/*'];
@@ -40,7 +41,7 @@ export async function sendTabMessage({
         const res = await browser.tabs.sendMessage(currentTab?.id, { msgType, data });
         console.log('browser.tabs.sendMessage__result', res);
       } catch (error) {
-        console.log('browser.tabs.sendMessage__error', error)
+        console.log('browser.tabs.sendMessage__error', error);
       }
     }
     return;
@@ -58,7 +59,7 @@ export async function sendTabMessage({
       const res = await browser.tabs.sendMessage(tab.id!, { msgType, data });
       console.log('browser.tabs.sendMessage__result', res);
     } catch (error) {
-      console.log('browser.tabs.sendMessage__error', error)
+      console.log('browser.tabs.sendMessage__error', error);
     }
   });
 }
@@ -320,24 +321,39 @@ export async function openNewTab(
 
 // 打开标签组
 export async function openNewGroup(groupName: string, urls: Array<string | undefined>) {
-  if (!IS_GROUP_SUPPORT) {
-    for (let url of urls) {
-      openNewTab(url);
-    }
-    return;
-  }
+  const settings = await settingsUtils.getSettings();
 
-  Promise.all(
-    urls.map((url) => {
-      return browser.tabs.create({ url, active: false });
-    })
-  ).then(async (tabs) => {
-    const filteredTabs = tabs.filter((tab) => !!tab.id);
+  if (settings[RESTORE_IN_NEW_WINDOW]) {
+    const _urls = urls.filter((url) => !!url) as string[];
+    const windowInfo = await browser.windows.create({ focused: true, url: _urls });
+    if (!IS_GROUP_SUPPORT) return;
+
+    const tabs = await browser.tabs.query({ windowId: windowInfo.id, pinned: false });
     const bsGroupId = await browser.tabs.group({
-      tabIds: filteredTabs.map((tab) => tab.id!),
+      createProperties: { windowId: windowInfo.id },
+      tabIds: tabs.map((tab) => tab.id!),
     });
     browser.tabGroups?.update(bsGroupId, { title: groupName });
-  });
+  } else {
+    if (!IS_GROUP_SUPPORT) {
+      for (let url of urls) {
+        openNewTab(url);
+      }
+      return;
+    }
+
+    Promise.all(
+      urls.map((url) => {
+        return browser.tabs.create({ url, active: false });
+      })
+    ).then(async (tabs) => {
+      const filteredTabs = tabs.filter((tab) => !!tab.id);
+      const bsGroupId = await browser.tabs.group({
+        tabIds: filteredTabs.map((tab) => tab.id!),
+      });
+      browser.tabGroups?.update(bsGroupId, { title: groupName });
+    });
+  }
 }
 
 export default {

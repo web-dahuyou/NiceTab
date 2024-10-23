@@ -9,13 +9,16 @@ import {
   StyledActionIconBtn,
 } from '~/entrypoints/common/style/Common.styled';
 
-const StyledWrapper = styled.div<{$maxWidth?: string | number, $fontSize?: string | number}>`
+const StyledWrapper = styled.div<{
+  $maxWidth?: string | number;
+  $fontSize?: string | number;
+}>`
   display: flex;
   align-items: center;
-  max-width: ${props => props.$maxWidth ? `${props.$maxWidth}px` : '100%'};
+  max-width: ${(props) => (props.$maxWidth ? `${props.$maxWidth}px` : '100%')};
   gap: 4px;
   .text-readonly {
-    font-size: ${props => props.$fontSize || 14}px;
+    font-size: ${(props) => props.$fontSize || 14}px;
     ${StyledEllipsis}
   }
   input {
@@ -27,7 +30,7 @@ type CustomStyleProps = {
   maxWidth?: string | number;
   fontSize?: string | number;
   iconSize?: string | number;
-}
+};
 
 export default function EditInput({
   type = 'text',
@@ -39,8 +42,15 @@ export default function EditInput({
   iconSize = 16,
   onValueChange,
   stopPropagation = true,
+  onEditingStatusChange,
   ...otherProps
-}: InputProps & CustomStyleProps & { value: string; onValueChange: (value?: string) => void; stopPropagation?: boolean }) {
+}: InputProps &
+  CustomStyleProps & {
+    value: string;
+    onValueChange: (value?: string) => void;
+    onEditingStatusChange?: (status: boolean) => void;
+    stopPropagation?: boolean;
+  }) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const inputRef = useRef<InputRef>(null);
@@ -48,22 +58,26 @@ export default function EditInput({
   const [isEditing, setIsEditing] = useState(false);
   const onFocus = () => {
     setIsEditing(true);
+    onEditingStatusChange?.(true);
   };
   const onBlur = () => {
     const newValue = inputRef?.current?.input?.value || '';
     setInnerValue(newValue);
     onValueChange?.(newValue);
     setIsEditing(false);
-  }
+    onEditingStatusChange?.(false);
+  };
   const onPressEnter = () => {
     const newValue = inputRef?.current?.input?.value || '';
     setInnerValue(newValue);
     onValueChange?.(newValue);
     setIsEditing(false);
-  }
+    onEditingStatusChange?.(false);
+  };
   const handleClick = (e: React.MouseEvent) => {
     stopPropagation && e.stopPropagation();
     setIsEditing(true);
+    onEditingStatusChange?.(true);
     setTimeout(() => {
       inputRef?.current?.focus();
     }, 10);
@@ -73,7 +87,11 @@ export default function EditInput({
     setInnerValue(value);
   }, [value]);
   return (
-    <StyledWrapper className="edit-input-wrapper" $maxWidth={maxWidth} $fontSize={fontSize}>
+    <StyledWrapper
+      className="edit-input-wrapper"
+      $maxWidth={maxWidth}
+      $fontSize={fontSize}
+    >
       {isEditing ? (
         <Input
           ref={inputRef}
@@ -82,6 +100,7 @@ export default function EditInput({
           maxLength={maxLength}
           variant={isEditing ? 'outlined' : 'borderless'}
           readOnly={!isEditing}
+          draggable={false}
           onFocus={onFocus}
           onBlur={onBlur}
           onPressEnter={onPressEnter}
@@ -89,8 +108,10 @@ export default function EditInput({
         />
       ) : (
         <>
-          <span className="text-readonly" title={innerValue}>{innerValue}</span>
-          { !disabled && (
+          <span className="text-readonly" title={innerValue}>
+            {innerValue}
+          </span>
+          {!disabled && (
             <StyledActionIconBtn
               $size={iconSize}
               $hoverColor={token.colorPrimaryHover}
@@ -99,7 +120,7 @@ export default function EditInput({
             >
               <EditOutlined />
             </StyledActionIconBtn>
-          ) }
+          )}
         </>
       )}
     </StyledWrapper>

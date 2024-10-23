@@ -8,6 +8,7 @@ export type VersionInfo = { updateAvailable: boolean; version?: string };
 export type EventsEmitterProps = {
   'is-dragging': boolean;
   'home:set-tree-searchValue': string;
+  'home:set-editing-status': boolean;
 };
 
 // 全局 Context
@@ -91,6 +92,7 @@ export type SettingsProps = {
   openAdminTabAfterBrowserLaunch?: boolean; // 启动浏览器时是否自动打开管理后台
   autoPinAdminTab?: boolean; // 是否固定管理后台
   allowSendPinnedTabs?: boolean; // 是否发送固定标签页
+  restoreInNewWindow?: boolean; // 是否在新窗口打开标签组
   deleteAfterRestore?: boolean; // 恢复标签页/标签组时是否从列表中删除
   openAdminTabAfterSendTabs?: boolean; // 发送标签页后是否打开管理后台
   closeTabsAfterSendTabs?: boolean; // 发送标签页后是否关闭标签页
@@ -103,23 +105,6 @@ export type SettingsProps = {
   showPageContextMenus?: boolean; // 网页中是否显示NiceTab右键菜单
 };
 
-export type EnumSettingsProps = {
-  LANGUAGE: 'language';
-  THEME_TYPE: 'themeType';
-  OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH: 'openAdminTabAfterBrowserLaunch';
-  OPEN_ADMIN_TAB_AFTER_SEND_TABS: 'openAdminTabAfterSendTabs';
-  CLOSE_TABS_AFTER_SEND_TABS: 'closeTabsAfterSendTabs';
-  AUTO_PIN_ADMIN_TAB: 'autoPinAdminTab';
-  ALLOW_SEND_PINNED_TABS: 'allowSendPinnedTabs';
-  DELETE_AFTER_RESTORE: 'deleteAfterRestore';
-  DELETE_UNLOCKED_EMPTY_GROUP: 'deleteUnlockedEmptyGroup';
-  ALLOW_DUPLICATE_TABS: 'allowDuplicateTabs';
-  ALLOW_DUPLICATE_GROUPS: 'allowDuplicateGroups';
-  LINK_TEMPLATE: 'linkTemplate';
-  TAB_COUNT_THRESHOLD: 'tabCountThreshold';
-  SHOW_OPENED_TAB_COUNT: 'showOpenedTabCount';
-  SHOW_PAGE_CONTEXT_MENUS: 'showPageContextMenus';
-};
 // 状态相关
 export interface StateProps {
   'home:sidebarCollapsed'?: boolean;
