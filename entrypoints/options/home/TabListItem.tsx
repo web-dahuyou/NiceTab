@@ -76,6 +76,10 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
       if (settings[DELETE_AFTER_RESTORE]) {
         onRemove?.();
       }
+
+      setTimeout(() => {
+        setTooltipVisible(false);
+      }, 500);
     },
     { allowMissMatch: true, alt: true }
   );

@@ -16,13 +16,14 @@ import {
 import ToggleSidebarBtn from '../components/ToggleSidebarBtn';
 import SortingBtns from './SortingBtns';
 import HotkeyList from '../components/HotkeyList';
-import StickyFooter from '~/entrypoints/common/components/StickyFooter';
-import Footer from './footer/index';
+// import StickyFooter from '~/entrypoints/common/components/StickyFooter';
+// import Footer from './footer/index';
 import { useTreeData, HomeContext } from './hooks/treeData';
 import useHotkeys from './hooks/hotkeys';
 import { getSelectedCounts } from './utils';
 import TreeBox from './TreeBox';
 import TabGroupList from './TabGroupList';
+import FooterFloatButton from './FooterFloatButton';
 
 const { TAB_COUNT_THRESHOLD } = ENUM_SETTINGS_PROPS;
 
@@ -155,9 +156,11 @@ export default function Home() {
       </StyledListWrapper>
 
       {/* 吸底footer */}
-      <StickyFooter bottomGap={0} fullWidth>
+      {/* <StickyFooter bottomGap={0} fullWidth>
         <Footer></Footer>
-      </StickyFooter>
+      </StickyFooter> */}
+
+      <FooterFloatButton></FooterFloatButton>
 
       {/* 清空全部提示 */}
       <Modal
