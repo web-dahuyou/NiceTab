@@ -73,8 +73,8 @@ export default function App() {
     NiceGlobalContext.setThemeData(themeData);
     sendBrowserMessage('setPrimaryColor', themeData);
   };
-  const handleTabItemClick = useCallback((index: number) => {
-    browser.tabs.highlight({ tabs: index });
+  const handleTabItemClick = useCallback((tab: Tabs.Tab) => {
+    browser.tabs.highlight({ tabs: [tab.index] });
   }, []);
 
   const handleDelete = useCallback(
@@ -126,12 +126,12 @@ export default function App() {
           <div className="tab-list-title">{$fmt('common.openedTabs')}：</div>
         </div>
         <StyledList className="tab-list">
-          {tabs.map((tab, index) => (
+          {tabs.map((tab) => (
             <li
               key={tab.id}
               className={classNames('tab-item', tab.active && 'active')}
               title={tab.title}
-              onClick={() => handleTabItemClick(index)}
+              onClick={() => handleTabItemClick(tab)}
             >
               <StyledFavIcon
                 className="tab-item-icon"

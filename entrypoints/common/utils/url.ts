@@ -40,7 +40,12 @@ export function objectToUrlParams(params: Record<string, any>): string {
 
 // 获取网站 favicon
 export function getFaviconURL(pageUrl: string, size: number = 16) {
-  const pageOrigin = new URL(pageUrl)?.origin || pageUrl;
+  let pageOrigin = pageUrl;
+  try {
+    pageOrigin = new URL(pageUrl)?.origin || pageUrl;
+  } catch {
+    pageOrigin = pageUrl;
+  }
   // 通过 favicon api 获取网站图标 (官方文档: https://developer.chrome.com/docs/extensions/how-to/ui/favicons?hl=en)
   if (pageOrigin.includes('extension://')) {
     const apiUrl = browser.runtime.getURL('/_favicon/');

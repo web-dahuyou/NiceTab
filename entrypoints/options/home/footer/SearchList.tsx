@@ -1,6 +1,7 @@
-import { useMemo } from 'react';
+import { useMemo, forwardRef, useImperativeHandle } from 'react';
 import styled from 'styled-components';
 import { theme, Space, Select } from 'antd';
+import type { RefSelectProps } from 'antd';
 import { TagOutlined, ProductOutlined, ExportOutlined } from '@ant-design/icons';
 import { debounce } from 'lodash-es';
 import { pick } from '~/entrypoints/common/utils';
@@ -18,7 +19,10 @@ type SearchListItemProps = Pick<TagItem, 'tagId' | 'tagName' | 'static'> &
   Pick<GroupItem, 'groupId' | 'groupName'> &
   Pick<TabItem, 'tabId' | 'title' | 'url'>;
 
-type ActionCallbackFn = (type: 'tag' | 'tabGroup' | 'tab', option: SearchListItemProps) => void;
+type ActionCallbackFn = (
+  type: 'tag' | 'tabGroup' | 'tab',
+  option: SearchListItemProps
+) => void;
 
 const StyledSearchList = styled.div`
   position: relative;
@@ -35,7 +39,7 @@ const StyledListItem = styled.div`
     flex: 0 0 auto;
     cursor: pointer;
     // &:hover {
-    //   background: ${props => props.theme.colorInfoHover || '#e6f4ff'};
+    //   background: ${(props) => props.theme.colorInfoHover || '#e6f4ff'};
     // }
   }
   .divider {
@@ -129,12 +133,13 @@ function SearchListItem({
   );
 }
 
-export default function SearchList() {
+export default forwardRef((_, ref) => {
   const { $fmt } = useIntlUtls();
   const { treeDataHook } = useContext(HomeContext);
   const { tagList, selectedKeyChange } = treeDataHook;
   const [searchValue, setSearchValue] = useState<string>('');
   const [filterList, setFilterList] = useState<SearchListItemProps[]>([]);
+  const selectRef = useRef<RefSelectProps>(null);
   const searchListRef = useRef<HTMLDivElement>(null);
 
   const onAction: ActionCallbackFn = (type, option) => {
@@ -147,7 +152,7 @@ export default function SearchList() {
         type: 'tabGroup',
         key: groupId,
         parentKey: tagId,
-      }
+      };
     }
     setTimeout(() => {
       selectedKeyChange(params, () => {
@@ -195,7 +200,10 @@ export default function SearchList() {
     setFilterList(filterList || []);
   }, 600);
 
-  const onChange = (value: string, option: SearchListItemProps | SearchListItemProps[]) => {
+  const onChange = (
+    value: string,
+    option: SearchListItemProps | SearchListItemProps[]
+  ) => {
     onAction('tab', Array.isArray(option) ? option[0] : option);
     setSearchValue(value || '');
   };
@@ -209,9 +217,16 @@ export default function SearchList() {
     setFilterList(list || []);
   }, [tagList]);
 
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      selectRef.current?.focus();
+    }
+  }))
+
   return (
     <StyledSearchList ref={searchListRef}>
       <Select
+        ref={selectRef}
         options={options}
         listHeight={500}
         filterOption={false}
@@ -222,10 +237,10 @@ export default function SearchList() {
         popupMatchSelectWidth={600}
         onChange={onChange}
         onSearch={onSearch}
-        placement="topLeft"
+        placement="topRight"
         placeholder={$fmt('home.searchTabAndUrl')}
         style={{ width: 240 }}
       ></Select>
     </StyledSearchList>
   );
-}
+});
