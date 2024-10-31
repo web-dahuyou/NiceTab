@@ -2,7 +2,7 @@ import { useCallback, forwardRef, useImperativeHandle } from 'react';
 import { message, Flex, Divider, Drawer, Typography, Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { syncWebDAVUtils } from '~/entrypoints/common/storage';
 import type {
   SyncTargetType,
@@ -10,6 +10,7 @@ import type {
   SyncConfigItemWebDAVProps,
   SyncConfigWebDAVProps,
 } from '~/entrypoints/types';
+import { syncTypeMap } from '~/entrypoints/common/constants';
 import { StyledCard } from '../../Sync.styled';
 import SidebarBaseCardItem from '../SidebarBaseCardItem';
 import SyncConfigForm from './SyncConfigForm';
@@ -20,7 +21,6 @@ type SideBarContentProps = {
   onSelect?: (tselectedKey: string) => void;
   onConfigChange?: (config: SyncConfigWebDAVProps) => void;
   onAction?: (
-    targetType: SyncTargetType,
     option: SyncConfigItemWebDAVProps,
     actionType: string
   ) => void;
@@ -50,14 +50,17 @@ export default forwardRef(
       setSyncConfig(config);
     };
 
-    const validator = useCallback((config: SyncConfigItemWebDAVProps): boolean => {
-      const { webdavConnectionUrl } = config || {};
-      if (!webdavConnectionUrl) {
-        messageApi.warning($fmt('sync.noWebdavConnectionUrl'));
-        return false;
-      }
-      return true;
-    }, []);
+    const validator = useCallback(
+      (config: SyncConfigItemWebDAVProps, showMessage = true): boolean => {
+        const { webdavConnectionUrl } = config || {};
+        if (!webdavConnectionUrl) {
+          showMessage && messageApi.warning($fmt('sync.noWebdavConnectionUrl'));
+          return false;
+        }
+        return true;
+      },
+      []
+    );
 
     const onSyncConfigChange = (config: SyncConfigWebDAVProps) => {
       setDrawerVisible(false);
@@ -82,14 +85,27 @@ export default forwardRef(
           await syncWebDAVUtils.syncStart(option, actionType as SyncType);
           syncWebDAVUtils.setSyncStatus(option.key, 'idle');
           await getSyncInfo();
-          onAction?.('webdav', option, actionType);
+          onAction?.(option, actionType);
         }
       },
       []
     );
 
+    // 一键推送到所有远程存储
+    const pushToAllRemotes = async () => {
+      const config = await syncWebDAVUtils.getConfig();
+      const configList = config.configList?.filter((item) => !!item.webdavConnectionUrl);
+      configList.forEach((option) => {
+        handleAction(option, syncTypeMap.MANUAL_PUSH_FORCE);
+      });
+    };
+
     useEffect(() => {
       getSyncInfo();
+      eventEmitter.on('sync:push-to-all-remotes', pushToAllRemotes);
+      return () => {
+        eventEmitter.off('sync:push-to-all-remotes', pushToAllRemotes);
+      };
     }, []);
 
     useImperativeHandle(

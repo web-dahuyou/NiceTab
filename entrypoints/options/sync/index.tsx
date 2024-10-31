@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
-import { theme, Flex, Button } from 'antd';
-import { ClearOutlined } from '@ant-design/icons';
+import { theme, Flex, Button, Modal } from 'antd';
+import { CloudUploadOutlined, ClearOutlined } from '@ant-design/icons';
 import { classNames } from '~/entrypoints/common/utils';
-import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { syncUtils, syncWebDAVUtils } from '~/entrypoints/common/storage';
 import type {
   SyncTargetType,
@@ -11,7 +11,7 @@ import type {
   SyncConfigWebDAVProps,
 } from '~/entrypoints/types';
 import { StyledContainer, StyledSidebarWrapper } from './Sync.styled';
-import ToggleSidebarBtn from '../components/ToggleSidebarBtn';
+// import ToggleSidebarBtn from '../components/ToggleSidebarBtn';
 import SidebarContentModuleGist from './components/gist/SidebarContentModule';
 import SidebarContentModuleWebDAV from './components/webdav/SidebarContentModule';
 import SyncResultList from './SyncResultList';
@@ -21,6 +21,7 @@ interface ChildComponentHandle {
 }
 
 export default function SyncPage() {
+  const [modal, modalContextHolder] = Modal.useModal();
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const gistRef = useRef<ChildComponentHandle>(null);
@@ -46,8 +47,9 @@ export default function SyncPage() {
     setSelectedTargetType(targetType);
     setSelectedKey(key);
   };
-  const onAction = useCallback((targetType: SyncTargetType) => {
+  const onAction = useCallback((targetType: SyncTargetType, key: string) => {
     setSelectedTargetType(targetType);
+    setSelectedKey(key);
     if (targetType === 'gist') {
       getSyncInfo();
     } else if (targetType === 'webdav') {
@@ -65,7 +67,17 @@ export default function SyncPage() {
       getWebDavConfig();
       webDAVRef.current?.getSyncInfo();
     }
+  };
 
+  const pushToAllRemotes = async () => {
+    const modalConfig = {
+      title: $fmt('sync.actionTip'),
+      content: $fmt('sync.actionTip.manualPushForce'),
+    };
+    const confirmed = await modal.confirm(modalConfig);
+    if (!confirmed) return;
+
+    eventEmitter.emit('sync:push-to-all-remotes');
   };
 
   const getSyncInfo = async () => {
@@ -84,50 +96,60 @@ export default function SyncPage() {
   }, []);
 
   return (
-    <StyledContainer
-      className={classNames('sync-wrapper', sidebarCollapsed && 'collapsed')}
-      $collapsed={sidebarCollapsed}
-    >
-      <StyledSidebarWrapper
-        className="sidebar"
-        $primaryColor={token.colorPrimary}
+    <>
+      {modalContextHolder}
+      <StyledContainer
+        className={classNames('sync-wrapper', sidebarCollapsed && 'collapsed')}
         $collapsed={sidebarCollapsed}
       >
-        <div className={classNames('sidebar-inner-box', sidebarCollapsed && 'collapsed')}>
-          <div className="sidebar-action-box">
-            {/* <ToggleSidebarBtn onCollapseChange={setSidebarCollapsed}></ToggleSidebarBtn> */}
-            <div
-              className="action-icon"
-              title={$fmt('sync.clearSyncHistory')}
-              onClick={clearSyncResult}
-            >
-              <Button icon={<ClearOutlined />}></Button>
+        <StyledSidebarWrapper
+          className="sidebar"
+          $primaryColor={token.colorPrimary}
+          $collapsed={sidebarCollapsed}
+        >
+          <div className={classNames('sidebar-inner-box', sidebarCollapsed && 'collapsed')}>
+            <div className="sidebar-action-box">
+              {/* <ToggleSidebarBtn onCollapseChange={setSidebarCollapsed}></ToggleSidebarBtn> */}
+              <div
+                className="action-icon"
+                title={$fmt('sync.pushToAllRemotes')}
+                onClick={pushToAllRemotes}
+              >
+                <Button icon={<CloudUploadOutlined />}></Button>
+              </div>
+              <div
+                className="action-icon"
+                title={$fmt('sync.clearSyncHistory')}
+                onClick={clearSyncResult}
+              >
+                <Button icon={<ClearOutlined />}></Button>
+              </div>
+            </div>
+            <div className="sidebar-inner-content">
+              <Flex vertical gap={12}>
+                <SidebarContentModuleGist
+                  ref={gistRef}
+                  targetType={selectedTargetType}
+                  selectedKey={selectedKey}
+                  onSelect={(key) => onSelect('gist', key)}
+                  onAction={({key}) => onAction?.('gist', key)}
+                />
+
+                <SidebarContentModuleWebDAV
+                  ref={webDAVRef}
+                  targetType={selectedTargetType}
+                  selectedKey={selectedKey}
+                  onSelect={(key) => onSelect('webdav', key)}
+                  onAction={({key}) => onAction?.('webdav', key)}
+                />
+              </Flex>
             </div>
           </div>
-          <div className="sidebar-inner-content">
-            <Flex vertical gap={12}>
-              <SidebarContentModuleGist
-                ref={gistRef}
-                targetType={selectedTargetType}
-                selectedKey={selectedKey}
-                onSelect={(key) => onSelect('gist', key)}
-                onAction={() => onAction?.('gist')}
-              />
-
-              <SidebarContentModuleWebDAV
-                ref={webDAVRef}
-                targetType={selectedTargetType}
-                selectedKey={selectedKey}
-                onSelect={(key) => onSelect('webdav', key)}
-                onAction={() => onAction?.('webdav')}
-              />
-            </Flex>
-          </div>
+        </StyledSidebarWrapper>
+        <div className="content">
+          <SyncResultList resultList={resultList}></SyncResultList>
         </div>
-      </StyledSidebarWrapper>
-      <div className="content">
-        <SyncResultList resultList={resultList}></SyncResultList>
-      </div>
-    </StyledContainer>
+      </StyledContainer>
+    </>
   );
 }
