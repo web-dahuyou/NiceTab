@@ -18,6 +18,7 @@ export const eventEmitter = mitt<EventsEmitterProps>();
 
 // global context
 export const GlobalContext = createContext<GlobalContextProps>({
+  version: '888.888.888',
   colorPrimary: PRIMARY_COLOR,
   themeTypeConfig: THEME_TYPE_CONFIG[defaultThemeType],
   setThemeType: async (themeType = defaultThemeType) => {

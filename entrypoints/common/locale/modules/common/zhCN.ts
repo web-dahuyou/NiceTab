@@ -71,4 +71,5 @@ export default {
   'common.export': '导出',
   'common.none': '无',
   'common.pleaseInput': '请输入 {label}',
+  'common.version': '版本',
 };

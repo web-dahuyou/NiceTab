@@ -168,7 +168,7 @@ function AppLayout() {
   const { updateDetail, updateReload } = useUpdate();
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const { $fmt, locale } = useIntlUtls();
-  const { themeTypeConfig } = NiceGlobalContext;
+  const { version, themeTypeConfig } = NiceGlobalContext;
   const navs = useMemo(() => {
     return navsTemplate.map((item) => {
       return { ...item, label: $fmt(item.label) };
@@ -236,6 +236,7 @@ function AppLayout() {
           )}
 
           <Space className="menu-right select-none" align="center" size="middle">
+            <div>{$fmt('common.version')}: {version}</div>
             {/* theme */}
             <Tooltip
               placement="bottom"

@@ -9,8 +9,8 @@ import { openNewTab } from '@/entrypoints/common/tabs';
 
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import {
-  StyledListWrapper,
   StyledSidebarWrapper,
+  StyledMainWrapper,
   StyledHelpInfoBox,
 } from './Home.styled';
 import ToggleSidebarBtn from '../components/ToggleSidebarBtn';
@@ -85,7 +85,7 @@ export default function Home() {
 
   return (
     <HomeContext.Provider value={{ treeDataHook }}>
-      <StyledListWrapper
+      <StyledMainWrapper
         className={classNames('home-wrapper', sidebarCollapsed && 'collapsed')}
         $collapsed={sidebarCollapsed}
       >
@@ -153,7 +153,7 @@ export default function Home() {
 
         {/* 标签组和标签页列表 */}
         <TabGroupList virtual={virtualMap.tabList}></TabGroupList>
-      </StyledListWrapper>
+      </StyledMainWrapper>
 
       {/* 吸底footer */}
       {/* <StickyFooter bottomGap={0} fullWidth>

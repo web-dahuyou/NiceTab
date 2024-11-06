@@ -14,6 +14,7 @@ export type EventsEmitterProps = {
 
 // 全局 Context
 export interface GlobalContextProps {
+  version: string;
   colorPrimary: string;
   themeTypeConfig: ThemeTypeConfig;
   setThemeType: (themeType: ThemeTypes) => void;

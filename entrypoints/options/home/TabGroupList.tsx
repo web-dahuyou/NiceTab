@@ -4,10 +4,10 @@ import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import type { TabItem } from '~/entrypoints/types';
 import type { TreeDataNodeTag, TreeDataNodeTabGroup, MoveToCallbackProps } from './types';
+import { StyledGroupList } from './Home.styled';
 import TabGroup from './TabGroup';
 import { HomeContext } from './hooks/treeData';
 import { getSelectedCounts } from './utils';
-
 
 const ListItem = memo(
   ({ tabGroup, virtual }: { tabGroup: TreeDataNodeTabGroup; virtual?: boolean }) => {
@@ -114,7 +114,7 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
       // const offsetTop = selectedTabGroupRef.current?.offsetTop || 0;
       // window.scrollTo({ top: offsetTop - 100, behavior: 'instant' });
 
-      const pagePaddingTop = 100
+      const pagePaddingTop = 100;
       const body = document.documentElement || document.body;
       const scrollTop = body.scrollTop;
       const groupTop = selectedTabGroupRef.current?.offsetTop || 0;
@@ -138,7 +138,7 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
   }, [selectedTagKey, selectedTabGroupKey, refreshKey]);
 
   return (
-    <div className="content">
+    <StyledGroupList className="main-content-wrapper">
       {virtual && (
         <div className="tip">
           <Typography.Text type="warning">{$fmt('home.tip.tooManyTabs')}</Typography.Text>
@@ -167,12 +167,15 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
         (selectedTag?.children as TreeDataNodeTabGroup[])?.map(
           (tabGroup: TreeDataNodeTabGroup) =>
             tabGroup?.originData && (
-              <div ref={tabGroup.key === selectedTabGroupKey ? selectedTabGroupRef : null} key={tabGroup.key}>
+              <div
+                ref={tabGroup.key === selectedTabGroupKey ? selectedTabGroupRef : null}
+                key={tabGroup.key}
+              >
                 <ListItem tabGroup={tabGroup} virtual={virtual}></ListItem>
               </div>
             )
         )
       )}
-    </div>
+    </StyledGroupList>
   );
 }

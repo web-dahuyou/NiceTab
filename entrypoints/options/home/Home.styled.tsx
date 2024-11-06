@@ -1,53 +1,14 @@
 import styled from 'styled-components';
 import { StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
 import type { StyledThemeProps } from '@/entrypoints/types';
+import { StyledBaseSidebarWrapper, StyledBaseMainWrapper } from '../Layout.styled';
 
-export const StyledSidebarWrapper = styled.div<{
+export const StyledMainWrapper = StyledBaseMainWrapper;
+
+export const StyledSidebarWrapper = styled(StyledBaseSidebarWrapper)<{
   theme: StyledThemeProps;
-  $collapsed?: boolean;
-  $sidebarWidth?: number;
 }>`
-  position: relative;
-
-  .sidebar-inner-box {
-    width: ${(props) => props.$sidebarWidth || 280}px;
-    height: calc(100vh - 180px);
-    position: fixed;
-    top: 100px;
-    transition: transform 0.2s ease-in-out;
-    border-right: 1px solid ${(props) => props.theme.colorBorder || 'rgba(5, 5, 5, 0.06)'};
-
-    &.collapsed {
-      .sidebar-inner-content {
-        pointer-events: none;
-        visibility: hidden;
-        opacity: 0;
-      }
-      transform: translateX(-${(props) => props.$sidebarWidth || 280}px);
-    }
-
-    .sidebar-action-box {
-      position: absolute;
-      box-sizing: border-box;
-      top: 0;
-      right: -36px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      align-items: center;
-      justify-content: center;
-      visibility: visible;
-      .computing-icon {
-        margin-top: 10px;
-      }
-    }
-  }
-
   .sidebar-inner-content {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
     padding-right: 4px;
 
     .tag-list-title {
@@ -94,35 +55,6 @@ export const StyledSidebarWrapper = styled.div<{
   }
 `;
 
-export const StyledListWrapper = styled.div<{
-  $collapsed?: boolean;
-  $sidebarWidth?: number;
-}>`
-  position: relative;
-  width: 100%;
-  min-height: 400px;
-  display: grid;
-  grid-template-columns: ${(props) =>
-    props.$collapsed ? '0px auto' : `${props.$sidebarWidth || 280}px auto`};
-  transition: grid-template-columns 0.2s ease-in-out;
-
-  .content {
-    padding-left: 40px;
-    .tip {
-      padding: 0 16px;
-      margin-bottom: 8px;
-    }
-    .count-info {
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      margin-bottom: 24px;
-      .count-item {
-        margin-right: 8px;
-      }
-    }
-  }
-`;
 
 export const StyledTreeNodeItem = styled.div`
   display: flex;
@@ -157,6 +89,22 @@ export const StyledHelpInfoBox = styled.div`
     list-style-type: disc;
     li {
       margin-bottom: 8px;
+    }
+  }
+`;
+
+export const StyledGroupList = styled.div`
+  .tip {
+    padding: 0 16px;
+    margin-bottom: 8px;
+  }
+  .count-info {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    margin-bottom: 24px;
+    .count-item {
+      margin-right: 8px;
     }
   }
 `;
