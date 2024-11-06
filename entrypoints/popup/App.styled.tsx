@@ -17,7 +17,7 @@ export const StyledContainer = styled.div<{theme: StyledThemeProps}>`
   .block {
     display: flex;
     align-items: center;
-    padding: 12px;
+    padding: 10px;
     border-bottom: 1px solid #0505050f;
     gap: 8px;
     .block-title {

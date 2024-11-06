@@ -36,7 +36,7 @@ export default function App() {
   const { token } = theme.useToken();
   const NiceGlobalContext = useContext(GlobalContext);
   const { $fmt } = useIntlUtls();
-  const { themeTypeConfig } = NiceGlobalContext;
+  const { version, themeTypeConfig } = NiceGlobalContext;
   const [tabs, setTabs] = useState<Tabs.Tab[]>([]);
 
   // 快捷按钮
@@ -102,6 +102,10 @@ export default function App() {
       <StyledContainer className="popup-container select-none">
         <GlobalStyle />
         <div className="fixed-top">
+          <div className="block version">
+            <span className="block-title">{$fmt('common.version')}：</span>
+            {version}
+          </div>
           <div className="block quick-actions">
             <span className="block-title">{$fmt('common.view')}：</span>
             <Space
@@ -112,8 +116,7 @@ export default function App() {
             >
               {quickActionBtns.map((item) => (
                 <span className="action-btn" key={item.path} onClick={item.onClick}>
-                  {' '}
-                  {item.label}{' '}
+                  {item.label}
                 </span>
               ))}
             </Space>

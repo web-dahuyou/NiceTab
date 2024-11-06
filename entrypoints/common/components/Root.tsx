@@ -12,6 +12,7 @@ import type { ThemeProps, LanguageTypes, ThemeTypes } from '~/entrypoints/types'
 import { themeUtils } from '~/entrypoints/common/storage';
 
 export default function Root({ children }: { children: React.ReactNode }) {
+  const [version, setVersion] = useState('');
   const { locale: localeAntd, changeLocale: changeLocaleAntd } = useAntdLocale();
   const {
     locale: localeCustom,
@@ -40,12 +41,18 @@ export default function Root({ children }: { children: React.ReactNode }) {
     setHasReady(true);
   };
 
+  const getManifest = async () => {
+    const manifestInfo = await browser.runtime.getManifest();
+    setVersion(manifestInfo?.version || '888.888.888');
+  }
+
   useEffect(() => {
     document.documentElement.lang = localeCustom || defaultLanguage;
   }, [localeCustom]);
 
   useEffect(() => {
     initThemeData();
+    getManifest();
     browser.runtime.onMessage.addListener(async (msg, msgSender, sendResponse) => {
       // console.log('browser.runtime.onMessage--Root', msg);
       const { msgType, data } = msg || {};
@@ -84,6 +91,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
       >
         <GlobalContext.Provider
           value={{
+            version,
             colorPrimary: primaryColor,
             themeTypeConfig,
             setThemeType: handleThemeTypeChange,
