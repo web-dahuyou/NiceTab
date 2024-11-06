@@ -10,7 +10,8 @@ import type {
   SyncResultProps,
   SyncConfigWebDAVProps,
 } from '~/entrypoints/types';
-import { StyledContainer, StyledSidebarWrapper } from './Sync.styled';
+
+import { StyledSidebarWrapper, StyledMainWrapper } from './Sync.styled';
 // import ToggleSidebarBtn from '../components/ToggleSidebarBtn';
 import SidebarContentModuleGist from './components/gist/SidebarContentModule';
 import SidebarContentModuleWebDAV from './components/webdav/SidebarContentModule';
@@ -30,7 +31,9 @@ export default function SyncPage() {
   const [selectedTargetType, setSelectedTargetType] = useState<SyncTargetType>('gist');
   const [selectedKey, setSelectedKey] = useState<string>('github');
   const [syncResult, setSyncResult] = useState<SyncResultProps>(syncUtils.syncResult);
-  const [configWevDAV, setConfigWevDAV] = useState<SyncConfigWebDAVProps>(syncWebDAVUtils.config || {});
+  const [configWevDAV, setConfigWevDAV] = useState<SyncConfigWebDAVProps>(
+    syncWebDAVUtils.config || {}
+  );
 
   const resultList = useMemo(() => {
     if (selectedTargetType === 'gist') {
@@ -88,7 +91,7 @@ export default function SyncPage() {
   const getWebDavConfig = async () => {
     const config = await syncWebDAVUtils.getConfig();
     setConfigWevDAV(config || {});
-  }
+  };
 
   useEffect(() => {
     getSyncInfo();
@@ -98,16 +101,19 @@ export default function SyncPage() {
   return (
     <>
       {modalContextHolder}
-      <StyledContainer
+      <StyledMainWrapper
         className={classNames('sync-wrapper', sidebarCollapsed && 'collapsed')}
         $collapsed={sidebarCollapsed}
+        $sidebarWidth={400}
       >
         <StyledSidebarWrapper
           className="sidebar"
-          $primaryColor={token.colorPrimary}
           $collapsed={sidebarCollapsed}
+          $sidebarWidth={400}
         >
-          <div className={classNames('sidebar-inner-box', sidebarCollapsed && 'collapsed')}>
+          <div
+            className={classNames('sidebar-inner-box', sidebarCollapsed && 'collapsed')}
+          >
             <div className="sidebar-action-box">
               {/* <ToggleSidebarBtn onCollapseChange={setSidebarCollapsed}></ToggleSidebarBtn> */}
               <div
@@ -132,7 +138,7 @@ export default function SyncPage() {
                   targetType={selectedTargetType}
                   selectedKey={selectedKey}
                   onSelect={(key) => onSelect('gist', key)}
-                  onAction={({key}) => onAction?.('gist', key)}
+                  onAction={({ key }) => onAction?.('gist', key)}
                 />
 
                 <SidebarContentModuleWebDAV
@@ -140,16 +146,16 @@ export default function SyncPage() {
                   targetType={selectedTargetType}
                   selectedKey={selectedKey}
                   onSelect={(key) => onSelect('webdav', key)}
-                  onAction={({key}) => onAction?.('webdav', key)}
+                  onAction={({ key }) => onAction?.('webdav', key)}
                 />
               </Flex>
             </div>
           </div>
         </StyledSidebarWrapper>
-        <div className="content">
+        <div className="main-content-wrapper">
           <SyncResultList resultList={resultList}></SyncResultList>
         </div>
-      </StyledContainer>
+      </StyledMainWrapper>
     </>
   );
 }
