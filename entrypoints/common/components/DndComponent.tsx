@@ -81,12 +81,12 @@ export default function DndComponent<IncomeData extends DragData>({
         onDragStart() {
           // console.log('--------------draggable--onDragStart');
           setIsDragging(true);
-          eventEmitter.emit('is-dragging', true);
+          eventEmitter.emit('home:is-dragging', true);
         },
         onDrop() {
           // console.log('--------------draggable--onDrop');
           setIsDragging(false);
-          eventEmitter.emit('is-dragging', false);
+          eventEmitter.emit('home:is-dragging', false);
         },
       }),
       dropTargetForElements({

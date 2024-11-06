@@ -6,9 +6,10 @@ export type VersionInfo = { updateAvailable: boolean; version?: string };
 
 // 订阅事件类型
 export type EventsEmitterProps = {
-  'is-dragging': boolean;
+  'home:is-dragging': boolean;
   'home:set-tree-searchValue': string;
   'home:set-editing-status': boolean;
+  'sync:push-to-all-remotes': undefined;
 };
 
 // 全局 Context

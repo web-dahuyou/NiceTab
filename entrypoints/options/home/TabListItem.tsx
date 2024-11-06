@@ -90,9 +90,9 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
   };
 
   useEffect(() => {
-    eventEmitter.on('is-dragging', draggingListener);
+    eventEmitter.on('home:is-dragging', draggingListener);
     return () => {
-      eventEmitter.off('is-dragging', draggingListener);
+      eventEmitter.off('home:is-dragging', draggingListener);
     };
   }, []);
 

@@ -2,7 +2,7 @@ import { useCallback, forwardRef, useImperativeHandle } from 'react';
 import { message, Flex, Divider, Drawer, Typography, Button, Tag } from 'antd';
 import { SyncOutlined, ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { syncUtils } from '~/entrypoints/common/storage';
 import type {
   SyncTargetType,
@@ -11,6 +11,7 @@ import type {
   SyncStatusProps,
   SyncResultProps,
 } from '~/entrypoints/types';
+import { syncTypeMap } from '~/entrypoints/common/constants';
 import type { RemoteOptionProps, BaseCardItemProps } from '../../types';
 import { remoteOptions } from '../../constants';
 import { StyledCard, StyledCardTitle } from '../../Sync.styled';
@@ -68,17 +69,20 @@ export default forwardRef(
       return remoteOptions?.filter((item) => syncConfig?.[item.key]?.accessToken);
     }, [syncConfig]);
 
-    const validator = useCallback((option: RemoteOptionProps): boolean => {
-      const { github, gitee } = syncUtils.config || {};
-      if (option.key === 'github' && !github?.accessToken) {
-        messageApi.warning($fmt('sync.noGithubToken'));
-        return false;
-      } else if (option.key === 'gitee' && !gitee?.accessToken) {
-        messageApi.warning($fmt('sync.noGiteeToken'));
-        return false;
-      }
-      return true;
-    }, []);
+    const validator = useCallback(
+      (option: RemoteOptionProps, showMessage = true): boolean => {
+        const { github, gitee } = syncUtils.config || {};
+        if (option.key === 'github' && !github?.accessToken) {
+          showMessage && messageApi.warning($fmt('sync.noGithubToken'));
+          return false;
+        } else if (option.key === 'gitee' && !gitee?.accessToken) {
+          showMessage && messageApi.warning($fmt('sync.noGiteeToken'));
+          return false;
+        }
+        return true;
+      },
+      []
+    );
 
     const onSyncConfigChange = (config: SyncConfigProps) => {
       setDrawerVisible(false);
@@ -109,6 +113,15 @@ export default forwardRef(
       []
     );
 
+    // 一键推送到所有远程存储
+    const pushToAllRemotes = async () => {
+      const config = await syncUtils.getConfig();
+      const configList = remoteOptions?.filter((item) => config?.[item.key]?.accessToken);
+      configList.forEach((option) => {
+        handleAction(option, syncTypeMap.MANUAL_PUSH_FORCE);
+      });
+    };
+
     const getSyncInfo = async () => {
       syncUtils.getSyncStatus();
       setSyncStatus(syncUtils.syncStatus);
@@ -122,6 +135,10 @@ export default forwardRef(
 
     useEffect(() => {
       getSyncInfo();
+      eventEmitter.on('sync:push-to-all-remotes', pushToAllRemotes);
+      return () => {
+        eventEmitter.off('sync:push-to-all-remotes', pushToAllRemotes);
+      };
     }, []);
 
     useImperativeHandle(
@@ -162,7 +179,7 @@ export default forwardRef(
                 ></SidebarBaseCardItem>
               </StyledCard>
             ))}
-            { configList.length < remoteOptions.length && (
+            {configList.length < remoteOptions.length && (
               <Flex justify="center">
                 <Button
                   type="dashed"
@@ -172,7 +189,7 @@ export default forwardRef(
                   {$fmt('sync.addConfig')}
                 </Button>
               </Flex>
-            ) }
+            )}
           </Flex>
         </Flex>
 

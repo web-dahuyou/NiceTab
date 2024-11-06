@@ -33,6 +33,7 @@ export default {
   'sync.clearSyncHistory': '清空同步历史记录',
   'sync.removeDesc': '您确定要删除该配置项吗？',
   'sync.noWebdavConnectionUrl': '未设置 WebDAV URL',
+  'sync.pushToAllRemotes': '一键推送到所有远程存储（强制覆盖）',
 
   'sync.reason.contentTooLarge': '远程文件内容太大，返回的内容被 gist API 截断了，取消合并到本地',
   'sync.reason.authFailed': '认证失败',

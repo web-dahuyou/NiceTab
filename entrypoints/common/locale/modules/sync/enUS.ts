@@ -33,6 +33,7 @@ export default {
   'sync.clearSyncHistory': 'Clear Sync History',
   'sync.removeDesc': 'Are you sure you want to remove the item ?',
   'sync.noWebdavConnectionUrl': 'No WebDAV Connection URL',
+  'sync.pushToAllRemotes': 'Push to All remote locations (force overwrite)',
 
   'sync.reason.contentTooLarge': 'The remote file content is too large, truncated by gist API, cancel merge to local',
   'sync.reason.authFailed': 'Authentication Failed',
