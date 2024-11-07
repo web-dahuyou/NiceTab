@@ -9,6 +9,9 @@ export default function useUpdate() {
   }, []);
 
   useEffect(() => {
+    // 调试用
+    // setUpdateDetail({ version: '666.666.666', updateAvailable: true });
+
     // 监听是否可升级
     browser.runtime.onUpdateAvailable.addListener((details) => {
       console.log('onUpdateAvailable--details', details);
