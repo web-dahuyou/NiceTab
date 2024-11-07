@@ -26,6 +26,7 @@ import {
   GithubOutlined,
   MoonOutlined,
   SunOutlined,
+  SmileOutlined,
 } from '@ant-design/icons';
 import styled, { ThemeProvider } from 'styled-components';
 import '~/assets/css/reset.css';
@@ -65,7 +66,8 @@ const StyledPageContainer = styled.div<{ theme: StyledThemeProps }>`
     align-items: center;
     height: 60px;
     // box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    box-shadow: ${(props) => props.theme.boxShadow || '0 2px 12px 3px rgba(0, 0, 0, 0.1)'};
+    box-shadow: ${(props) =>
+      props.theme.boxShadow || '0 2px 12px 3px rgba(0, 0, 0, 0.1)'};
     background: ${(props) => props.theme.colorBgContainer || '#fff'};
 
     .logo {
@@ -227,7 +229,11 @@ function AppLayout() {
           {updateDetail?.updateAvailable && (
             <Space className="header-tip select-none" style={{ margin: '0 12px' }}>
               <Typography.Text type="warning">
-                {$fmt('common.update.available')}:
+                {$fmt({
+                  id: 'common.update.available',
+                  values: { version: updateDetail?.version || <SmileOutlined /> },
+                })}
+                :
               </Typography.Text>
               <Typography.Link href="javascript:void(0);" onClick={updateReload}>
                 {$fmt('common.update.upgradeNow')}
@@ -236,7 +242,9 @@ function AppLayout() {
           )}
 
           <Space className="menu-right select-none" align="center" size="middle">
-            <div>{$fmt('common.version')}: {version}</div>
+            <div>
+              {$fmt('common.version')}: {version}
+            </div>
             {/* theme */}
             <Tooltip
               placement="bottom"

@@ -42,7 +42,7 @@ export default {
   'common.url': 'URL',
   'common.link': 'Link',
   'common.goToGithub': 'Give me a star',
-  'common.update.available': 'New version available',
+  'common.update.available': 'New version[{version}] available',
   'common.update.upgradeNow': 'Upgrade right now',
   'common.backToTop': 'Back to Top',
   'common.panel': 'Panel',

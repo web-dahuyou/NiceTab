@@ -42,7 +42,7 @@ export default {
   'common.url': '网址',
   'common.link': '链接',
   'common.goToGithub': '给个小星星吧',
-  'common.update.available': '有可用的新版本',
+  'common.update.available': '有可用的新版本[{version}]',
   'common.update.upgradeNow': '立即升级',
   'common.backToTop': '回到顶部',
   'common.panel': '面板',
