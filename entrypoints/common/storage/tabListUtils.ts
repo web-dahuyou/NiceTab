@@ -1137,12 +1137,12 @@ export default class TabListUtils {
           groupList:
             tag?.groupList?.map((g) => {
               return omit(
-                { ...g, tabList: g?.tabList?.map((tab) => omit(tab, ['tabId'])) || [] },
-                ['groupId', 'createTime']
+                { ...g, tabList: g?.tabList?.map((tab) => omit(tab, ['tabId', 'favIconUrl'])) || [] },
+                ['groupId', /* 'createTime' */]
               );
             }) || [],
         },
-        ['tagId', 'createTime']
+        ['tagId', /* 'createTime' */]
       ) as Partial<TagItem>;
     });
     return exportTagList;
