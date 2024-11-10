@@ -18,7 +18,6 @@ import type {
   ColorItem,
   ThemeColors,
   TabEvents,
-  ActionNames,
   SyncType,
 } from '~/entrypoints/types';
 
@@ -76,14 +75,22 @@ export const THEME_TYPE_CONFIG: Record<ThemeTypes, ThemeTypeConfig> = {
 // 默认主题类型
 export const defaultThemeType: ThemeTypes = 'light';
 
+export const SEND_TAB_ACTION_NAMES = [
+  'sendAllTabs', // 发送全部标签页
+  'sendCurrentTab', // 发送当前标签页
+  'sendOtherTabs', // 发送其他标签页
+  'sendLeftTabs', // 发送左侧标签页
+  'sendRightTabs', // 发送右侧标签页
+];
+
 // action 名称枚举
-export const ENUM_ACTION_NAME: Record<string, `action:${ActionNames}`> = {
-  SEND_ALL_TABS: 'action:sendAllTabs', // 发送全部标签页
-  SEND_CURRENT_TAB: 'action:sendCurrentTab', // 发送当前标签页
-  SEND_OTHER_TABS: 'action:sendOtherTabs', // 发送其他标签页
-  SEND_LEFT_TABS: 'action:sendLeftTabs', // 发送左侧标签页
-  SEND_RIGHT_TABS: 'action:sendRightTabs', // 发送右侧标签页
-  OPEN_ADMIN_TAB: 'action:openAdminTab', // 打开管理后台
+export enum ENUM_ACTION_NAME {
+  SEND_ALL_TABS = 'action:sendAllTabs', // 发送全部标签页
+  SEND_CURRENT_TAB = 'action:sendCurrentTab', // 发送当前标签页
+  SEND_OTHER_TABS = 'action:sendOtherTabs', // 发送其他标签页
+  SEND_LEFT_TABS = 'action:sendLeftTabs', // 发送左侧标签页
+  SEND_RIGHT_TABS = 'action:sendRightTabs', // 发送右侧标签页
+  OPEN_ADMIN_TAB = 'action:openAdminTab', // 打开管理后台
 };
 // 设置项枚举
 export enum ENUM_SETTINGS_PROPS {
@@ -92,6 +99,7 @@ export enum ENUM_SETTINGS_PROPS {
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH = 'openAdminTabAfterBrowserLaunch', // 启动浏览器时是否自动打开管理后台
   OPEN_ADMIN_TAB_AFTER_SEND_TABS = 'openAdminTabAfterSendTabs', // 发送标签页后是否打开管理后台
   CLOSE_TABS_AFTER_SEND_TABS = 'closeTabsAfterSendTabs', // 发送标签页后是否关闭标签页
+  ACTION_AUTO_CLOSE_FLAGS = 'actionAutoCloseFlags', // 各种发送标签页操作的自动关闭标签页标志
   AUTO_PIN_ADMIN_TAB = 'autoPinAdminTab', // 是否固定管理后台
   ALLOW_SEND_PINNED_TABS = 'allowSendPinnedTabs', // 是否发送固定标签页
   RESTORE_IN_NEW_WINDOW = 'restoreInNewWindow', // 是否在新窗口打开标签组

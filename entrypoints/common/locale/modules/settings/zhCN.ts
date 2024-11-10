@@ -17,6 +17,8 @@ export default {
   'settings.closeTabsAfterSendTabs': '发送标签页时-是否自动关闭标签页{mark}',
   'settings.closeTabsAfterSendTabs.yes': '自动关闭标签页',
   'settings.closeTabsAfterSendTabs.no': '不要自动关闭标签页',
+  'settings.actionAutoCloseFlags': '当执行下面选中的操作时将自动关闭标签页',
+  'settings.actionAutoCloseFlags.tooltip': '当[发送标签页时-是否自动关闭标签页]设置为“不要自动关闭标签页”时生效',
   'settings.restoreInNewWindow': '是否在新窗口打开标签组{mark}',
   'settings.deleteAfterRestore': '打开标签页/标签组时-是否自动删除标签页{mark}',
   'settings.deleteAfterRestore.yes': '从NiceTab列表中删除（仍保留固定标签页）',

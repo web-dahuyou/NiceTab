@@ -98,6 +98,7 @@ export type SettingsProps = {
   deleteAfterRestore?: boolean; // 恢复标签页/标签组时是否从列表中删除
   openAdminTabAfterSendTabs?: boolean; // 发送标签页后是否打开管理后台
   closeTabsAfterSendTabs?: boolean; // 发送标签页后是否关闭标签页
+  actionAutoCloseFlags?: ActionNames[]; // 各种发送标签页操作是否自动关闭标签页的开关配置
   deleteUnlockedEmptyGroup?: boolean; // 是否删除未锁定的空标签组
   allowDuplicateTabs?: boolean; // 同一个标签组中是否允许重复的标签页
   allowDuplicateGroups?: boolean; // 同一个分类中是否允许重复的标签组
