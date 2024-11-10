@@ -8,6 +8,7 @@ const {
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
   OPEN_ADMIN_TAB_AFTER_SEND_TABS,
   CLOSE_TABS_AFTER_SEND_TABS,
+  ACTION_AUTO_CLOSE_FLAGS,
   AUTO_PIN_ADMIN_TAB,
   ALLOW_SEND_PINNED_TABS,
   RESTORE_IN_NEW_WINDOW,
@@ -29,6 +30,7 @@ export default class SettingsUtils {
     [OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH]: true, // 启动浏览器时是否自动打开管理后台
     [OPEN_ADMIN_TAB_AFTER_SEND_TABS]: true, // 发送标签页后默认打开管理后台
     [CLOSE_TABS_AFTER_SEND_TABS]: true, // 发送标签页后是否关闭标签页
+    [ACTION_AUTO_CLOSE_FLAGS]: [], // 各种操作的自动关闭标签页标志
     [AUTO_PIN_ADMIN_TAB]: true, // 是否固定管理后台
     [ALLOW_SEND_PINNED_TABS]: false, // 是否发送固定标签页
     [RESTORE_IN_NEW_WINDOW]: false, // 是否在新窗口打开标签组

@@ -17,6 +17,8 @@ export default {
   'settings.closeTabsAfterSendTabs': 'When sending tabs - whether to automatically close the tabs ?',
   'settings.closeTabsAfterSendTabs.yes': 'Automatically close',
   'settings.closeTabsAfterSendTabs.no': 'Do not',
+  'settings.actionAutoCloseFlags': 'When sending tabs through the selected actions below, the tabs will be automatically closed.',
+  'settings.actionAutoCloseFlags.tooltip': 'Take effect when the setting [when sending tabs - whether to automatically close the tabs] is set to "Do not".',
   'settings.restoreInNewWindow': 'When opening tab group - whether to open in a new window ?',
   'settings.deleteAfterRestore': 'When opening tabs or tab group - whether to remove the tabs ?',
   'settings.deleteAfterRestore.yes': 'Remove (pinned tabs remain)',

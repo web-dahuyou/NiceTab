@@ -13,6 +13,7 @@ const {
   LANGUAGE,
   OPEN_ADMIN_TAB_AFTER_SEND_TABS,
   CLOSE_TABS_AFTER_SEND_TABS,
+  ACTION_AUTO_CLOSE_FLAGS,
   AUTO_PIN_ADMIN_TAB,
   ALLOW_SEND_PINNED_TABS,
   RESTORE_IN_NEW_WINDOW,
@@ -73,15 +74,20 @@ export async function executeContentScript(
   const customMessages = getCustomLocaleMessages(language);
   const openAdminTabAfterSendTabs = settings[OPEN_ADMIN_TAB_AFTER_SEND_TABS];
   const closeTabsAfterSendTabs = settings[CLOSE_TABS_AFTER_SEND_TABS];
+  const actionAutoCloseFlags = settings[ACTION_AUTO_CLOSE_FLAGS];
 
   const tabs = await browser.tabs.query({
     active: true,
     currentWindow: true,
   });
   const currentTab = tabs?.[0];
-
-  if (currentTab?.id && !openAdminTabAfterSendTabs && !closeTabsAfterSendTabs) {
-    const _actionName: ActionNames = actionName.replace('action:', '') as ActionNames;
+  const _actionName: ActionNames = actionName.replace('action:', '') as ActionNames;
+  if (
+    currentTab?.id &&
+    !openAdminTabAfterSendTabs &&
+    !closeTabsAfterSendTabs &&
+    !actionAutoCloseFlags?.includes(_actionName)
+  ) {
     const status = resultType === 'success' ? 'success' : 'failed';
 
     sendTabMessage({
@@ -205,7 +211,11 @@ async function sendAllTabs() {
   const filteredTabs = await getFilteredTabs(tabs, settings);
   const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs);
   await openAdminTab(settings, { tagId, groupId });
-  if (settings[CLOSE_TABS_AFTER_SEND_TABS]) {
+  const actionAutoCloseFlags = settings[ACTION_AUTO_CLOSE_FLAGS];
+  if (
+    settings[CLOSE_TABS_AFTER_SEND_TABS] ||
+    actionAutoCloseFlags?.includes('sendAllTabs')
+  ) {
     setTimeout(() => {
       browser.tabs.remove(filteredTabs.map((t) => t.id as number).filter(Boolean));
     }, 30);
@@ -228,7 +238,11 @@ async function sendCurrentTab() {
   filteredTabs = filteredTabs.map((tab) => ({ ...tab, groupId: -1 }));
   const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs);
   openAdminTab(settings, { tagId, groupId });
-  if (settings[CLOSE_TABS_AFTER_SEND_TABS]) {
+  const actionAutoCloseFlags = settings[ACTION_AUTO_CLOSE_FLAGS];
+  if (
+    settings[CLOSE_TABS_AFTER_SEND_TABS] ||
+    actionAutoCloseFlags?.includes('sendCurrentTab')
+  ) {
     browser.tabs.remove(filteredTabs.map((t) => t.id as number).filter(Boolean));
   } else {
     // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
@@ -245,7 +259,11 @@ async function sendOtherTabs() {
   const filteredTabs = await getFilteredTabs(tabs, settings);
   const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs);
   openAdminTab(settings, { tagId, groupId });
-  if (settings[CLOSE_TABS_AFTER_SEND_TABS]) {
+  const actionAutoCloseFlags = settings[ACTION_AUTO_CLOSE_FLAGS];
+  if (
+    settings[CLOSE_TABS_AFTER_SEND_TABS] ||
+    actionAutoCloseFlags?.includes('sendOtherTabs')
+  ) {
     browser.tabs.remove(filteredTabs.map((t) => t.id as number).filter(Boolean));
   }
   // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
@@ -267,8 +285,11 @@ async function sendLeftTabs(currTab?: Tabs.Tab) {
   const filteredTabs = await getFilteredTabs(leftTabs, settings);
   const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs);
   openAdminTab(settings, { tagId, groupId });
-
-  if (settings[CLOSE_TABS_AFTER_SEND_TABS]) {
+  const actionAutoCloseFlags = settings[ACTION_AUTO_CLOSE_FLAGS];
+  if (
+    settings[CLOSE_TABS_AFTER_SEND_TABS] ||
+    actionAutoCloseFlags?.includes('sendLeftTabs')
+  ) {
     browser.tabs.remove(filteredTabs.map((t) => t.id as number).filter(Boolean));
   }
   // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
@@ -290,8 +311,11 @@ async function sendRightTabs(currTab?: Tabs.Tab) {
   const filteredTabs = await getFilteredTabs(rightTabs, settings);
   const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs);
   openAdminTab(settings, { tagId, groupId });
-
-  if (settings[CLOSE_TABS_AFTER_SEND_TABS]) {
+  const actionAutoCloseFlags = settings[ACTION_AUTO_CLOSE_FLAGS];
+  if (
+    settings[CLOSE_TABS_AFTER_SEND_TABS] ||
+    actionAutoCloseFlags?.includes('sendRightTabs')
+  ) {
     browser.tabs.remove(filteredTabs.map((t) => t.id as number).filter(Boolean));
   }
   // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮

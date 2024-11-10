@@ -4,6 +4,7 @@ import {
   Form,
   Input,
   InputNumber,
+  Checkbox,
   Button,
   Radio,
   Typography,
@@ -14,7 +15,11 @@ import type { FormProps } from 'antd';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import type { SettingsProps } from '~/entrypoints/types';
 import { settingsUtils } from '~/entrypoints/common/storage';
-import { ENUM_SETTINGS_PROPS, defaultLanguage } from '~/entrypoints/common/constants';
+import {
+  SEND_TAB_ACTION_NAMES,
+  ENUM_SETTINGS_PROPS,
+  defaultLanguage,
+} from '~/entrypoints/common/constants';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import QuickActions from './QuickActions';
 
@@ -23,6 +28,7 @@ const {
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
   OPEN_ADMIN_TAB_AFTER_SEND_TABS,
   CLOSE_TABS_AFTER_SEND_TABS,
+  ACTION_AUTO_CLOSE_FLAGS,
   AUTO_PIN_ADMIN_TAB,
   ALLOW_SEND_PINNED_TABS,
   RESTORE_IN_NEW_WINDOW,
@@ -46,6 +52,16 @@ export default function Settings() {
   const [messageApi, contextHolder] = message.useMessage();
 
   const [form] = Form.useForm();
+
+  const actionAutoCloseFlagOptions = useMemo(() => {
+    return SEND_TAB_ACTION_NAMES.map((actionName) => {
+      return {
+        label: $fmt({ id: `common.${actionName}` }),
+        value: actionName,
+      };
+    });
+  }, [$fmt]);
+
   const onFinish: FormProps<SettingsProps>['onFinish'] = async (values) => {
     console.log('Save Success:', values);
     const newSettings = { ...settingsUtils.initialSettings, ...values };
@@ -136,12 +152,23 @@ export default function Settings() {
           </Form.Item>
           {/* 发送标签页后是否打开管理后台 */}
           <Form.Item<SettingsProps>
-            label={<div>{$fmt({ id: `${module}.${OPEN_ADMIN_TAB_AFTER_SEND_TABS}`, values: {mark: '：'}})}：</div>}
+            label={
+              <div>
+                {$fmt({
+                  id: `${module}.${OPEN_ADMIN_TAB_AFTER_SEND_TABS}`,
+                  values: { mark: '：' },
+                })}
+              </div>
+            }
             name={OPEN_ADMIN_TAB_AFTER_SEND_TABS}
           >
             <Radio.Group>
-              <Radio value={true}>{$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_SEND_TABS}.yes`)}</Radio>
-              <Radio value={false}>{$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_SEND_TABS}.no`)}</Radio>
+              <Radio value={true}>
+                {$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_SEND_TABS}.yes`)}
+              </Radio>
+              <Radio value={false}>
+                {$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_SEND_TABS}.no`)}
+              </Radio>
             </Radio.Group>
           </Form.Item>
           {/* 发送标签页后是否关闭标签页 */}
@@ -160,6 +187,31 @@ export default function Settings() {
                 {$fmt(`${module}.${CLOSE_TABS_AFTER_SEND_TABS}.no`)}
               </Radio>
             </Radio.Group>
+          </Form.Item>
+          {/* 发送标签页各种操作单独控制, 当 `发送标签页后是否关闭标签页` 设置为保留标签页时生效 */}
+          <Form.Item
+            noStyle
+            shouldUpdate={(prevValues, currentValues) =>
+              prevValues[CLOSE_TABS_AFTER_SEND_TABS] !==
+              currentValues[CLOSE_TABS_AFTER_SEND_TABS]
+            }
+          >
+            {({ getFieldValue }) => {
+              return !getFieldValue(CLOSE_TABS_AFTER_SEND_TABS) ? (
+                <Form.Item
+                  label={$fmt(`${module}.${ACTION_AUTO_CLOSE_FLAGS}`)}
+                  name={ACTION_AUTO_CLOSE_FLAGS}
+                  tooltip={{
+                    color: token.colorBgElevated,
+                    title: (
+                      <Typography.Text>{$fmt(`${module}.${ACTION_AUTO_CLOSE_FLAGS}.tooltip`)}</Typography.Text>
+                    ),
+                  }}
+                >
+                  <Checkbox.Group options={actionAutoCloseFlagOptions}></Checkbox.Group>
+                </Form.Item>
+              ) : null;
+            }}
           </Form.Item>
           {/* 是否在新窗口打开标签组 */}
           <Form.Item<SettingsProps>
