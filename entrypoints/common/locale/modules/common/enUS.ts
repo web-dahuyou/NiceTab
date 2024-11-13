@@ -24,6 +24,7 @@ export default {
   'common.delete': 'Delete',
   'common.remove': 'Remove',
   'common.edit': 'Edit',
+  'common.extensionInfo': 'Extension Info',
   'common.view': 'View',
   'common.theme': 'Theme',
   'common.openedTabs': 'Opened Tabs',

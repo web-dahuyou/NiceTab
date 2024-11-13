@@ -1,4 +1,8 @@
 export default {
+  'settings.block.sendTabs': 'Settings: Sending Tabs',
+  'settings.block.openTabs': 'Settings: Sending Tabs',
+  'settings.block.otherActions': 'Settings: Other Actions',
+  'settings.block.display': 'Settings: Displays',
   'settings.language': 'Language{mark}',
   'settings.language.ChineseSimplified': 'Chinese Simplified',
   'settings.language.English': 'English',
@@ -41,4 +45,6 @@ export default {
 
   'settings.showOpenedTabCount': 'Whether to display the number of open tabs on the extension icon ?',
   'settings.showPageContextMenus': 'Whether to display the ContextMenu on your webpage?',
+  'settings.popupModuleDisplays': 'Configure the modules to be displayed in the "Popup Panel".',
+  'settings.popupModuleDisplays.tooltip': 'The "popup Panel" is the opended panel when clicking on the extension icon.',
 }

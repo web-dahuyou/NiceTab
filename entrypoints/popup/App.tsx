@@ -20,8 +20,15 @@ import '~/assets/css/index.css';
 import './App.css';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { getAdminTabInfo, openNewTab } from '~/entrypoints/common/tabs';
+import { settingsUtils } from '~/entrypoints/common/storage';
+import type { PopupModuleNames } from '~/entrypoints/types';
+import {
+  GITHUB_URL,
+  THEME_COLORS,
+  ENUM_SETTINGS_PROPS,
+  POPUP_MODULE_NAMES,
+} from '~/entrypoints/common/constants';
 import ColorList from '~/entrypoints/common/components/ColorList.tsx';
-import { THEME_COLORS } from '~/entrypoints/common/constants';
 import {
   StyledActionIconBtn,
   GlobalStyle,
@@ -38,6 +45,7 @@ export default function App() {
   const { $fmt } = useIntlUtls();
   const { version, themeTypeConfig } = NiceGlobalContext;
   const [tabs, setTabs] = useState<Tabs.Tab[]>([]);
+  const [modules, setModules] = useState<PopupModuleNames[]>([]);
 
   // 快捷按钮
   const quickActionBtns = [
@@ -83,11 +91,22 @@ export default function App() {
     [tabs]
   );
 
+  const init = async () => {
+    const settings = await settingsUtils.getSettings();
+    const modules =
+      settings[ENUM_SETTINGS_PROPS.POPUP_MODULE_DISPLAYS] || POPUP_MODULE_NAMES;
+    setModules(modules);
+
+    if (modules.includes('openedTabs')) {
+      browser.tabs.query({ currentWindow: true }).then(async (allTabs) => {
+        const { tab: adminTab } = await getAdminTabInfo();
+        setTabs(allTabs?.filter((t) => t.id !== adminTab?.id && !t.pinned));
+      });
+    }
+  };
+
   useEffect(() => {
-    browser.tabs.query({ currentWindow: true }).then(async (allTabs) => {
-      const { tab: adminTab } = await getAdminTabInfo();
-      setTabs(allTabs?.filter((t) => t.id !== adminTab?.id && !t.pinned));
-    });
+    init();
   }, []);
 
   return (
@@ -95,55 +114,77 @@ export default function App() {
       <StyledContainer className="popup-container select-none">
         <GlobalStyle />
         <div className="fixed-top">
-          <div className="block version">
-            <span className="block-title">{$fmt('common.version')}：</span>
-            {version}
-          </div>
-          <div className="block quick-actions">
-            <span className="block-title">{$fmt('common.goto')}：</span>
-            <Space
-              size={0}
-              split={
-                <Divider type="vertical" style={{ background: token.colorBorder }} />
-              }
-            >
-              {quickActionBtns.map((item) => (
-                <span className="action-btn" key={item.path} onClick={item.onClick}>
-                  {item.label}
-                </span>
-              ))}
-            </Space>
-          </div>
-          <div className="block theme-colors">
-            <span className="block-title">{$fmt('common.theme')}：</span>
-            <ColorList colors={THEME_COLORS} onItemClick={handleThemeChange} />
-          </div>
-
-          <div className="tab-list-title">{$fmt('common.openedTabs')}：</div>
-        </div>
-        <StyledList className="tab-list">
-          {tabs.map((tab) => (
-            <li
-              key={tab.id}
-              className={classNames('tab-item', tab.active && 'active')}
-              title={tab.title}
-              onClick={() => handleTabItemClick(tab)}
-            >
-              <StyledFavIcon
-                className="tab-item-icon"
-                $icon={tab.favIconUrl || getFaviconURL(tab.url!)}
-              />
-              <span className="tab-item-title">{tab.title}</span>
-              <StyledActionIconBtn
-                className="action-icon-btn"
-                $hoverColor="red"
-                onClick={(event) => handleDelete(event, tab)}
+          {!modules.length && (
+            <div className="block quick-actions">
+              <span
+                className="action-btn"
+                onClick={() => openNewTab(GITHUB_URL, { active: true, openToNext: true })}
               >
-                <CloseOutlined />
-              </StyledActionIconBtn>
-            </li>
-          ))}
-        </StyledList>
+                {$fmt('common.goToGithub')}
+              </span>
+            </div>
+          )}
+
+          {modules.includes('extensionInfo') && (
+            <div className="block version">
+              <span className="block-title">{$fmt('common.version')}：</span>
+              {version}
+            </div>
+          )}
+
+          {modules.includes('goto') && (
+            <div className="block quick-actions">
+              <span className="block-title">{$fmt('common.goto')}：</span>
+              <Space
+                size={0}
+                split={
+                  <Divider type="vertical" style={{ background: token.colorBorder }} />
+                }
+              >
+                {quickActionBtns.map((item) => (
+                  <span className="action-btn" key={item.path} onClick={item.onClick}>
+                    {item.label}
+                  </span>
+                ))}
+              </Space>
+            </div>
+          )}
+          {modules.includes('theme') && (
+            <div className="block theme-colors">
+              <span className="block-title">{$fmt('common.theme')}：</span>
+              <ColorList colors={THEME_COLORS} onItemClick={handleThemeChange} />
+            </div>
+          )}
+          {modules.includes('openedTabs') && (
+            <div className="tab-list-title">{$fmt('common.openedTabs')}：</div>
+          )}
+        </div>
+
+        {modules.includes('openedTabs') && (
+          <StyledList className="tab-list">
+            {tabs.map((tab) => (
+              <li
+                key={tab.id}
+                className={classNames('tab-item', tab.active && 'active')}
+                title={tab.title}
+                onClick={() => handleTabItemClick(tab)}
+              >
+                <StyledFavIcon
+                  className="tab-item-icon"
+                  $icon={tab.favIconUrl || getFaviconURL(tab.url!)}
+                />
+                <span className="tab-item-title">{tab.title}</span>
+                <StyledActionIconBtn
+                  className="action-icon-btn"
+                  $hoverColor="red"
+                  onClick={(event) => handleDelete(event, tab)}
+                >
+                  <CloseOutlined />
+                </StyledActionIconBtn>
+              </li>
+            ))}
+          </StyledList>
+        )}
       </StyledContainer>
     </ThemeProvider>
   );

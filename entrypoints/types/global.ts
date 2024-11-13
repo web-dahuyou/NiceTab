@@ -87,6 +87,9 @@ export type ActionNames =
   | 'sendLeftTabs'
   | 'sendRightTabs';
 
+// popup 弹窗中的模块名称
+export type PopupModuleNames = 'extensionInfo' | 'goto' | 'theme' | 'openedTabs';
+
 // 管理后台-设置信息
 export type SettingsProps = {
   language?: LanguageTypes; // 语言
@@ -106,6 +109,7 @@ export type SettingsProps = {
   tabCountThreshold?: number; // 分类中标签页超过该数量时，则右侧面板只展示单个分组
   showOpenedTabCount?: boolean; // 扩展图标上是否显示打开的标签页数量
   showPageContextMenus?: boolean; // 网页中是否显示NiceTab右键菜单
+  popupModuleDisplays?: PopupModuleNames[]; // popup面板中需要展示的模块
 };
 
 // 状态相关

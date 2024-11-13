@@ -24,6 +24,7 @@ export default {
   'common.delete': '删除',
   'common.remove': '删除',
   'common.edit': '编辑',
+  'common.extensionInfo': '扩展信息',
   'common.view': '查看',
   'common.theme': '主题',
   'common.openedTabs': '打开的标签页',
