@@ -41,6 +41,7 @@ export default {
   'common.title': 'Title',
   'common.url': 'URL',
   'common.link': 'Link',
+  'common.goto': 'Go to',
   'common.goToGithub': 'Give me a star',
   'common.update.available': 'New version[{version}] available',
   'common.update.upgradeNow': 'Upgrade right now',
@@ -72,5 +73,8 @@ export default {
   'common.none': 'None',
   'common.pleaseInput': 'Please input {label}.',
   'common.version': 'Version',
+  'common.adminPage': 'Admin Page',
+  'common.shortcuts': 'Shortcuts',
+  'common.bindShortcuts': 'Shortcuts binding',
 }
 

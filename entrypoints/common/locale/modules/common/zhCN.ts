@@ -41,6 +41,7 @@ export default {
   'common.title': '标题',
   'common.url': '网址',
   'common.link': '链接',
+  'common.goto': '前往',
   'common.goToGithub': '给个小星星吧',
   'common.update.available': '有可用的新版本[{version}]',
   'common.update.upgradeNow': '立即升级',
@@ -72,4 +73,7 @@ export default {
   'common.none': '无',
   'common.pleaseInput': '请输入 {label}',
   'common.version': '版本',
+  'common.adminPage': '管理后台',
+  'common.shortcuts': '快捷键',
+  'common.bindShortcuts': '绑定快捷键',
 };

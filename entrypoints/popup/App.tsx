@@ -5,9 +5,10 @@ import { theme, Space, Divider } from 'antd';
 import {
   CloseOutlined,
   HomeOutlined,
-  SettingOutlined,
-  ImportOutlined,
-  RestOutlined,
+  // SettingOutlined,
+  // ImportOutlined,
+  // SyncOutlined,
+  // RestOutlined,
 } from '@ant-design/icons';
 import {
   classNames,
@@ -18,12 +19,11 @@ import '~/assets/css/reset.css';
 import '~/assets/css/index.css';
 import './App.css';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { getAdminTabInfo } from '~/entrypoints/common/tabs';
+import { getAdminTabInfo, openNewTab } from '~/entrypoints/common/tabs';
 import ColorList from '~/entrypoints/common/components/ColorList.tsx';
 import { THEME_COLORS } from '~/entrypoints/common/constants';
 import {
   StyledActionIconBtn,
-  StyledColorItem,
   GlobalStyle,
 } from '~/entrypoints/common/style/Common.styled';
 import { StyledContainer, StyledList, StyledFavIcon } from './App.styled';
@@ -43,27 +43,20 @@ export default function App() {
   const quickActionBtns = [
     {
       path: '/home',
-      label: $fmt('common.list'),
+      label: $fmt('common.adminPage'),
       icon: <HomeOutlined />,
       onClick: () => handleQuickAction({ path: '/home' }),
     },
     {
-      path: '/settings',
-      label: $fmt('common.settings'),
-      icon: <SettingOutlined />,
-      onClick: () => handleQuickAction({ path: '/settings' }),
-    },
-    {
-      path: '/import-export',
-      label: $fmt('common.importExport'),
-      icon: <ImportOutlined />,
-      onClick: () => handleQuickAction({ path: '/import-export' }),
-    },
-    {
-      label: $fmt('common.recycleBin'),
-      path: '/recycle',
-      icon: <RestOutlined />,
-      onClick: () => handleQuickAction({ path: '/recycle' }),
+      path: '/shortcuts',
+      label: $fmt('common.bindShortcuts'),
+      icon: <HomeOutlined />,
+      onClick: () => {
+        openNewTab('chrome://extensions/shortcuts', {
+          active: true,
+          openToNext: true,
+        });
+      },
     },
   ];
 
@@ -107,7 +100,7 @@ export default function App() {
             {version}
           </div>
           <div className="block quick-actions">
-            <span className="block-title">{$fmt('common.view')}：</span>
+            <span className="block-title">{$fmt('common.goto')}：</span>
             <Space
               size={0}
               split={
