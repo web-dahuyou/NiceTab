@@ -58,7 +58,7 @@ export default {
   'common.noData': '暂无',
   'common.comingSoon': '敬请期待',
   'common.CopySuccess': '复制成功',
-  'common.CopyFailed': '复制失败',
+  'common.CopyFailure': '复制失败',
   'common.quickAction': '快捷操作',
   'common.toggleThemeType': '切换亮色/暗黑模式',
   'common.showMore': '展示更多',

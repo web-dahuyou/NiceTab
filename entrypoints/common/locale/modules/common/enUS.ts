@@ -58,7 +58,7 @@ export default {
   'common.noData': 'No Data',
   'common.comingSoon': 'Coming Soon',
   'common.CopySuccess': 'Copy Success',
-  'common.CopyFailed': 'Copy Failed',
+  'common.CopyFailure': 'Copy Failure',
   'common.quickAction': 'Quick Action',
   'common.toggleThemeType': 'Toggle Light / Dark',
   'common.showMore': 'Show More',
