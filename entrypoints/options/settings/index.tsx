@@ -393,6 +393,14 @@ export default function Settings() {
           <Form.Item<SettingsProps>
             label={$fmt(`${module}.${POPUP_MODULE_DISPLAYS}`)}
             name={POPUP_MODULE_DISPLAYS}
+            tooltip={{
+              color: token.colorBgElevated,
+              title: (
+                <Typography.Text>
+                  {$fmt(`${module}.${POPUP_MODULE_DISPLAYS}.tooltip`)}
+                </Typography.Text>
+              ),
+            }}
           >
             <Checkbox.Group options={popupModuleDisplayOptions}></Checkbox.Group>
           </Form.Item>

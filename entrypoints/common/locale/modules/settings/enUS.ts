@@ -45,6 +45,6 @@ export default {
 
   'settings.showOpenedTabCount': 'Whether to display the number of open tabs on the extension icon ?',
   'settings.showPageContextMenus': 'Whether to display the ContextMenu on your webpage?',
-  'settings.popupModuleDisplays': 'Configure the modules to be displayed in the "Popup Panel".',
-  'settings.popupModuleDisplays.tooltip': 'The "popup Panel" is the opended panel when clicking on the extension icon.',
+  'settings.popupModuleDisplays': 'Choose the modules to be displayed in the "Popup Panel"',
+  'settings.popupModuleDisplays.tooltip': 'If any panel module is selected, the Popup Panel will display when clicking the extension icon, otherwise directly trigger "Send All Tabs" action.',
 }

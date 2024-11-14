@@ -46,5 +46,5 @@ export default {
   'settings.showOpenedTabCount': '是否在扩展图标上显示打开的标签页数量：',
   'settings.showPageContextMenus': '是否在网页中显示NiceTab右键菜单：',
   'settings.popupModuleDisplays': 'Popup面板模块展示设置：',
-  'settings.popupModuleDisplays.tooltip': 'Popup面板是点击扩展图标时弹出的窗口.',
+  'settings.popupModuleDisplays.tooltip': '只要选择了任意面板模块，则点击扩展图标时将展示 Popup 面板，否则将直接发送所有标签页。',
 }
