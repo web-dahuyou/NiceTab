@@ -2,6 +2,7 @@ import { useContext, useEffect } from 'react';
 import {
   Space,
   Form,
+  Divider,
   Input,
   InputNumber,
   Checkbox,
@@ -17,6 +18,7 @@ import type { SettingsProps } from '~/entrypoints/types';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import {
   SEND_TAB_ACTION_NAMES,
+  POPUP_MODULE_NAMES,
   ENUM_SETTINGS_PROPS,
   defaultLanguage,
 } from '~/entrypoints/common/constants';
@@ -40,6 +42,7 @@ const {
   TAB_COUNT_THRESHOLD,
   SHOW_OPENED_TAB_COUNT,
   SHOW_PAGE_CONTEXT_MENUS,
+  POPUP_MODULE_DISPLAYS,
 } = ENUM_SETTINGS_PROPS;
 
 const module = 'settings'; // locale module name
@@ -53,11 +56,22 @@ export default function Settings() {
 
   const [form] = Form.useForm();
 
+  // 发送标签页自动关闭标签页的操作选项
   const actionAutoCloseFlagOptions = useMemo(() => {
     return SEND_TAB_ACTION_NAMES.map((actionName) => {
       return {
         label: $fmt({ id: `common.${actionName}` }),
         value: actionName,
+      };
+    });
+  }, [$fmt]);
+
+  // popup面板显示模块选项
+  const popupModuleDisplayOptions = useMemo(() => {
+    return POPUP_MODULE_NAMES.map((moduleName) => {
+      return {
+        label: $fmt({ id: `common.${moduleName}` }),
+        value: moduleName,
       };
     });
   }, [$fmt]);
@@ -133,6 +147,8 @@ export default function Settings() {
               <Radio value={false}>{$fmt(`${module}.${AUTO_PIN_ADMIN_TAB}.no`)}</Radio>
             </Radio.Group>
           </Form.Item>
+
+          <Divider orientation="left">{$fmt('settings.block.sendTabs')}</Divider>
           {/* 是否发送固定标签页 */}
           <Form.Item<SettingsProps>
             label={$fmt({
@@ -213,6 +229,9 @@ export default function Settings() {
               ) : null;
             }}
           </Form.Item>
+
+          <Divider orientation="left">{$fmt('settings.block.openTabs')}</Divider>
+
           {/* 是否在新窗口打开标签组 */}
           <Form.Item<SettingsProps>
             label={$fmt({
@@ -239,6 +258,8 @@ export default function Settings() {
               <Radio value={true}>{$fmt(`${module}.${DELETE_AFTER_RESTORE}.yes`)}</Radio>
             </Radio.Group>
           </Form.Item>
+
+          <Divider orientation="left">{$fmt('settings.block.otherActions')}</Divider>
           {/* 是否删除未锁定的空标签组 */}
           <Form.Item<SettingsProps>
             label={$fmt({
@@ -345,6 +366,7 @@ export default function Settings() {
             </Space>
           </Form.Item>
 
+          <Divider orientation="left">{$fmt('settings.block.display')}</Divider>
           {/* 扩展图标上是否展示当前打开的标签页数 */}
           <Form.Item<SettingsProps>
             label={$fmt(`${module}.${SHOW_OPENED_TAB_COUNT}`)}
@@ -365,6 +387,22 @@ export default function Settings() {
               <Radio value={true}>{$fmt('common.yes')}</Radio>
               <Radio value={false}>{$fmt('common.no')}</Radio>
             </Radio.Group>
+          </Form.Item>
+
+          {/* popup面板中模块设置 */}
+          <Form.Item<SettingsProps>
+            label={$fmt(`${module}.${POPUP_MODULE_DISPLAYS}`)}
+            name={POPUP_MODULE_DISPLAYS}
+            tooltip={{
+              color: token.colorBgElevated,
+              title: (
+                <Typography.Text>
+                  {$fmt(`${module}.${POPUP_MODULE_DISPLAYS}.tooltip`)}
+                </Typography.Text>
+              ),
+            }}
+          >
+            <Checkbox.Group options={popupModuleDisplayOptions}></Checkbox.Group>
           </Form.Item>
 
           <Form.Item>

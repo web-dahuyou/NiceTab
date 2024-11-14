@@ -19,6 +19,7 @@ import type {
   ThemeColors,
   TabEvents,
   SyncType,
+  PopupModuleNames,
 } from '~/entrypoints/types';
 
 export const GITHUB_URL = 'https://github.com/web-dahuyou/NiceTab';
@@ -75,12 +76,21 @@ export const THEME_TYPE_CONFIG: Record<ThemeTypes, ThemeTypeConfig> = {
 // 默认主题类型
 export const defaultThemeType: ThemeTypes = 'light';
 
+// 发送标签页操作名称
 export const SEND_TAB_ACTION_NAMES = [
   'sendAllTabs', // 发送全部标签页
   'sendCurrentTab', // 发送当前标签页
   'sendOtherTabs', // 发送其他标签页
   'sendLeftTabs', // 发送左侧标签页
   'sendRightTabs', // 发送右侧标签页
+];
+
+// popup面板模块名称
+export const POPUP_MODULE_NAMES: PopupModuleNames[] = [
+  'extensionInfo', // 插件信息
+  'goto', // 前往
+  'theme', // 主题色
+  'openedTabs', // 已打开的标签页
 ];
 
 // action 名称枚举
@@ -111,6 +121,7 @@ export enum ENUM_SETTINGS_PROPS {
   TAB_COUNT_THRESHOLD = 'tabCountThreshold', // 分类中标签页超过该数量时，则右侧面板开启虚拟滚动
   SHOW_OPENED_TAB_COUNT = 'showOpenedTabCount', // 扩展图标上是否显示打开的标签页数量
   SHOW_PAGE_CONTEXT_MENUS = 'showPageContextMenus', // 网页中是否显示NiceTab右键菜单
+  POPUP_MODULE_DISPLAYS = 'popupModuleDisplays', // popup弹窗中需要展示的模块
 };
 
 // tab 事件

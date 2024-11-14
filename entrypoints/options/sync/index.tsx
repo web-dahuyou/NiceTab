@@ -86,16 +86,34 @@ export default function SyncPage() {
   const getSyncInfo = async () => {
     await syncUtils.getSyncResult();
     setSyncResult(syncUtils.syncResult);
+    const config = await syncUtils.getConfig();
+    return config || {};
   };
 
   const getWebDavConfig = async () => {
     const config = await syncWebDAVUtils.getConfig();
     setConfigWevDAV(config || {});
+    return config || {};
   };
 
+  const init = async () => {
+    const { github, gitee } = await getSyncInfo();
+    const { configList } = await getWebDavConfig();
+    // 选中第一个配置
+    if (github?.accessToken) {
+      setSelectedTargetType('gist');
+      setSelectedKey('github');
+    } else if (gitee?.accessToken) {
+      setSelectedTargetType('gist');
+      setSelectedKey('gitee');
+    } else {
+      setSelectedTargetType('webdav');
+      setSelectedKey(configList[0]?.key || '');
+    }
+  }
+
   useEffect(() => {
-    getSyncInfo();
-    getWebDavConfig();
+    init();
   }, []);
 
   return (

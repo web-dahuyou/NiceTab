@@ -1,10 +1,23 @@
-import contextMenusRegister from '~/entrypoints/common/contextMenus';
+import contextMenusRegister, { actionHandler } from '~/entrypoints/common/contextMenus';
 import commandsRegister from '~/entrypoints/common/commands';
 import tabUtils from '~/entrypoints/common/tabs';
-import initStorageListener, { themeUtils, settingsUtils } from '~/entrypoints/common/storage';
-import { PRIMARY_COLOR, TAB_EVENTS, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
+import initStorageListener, {
+  themeUtils,
+  settingsUtils,
+} from '~/entrypoints/common/storage';
+import {
+  PRIMARY_COLOR,
+  // TAB_EVENTS,
+  ENUM_SETTINGS_PROPS,
+  POPUP_MODULE_NAMES,
+  ENUM_ACTION_NAME,
+} from '~/entrypoints/common/constants';
 
-const { OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH, SHOW_OPENED_TAB_COUNT } = ENUM_SETTINGS_PROPS;
+const {
+  OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
+  SHOW_OPENED_TAB_COUNT,
+  POPUP_MODULE_DISPLAYS,
+} = ENUM_SETTINGS_PROPS;
 
 // 设置插件图标徽标
 async function setBadge() {
@@ -17,7 +30,9 @@ async function setBadge() {
     browser.action.setBadgeText({ text: String(tabs.length || 0) });
   }
   browser.action.setBadgeTextColor({ color: '#fff' });
-  browser.action.setBadgeBackgroundColor({ color: themeData?.colorPrimary || PRIMARY_COLOR });
+  browser.action.setBadgeBackgroundColor({
+    color: themeData?.colorPrimary || PRIMARY_COLOR,
+  });
 
   browser.tabs.onCreated.removeListener(setBadge);
   browser.tabs.onRemoved.removeListener(setBadge);
@@ -30,18 +45,43 @@ async function setBadge() {
   // TAB_EVENTS.forEach((event) => browser.tabs[event]?.addListener(setBadge));
 }
 
+// 初始化 popup 交互
+async function initPopup() {
+  const settings = await settingsUtils.getSettings();
+  const modules = settings[POPUP_MODULE_DISPLAYS] || POPUP_MODULE_NAMES;
+  if (modules.length > 0) {
+    console.log('配置了popup模块, 点击图标显示popup面板');
+    browser.action.setPopup({ popup: 'popup.html' });
+  } else {
+    console.log('没有配置popup模块, 点击图标不显示popup面板， 直接发送所有标签页');
+    browser.action.setPopup({ popup: '' });
+  }
+}
+
 export default defineBackground(() => {
   // console.log('Hello background!', { id: browser.runtime.id });
   // 设置插件图标徽标
   setBadge();
+  // 初始化 popup 交互
+  initPopup();
   initStorageListener(async () => {
     setBadge();
+    initPopup();
   });
 
   // 注册 contextMenus
   contextMenusRegister();
   // 注册 commands
   commandsRegister();
+
+  browser.action.onClicked.addListener(async (tab) => {
+    const settings = await settingsUtils.getSettings();
+    const modules = settings[POPUP_MODULE_DISPLAYS] || POPUP_MODULE_NAMES;
+    if (!modules.length) {
+      await actionHandler(ENUM_ACTION_NAME.SEND_ALL_TABS);
+      tabUtils.executeContentScript(ENUM_ACTION_NAME.SEND_ALL_TABS);
+    }
+  });
 
   browser.runtime.onInstalled.addListener(async () => {
     const settings = await settingsUtils.getSettings();
