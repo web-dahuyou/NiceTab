@@ -24,12 +24,12 @@ export default {
   'importExport.importFromText': '从文本导入',
   'importExport.importFromFile': '从文件导入',
   'importExport.importSuccess': '导入成功',
-  'importExport.importFailure': '导入失败，请检查格式是否正确',
+  'importExport.importFailed': '导入失败，请检查格式是否正确',
 
   'importExport.exportContent': '导出内容：',
   'importExport.getContent': '生成内容',
   'importExport.copy': '复制到剪贴板',
   'importExport.exportToFile': '导出到本地',
   'importExport.CopySuccess': '复制成功',
-  'importExport.CopyFailure': '复制失败',
+  'importExport.CopyFailed': '复制失败',
 }

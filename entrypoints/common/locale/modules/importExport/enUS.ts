@@ -19,12 +19,12 @@ export default {
   'importExport.importFromText': 'Import from Text',
   'importExport.importFromFile': 'Import from File',
   'importExport.importSuccess': 'Import Successful',
-  'importExport.importFailure': 'Import Failed! Please check whether the format is correct',
+  'importExport.importFailed': 'Import Failed! Please check whether the format is correct',
 
   'importExport.exportContent': 'Content to Export:',
   'importExport.getContent': 'Get Content',
   'importExport.copy': 'Copy to Clipboard',
   'importExport.exportToFile': 'Export to Local File',
   'importExport.CopySuccess': 'Copy Successful',
-  'importExport.CopyFailure': 'Copy Failed',
+  'importExport.CopyFailed': 'Copy Failed',
 }
