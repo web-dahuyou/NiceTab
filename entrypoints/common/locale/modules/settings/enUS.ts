@@ -1,6 +1,6 @@
 export default {
   'settings.block.sendTabs': 'Settings: Sending Tabs',
-  'settings.block.openTabs': 'Settings: Sending Tabs',
+  'settings.block.openTabs': 'Settings: Opening Tabs',
   'settings.block.otherActions': 'Settings: Other Actions',
   'settings.block.display': 'Settings: Displays',
   'settings.language': 'Language{mark}',
