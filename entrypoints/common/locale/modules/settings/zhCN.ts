@@ -13,7 +13,7 @@ export default {
   'settings.autoPinAdminTab.yes': '自动固定NiceTab管理后台（推荐）',
   'settings.autoPinAdminTab.no': '不自动固定NiceTab管理后台',
   'settings.showSendTargetModal': '发送标签页时-是否展示指定目录选择框：',
-  'settings.showSendTargetModal.tooltip': '若选择否，则直接发送到中转站',
+  'settings.showSendTargetModal.tooltip': '若选择否，则直接发送到中转站（某些特殊页面无法触发弹窗，也会直接发送到中转站）',
   'settings.allowSendPinnedTabs': '发送标签页时-是否发送固定标签页到NiceTab{mark}',
   'settings.allowSendPinnedTabs.yes': '允许发送固定标签页',
   'settings.allowSendPinnedTabs.no': '不要发送固定标签页（推荐）',
