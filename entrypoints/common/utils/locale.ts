@@ -5,8 +5,8 @@ import { ENUM_SETTINGS_PROPS, defaultLanguage } from '../constants';
 const { LANGUAGE } = ENUM_SETTINGS_PROPS;
 
 // 在react上下文之外获取locale信息
-export function getLocaleMessages() {
-  const settings = settingsUtils.settings;
+export async function getLocaleMessages() {
+  const settings = await settingsUtils.getSettings();
   const language = settings[LANGUAGE] || defaultLanguage;
   return getCustomLocaleMessages(language);
 }

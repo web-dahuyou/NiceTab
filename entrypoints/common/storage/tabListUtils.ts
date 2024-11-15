@@ -1,7 +1,13 @@
 import { Key } from 'react';
 import { Tabs } from 'wxt/browser';
 // import { storage } from 'wxt/storage';
-import type { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
+import type {
+  SendTargetProps,
+  TagItem,
+  GroupItem,
+  TabItem,
+  CountInfo,
+} from '~/entrypoints/types';
 import {
   ENUM_SETTINGS_PROPS,
   UNNAMED_TAG,
@@ -670,21 +676,21 @@ export default class TabListUtils {
   // 外部调用：创建标签页（区分浏览器是否支持群组）
   async createTabs(
     tabs: Tabs.Tab[],
-    createNewGroup = true
+    targetData: SendTargetProps
   ): Promise<{ tagId: string; groupId: string }> {
     await this.getTagList();
     let result = {} as { tagId: string; groupId: string };
     if (IS_GROUP_SUPPORT) {
-      result = await this.createTabsByGroups(tabs, createNewGroup);
+      result = await this.createTabsByGroups(tabs, targetData);
     } else {
-      result = await this.createTabsIndependent(tabs, createNewGroup);
+      result = await this.createTabsIndependent(tabs, targetData);
     }
 
     await this.setTagList(this.tagList);
     return result;
   }
   // 内部调用：保留浏览器群组的标签页
-  async createTabsByGroups(tabs: Tabs.Tab[], createNewGroup = true) {
+  async createTabsByGroups(tabs: Tabs.Tab[], targetData: SendTargetProps = {}) {
     const groupsMap = new Map<number, GroupItem>(),
       independentTabs = [];
     for (let tab of tabs) {
@@ -713,12 +719,15 @@ export default class TabListUtils {
 
     if (independentTabs.length > 0) {
       // 先创建独立的tab页
-      const result = await this.createTabsIndependent(independentTabs, createNewGroup);
+      const result = await this.createTabsIndependent(independentTabs, targetData);
       // 不存在浏览器自带的标签组，直接返回独立标签页创建的标签组信息
       if (groupsMap.size == 0) return result;
     }
+
+    const { targetTagId } = targetData;
+    const targetTag = this.tagList?.find((tag) => tag.tagId === targetTagId);
     // 接下来保存浏览器自带的标签组
-    let tag0 = this.tagList?.[0];
+    let tag0 = targetTag || this.tagList?.[0];
     if (!tag0) {
       tag0 = this.createStagingAreaTag();
       this.tagList.push(tag0);
@@ -759,19 +768,25 @@ export default class TabListUtils {
     };
   }
   // 内部调用：所有标签页独立创建
-  async createTabsIndependent(tabs: Tabs.Tab[], createNewGroup = true) {
-    let newTabs = tabs.map(this.transformTabItem);
-    let tag0 = this.tagList?.[0];
-    const group = tag0?.groupList?.find((group) => !group.isLocked && !group.isStarred);
+  async createTabsIndependent(tabs: Tabs.Tab[], targetData: SendTargetProps = {}) {
     const settings = Store.settingsUtils?.settings;
-    if (!createNewGroup && group) {
-      newTabs = [...newTabs, ...(group?.tabList || [])];
+    let newTabs = tabs.map(this.transformTabItem);
+
+    const { targetTagId, targetGroupId } = targetData;
+    const targetTag = this.tagList?.find((tag) => tag.tagId === targetTagId);
+    const targetGroup = targetTag?.groupList?.find(
+      (group) => group.groupId === targetGroupId
+    );
+    let tag0 = targetTag || this.tagList?.[0];
+
+    if (targetTagId && targetTag && targetGroupId && targetGroup) {
+      newTabs = [...newTabs, ...(targetGroup?.tabList || [])];
       if (!settings?.[ALLOW_DUPLICATE_TABS]) {
         newTabs = getUniqueList(newTabs, 'url');
       }
-      group.tabList = newTabs;
-      await this.setTagList([tag0, ...this.tagList.slice(1)]);
-      return { tagId: tag0.tagId, groupId: group.groupId };
+      targetGroup.tabList = newTabs;
+      await this.setTagList(this.tagList);
+      return { tagId: targetTagId, groupId: targetGroupId };
     }
     // 不存在标签组或者createNewGroup=true，就创建一个新标签组
     const newtabGroup = this.getInitialTabGroup();
@@ -796,7 +811,8 @@ export default class TabListUtils {
       }
       const index = tag0.groupList.findIndex((g) => !g.isStarred);
       tag0.groupList.splice(index > -1 ? index : tag0.groupList.length, 0, newtabGroup);
-      await this.setTagList([tag0, ...this.tagList.slice(1)]);
+      // await this.setTagList([tag0, ...this.tagList.slice(1)]);
+      await this.setTagList(this.tagList);
       return { tagId: tag0.tagId, groupId: newtabGroup.groupId };
     }
 
@@ -1119,7 +1135,7 @@ export default class TabListUtils {
           targetList: stagingAreaTag.groupList,
           insertList: tags?.[stagingAreaInsertIndex].groupList,
           exceptValue: UNNAMED_GROUP,
-        })
+        });
         tags.splice(stagingAreaInsertIndex, 1);
       }
 
@@ -1137,12 +1153,16 @@ export default class TabListUtils {
           groupList:
             tag?.groupList?.map((g) => {
               return omit(
-                { ...g, tabList: g?.tabList?.map((tab) => omit(tab, ['tabId', 'favIconUrl'])) || [] },
-                ['groupId', /* 'createTime' */]
+                {
+                  ...g,
+                  tabList:
+                    g?.tabList?.map((tab) => omit(tab, ['tabId', 'favIconUrl'])) || [],
+                },
+                ['groupId' /* 'createTime' */]
               );
             }) || [],
         },
-        ['tagId', /* 'createTime' */]
+        ['tagId' /* 'createTime' */]
       ) as Partial<TagItem>;
     });
     return exportTagList;

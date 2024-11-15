@@ -31,6 +31,7 @@ const {
   OPEN_ADMIN_TAB_AFTER_SEND_TABS,
   CLOSE_TABS_AFTER_SEND_TABS,
   ACTION_AUTO_CLOSE_FLAGS,
+  SHOW_SEND_TARGET_MODAL,
   AUTO_PIN_ADMIN_TAB,
   ALLOW_SEND_PINNED_TABS,
   RESTORE_IN_NEW_WINDOW,
@@ -149,6 +150,24 @@ export default function Settings() {
           </Form.Item>
 
           <Divider orientation="left">{$fmt('settings.block.sendTabs')}</Divider>
+          {/* 是否展示目录选择弹窗 */}
+          <Form.Item<SettingsProps>
+            label={$fmt(`${module}.${SHOW_SEND_TARGET_MODAL}`)}
+            name={SHOW_SEND_TARGET_MODAL}
+            tooltip={{
+              color: token.colorBgElevated,
+              title: (
+                <Typography.Text>
+                  {$fmt(`${module}.${SHOW_SEND_TARGET_MODAL}.tooltip`)}
+                </Typography.Text>
+              ),
+            }}
+          >
+            <Radio.Group>
+              <Radio value={true}>{$fmt('common.yes')}</Radio>
+              <Radio value={false}>{$fmt(`common.no`)}</Radio>
+            </Radio.Group>
+          </Form.Item>
           {/* 是否发送固定标签页 */}
           <Form.Item<SettingsProps>
             label={$fmt({
@@ -220,7 +239,9 @@ export default function Settings() {
                   tooltip={{
                     color: token.colorBgElevated,
                     title: (
-                      <Typography.Text>{$fmt(`${module}.${ACTION_AUTO_CLOSE_FLAGS}.tooltip`)}</Typography.Text>
+                      <Typography.Text>
+                        {$fmt(`${module}.${ACTION_AUTO_CLOSE_FLAGS}.tooltip`)}
+                      </Typography.Text>
                     ),
                   }}
                 >

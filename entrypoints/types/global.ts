@@ -4,6 +4,11 @@ import { MessageDescriptor } from 'react-intl';
 // 扩展版本信息
 export type VersionInfo = { updateAvailable: boolean; version?: string };
 
+export interface BrowserMessageProps {
+  msgType: string; // 消息类型
+  data: any; // 消息内容
+}
+
 // 订阅事件类型
 export type EventsEmitterProps = {
   'home:is-dragging': boolean;
@@ -95,6 +100,7 @@ export type SettingsProps = {
   language?: LanguageTypes; // 语言
   themeType?: ThemeTypes; // 主题类型
   openAdminTabAfterBrowserLaunch?: boolean; // 启动浏览器时是否自动打开管理后台
+  showSendTargetModal?: boolean; // 发送标签页时是否显示目标分类选择弹窗
   autoPinAdminTab?: boolean; // 是否固定管理后台
   allowSendPinnedTabs?: boolean; // 是否发送固定标签页
   restoreInNewWindow?: boolean; // 是否在新窗口打开标签组

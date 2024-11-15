@@ -1,6 +1,7 @@
 import ReactDOM from 'react-dom/client';
 import '~/assets/css/reset.css';
 import './style.css';
+import Root from '~/entrypoints/common/components/Root';
 import App from './App';
 
 export default defineContentScript({
@@ -22,7 +23,12 @@ export default defineContentScript({
         container.append(wrapper);
 
         const root = ReactDOM.createRoot(wrapper);
-        root.render(<App />);
+        // root.render(<App />);
+        root.render(
+          <Root>
+            <App />
+          </Root>
+        );
         return { root, wrapper };
       },
       onRemove: (elements) => {

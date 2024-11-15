@@ -19,7 +19,7 @@ import '~/assets/css/reset.css';
 import '~/assets/css/index.css';
 import './App.css';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { getAdminTabInfo, openNewTab } from '~/entrypoints/common/tabs';
+import { sendTabMessage, getAdminTabInfo, openNewTab } from '~/entrypoints/common/tabs';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import type { PopupModuleNames } from '~/entrypoints/types';
 import {
@@ -73,6 +73,7 @@ export default function App() {
     const themeData = { colorPrimary: color };
     NiceGlobalContext.setThemeData(themeData);
     sendBrowserMessage('setPrimaryColor', themeData);
+    sendTabMessage({ msgType: 'setPrimaryColor', data: { themeData } });
   };
   const handleTabItemClick = useCallback((tab: Tabs.Tab) => {
     browser.tabs.highlight({ tabs: [tab.index] });
