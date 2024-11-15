@@ -42,7 +42,7 @@ import {
   THEME_COLORS,
   defaultThemeType,
 } from '~/entrypoints/common/constants';
-import { openNewTab } from '~/entrypoints/common/tabs';
+import { sendTabMessage, openNewTab } from '~/entrypoints/common/tabs';
 import {
   StyledActionIconBtn,
   GlobalStyle,
@@ -190,12 +190,14 @@ function AppLayout() {
     const themeType = currThemeType === 'light' ? 'dark' : 'light';
     NiceGlobalContext.setThemeType(themeType);
     sendBrowserMessage('setThemeType', { themeType });
+    sendTabMessage({ msgType: 'setThemeType', data: { themeType } });
   };
   // 切换主题
   const handleThemeChange = (color: string) => {
     const themeData = { colorPrimary: color };
     NiceGlobalContext.setThemeData(themeData);
     sendBrowserMessage('setPrimaryColor', themeData);
+    sendTabMessage({ msgType: 'setPrimaryColor', data: { themeData } });
   };
   // 切换语言
   const handleLocaleChange = useCallback(({ key }: { key: string }) => {
@@ -203,6 +205,8 @@ function AppLayout() {
       locale: 'zh-CN',
     };
     NiceGlobalContext.setLocale(option.locale);
+    sendBrowserMessage('setLocale', { locale: option.locale });
+    sendTabMessage({ msgType: 'setLocale', data: { locale: option.locale } });
   }, []);
 
   useEffect(() => {

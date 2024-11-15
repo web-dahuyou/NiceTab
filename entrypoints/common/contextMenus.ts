@@ -7,11 +7,17 @@ import {
 } from './constants';
 import tabUtils from '~/entrypoints/common/tabs';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
+import type { SendTargetProps } from '~/entrypoints/types';
 import initStorageListener, { settingsUtils } from './storage';
 import { getCommandsHotkeys } from './commands';
 import { pick } from './utils';
 
-const { LANGUAGE, ALLOW_SEND_PINNED_TABS, SHOW_PAGE_CONTEXT_MENUS } = ENUM_SETTINGS_PROPS;
+const {
+  LANGUAGE,
+  ALLOW_SEND_PINNED_TABS,
+  SHOW_PAGE_CONTEXT_MENUS,
+  SHOW_SEND_TARGET_MODAL,
+} = ENUM_SETTINGS_PROPS;
 
 export type ContextMenuHotKeys = Record<string, string>;
 
@@ -129,32 +135,76 @@ async function createContextMenus(callback?: () => void) {
 async function handleContextMenusUpdate() {
   const menus = await getMenus();
   for (let menu of menus) {
-    if (menu.id) browser.contextMenus.update(menu.id, pick(menu, ['title', 'enabled', 'contexts']));
+    if (menu.id)
+      browser.contextMenus.update(menu.id, pick(menu, ['title', 'enabled', 'contexts']));
   }
 }
 
-export async function actionHandler(actionName: string) {
+export async function actionHandler(actionName: string, targetData?: SendTargetProps) {
   switch (actionName) {
     case ENUM_ACTION_NAME.SEND_ALL_TABS:
-      await tabUtils.sendAllTabs();
+      await tabUtils.sendAllTabs(targetData);
       break;
     case ENUM_ACTION_NAME.SEND_CURRENT_TAB:
-      await tabUtils.sendCurrentTab();
+      await tabUtils.sendCurrentTab(targetData);
       break;
     case ENUM_ACTION_NAME.SEND_OTHER_TABS:
-      await tabUtils.sendOtherTabs();
+      await tabUtils.sendOtherTabs(targetData);
       break;
     case ENUM_ACTION_NAME.SEND_LEFT_TABS:
-      await tabUtils.sendLeftTabs();
+      await tabUtils.sendLeftTabs(targetData);
       break;
     case ENUM_ACTION_NAME.SEND_RIGHT_TABS:
-      await tabUtils.sendRightTabs();
+      await tabUtils.sendRightTabs(targetData);
       break;
     case ENUM_ACTION_NAME.OPEN_ADMIN_TAB:
       await tabUtils.openAdminRoutePage({ path: '/home' });
       break;
     default:
       break;
+  }
+}
+
+// 最终要执行的发送标签页操作
+export async function handleSendTabsAction(
+  actionName: string,
+  targetData?: SendTargetProps
+) {
+  try {
+    await actionHandler(actionName, targetData);
+    tabUtils.executeContentScript(actionName);
+  } catch (error) {
+    console.error(error);
+    tabUtils.executeContentScript(actionName, 'error');
+  }
+}
+
+// 右键菜单点击以及快捷命令操作
+export async function strategyHandler(actionName: string) {
+  const { tab: adminTab } = await tabUtils.getAdminTabInfo();
+  const currentTabs = await browser.tabs.query({ active: true, currentWindow: true });
+  const currentTab = currentTabs?.[0];
+  if (currentTab.id === adminTab?.id) {
+    actionHandler(actionName);
+    return;
+  };
+
+  if (actionName === ENUM_ACTION_NAME.OPEN_ADMIN_TAB) {
+    actionHandler(actionName);
+    return;
+  }
+
+  const settings = await settingsUtils.getSettings();
+  if (!settings[SHOW_SEND_TARGET_MODAL]) {
+    handleSendTabsAction(actionName);
+  } else {
+    tabUtils.sendTabMessage({
+      msgType: 'action:open-send-target-modal',
+      data: { actionName },
+      onlyCurrentTab: true,
+    }, () => {
+      actionHandler(actionName);
+    });
   }
 }
 
@@ -169,18 +219,12 @@ export default async function contextMenusRegister() {
 
   initStorageListener(handleContextMenusUpdate);
 
+  // 点击右键菜单
   browser.contextMenus.onClicked.addListener(async (info, tab) => {
     // console.log('info', info);
     // console.log('tab', tab);
 
     const actionName = String(info.menuItemId);
-    try {
-      await actionHandler(actionName);
-      if (actionName === ENUM_ACTION_NAME.OPEN_ADMIN_TAB) return;
-      tabUtils.executeContentScript(actionName);
-    } catch (error) {
-      console.error(error);
-      tabUtils.executeContentScript(actionName, 'error');
-    }
+    strategyHandler(actionName);
   });
 }

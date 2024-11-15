@@ -6,6 +6,7 @@ const {
   LANGUAGE,
   THEME_TYPE,
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
+  SHOW_SEND_TARGET_MODAL,
   OPEN_ADMIN_TAB_AFTER_SEND_TABS,
   CLOSE_TABS_AFTER_SEND_TABS,
   ACTION_AUTO_CLOSE_FLAGS,
@@ -29,6 +30,7 @@ export default class SettingsUtils {
     [LANGUAGE]: defaultLanguage,
     [THEME_TYPE]: defaultThemeType,
     [OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH]: true, // 启动浏览器时是否自动打开管理后台
+    [SHOW_SEND_TARGET_MODAL]: false, // 发送标签页时是否显示目标选择弹窗
     [OPEN_ADMIN_TAB_AFTER_SEND_TABS]: true, // 发送标签页后默认打开管理后台
     [CLOSE_TABS_AFTER_SEND_TABS]: true, // 发送标签页后是否关闭标签页
     [ACTION_AUTO_CLOSE_FLAGS]: [], // 各种操作的自动关闭标签页标志

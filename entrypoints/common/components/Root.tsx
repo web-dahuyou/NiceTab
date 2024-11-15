@@ -8,7 +8,7 @@ import {
   useCustomLocale,
   useThemeTypeConfig,
 } from '~/entrypoints/common/hooks/global';
-import type { ThemeProps, LanguageTypes, ThemeTypes } from '~/entrypoints/types';
+import type { BrowserMessageProps, ThemeProps, LanguageTypes, ThemeTypes } from '~/entrypoints/types';
 import { themeUtils } from '~/entrypoints/common/storage';
 
 export default function Root({ children }: { children: React.ReactNode }) {
@@ -45,6 +45,23 @@ export default function Root({ children }: { children: React.ReactNode }) {
     const manifestInfo = await browser.runtime.getManifest();
     setVersion(manifestInfo?.version || '888.888.888');
   }
+  // 监听消息
+  const messageListener = async (msg: BrowserMessageProps) => {
+    // console.log('browser.runtime.onMessage--Root', msg);
+    const { msgType, data } = msg || {};
+    if (msgType === 'setPrimaryColor') {
+      const colorPrimary = data.colorPrimary || PRIMARY_COLOR;
+      await themeUtils.setThemeData({ colorPrimary });
+      handleThemeChange({ colorPrimary });
+    } else if (msgType === 'setThemeData') {
+      await themeUtils.setThemeData(data);
+      handleThemeChange(data);
+    } else if (msgType === 'setThemeType') {
+      handleThemeTypeChange(data.themeType);
+    } else if (msgType === 'setLocale') {
+      handleLocaleChange(data.locale);
+    }
+  };
 
   useEffect(() => {
     document.documentElement.lang = localeCustom || defaultLanguage;
@@ -53,20 +70,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     initThemeData();
     getManifest();
-    browser.runtime.onMessage.addListener(async (msg, msgSender, sendResponse) => {
-      // console.log('browser.runtime.onMessage--Root', msg);
-      const { msgType, data } = msg || {};
-      if (msgType === 'setPrimaryColor') {
-        const colorPrimary = data.colorPrimary || PRIMARY_COLOR;
-        await themeUtils.setThemeData({ colorPrimary });
-        handleThemeChange({ colorPrimary });
-      } else if (msgType === 'setThemeData') {
-        await themeUtils.setThemeData(data);
-        handleThemeChange(data);
-      } else if (msgType === 'setThemeType') {
-        handleThemeTypeChange(data.themeType);
-      }
-    });
+    browser.runtime.onMessage.addListener(messageListener);
   }, []);
 
   return (

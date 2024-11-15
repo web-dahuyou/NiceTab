@@ -32,6 +32,10 @@ export interface CountInfo {
   tabCount: number;
 }
 
+export interface SendTargetProps {
+  targetTagId?: string;
+  targetGroupId?: string;
+}
 
 /* 导入导出相关 */
 export type ExtContentParserFuncName = 'niceTab' | 'oneTab';

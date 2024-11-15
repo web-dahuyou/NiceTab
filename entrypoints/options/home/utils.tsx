@@ -85,6 +85,41 @@ export const getCascaderData = async (
   }));
 };
 
+// 生成全量的Cascader级联数据，发送标签页时选择指定分类或者标签组
+export const getTotalCascaderData = async (
+  tagList: TagItem[],
+): Promise<CascaderOption[]> => {
+  const localeMessage = await getLocaleMessages();
+
+  return tagList.map((tag) => ({
+    type: 'tag',
+    value: tag.tagId,
+    label: (
+      <div className="cascader-label-custom cascader-label-tag">
+        <TagOutlined />
+        <span>{tag.static ? localeMessage?.['home.stagingArea'] : tag.tagName}</span>
+      </div>
+    ),
+    // isLeaf: false,
+    originData: { ...tag },
+    children: tag?.groupList?.map((group) => {
+      return {
+        type: 'tabGroup',
+        value: group.groupId,
+        label: (
+          <div className="cascader-label-custom cascader-label-group">
+            <ProductOutlined />
+            <span>{group.groupName}</span>
+          </div>
+        ),
+        parentKey: tag.tagId,
+        isLeaf: true,
+        originData: { ...group },
+      };
+    }),
+  }));
+};
+
 export default {
   getTreeData,
   getCascaderData,
