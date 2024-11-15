@@ -1,6 +1,5 @@
 import { Commands } from 'wxt/browser';
-import tabUtils from '~/entrypoints/common/tabs';
-import { actionHandler } from './contextMenus';
+import { strategyHandler } from './contextMenus';
 
 export default async function commandsRegister() {
   async function checkCommandShortcuts() {
@@ -32,13 +31,7 @@ export default async function commandsRegister() {
 
   browser.commands.onCommand.addListener(async (command) => {
     console.log(`Command "${command}" triggered`);
-    try {
-      await actionHandler(command);
-      tabUtils.executeContentScript(command);
-    } catch (error) {
-      console.error(error);
-      tabUtils.executeContentScript(command, 'error');
-    }
+    strategyHandler(command);
   });
 }
 

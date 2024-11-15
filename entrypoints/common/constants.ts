@@ -107,6 +107,7 @@ export enum ENUM_SETTINGS_PROPS {
   LANGUAGE = 'language', // 语言
   THEME_TYPE = 'themeType', // 主题类型
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH = 'openAdminTabAfterBrowserLaunch', // 启动浏览器时是否自动打开管理后台
+  SHOW_SEND_TARGET_MODAL = 'showSendTargetModal', // 发送标签页时是否显示目标选择弹窗
   OPEN_ADMIN_TAB_AFTER_SEND_TABS = 'openAdminTabAfterSendTabs', // 发送标签页后是否打开管理后台
   CLOSE_TABS_AFTER_SEND_TABS = 'closeTabsAfterSendTabs', // 发送标签页后是否关闭标签页
   ACTION_AUTO_CLOSE_FLAGS = 'actionAutoCloseFlags', // 各种发送标签页操作的自动关闭标签页标志
@@ -152,7 +153,7 @@ export const defaultLanguage: LanguageTypes = 'en-US';
 export const UNNAMED_TAG = 'Unnamed Tag';
 export const UNNAMED_GROUP = 'Unnamed Group';
 
-export const IS_GROUP_SUPPORT = 'group' in browser.tabs && 'tabGroups' in browser;
+export const IS_GROUP_SUPPORT = 'group' in (browser.tabs || {}) && 'tabGroups' in browser;
 
 // 状态标识
 export const SUCCESS_KEY = 'success';

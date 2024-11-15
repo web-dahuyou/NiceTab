@@ -12,6 +12,8 @@ export default {
   'settings.autoPinAdminTab': 'Pin NiceTab Admin Page?',
   'settings.autoPinAdminTab.yes': 'Automatically pin (recommended)',
   'settings.autoPinAdminTab.no': 'Do not',
+  'settings.showSendTargetModal': 'Show "Send To Modal" when sending tabs?',
+  'settings.showSendTargetModal.tooltip': 'if choosed "No", the tabs will be sent directly to the Staging Area.',
   'settings.allowSendPinnedTabs': 'Send pinned tabs to NiceTab when sending tabs?',
   'settings.allowSendPinnedTabs.yes': 'Allowed',
   'settings.allowSendPinnedTabs.no': 'Not allowed (recommended)',

@@ -1,4 +1,4 @@
-import contextMenusRegister, { actionHandler } from '~/entrypoints/common/contextMenus';
+import contextMenusRegister, { strategyHandler, handleSendTabsAction } from '~/entrypoints/common/contextMenus';
 import commandsRegister from '~/entrypoints/common/commands';
 import tabUtils from '~/entrypoints/common/tabs';
 import initStorageListener, {
@@ -12,6 +12,7 @@ import {
   POPUP_MODULE_NAMES,
   ENUM_ACTION_NAME,
 } from '~/entrypoints/common/constants';
+import type { BrowserMessageProps } from '~/entrypoints/types';
 
 const {
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
@@ -74,12 +75,13 @@ export default defineBackground(() => {
   // 注册 commands
   commandsRegister();
 
+  // 左键点击图标 (如果有 popup 是不会触发的，可以执行 browser.action.setPopup({ popup: '' }) 来监听事件)
+  // Fired when an action icon is clicked. This event will not fire if the action has a popup.
   browser.action.onClicked.addListener(async (tab) => {
     const settings = await settingsUtils.getSettings();
     const modules = settings[POPUP_MODULE_DISPLAYS] || POPUP_MODULE_NAMES;
     if (!modules.length) {
-      await actionHandler(ENUM_ACTION_NAME.SEND_ALL_TABS);
-      tabUtils.executeContentScript(ENUM_ACTION_NAME.SEND_ALL_TABS);
+      strategyHandler(ENUM_ACTION_NAME.SEND_ALL_TABS);
     }
   });
 
@@ -90,7 +92,7 @@ export default defineBackground(() => {
     }
   });
 
-  browser.runtime.onMessage.addListener(async (msg, msgSender, sendResponse) => {
+  browser.runtime.onMessage.addListener(async (msg: BrowserMessageProps, msgSender, sendResponse) => {
     // console.log('browser.runtime.onMessage--background', msg, msgSender);
     const { msgType, data } = msg || {};
     if (msgType === 'setPrimaryColor') {
@@ -102,6 +104,8 @@ export default defineBackground(() => {
       setBadge();
     } else if (msgType === 'openAdminRoutePage') {
       tabUtils.openAdminRoutePage(data || {});
+    } else if (msgType === 'sendTabsActionConfirm') {
+      handleSendTabsAction(data.actionName, data.targetData);
     }
   });
 });

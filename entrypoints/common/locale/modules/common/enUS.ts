@@ -77,4 +77,5 @@ export default {
   'common.adminPage': 'Admin Page',
   'common.shortcuts': 'Shortcuts',
   'common.bindShortcuts': 'Bind Shortcuts',
-}
+  'common.sendTo': 'Send To',
+};
