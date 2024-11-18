@@ -81,13 +81,13 @@ export default function App() {
 
   const handleDelete = useCallback(
     async (event: React.MouseEvent<HTMLElement, MouseEvent>, tab: Tabs.Tab) => {
+      event.stopPropagation();
       const { tab: adminTab } = await getAdminTabInfo();
       const newTabs = tabs.filter(
         (t) => t.id !== tab.id && t.id !== adminTab?.id && !t.pinned
       );
       setTabs(newTabs);
       tab.id && browser.tabs.remove(tab.id);
-      event.stopPropagation();
     },
     [tabs]
   );
