@@ -709,9 +709,9 @@ export default class TabListUtils {
     }
 
     // 目前 webextension-polyfill 中没有 group 相关的类型定义, 但是新版浏览器有相关的 API
-    if (IS_GROUP_SUPPORT && 'get' in browser.tabGroups) {
+    if (IS_GROUP_SUPPORT && browser.tabGroups?.get) {
       for (const [bsGroupId, group] of groupsMap.entries()) {
-        const tabGroup = await browser.tabGroups?.get(bsGroupId);
+        const tabGroup = await browser.tabGroups.get(bsGroupId);
         // console.log('tabGroup', tabGroup);
         group.groupName = tabGroup?.title || group.groupName;
       }

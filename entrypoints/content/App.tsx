@@ -29,9 +29,9 @@ export default function App() {
   );
 
   useEffect(() => {
-    browser.runtime.onMessage.addListener(async (msg: BrowserMessageProps) => {
+    browser.runtime.onMessage.addListener(async (msg: unknown) => {
       // console.log('browser.runtime.onMessage--contentScript', msg);
-      const { msgType, data } = msg || {};
+      const { msgType, data } = (msg || {}) as BrowserMessageProps;
 
       if (msgType === 'action:open-send-target-modal') {
         setActionName(data?.actionName || '');

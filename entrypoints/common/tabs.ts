@@ -358,7 +358,7 @@ export async function openNewGroup(groupName: string, urls: Array<string | undef
     if (!IS_GROUP_SUPPORT) return;
 
     const tabs = await browser.tabs.query({ windowId: windowInfo.id, pinned: false });
-    const bsGroupId = await browser.tabs.group({
+    const bsGroupId = await browser.tabs.group!({
       createProperties: { windowId: windowInfo.id },
       tabIds: tabs.map((tab) => tab.id!),
     });
@@ -377,7 +377,7 @@ export async function openNewGroup(groupName: string, urls: Array<string | undef
       })
     ).then(async (tabs) => {
       const filteredTabs = tabs.filter((tab) => !!tab.id);
-      const bsGroupId = await browser.tabs.group({
+      const bsGroupId = await browser.tabs.group!({
         tabIds: filteredTabs.map((tab) => tab.id!),
       });
       browser.tabGroups?.update(bsGroupId, { title: groupName });

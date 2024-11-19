@@ -19,7 +19,7 @@ export default defineConfig({
     host_permissions: ['<all_urls>'],
     default_locale: 'zh_CN',
     content_security_policy: {
-      extension_pages: "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';",
+      extension_pages: "script-src 'self' 'wasm-unsafe-eval' http://localhost:8097; object-src 'self';",
       sandbox:
         "sandbox allow-scripts; script-src 'self' 'unsafe-eval' https://api.github.com https://gitee.com; object-src 'self'",
     },

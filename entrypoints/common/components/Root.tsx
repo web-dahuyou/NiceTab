@@ -46,9 +46,9 @@ export default function Root({ children }: { children: React.ReactNode }) {
     setVersion(manifestInfo?.version || '888.888.888');
   }
   // 监听消息
-  const messageListener = async (msg: BrowserMessageProps) => {
+  const messageListener = async (msg: unknown) => {
     // console.log('browser.runtime.onMessage--Root', msg);
-    const { msgType, data } = msg || {};
+    const { msgType, data } = (msg || {}) as BrowserMessageProps;
     if (msgType === 'setPrimaryColor') {
       const colorPrimary = data.colorPrimary || PRIMARY_COLOR;
       await themeUtils.setThemeData({ colorPrimary });

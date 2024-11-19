@@ -92,9 +92,9 @@ export default defineBackground(() => {
     }
   });
 
-  browser.runtime.onMessage.addListener(async (msg: BrowserMessageProps, msgSender, sendResponse) => {
+  browser.runtime.onMessage.addListener(async (msg, msgSender, sendResponse) => {
     // console.log('browser.runtime.onMessage--background', msg, msgSender);
-    const { msgType, data } = msg || {};
+    const { msgType, data } = (msg || {}) as BrowserMessageProps;
     if (msgType === 'setPrimaryColor') {
       const colorPrimary = data?.colorPrimary || PRIMARY_COLOR;
       await themeUtils.setThemeData({ colorPrimary });
