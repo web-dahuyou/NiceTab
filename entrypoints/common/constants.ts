@@ -154,7 +154,7 @@ export const defaultLanguage: LanguageTypes = 'en-US';
 export const UNNAMED_TAG = 'Unnamed Tag';
 export const UNNAMED_GROUP = 'Unnamed Group';
 
-export const IS_GROUP_SUPPORT = typeof browser.tabs.group === 'function' && !!browser.tabGroups;
+// export const IS_GROUP_SUPPORT = typeof browser.tabs.group === 'function' && !!browser.tabGroups;
 
 // 状态标识
 export const SUCCESS_KEY = 'success';
@@ -181,5 +181,4 @@ export default {
   defaultLanguage,
   UNNAMED_TAG,
   UNNAMED_GROUP,
-  IS_GROUP_SUPPORT,
 };

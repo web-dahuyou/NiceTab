@@ -27,6 +27,7 @@ import {
   MoonOutlined,
   SunOutlined,
   SmileOutlined,
+  SendOutlined
 } from '@ant-design/icons';
 import styled, { ThemeProvider } from 'styled-components';
 import '~/assets/css/reset.css';
@@ -197,7 +198,7 @@ function AppLayout() {
     const themeData = { colorPrimary: color };
     NiceGlobalContext.setThemeData(themeData);
     sendBrowserMessage('setPrimaryColor', themeData);
-    sendTabMessage({ msgType: 'setPrimaryColor', data: { themeData } });
+    sendTabMessage({ msgType: 'setPrimaryColor', data: themeData });
   };
   // 切换语言
   const handleLocaleChange = useCallback(({ key }: { key: string }) => {
@@ -308,6 +309,9 @@ function AppLayout() {
           {/* BackTop组件自带的 tooltip 在点击按钮时会闪 */}
           <span title={$fmt('common.backToTop')}>
             <FloatButton.BackTop duration={100} visibilityHeight={400} />
+          </span>
+          <span title={$fmt('common.sendAllTabs')}>
+            <FloatButton icon={<SendOutlined />} />
           </span>
         </FloatButton.Group>
       </StyledPageContainer>

@@ -1,9 +1,11 @@
 import { FloatButton } from 'antd';
 import type { RefSelectProps } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
+import { useIntlUtls } from '~/entrypoints/common/hooks/global'
 import SearchList from './footer/SearchList';
 
 export default function FooterFloatButton() {
+  const { $fmt } = useIntlUtls();
   const searchSelectRef = useRef<RefSelectProps>(null);
 
   return (
@@ -12,7 +14,7 @@ export default function FooterFloatButton() {
         placement="left"
         shape="circle"
         style={{ right: 30, bottom: 30 }}
-        icon={<SearchOutlined />}
+        icon={<span title={$fmt('common.search')}><SearchOutlined /></span>}
         onClick={() => {
           setTimeout(() => {
             searchSelectRef.current?.focus();

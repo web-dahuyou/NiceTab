@@ -73,7 +73,7 @@ export default function App() {
     const themeData = { colorPrimary: color };
     NiceGlobalContext.setThemeData(themeData);
     sendBrowserMessage('setPrimaryColor', themeData);
-    sendTabMessage({ msgType: 'setPrimaryColor', data: { themeData } });
+    sendTabMessage({ msgType: 'setPrimaryColor', data: themeData });
   };
   const handleTabItemClick = useCallback((tab: Tabs.Tab) => {
     browser.tabs.highlight({ tabs: [tab.index] });

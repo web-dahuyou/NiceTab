@@ -1,4 +1,5 @@
 export * from './common';
+export * from './support';
 export * from './url';
 export * from './locale';
 export * from './os';
