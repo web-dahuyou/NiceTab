@@ -9,6 +9,7 @@ import { settingsUtils } from '~/entrypoints/common/storage';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { getOSInfo } from '@/entrypoints/common/utils';
 import {
   StyledTabItemWrapper,
   StyledTabTitle,
@@ -24,7 +25,8 @@ type TabItemProps = {
   onChange?: (data: TabItem) => void;
 };
 
-const { DELETE_AFTER_RESTORE } = ENUM_SETTINGS_PROPS;
+const { DELETE_AFTER_RESTORE, SILENT_OPEN_TAB_MODIFIER_KEY } = ENUM_SETTINGS_PROPS;
+const osInfo = getOSInfo();
 
 // 标签页tooltip内容
 function TabItemTooltipMarkup({ tab }: { tab: TabItem }) {
@@ -67,22 +69,29 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
   );
 
   // 点击打开标签页
-  const onTabOpen = clickDecorator(
-    ({ isMatched }) => {
-      const settings = settingsUtils.settings;
-      // 如果直接单击未按下alt键，则打开新标签页并激活(active: true)，如果按下了alt键，则后台静默打开新标签页(active: false)
-      openNewTab(tab.url, { active: !isMatched });
+  const onTabOpen = useMemo(() => {
+    const settings = settingsUtils.settings;
+    let modifierKey = settings[SILENT_OPEN_TAB_MODIFIER_KEY] || 'alt';
+    if (modifierKey === 'cmdOrCtrl') {
+      modifierKey = osInfo.isMac ? 'meta' : 'ctrl';
+    }
 
-      if (settings[DELETE_AFTER_RESTORE]) {
-        onRemove?.();
-      }
+    return clickDecorator(
+      ({ isMatched }) => {
+        // 如果直接单击未按下alt键，则打开新标签页并激活(active: true)，如果按下了alt键，则后台静默打开新标签页(active: false)
+        openNewTab(tab.url, { active: !isMatched });
 
-      setTimeout(() => {
-        setTooltipVisible(false);
-      }, 500);
-    },
-    { allowMissMatch: true, alt: true }
-  );
+        if (settings[DELETE_AFTER_RESTORE]) {
+          onRemove?.();
+        }
+
+        setTimeout(() => {
+          setTooltipVisible(false);
+        }, 500);
+      },
+      { allowMissMatch: true, [modifierKey]: true }
+    )
+  }, [onRemove]);
 
   const draggingListener = (value: boolean) => {
     setIsDragging(value);
