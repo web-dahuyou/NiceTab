@@ -78,4 +78,5 @@ export default {
   'common.shortcuts': '快捷键',
   'common.bindShortcuts': '绑定快捷键',
   'common.sendTo': '发送到',
+  'common.search': '搜索',
 };

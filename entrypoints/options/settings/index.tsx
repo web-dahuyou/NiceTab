@@ -23,6 +23,7 @@ import {
   defaultLanguage,
 } from '~/entrypoints/common/constants';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { getKeysByOS } from '@/entrypoints/common/utils';
 import QuickActions from './QuickActions';
 
 const {
@@ -36,6 +37,7 @@ const {
   ALLOW_SEND_PINNED_TABS,
   RESTORE_IN_NEW_WINDOW,
   DELETE_AFTER_RESTORE,
+  SILENT_OPEN_TAB_MODIFIER_KEY,
   DELETE_UNLOCKED_EMPTY_GROUP,
   ALLOW_DUPLICATE_TABS,
   ALLOW_DUPLICATE_GROUPS,
@@ -48,6 +50,8 @@ const {
 
 const module = 'settings'; // locale module name
 const defaultTemplate = String.raw`{{url}} | {{title}}`;
+
+const modifierKeyLabels = getKeysByOS();
 
 export default function Settings() {
   const NiceGlobalContext = useContext(GlobalContext);
@@ -277,6 +281,17 @@ export default function Settings() {
             <Radio.Group>
               <Radio value={false}>{$fmt(`${module}.${DELETE_AFTER_RESTORE}.no`)}</Radio>
               <Radio value={true}>{$fmt(`${module}.${DELETE_AFTER_RESTORE}.yes`)}</Radio>
+            </Radio.Group>
+          </Form.Item>
+          {/* 静默打开标签页修饰键 */}
+          <Form.Item<SettingsProps>
+            label={$fmt(`${module}.${SILENT_OPEN_TAB_MODIFIER_KEY}`)}
+            name={SILENT_OPEN_TAB_MODIFIER_KEY}
+          >
+            <Radio.Group>
+              <Radio value="alt">{modifierKeyLabels.alt.symbol}</Radio>
+              <Radio value="cmdOrCtrl">{modifierKeyLabels.cmd.symbol}</Radio>
+              <Radio value="shift">{modifierKeyLabels.shift.symbol}</Radio>
             </Radio.Group>
           </Form.Item>
 

@@ -19,6 +19,34 @@ import {
 } from './TreeNodeActionModals';
 import { getTreeData } from './utils';
 
+// 判断能否拖拽到节点上
+const checkAllowDrop: TreeProps<TreeDataNodeUnion>['allowDrop'] = ({
+  dragNode,
+  dropNode,
+  dropPosition,
+}) => {
+  // console.log('checkAllowDrop--dragNode', dragNode)
+  // console.log('checkAllowDrop--dropNode', dropNode)
+  // console.log('checkAllowDrop--dropPosition', dropPosition)
+
+  // dropPosition = 0 时表示，拖放到目标 node 的子集
+  // dropPosition = 1 时表示，拖放到目标 node 的同级之后
+  // dropPosition = -1 时表示，拖放到目标 node 的同级之前
+  if (
+    (dragNode.type === 'tag' && dragNode?.originData?.static) ||
+    (dropNode.type === 'tag' && dropNode?.originData?.static && dropPosition == -1)
+  ) {
+    // 中转站永远置顶，不允许其他分类排到它前面
+    return false;
+  }
+
+  return (
+    (dragNode.type === 'tabGroup' && dropNode.type === 'tabGroup') ||
+    (dragNode.type === 'tag' && dropNode.type === 'tag' && dropPosition !== 0) ||
+    (dragNode.type === 'tabGroup' && dropNode.type === 'tag' && dropPosition >= 0)
+  );
+};
+
 function TreeBox() {
   const { $fmt } = useIntlUtls();
   const { treeDataHook } = useContext(HomeContext);
@@ -108,35 +136,11 @@ function TreeBox() {
     if (_node.type === 'tag' && _node?.originData?.static) return false;
     if (isEditing) return false;
     return true;
-  }, []);
+  }, [isEditing]);
 
-  // 判断能否拖拽到节点上
-  const checkAllowDrop: TreeProps<TreeDataNodeUnion>['allowDrop'] = ({
-    dragNode,
-    dropNode,
-    dropPosition,
-  }) => {
-    // console.log('checkAllowDrop--dragNode', dragNode)
-    // console.log('checkAllowDrop--dropNode', dropNode)
-    // console.log('checkAllowDrop--dropPosition', dropPosition)
-
-    // dropPosition = 0 时表示，拖放到目标 node 的子集
-    // dropPosition = 1 时表示，拖放到目标 node 的同级之后
-    // dropPosition = -1 时表示，拖放到目标 node 的同级之前
-    if (
-      (dragNode.type === 'tag' && dragNode?.originData?.static) ||
-      (dropNode.type === 'tag' && dropNode?.originData?.static && dropPosition == -1)
-    ) {
-      // 中转站永远置顶，不允许其他分类排到它前面
-      return false;
-    }
-
-    return (
-      (dragNode.type === 'tabGroup' && dropNode.type === 'tabGroup') ||
-      (dragNode.type === 'tag' && dropNode.type === 'tag' && dropPosition !== 0) ||
-      (dragNode.type === 'tabGroup' && dropNode.type === 'tag' && dropPosition >= 0)
-    );
-  };
+  const draggableConfig = useMemo(() => {
+    return { icon: false, nodeDraggable: isNodeDraggable };
+  }, [isNodeDraggable]);
 
   // 移动所有标签组
   const handleAllTabGroupsMoveTo = async ({ targetData }: MoveToCallbackProps) => {
@@ -190,7 +194,7 @@ function TreeBox() {
               ref={treeRef}
               virtual={true}
               height={treeBoxHeight}
-              draggable={{ icon: false, nodeDraggable: isNodeDraggable }}
+              draggable={draggableConfig}
               allowDrop={checkAllowDrop}
               blockNode
               switcherIcon={<DownOutlined />}

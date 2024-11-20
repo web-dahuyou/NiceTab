@@ -103,11 +103,12 @@ export type SettingsProps = {
   showSendTargetModal?: boolean; // 发送标签页时是否显示目标分类选择弹窗
   autoPinAdminTab?: boolean; // 是否固定管理后台
   allowSendPinnedTabs?: boolean; // 是否发送固定标签页
-  restoreInNewWindow?: boolean; // 是否在新窗口打开标签组
-  deleteAfterRestore?: boolean; // 恢复标签页/标签组时是否从列表中删除
   openAdminTabAfterSendTabs?: boolean; // 发送标签页后是否打开管理后台
   closeTabsAfterSendTabs?: boolean; // 发送标签页后是否关闭标签页
   actionAutoCloseFlags?: ActionNames[]; // 各种发送标签页操作是否自动关闭标签页的开关配置
+  restoreInNewWindow?: boolean; // 是否在新窗口打开标签组
+  deleteAfterRestore?: boolean; // 恢复标签页/标签组时是否从列表中删除
+  silentOpenTabModifierKey?: string; // 静默打开标签页的修饰键
   deleteUnlockedEmptyGroup?: boolean; // 是否删除未锁定的空标签组
   allowDuplicateTabs?: boolean; // 同一个标签组中是否允许重复的标签页
   allowDuplicateGroups?: boolean; // 同一个分类中是否允许重复的标签组

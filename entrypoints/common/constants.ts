@@ -108,13 +108,14 @@ export enum ENUM_SETTINGS_PROPS {
   THEME_TYPE = 'themeType', // 主题类型
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH = 'openAdminTabAfterBrowserLaunch', // 启动浏览器时是否自动打开管理后台
   SHOW_SEND_TARGET_MODAL = 'showSendTargetModal', // 发送标签页时是否显示目标选择弹窗
+  AUTO_PIN_ADMIN_TAB = 'autoPinAdminTab', // 是否固定管理后台
   OPEN_ADMIN_TAB_AFTER_SEND_TABS = 'openAdminTabAfterSendTabs', // 发送标签页后是否打开管理后台
   CLOSE_TABS_AFTER_SEND_TABS = 'closeTabsAfterSendTabs', // 发送标签页后是否关闭标签页
   ACTION_AUTO_CLOSE_FLAGS = 'actionAutoCloseFlags', // 各种发送标签页操作的自动关闭标签页标志
-  AUTO_PIN_ADMIN_TAB = 'autoPinAdminTab', // 是否固定管理后台
   ALLOW_SEND_PINNED_TABS = 'allowSendPinnedTabs', // 是否发送固定标签页
   RESTORE_IN_NEW_WINDOW = 'restoreInNewWindow', // 是否在新窗口打开标签组
   DELETE_AFTER_RESTORE = 'deleteAfterRestore', // 恢复标签页/标签组时是否从列表中删除
+  SILENT_OPEN_TAB_MODIFIER_KEY = 'silentOpenTabModifierKey', // 静默打开标签页的修饰键
   DELETE_UNLOCKED_EMPTY_GROUP = 'deleteUnlockedEmptyGroup', // 是否删除未锁定的空标签组
   ALLOW_DUPLICATE_TABS = 'allowDuplicateTabs', // 同一个标签组中是否允许重复的标签页
   ALLOW_DUPLICATE_GROUPS = 'allowDuplicateGroups', // 同一个分类中是否允许重复的标签组
@@ -153,7 +154,7 @@ export const defaultLanguage: LanguageTypes = 'en-US';
 export const UNNAMED_TAG = 'Unnamed Tag';
 export const UNNAMED_GROUP = 'Unnamed Group';
 
-export const IS_GROUP_SUPPORT = 'group' in (browser.tabs || {}) && 'tabGroups' in browser;
+// export const IS_GROUP_SUPPORT = typeof browser.tabs.group === 'function' && !!browser.tabGroups;
 
 // 状态标识
 export const SUCCESS_KEY = 'success';
@@ -180,5 +181,4 @@ export default {
   defaultLanguage,
   UNNAMED_TAG,
   UNNAMED_GROUP,
-  IS_GROUP_SUPPORT,
 };

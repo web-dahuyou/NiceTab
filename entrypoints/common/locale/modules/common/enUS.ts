@@ -78,4 +78,5 @@ export default {
   'common.shortcuts': 'Shortcuts',
   'common.bindShortcuts': 'Bind Shortcuts',
   'common.sendTo': 'Send To',
+  'common.search': 'Search',
 };

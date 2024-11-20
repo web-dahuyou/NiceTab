@@ -3,10 +3,9 @@ import { settingsUtils, tabListUtils } from './storage';
 import type { SettingsProps, ActionNames, SendTargetProps } from '~/entrypoints/types';
 import {
   ENUM_SETTINGS_PROPS,
-  IS_GROUP_SUPPORT,
-  defaultLanguage,
+  defaultLanguage
 } from '~/entrypoints/common/constants';
-import { objectToUrlParams, getRandomId } from '~/entrypoints/common/utils';
+import { objectToUrlParams, getRandomId, isGroupSupported } from '~/entrypoints/common/utils';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 
 const {
@@ -355,16 +354,16 @@ export async function openNewGroup(groupName: string, urls: Array<string | undef
   if (settings[RESTORE_IN_NEW_WINDOW]) {
     const _urls = urls.filter((url) => !!url) as string[];
     const windowInfo = await browser.windows.create({ focused: true, url: _urls });
-    if (!IS_GROUP_SUPPORT) return;
+    if (!isGroupSupported()) return;
 
     const tabs = await browser.tabs.query({ windowId: windowInfo.id, pinned: false });
-    const bsGroupId = await browser.tabs.group({
+    const bsGroupId = await browser.tabs.group!({
       createProperties: { windowId: windowInfo.id },
       tabIds: tabs.map((tab) => tab.id!),
     });
     browser.tabGroups?.update(bsGroupId, { title: groupName });
   } else {
-    if (!IS_GROUP_SUPPORT) {
+    if (!isGroupSupported()) {
       for (let url of urls) {
         openNewTab(url);
       }
@@ -377,7 +376,7 @@ export async function openNewGroup(groupName: string, urls: Array<string | undef
       })
     ).then(async (tabs) => {
       const filteredTabs = tabs.filter((tab) => !!tab.id);
-      const bsGroupId = await browser.tabs.group({
+      const bsGroupId = await browser.tabs.group!({
         tabIds: filteredTabs.map((tab) => tab.id!),
       });
       browser.tabGroups?.update(bsGroupId, { title: groupName });

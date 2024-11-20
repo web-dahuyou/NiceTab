@@ -8,13 +8,9 @@ import type {
   TabItem,
   CountInfo,
 } from '~/entrypoints/types';
+import { ENUM_SETTINGS_PROPS, UNNAMED_TAG, UNNAMED_GROUP } from '../constants';
 import {
-  ENUM_SETTINGS_PROPS,
-  UNNAMED_TAG,
-  UNNAMED_GROUP,
-  IS_GROUP_SUPPORT,
-} from '../constants';
-import {
+  isGroupSupported,
   getRandomId,
   pick,
   omit,
@@ -680,7 +676,7 @@ export default class TabListUtils {
   ): Promise<{ tagId: string; groupId: string }> {
     await this.getTagList();
     let result = {} as { tagId: string; groupId: string };
-    if (IS_GROUP_SUPPORT) {
+    if (isGroupSupported()) {
       result = await this.createTabsByGroups(tabs, targetData);
     } else {
       result = await this.createTabsIndependent(tabs, targetData);
@@ -709,9 +705,9 @@ export default class TabListUtils {
     }
 
     // 目前 webextension-polyfill 中没有 group 相关的类型定义, 但是新版浏览器有相关的 API
-    if (IS_GROUP_SUPPORT && 'get' in browser.tabGroups) {
+    if (isGroupSupported() && browser.tabGroups?.get) {
       for (const [bsGroupId, group] of groupsMap.entries()) {
-        const tabGroup = await browser.tabGroups?.get(bsGroupId);
+        const tabGroup = await browser.tabGroups.get(bsGroupId);
         // console.log('tabGroup', tabGroup);
         group.groupName = tabGroup?.title || group.groupName;
       }
