@@ -11,10 +11,10 @@ import { HomeContext } from './hooks/treeData';
 import { getCascaderData } from './utils';
 
 const StyledCascaderWrapper = styled.div`
-  .ant-cascader-panel {
+  .nicetab-cascader-panel {
     overflow-x: visible;
   }
-  .ant-cascader-menu {
+  .nicetab-cascader-menu {
     min-height: 180px;
     max-height: 360px;
     overflow: auto;

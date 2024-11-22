@@ -74,7 +74,7 @@ export const GlobalStyle = createGlobalStyle`
     color: ${(props) => props.theme.colorText || 'rgba(0, 0, 0, 0.88)'};
 	}
 
-  ::-webkit-scrollbar, .ant-tree-list-scrollbar {
+  ::-webkit-scrollbar, .nicetab-tree-list-scrollbar {
     width: 8px !important;
     height: 8px !important;
   }
@@ -84,13 +84,13 @@ export const GlobalStyle = createGlobalStyle`
     background: var(--bg-color, #fff) !important;
   }
 
-  ::-webkit-scrollbar-thumb, .ant-tree-list-scrollbar-thumb {
+  ::-webkit-scrollbar-thumb, .nicetab-tree-list-scrollbar-thumb {
     border-radius: 4px;
     background: ${(props) => `${props.theme.type === 'light' ? '#d9d9d9' : '#555'} !important`};
     box-shadow:inset 0 0 4px rgba(0, 0, 0, .3);
   }
 
-  ::-webkit-scrollbar-thumb:hover, .ant-tree-list-scrollbar-thumb:hover {
+  ::-webkit-scrollbar-thumb:hover, .nicetab-tree-list-scrollbar-thumb:hover {
     background: ${(props) => `${props.theme.type === 'light' ? '#bfbfbf' : '#888'} !important`};
   }
 `;

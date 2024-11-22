@@ -59,7 +59,7 @@ function RenderTreeNode({
   // 编辑状态禁止node节点拖拽
   const handleEditingStatusChange = useCallback((status: boolean) => {
     // console.log('handleEditingStatusChange', status);
-    const draggableTreeNode = nodeRef.current?.closest('.ant-tree-treenode-draggable');
+    const draggableTreeNode = nodeRef.current?.closest('.nicetab-tree-treenode-draggable');
     draggableTreeNode?.setAttribute('draggable', status ? 'false' : 'true');
     eventEmitter.emit('home:set-editing-status', status);
   }, []);
