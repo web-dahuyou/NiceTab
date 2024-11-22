@@ -254,6 +254,37 @@ export default function Settings() {
               ) : null;
             }}
           </Form.Item>
+          {/* 发送标签页时-是否允许重复的标签组 */}
+          <Form.Item<SettingsProps>
+            label={$fmt({
+              id: `${module}.${ALLOW_DUPLICATE_GROUPS}`,
+              values: { mark: '：' },
+            })}
+            name={ALLOW_DUPLICATE_GROUPS}
+          >
+            <Radio.Group>
+              <Radio value={true}>
+                {$fmt(`${module}.${ALLOW_DUPLICATE_GROUPS}.yes`)}
+              </Radio>
+              <Radio value={false}>
+                {$fmt(`${module}.${ALLOW_DUPLICATE_GROUPS}.no`)}
+              </Radio>
+            </Radio.Group>
+          </Form.Item>
+
+          {/* 发送标签页时-是否允许重复的标签页 */}
+          <Form.Item<SettingsProps>
+            label={$fmt({
+              id: `${module}.${ALLOW_DUPLICATE_TABS}`,
+              values: { mark: '：' },
+            })}
+            name={ALLOW_DUPLICATE_TABS}
+          >
+            <Radio.Group>
+              <Radio value={true}>{$fmt(`${module}.${ALLOW_DUPLICATE_TABS}.yes`)}</Radio>
+              <Radio value={false}>{$fmt(`${module}.${ALLOW_DUPLICATE_TABS}.no`)}</Radio>
+            </Radio.Group>
+          </Form.Item>
 
           <Divider orientation="left">{$fmt('settings.block.openTabs')}</Divider>
 
@@ -311,38 +342,6 @@ export default function Settings() {
               <Radio value={false}>
                 {$fmt(`${module}.${DELETE_UNLOCKED_EMPTY_GROUP}.no`)}
               </Radio>
-            </Radio.Group>
-          </Form.Item>
-
-          {/* 是否允许重复的标签组 */}
-          <Form.Item<SettingsProps>
-            label={$fmt({
-              id: `${module}.${ALLOW_DUPLICATE_GROUPS}`,
-              values: { mark: '：' },
-            })}
-            name={ALLOW_DUPLICATE_GROUPS}
-          >
-            <Radio.Group>
-              <Radio value={true}>
-                {$fmt(`${module}.${ALLOW_DUPLICATE_GROUPS}.yes`)}
-              </Radio>
-              <Radio value={false}>
-                {$fmt(`${module}.${ALLOW_DUPLICATE_GROUPS}.no`)}
-              </Radio>
-            </Radio.Group>
-          </Form.Item>
-
-          {/* 是否允许重复的标签页 */}
-          <Form.Item<SettingsProps>
-            label={$fmt({
-              id: `${module}.${ALLOW_DUPLICATE_TABS}`,
-              values: { mark: '：' },
-            })}
-            name={ALLOW_DUPLICATE_TABS}
-          >
-            <Radio.Group>
-              <Radio value={true}>{$fmt(`${module}.${ALLOW_DUPLICATE_TABS}.yes`)}</Radio>
-              <Radio value={false}>{$fmt(`${module}.${ALLOW_DUPLICATE_TABS}.no`)}</Radio>
             </Radio.Group>
           </Form.Item>
 

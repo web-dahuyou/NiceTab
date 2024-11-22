@@ -48,7 +48,7 @@ export const StyledSidebarWrapper = styled(StyledBaseSidebarWrapper)<{
           font-size: 12px;
         }
       }
-      .ant-tree {
+      .nicetab-tree {
         background: transparent;
       }
     }

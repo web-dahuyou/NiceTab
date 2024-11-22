@@ -76,6 +76,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
   return (
     <IntlProvider locale={localeCustom} messages={messages}>
       <ConfigProvider
+        prefixCls="nicetab"
         locale={localeAntd}
         theme={{
           cssVar: true,

@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { theme, message } from 'antd';
 import { ThemeProvider } from 'styled-components';
-import { GlobalStyle } from '~/entrypoints/common/style/Common.styled';
 import { sendBrowserMessage } from '~/entrypoints/common/utils';
 import { GlobalContext } from '~/entrypoints/common/hooks/global';
 import type { BrowserMessageProps, SendTargetProps } from '~/entrypoints/types';
@@ -44,7 +43,6 @@ export default function App() {
 
   return (
     <ThemeProvider theme={{ ...themeTypeConfig, ...token }}>
-      <GlobalStyle />
       {contextHolder}
       {/* 移动到弹窗 */}
       {sendTargetModalVisible && (
