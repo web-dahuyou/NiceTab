@@ -107,6 +107,11 @@ function TabGroup({
     [groupId, groupName, createTime, isLocked, isStarred, selected]
   );
 
+  const [tabListLocal, setTabListLocal] = useState<TabItem[]>(tabList);
+  useEffect(() => {
+    setTabListLocal(tabList);
+  }, [tabList]);
+
   const removeDesc = useMemo(() => {
     const typeName = $fmt(`home.tabGroup`);
     return $fmt({
@@ -119,22 +124,22 @@ function TabGroup({
 
   // 已选择的tabItem数组
   const selectedTabs = useMemo(() => {
-    return tabList.filter((tab) => selectedTabIds.includes(tab.tabId));
+    return tabListLocal.filter((tab) => selectedTabIds.includes(tab.tabId));
   }, [selectedTabIds]);
   // 是否全选
   const isAllChecked = useMemo(() => {
-    return tabList.length > 0 && selectedTabIds.length === tabList.length;
-  }, [tabList, selectedTabIds]);
+    return tabListLocal.length > 0 && selectedTabIds.length === tabListLocal.length;
+  }, [tabListLocal, selectedTabIds]);
 
   // 全选框 indeterminate 状态
   const checkAllIndeterminate = useMemo(() => {
-    return selectedTabIds.length > 0 && selectedTabIds.length < tabList.length;
-  }, [tabList, selectedTabIds]);
+    return selectedTabIds.length > 0 && selectedTabIds.length < tabListLocal.length;
+  }, [tabListLocal, selectedTabIds]);
   // 全选
   const handleSelectAll: CheckboxProps['onChange'] = (e) => {
     const checked = e.target.checked;
     if (checked) {
-      setSelectedTabIds(tabList.map((tab) => tab.tabId));
+      setSelectedTabIds(tabListLocal.map((tab) => tab.tabId));
     } else {
       setSelectedTabIds([]);
     }
@@ -167,6 +172,9 @@ function TabGroup({
   };
 
   const handleTabChange = useCallback((newData: TabItem) => {
+    setTabListLocal((tabList) =>
+      tabList.map((tab) => (tab.tabId === newData.tabId ? newData : tab))
+    );
     if (onTabChange) {
       // 给回收站使用
       onTabChange(newData);
@@ -179,6 +187,9 @@ function TabGroup({
   }, []);
 
   const handleTabRemove = useCallback((tabs: TabItem[]) => {
+    setTabListLocal((tabList) =>
+      tabList.filter((tab) => !tabs.some((t) => t.tabId === tab.tabId))
+    );
     setSelectedTabIds((selectedTabIds) =>
       selectedTabIds.filter((id) => !tabs.some((tab) => tab.tabId === id))
     );
@@ -255,7 +266,7 @@ function TabGroup({
           <div className="group-header-right-part">
             <div className="group-info">
               <span className="tab-count" style={{ color: ENUM_COLORS.volcano }}>
-                {$fmt({ id: 'home.tab.count', values: { count: tabList?.length || 0 } })}
+                {$fmt({ id: 'home.tab.count', values: { count: tabListLocal?.length || 0 } })}
               </span>
               <span className="group-create-time">{createTime}</span>
             </div>
@@ -320,7 +331,7 @@ function TabGroup({
         </StyledGroupHeader>
 
         {/* tab 选择、操作区域 */}
-        {tabList?.length > 0 && !isLocked && (
+        {tabListLocal?.length > 0 && !isLocked && (
           <StyledTabActions>
             <div className="checkall-wrapper">
               <Checkbox
@@ -332,7 +343,7 @@ function TabGroup({
                 className="selected-count-text"
                 style={{ color: ENUM_COLORS.volcano }}
               >
-                {`${selectedTabIds.length} / ${tabList?.length}`}
+                {`${selectedTabIds.length} / ${tabListLocal?.length}`}
               </span>
             </div>
             {selectedTabIds.length > 0 && (
@@ -369,7 +380,11 @@ function TabGroup({
 
         {/* tab 列表 */}
         <DropComponent
-          data={{ index: 0, groupId, allowKeys: tabList?.length > 0 ? [] : [dndKey] }}
+          data={{
+            index: 0,
+            groupId,
+            allowKeys: tabListLocal?.length > 0 ? [] : [dndKey],
+          }}
           canDrop={canDrop}
           onDrop={handleTabItemDrop}
         >
@@ -379,7 +394,7 @@ function TabGroup({
               value={selectedTabIds}
               onChange={setSelectedTabIds}
             >
-              {tabList.map((tab, index) => (
+              {tabListLocal.map((tab, index) => (
                 // <TabListMarkup key={tab.tabId} {...tab} index={index}></TabListMarkup>
                 <DndComponent<DndTabItemProps>
                   canDrag={canDrag && !isLocked && selectedTabIds.length === 0}
