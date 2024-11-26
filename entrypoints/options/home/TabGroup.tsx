@@ -1,24 +1,12 @@
 import { useEffect, useRef, useState, useMemo, memo } from 'react';
-import {
-  theme,
-  message,
-  Skeleton,
-  Modal,
-  Space,
-  Divider,
-  Checkbox,
-} from 'antd';
+import { theme, message, Skeleton, Modal, Space, Divider, Checkbox } from 'antd';
 import type { CheckboxProps } from 'antd';
-import {
-  LockOutlined,
-  StarOutlined,
-  CloseOutlined,
-} from '@ant-design/icons';
+import { LockOutlined, StarOutlined, CloseOutlined } from '@ant-design/icons';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { GroupItem, TabItem } from '~/entrypoints/types';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
-import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { tabListUtils } from '@/entrypoints/common/storage';
 import DndComponent from '@/entrypoints/common/components/DndComponent';
 import DropComponent from '@/entrypoints/common/components/DropComponent';
@@ -44,7 +32,6 @@ import useMoveTo from './hooks/moveTo';
 const dndKey = dndKeys.tabItem;
 
 type TabGroupProps = GroupItem & {
-  refreshKey?: string;
   canDrag?: boolean;
   canDrop?: boolean;
   allowGroupActions?: string[];
@@ -56,9 +43,6 @@ type TabGroupProps = GroupItem & {
   onStarredChange?: (isStarred: boolean) => void;
   onDedup?: () => void;
   onRecover?: () => void;
-  onDrop?: DndTabItemOnDropCallback;
-  onTabChange?: (data: TabItem) => void;
-  onTabRemove?: (groupId: string, tabs: TabItem[]) => void;
   onMoveTo?: ({ moveData, targetData, selected }: MoveToCallbackProps) => void;
 };
 
@@ -75,7 +59,6 @@ const defaultGroupActions = [
 const defaultTabActions = ['remove', 'moveTo'];
 
 function TabGroup({
-  // refreshKey,
   groupId,
   groupName,
   createTime,
@@ -93,9 +76,6 @@ function TabGroup({
   onStarredChange,
   onDedup,
   onRecover,
-  onDrop,
-  onTabChange,
-  onTabRemove,
   onMoveTo,
 }: TabGroupProps) {
   const { token } = theme.useToken();
@@ -116,6 +96,11 @@ function TabGroup({
     moveData,
   } = useMoveTo();
   const { treeDataHook } = useContext(HomeContext);
+
+  const group = useMemo(
+    () => ({ groupId, groupName, createTime, isLocked, isStarred, selected }),
+    [groupId, groupName, createTime, isLocked, isStarred, selected]
+  );
 
   const removeDesc = useMemo(() => {
     const typeName = $fmt(`home.tabGroup`);
@@ -176,32 +161,33 @@ function TabGroup({
     }
   };
 
+  const handleTabChange = useCallback((newData: TabItem) => {
+    eventEmitter.emit('home:treeDataHook', {
+      action: 'handleTabItemChange',
+      params: [{ key: group.groupId }, newData],
+    });
+  }, []);
+
+  const handleTabRemove = useCallback((tabs: TabItem[]) => {
+    setSelectedTabIds((selectedTabIds) =>
+      selectedTabIds.filter((id) => !tabs.some((tab) => tab.tabId === id))
+    );
+    eventEmitter.emit('home:treeDataHook', {
+      action: 'handleTabItemRemove',
+      params: [group.groupId, tabs],
+    });
+  }, []);
+
+  const handleTabItemDrop: DndTabItemOnDropCallback = useCallback((...params) => {
+    eventEmitter.emit('home:treeDataHook', {
+      action: 'handleTabItemDrop',
+      params,
+    });
+  }, []);
+
   useEffect(() => {
     setRendering(false);
   }, []);
-
-  function TabListMarkup({ tab, index }: { tab: TabItem; index: number }) {
-    return (
-      <DndComponent<DndTabItemProps>
-        canDrag={canDrag && !isLocked && selectedTabIds.length === 0}
-        key={tab.tabId || index}
-        data={{ ...tab, index, groupId, dndKey }}
-        dndKey={dndKey}
-        onDrop={onDrop}
-      >
-        <TabListItem
-          key={tab.tabId || index}
-          group={{ groupId, isLocked, isStarred }}
-          tab={tab}
-          onRemove={async () => {
-            await onTabRemove?.(groupId, [tab]);
-            setSelectedTabIds(selectedTabIds.filter((id) => id !== tab.tabId));
-          }}
-          onChange={onTabChange}
-        />
-      </DndComponent>
-    );
-  }
 
   if (rendering) return <Skeleton />;
 
@@ -347,7 +333,7 @@ function TabGroup({
                     className="action-btn"
                     onClick={() => {
                       setSelectedTabIds([]);
-                      onTabRemove?.(groupId, selectedTabs);
+                      handleTabRemove(selectedTabs);
                     }}
                   >
                     {$fmt('common.remove')}
@@ -370,7 +356,7 @@ function TabGroup({
         <DropComponent
           data={{ index: 0, groupId, allowKeys: tabList?.length > 0 ? [] : [dndKey] }}
           canDrop={canDrop}
-          onDrop={onDrop}
+          onDrop={handleTabItemDrop}
         >
           <StyledTabListWrapper className="tab-list-wrapper">
             <Checkbox.Group
@@ -379,7 +365,22 @@ function TabGroup({
               onChange={setSelectedTabIds}
             >
               {tabList.map((tab, index) => (
-                <TabListMarkup key={tab.tabId} tab={tab} index={index}></TabListMarkup>
+                // <TabListMarkup key={tab.tabId} {...tab} index={index}></TabListMarkup>
+                <DndComponent<DndTabItemProps>
+                  canDrag={canDrag && !isLocked && selectedTabIds.length === 0}
+                  key={tab.tabId || index}
+                  data={{ ...tab, index, groupId, dndKey }}
+                  dndKey={dndKey}
+                  onDrop={handleTabItemDrop}
+                >
+                  <TabListItem
+                    key={tab.tabId || index}
+                    group={group}
+                    {...tab}
+                    onRemove={handleTabRemove}
+                    onChange={handleTabChange}
+                  />
+                </DndComponent>
               ))}
             </Checkbox.Group>
           </StyledTabListWrapper>
@@ -446,4 +447,4 @@ function TabGroup({
   );
 }
 
-export default memo(TabGroup)
+export default memo(TabGroup);

@@ -14,6 +14,7 @@ export type EventsEmitterProps = {
   'home:is-dragging': boolean;
   'home:set-tree-searchValue': string;
   'home:set-editing-status': boolean;
+  'home:treeDataHook': { action: string, params: any[] };
   'sync:push-to-all-remotes': undefined;
 };
 

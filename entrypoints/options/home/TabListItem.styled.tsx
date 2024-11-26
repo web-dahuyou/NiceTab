@@ -32,7 +32,7 @@ export const StyledTabTitle = styled.span<{ $color?: string; $colorHover?: strin
   .tab-item-title-text {
     font-size: 14px;
     color: ${(props) => props.$color || blue.primary};
-    text-decoration: underline;
+    // text-decoration: underline;
     cursor: pointer;
     &:hover {
       color: ${(props) => props.$colorHover || PRIMARY_COLOR};

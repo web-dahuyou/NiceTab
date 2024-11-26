@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { theme, Flex, Button, Modal, Drawer, Space, Typography, Tooltip } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { classNames } from '~/entrypoints/common/utils';
 import { tabListUtils, settingsUtils, stateUtils } from '@/entrypoints/common/storage';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
@@ -18,7 +18,7 @@ import SortingBtns from './SortingBtns';
 import HotkeyList from '../components/HotkeyList';
 // import StickyFooter from '~/entrypoints/common/components/StickyFooter';
 // import Footer from './footer/index';
-import { useTreeData, HomeContext } from './hooks/treeData';
+import { useTreeData, HomeContext, type TreeDataHookProps, type HandleNames } from './hooks/treeData';
 import useHotkeys from './hooks/hotkeys';
 import { getSelectedCounts } from './utils';
 import TreeBox from './TreeBox';
@@ -82,6 +82,27 @@ export default function Home() {
     setSidebarCollapsed(status);
     stateUtils.setState({ 'home:sidebarCollapsed': status });
   };
+
+  const handleCustomEvent = useCallback(
+    ({ action, params }: { action: string; params: any[] }) => {
+      console.log('handleCustomEvent--action', action, params);
+      (treeDataHook?.[action as HandleNames] as any)?.(...params);
+    },
+    []
+  );
+  const addCustomEventListener = useCallback(() => {
+    eventEmitter.on('home:treeDataHook', handleCustomEvent);
+  }, []);
+  const removeCustomEventListener = useCallback(() => {
+    eventEmitter.off('home:treeDataHook', handleCustomEvent);
+  }, []);
+
+  useEffect(() => {
+    addCustomEventListener();
+    return () => {
+      removeCustomEventListener();
+    };
+  }, []);
 
   return (
     <HomeContext.Provider value={{ treeDataHook }}>

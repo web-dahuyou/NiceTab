@@ -2,7 +2,6 @@ import { memo, useMemo, useContext } from 'react';
 import { Typography } from 'antd';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
-import type { TabItem } from '~/entrypoints/types';
 import type { TreeDataNodeTag, TreeDataNodeTabGroup, MoveToCallbackProps } from './types';
 import { StyledGroupList } from './Home.styled';
 import TabGroup from './TabGroup';
@@ -15,7 +14,6 @@ const ListItem = memo(
     const {
       selectedTagKey,
       selectedTabGroupKey,
-      refreshKey,
       handleSelect,
       refreshTreeData,
       handleTabGroupRemove,
@@ -23,9 +21,6 @@ const ListItem = memo(
       handleTabGroupStarredChange,
       handleTabGroupDedup,
       handleTabGroupRestore,
-      handleTabItemDrop,
-      handleTabItemChange,
-      handleTabItemRemove,
     } = treeDataHook;
 
     // 移动单个标签组
@@ -67,9 +62,9 @@ const ListItem = memo(
       <TabGroup
         key={tabGroup.key}
         selected={tabGroup.key === selectedTabGroupKey}
-        refreshKey={
-          !virtual && tabGroup.key === selectedTabGroupKey ? refreshKey : undefined
-        }
+        // refreshKey={
+        //   !virtual && tabGroup.key === selectedTabGroupKey ? refreshKey : undefined
+        // }
         {...tabGroup.originData}
         onChange={(data) => handleTabGroupChange(tabGroup, data)}
         onRemove={() =>
@@ -78,9 +73,6 @@ const ListItem = memo(
         onRestore={() => handleTabGroupRestore(tabGroup)}
         onStarredChange={(isStarred) => handleTabGroupStarredChange(tabGroup, isStarred)}
         onDedup={() => handleTabGroupDedup(tabGroup)}
-        onDrop={handleTabItemDrop}
-        onTabChange={(tabItem: TabItem) => handleTabItemChange(tabGroup, tabItem)}
-        onTabRemove={handleTabItemRemove}
         onMoveTo={handleTabGroupMoveTo}
       ></TabGroup>
     );
@@ -120,8 +112,8 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
       const groupTop = selectedTabGroupRef.current?.offsetTop || 0;
       if (groupTop < scrollTop + pagePaddingTop) {
         body.scrollTo(0, groupTop - pagePaddingTop - 60);
-      } else if (groupTop + pagePaddingTop + 80 > window.innerHeight + scrollTop) {
-        body.scrollTo(0, groupTop + pagePaddingTop - window.innerHeight + 300);
+      } else if (groupTop + pagePaddingTop + 240 > window.innerHeight + scrollTop) {
+        body.scrollTo(0, groupTop + pagePaddingTop - window.innerHeight + 400);
       }
     }
   }, [selectedTag, selectedTabGroupKey, refreshKey]);
