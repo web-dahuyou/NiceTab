@@ -18,7 +18,8 @@ import SortingBtns from './SortingBtns';
 import HotkeyList from '../components/HotkeyList';
 // import StickyFooter from '~/entrypoints/common/components/StickyFooter';
 // import Footer from './footer/index';
-import { useTreeData, HomeContext, type TreeDataHookProps, type HandleNames } from './hooks/treeData';
+import { useTreeData, HomeContext } from './hooks/treeData';
+import useCustomEventListener from './hooks/homeCustomEvent';
 import useHotkeys from './hooks/hotkeys';
 import { getSelectedCounts } from './utils';
 import TreeBox from './TreeBox';
@@ -41,6 +42,9 @@ export default function Home() {
     handleTagCreate,
     handleHotkeyAction,
   } = treeDataHook || {};
+
+  // 事件监听
+  useCustomEventListener(treeDataHook);
 
   const { hotkeyList } = useHotkeys({ onAction: handleHotkeyAction });
 
@@ -82,27 +86,6 @@ export default function Home() {
     setSidebarCollapsed(status);
     stateUtils.setState({ 'home:sidebarCollapsed': status });
   };
-
-  const handleCustomEvent = useCallback(
-    ({ action, params }: { action: string; params: any[] }) => {
-      console.log('handleCustomEvent--action', action, params);
-      (treeDataHook?.[action as HandleNames] as any)?.(...params);
-    },
-    []
-  );
-  const addCustomEventListener = useCallback(() => {
-    eventEmitter.on('home:treeDataHook', handleCustomEvent);
-  }, []);
-  const removeCustomEventListener = useCallback(() => {
-    eventEmitter.off('home:treeDataHook', handleCustomEvent);
-  }, []);
-
-  useEffect(() => {
-    addCustomEventListener();
-    return () => {
-      removeCustomEventListener();
-    };
-  }, []);
 
   return (
     <HomeContext.Provider value={{ treeDataHook }}>

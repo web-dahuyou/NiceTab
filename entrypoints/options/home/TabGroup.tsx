@@ -6,12 +6,13 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { GroupItem, TabItem } from '~/entrypoints/types';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
-import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { tabListUtils } from '@/entrypoints/common/storage';
 import DndComponent from '@/entrypoints/common/components/DndComponent';
 import DropComponent from '@/entrypoints/common/components/DropComponent';
 
 import { HomeContext } from './hooks/treeData';
+import { eventEmitter } from './hooks/homeCustomEvent';
 import EditInput from '../components/EditInput';
 import TabListItem from './TabListItem';
 import {

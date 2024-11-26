@@ -25,29 +25,6 @@ export const HomeContext = createContext<HomeContextProps>({
   treeDataHook: {} as TreeDataHookProps,
 });
 
-export type HandleNames =
-  | 'handleSelect'
-  | 'onSelect'
-  | 'handleMoreItemClick'
-  | 'onTreeNodeAction'
-  | 'toggleExpand'
-  | 'refreshTreeData'
-  | 'handleTagRemove'
-  | 'handleTagCreate'
-  | 'handleTagChange'
-  | 'handleTabGroupRemove'
-  | 'handleTabGroupCreate'
-  | 'handleTabGroupChange'
-  | 'handleTabGroupStarredChange'
-  | 'handleTabGroupDedup'
-  | 'handleTabGroupRestore'
-  | 'handleTreeNodeDrop'
-  | 'handleTabItemDrop'
-  | 'handleTabItemChange'
-  | 'handleTabItemRemove'
-  | 'handleHotkeyAction'
-  | 'selectedKeyChange';
-
 export function useTreeData() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState<boolean>(true);
@@ -331,7 +308,7 @@ export function useTreeData() {
   );
   // 修改标签页
   const handleTabItemChange = useCallback(
-    async (tabGroup: TreeDataNodeTabGroup, tabData: TabItem) => {
+    async (tabGroup: { parentKey?: React.Key; key: React.Key }, tabData: TabItem) => {
       await tabListUtils.updateTab({
         tagId: tabGroup.parentKey,
         groupId: tabGroup.key,
