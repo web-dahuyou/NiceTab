@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { theme, Flex, Space, Modal, Divider, Tag } from 'antd';
+import { theme, Flex, Space, Modal, Divider } from 'antd';
 import { TagOutlined } from '@ant-design/icons';
 import { TagItem } from '@/entrypoints/types';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';

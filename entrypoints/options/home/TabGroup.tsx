@@ -44,6 +44,8 @@ type TabGroupProps = GroupItem & {
   onStarredChange?: (isStarred: boolean) => void;
   onDedup?: () => void;
   onRecover?: () => void;
+  onTabChange?: (data: TabItem) => void;
+  onTabRemove?: (groupId: string, tabs: TabItem[]) => void;
   onMoveTo?: ({ moveData, targetData, selected }: MoveToCallbackProps) => void;
 };
 
@@ -77,6 +79,8 @@ function TabGroup({
   onStarredChange,
   onDedup,
   onRecover,
+  onTabChange,
+  onTabRemove,
   onMoveTo,
 }: TabGroupProps) {
   const { token } = theme.useToken();
@@ -163,6 +167,11 @@ function TabGroup({
   };
 
   const handleTabChange = useCallback((newData: TabItem) => {
+    if (onTabChange) {
+      // 给回收站使用
+      onTabChange(newData);
+      return;
+    }
     eventEmitter.emit('home:treeDataHook', {
       action: 'handleTabItemChange',
       params: [{ key: group.groupId }, newData],
@@ -173,6 +182,11 @@ function TabGroup({
     setSelectedTabIds((selectedTabIds) =>
       selectedTabIds.filter((id) => !tabs.some((tab) => tab.tabId === id))
     );
+    if (onTabRemove) {
+      // 给回收站使用
+      onTabRemove(group.groupId, tabs);
+      return;
+    }
     eventEmitter.emit('home:treeDataHook', {
       action: 'handleTabItemRemove',
       params: [group.groupId, tabs],
