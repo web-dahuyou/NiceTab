@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { theme, Flex, Button, Modal, Drawer, Space, Typography, Tooltip } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { classNames } from '~/entrypoints/common/utils';
 import { tabListUtils, settingsUtils, stateUtils } from '@/entrypoints/common/storage';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
@@ -19,6 +19,7 @@ import HotkeyList from '../components/HotkeyList';
 // import StickyFooter from '~/entrypoints/common/components/StickyFooter';
 // import Footer from './footer/index';
 import { useTreeData, HomeContext } from './hooks/treeData';
+import useCustomEventListener from './hooks/homeCustomEvent';
 import useHotkeys from './hooks/hotkeys';
 import { getSelectedCounts } from './utils';
 import TreeBox from './TreeBox';
@@ -41,6 +42,9 @@ export default function Home() {
     handleTagCreate,
     handleHotkeyAction,
   } = treeDataHook || {};
+
+  // 事件监听
+  useCustomEventListener(treeDataHook);
 
   const { hotkeyList } = useHotkeys({ onAction: handleHotkeyAction });
 

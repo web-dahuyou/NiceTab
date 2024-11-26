@@ -10,7 +10,6 @@ import {
   theme,
   Menu,
   Dropdown,
-  Flex,
   Space,
   Tooltip,
   Typography,
@@ -34,7 +33,9 @@ import '~/assets/css/reset.css';
 import '~/assets/css/index.css';
 import { IconTheme } from '~/entrypoints/common/components/icon/CustomIcon';
 import ColorList from '~/entrypoints/common/components/ColorList.tsx';
-import { classNames, pick, sendBrowserMessage } from '~/entrypoints/common/utils';
+import { pick, sendBrowserMessage } from '~/entrypoints/common/utils';
+import { ENUM_ACTION_NAME } from '~/entrypoints/common/constants';
+import { actionHandler } from '~/entrypoints/common/contextMenus';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import useUpdate from '~/entrypoints/common/hooks/update';
 import {
@@ -210,6 +211,10 @@ function AppLayout() {
     sendTabMessage({ msgType: 'setLocale', data: { locale: option.locale } });
   }, []);
 
+  const handleSendAllTabs = useCallback(() => {
+    actionHandler(ENUM_ACTION_NAME.SEND_ALL_TABS);
+  }, []);
+
   useEffect(() => {
     const nav = navs.find((item) => item.path === location.pathname);
     setSelectedKeys([nav?.key || 'home']);
@@ -311,7 +316,7 @@ function AppLayout() {
             <FloatButton.BackTop duration={100} visibilityHeight={400} />
           </span>
           <span title={$fmt('common.sendAllTabs')}>
-            <FloatButton icon={<SendOutlined />} />
+            <FloatButton icon={<SendOutlined />} onClick={handleSendAllTabs} />
           </span>
         </FloatButton.Group>
       </StyledPageContainer>
