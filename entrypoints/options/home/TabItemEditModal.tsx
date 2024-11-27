@@ -1,5 +1,5 @@
 import { useRef, useCallback, useEffect } from 'react';
-import { Modal, Form, Input } from 'antd';
+import { Modal, Form, Input, Button } from 'antd';
 import type { InputRef } from 'antd';
 import { TabItem } from '~/entrypoints/types';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -60,7 +60,7 @@ export default function TabItemEditModal({
       onOk={handleModalConfirm}
       onCancel={handleModalCancel}
     >
-      <Form form={form} name="edit-tab-form" initialValues={data} autoComplete="off">
+      <Form form={form} name="edit-tab-form" initialValues={data} autoComplete="off" onFinish={handleModalConfirm}>
         <Form.Item<EditTabFormProps>
           label={$fmt('common.name')}
           name={'title'}
@@ -74,6 +74,12 @@ export default function TabItemEditModal({
           rules={[{ required: true }]}
         >
           <Input />
+        </Form.Item>
+
+        <Form.Item style={{ display: 'none' }}>
+          <Button type="primary" htmlType="submit">
+            {$fmt('common.save')}
+          </Button>
         </Form.Item>
       </Form>
     </Modal>
