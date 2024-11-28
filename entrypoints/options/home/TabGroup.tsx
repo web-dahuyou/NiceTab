@@ -107,10 +107,11 @@ function TabGroup({
     [groupId, groupName, createTime, isLocked, isStarred, selected]
   );
 
-  const [tabListLocal, setTabListLocal] = useState<TabItem[]>(tabList);
-  useEffect(() => {
-    setTabListLocal(tabList);
+  const tabListHeight = useMemo(() => {
+    return tabList.length * 24 || 24;
   }, [tabList]);
+
+  const [tabListLocal, setTabListLocal] = useState<TabItem[]>(tabList);
 
   const removeDesc = useMemo(() => {
     const typeName = $fmt(`home.tabGroup`);
@@ -212,8 +213,17 @@ function TabGroup({
   }, []);
 
   useEffect(() => {
-    setRendering(false);
-  }, []);
+    let timer = null;
+    if (selected || tabList.length < 120) {
+      setRendering(false);
+      return;
+    }
+
+    timer = setTimeout(() => {
+      setRendering(false);
+    }, 10);
+    return () => clearTimeout(timer);
+  }, [selected, tabList.length]);
 
   if (rendering) return <Skeleton />;
 
@@ -266,7 +276,10 @@ function TabGroup({
           <div className="group-header-right-part">
             <div className="group-info">
               <span className="tab-count" style={{ color: ENUM_COLORS.volcano }}>
-                {$fmt({ id: 'home.tab.count', values: { count: tabListLocal?.length || 0 } })}
+                {$fmt({
+                  id: 'home.tab.count',
+                  values: { count: tabListLocal?.length || 0 },
+                })}
               </span>
               <span className="group-create-time">{createTime}</span>
             </div>
@@ -388,14 +401,16 @@ function TabGroup({
           canDrop={canDrop}
           onDrop={handleTabItemDrop}
         >
-          <StyledTabListWrapper className="tab-list-wrapper">
+          <StyledTabListWrapper
+            className="tab-list-wrapper"
+            style={{ minHeight: `${tabListHeight}px` }}
+          >
             <Checkbox.Group
               className="tab-list-checkbox-group"
               value={selectedTabIds}
               onChange={setSelectedTabIds}
             >
               {tabListLocal.map((tab, index) => (
-                // <TabListMarkup key={tab.tabId} {...tab} index={index}></TabListMarkup>
                 <DndComponent<DndTabItemProps>
                   canDrag={canDrag && !isLocked && selectedTabIds.length === 0}
                   key={tab.tabId || index}

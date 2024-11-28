@@ -50,4 +50,6 @@ export default {
   'settings.showPageContextMenus': '是否在网页中显示NiceTab右键菜单：',
   'settings.popupModuleDisplays': 'Popup面板模块展示设置：',
   'settings.popupModuleDisplays.tooltip': '只要选择了任意面板模块，则点击扩展图标时将展示 Popup 面板，否则将直接发送所有标签页。',
+
+  'settings.autoExpandHomeTree': '进入列表页时-是否自动展开全部节点：',
 }

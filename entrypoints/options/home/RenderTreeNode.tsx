@@ -90,6 +90,10 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
     eventEmitter.emit('home:set-editing-status', status);
   }, []);
 
+  const handleInputClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+  }, []);
+
   return (
     // 这个 DropComponent 只是为了方便右侧面板的标签页拖拽到左侧树的标签组，左侧树中的 分类和标签组的拖拽由 antd 的 Tree 组件自带实现
     <DropComponent
@@ -117,6 +121,7 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
                 iconSize={14}
                 onValueChange={handleRenameChange}
                 onEditingStatusChange={handleEditingStatusChange}
+                onClick={handleInputClick}
               ></EditInput>
             </span>
           )}

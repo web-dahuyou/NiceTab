@@ -23,6 +23,7 @@ const {
   SHOW_OPENED_TAB_COUNT,
   SHOW_PAGE_CONTEXT_MENUS,
   POPUP_MODULE_DISPLAYS,
+  AUTO_EXPAND_HOME_TREE,
 } = ENUM_SETTINGS_PROPS;
 
 // 设置工具类
@@ -49,6 +50,7 @@ export default class SettingsUtils {
     [SHOW_OPENED_TAB_COUNT]: true, // 扩展图标上是否显示打开的标签页数量
     [SHOW_PAGE_CONTEXT_MENUS]: true, // 网页中是否显示NiceTab右键菜单
     [POPUP_MODULE_DISPLAYS]: POPUP_MODULE_NAMES, // popup面板中需要展示的模块
+    [AUTO_EXPAND_HOME_TREE]: true, // 进入列表页时，是否自动展开全部节点
   };
   settings: SettingsProps = this.initialSettings;
 

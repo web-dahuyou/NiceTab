@@ -15,7 +15,7 @@ import {
 } from '../types';
 import { getTreeData } from '../utils';
 
-const { DELETE_AFTER_RESTORE } = ENUM_SETTINGS_PROPS;
+const { DELETE_AFTER_RESTORE, AUTO_EXPAND_HOME_TREE } = ENUM_SETTINGS_PROPS;
 
 export type TreeDataHookProps = ReturnType<typeof useTreeData>;
 interface HomeContextProps {
@@ -417,8 +417,12 @@ export function useTreeData() {
     setLoading(false);
     // console.log('init-treeData', treeData);
     setCountInfo(tabListUtils.countInfo);
-    // 考虑到数据量大，默认不展开列表了
-    // setExpandedKeys(treeData.map((tag) => tag.key));
+
+    const settings = await settingsUtils.getSettings();
+    if (settings?.[AUTO_EXPAND_HOME_TREE]) {
+      // 默认展开全部
+      setExpandedKeys(treeData.map((tag) => tag.key));
+    }
 
     const tag =
       treeData?.find((tag) => tag.type === 'tag' && tag.key === urlParams.tagId) ||

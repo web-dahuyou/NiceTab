@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
-import { theme, Flex, Button, Modal, Drawer, Space, Typography, Tooltip } from 'antd';
-import { QuestionCircleOutlined } from '@ant-design/icons';
-import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { theme, Flex, Button, Dropdown, Modal, Drawer, Space, Typography, Tooltip, type MenuProps } from 'antd';
+import { QuestionCircleOutlined, MoreOutlined, ClearOutlined } from '@ant-design/icons';
+import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { classNames } from '~/entrypoints/common/utils';
 import { tabListUtils, settingsUtils, stateUtils } from '@/entrypoints/common/storage';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
@@ -66,6 +66,16 @@ export default function Home() {
     };
   }, [selectedTag.originData, countInfo?.groupCount]);
 
+  const moreItems: MenuProps['items'] = useMemo(() => [
+    {
+      key: 'clear',
+      label: (
+        <span onClick={() => setConfirmModalVisible(true)}>{$fmt('home.clearAll')}</span>
+      ),
+      icon: <ClearOutlined />,
+    },
+  ], [$fmt]);
+
   // 确认清空全部
   const handleClearConfirm = () => {
     handleMoreItemClick('clear');
@@ -129,24 +139,21 @@ export default function Home() {
               </ul>
               {/* 顶部操作按钮组 */}
               <div className="sidebar-action-btns-wrapper">
-                {/* 隐藏展开全部按钮，自己主动打开吧
-                  <Button type="primary" size="small" onClick={() => toggleExpand(true)}>
-                    {$fmt('home.expandAll')}
-                  </Button>
-                */}
+                <Button type="primary" size="small" onClick={() => toggleExpand(true)}>
+                  {$fmt('home.expandAll')}
+                </Button>
                 <Button type="primary" size="small" onClick={() => toggleExpand(false)}>
                   {$fmt('home.collapseAll')}
                 </Button>
                 <Button type="primary" size="small" onClick={handleTagCreate}>
                   {$fmt('home.addTag')}
                 </Button>
-                <Button
-                  type="primary"
-                  size="small"
-                  onClick={() => setConfirmModalVisible(true)}
-                >
-                  {$fmt('home.clearAll')}
-                </Button>
+
+                <Dropdown menu={{ items: moreItems }} placement="bottomLeft">
+                  <StyledActionIconBtn className="btn-more" $size="20" title="更多">
+                    <MoreOutlined />
+                  </StyledActionIconBtn>
+                </Dropdown>
               </div>
 
               {/* 分类和标签组列表 */}
