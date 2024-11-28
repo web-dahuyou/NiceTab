@@ -50,4 +50,6 @@ export default {
   'settings.showPageContextMenus': 'Display ContextMenu on your webpage?',
   'settings.popupModuleDisplays': 'Choose the modules to be displayed in the "Popup Panel"',
   'settings.popupModuleDisplays.tooltip': 'If any panel module is selected, the Popup Panel will display when clicking the extension icon. Otherwise, the "Send All Tabs" action will be triggered directly.',
+
+  'settings.autoExpandHomeTree': 'Automatically expand the tree list when opening the Home Page?',
 }

@@ -117,6 +117,7 @@ export type SettingsProps = {
   showOpenedTabCount?: boolean; // 扩展图标上是否显示打开的标签页数量
   showPageContextMenus?: boolean; // 网页中是否显示NiceTab右键菜单
   popupModuleDisplays?: PopupModuleNames[]; // popup面板中需要展示的模块
+  autoExpandHomeTree?: boolean; // 进入列表页时，是否自动展开全部节点
 };
 
 // 状态相关

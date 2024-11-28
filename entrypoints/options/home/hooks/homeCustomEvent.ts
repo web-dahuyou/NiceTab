@@ -72,7 +72,7 @@ export const eventEmitter = mitt<HomeCustomEventProps>();
 export default function useCustomEventListener(treeDataHook: TreeDataHookProps) {
   const handleCustomEvent = useCallback(
     ({ action, params }: HomeCustomEventParamsProps) => {
-      console.log('handleCustomEvent--action', action, params);
+      // console.log('handleCustomEvent--action', action, params);
       (treeDataHook?.[action] as any)?.(...params);
     },
     []

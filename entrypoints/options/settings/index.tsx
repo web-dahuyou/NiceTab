@@ -46,6 +46,7 @@ const {
   SHOW_OPENED_TAB_COUNT,
   SHOW_PAGE_CONTEXT_MENUS,
   POPUP_MODULE_DISPLAYS,
+  AUTO_EXPAND_HOME_TREE,
 } = ENUM_SETTINGS_PROPS;
 
 const module = 'settings'; // locale module name
@@ -438,6 +439,17 @@ export default function Settings() {
             }}
           >
             <Checkbox.Group options={popupModuleDisplayOptions}></Checkbox.Group>
+          </Form.Item>
+
+          {/* 进入列表页时，是否自动展开全部节点 */}
+          <Form.Item<SettingsProps>
+            label={$fmt(`${module}.${AUTO_EXPAND_HOME_TREE}`)}
+            name={AUTO_EXPAND_HOME_TREE}
+          >
+            <Radio.Group>
+              <Radio value={true}>{$fmt('common.yes')}</Radio>
+              <Radio value={false}>{$fmt('common.no')}</Radio>
+            </Radio.Group>
           </Form.Item>
 
           <Form.Item>
