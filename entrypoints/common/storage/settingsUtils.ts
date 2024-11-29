@@ -1,6 +1,6 @@
 // import { storage } from 'wxt/storage';
 import type { LanguageTypes, SettingsProps } from '~/entrypoints/types';
-import { ENUM_SETTINGS_PROPS, POPUP_MODULE_NAMES, defaultLanguage, defaultThemeType } from '../constants';
+import { ENUM_SETTINGS_PROPS, POPUP_MODULE_NAMES, defaultLanguage, defaultThemeType, DEFAULT_EXCLUDE_DOMAINS } from '../constants';
 
 const {
   LANGUAGE,
@@ -8,10 +8,11 @@ const {
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
   SHOW_SEND_TARGET_MODAL,
   OPEN_ADMIN_TAB_AFTER_SEND_TABS,
+  ALLOW_SEND_PINNED_TABS,
+  EXCLUDE_DOMAINS_FOR_SENDING,
   CLOSE_TABS_AFTER_SEND_TABS,
   ACTION_AUTO_CLOSE_FLAGS,
   AUTO_PIN_ADMIN_TAB,
-  ALLOW_SEND_PINNED_TABS,
   RESTORE_IN_NEW_WINDOW,
   DELETE_AFTER_RESTORE,
   SILENT_OPEN_TAB_MODIFIER_KEY,
@@ -35,9 +36,10 @@ export default class SettingsUtils {
     [AUTO_PIN_ADMIN_TAB]: true, // 是否固定管理后台
     [SHOW_SEND_TARGET_MODAL]: false, // 发送标签页时是否显示目标选择弹窗
     [OPEN_ADMIN_TAB_AFTER_SEND_TABS]: true, // 发送标签页后默认打开管理后台
+    [ALLOW_SEND_PINNED_TABS]: false, // 是否发送固定标签页
+    [EXCLUDE_DOMAINS_FOR_SENDING]: DEFAULT_EXCLUDE_DOMAINS.join('\n'), // 发送标签页时排除的域名
     [CLOSE_TABS_AFTER_SEND_TABS]: true, // 发送标签页后是否关闭标签页
     [ACTION_AUTO_CLOSE_FLAGS]: [], // 各种操作的自动关闭标签页标志
-    [ALLOW_SEND_PINNED_TABS]: false, // 是否发送固定标签页
     [RESTORE_IN_NEW_WINDOW]: false, // 是否在新窗口打开标签组
     [DELETE_AFTER_RESTORE]: false, // 恢复标签页/标签组时是否从列表中删除
     [SILENT_OPEN_TAB_MODIFIER_KEY]: 'alt', // 静默打开标签页的修饰键

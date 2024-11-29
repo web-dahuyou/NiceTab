@@ -5,7 +5,7 @@ import {
   ENUM_SETTINGS_PROPS,
   defaultLanguage
 } from '~/entrypoints/common/constants';
-import { objectToUrlParams, getRandomId, isGroupSupported } from '~/entrypoints/common/utils';
+import { objectToUrlParams, getRandomId, isGroupSupported, isUrlMatched } from '~/entrypoints/common/utils';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 
 const {
@@ -15,6 +15,7 @@ const {
   ACTION_AUTO_CLOSE_FLAGS,
   AUTO_PIN_ADMIN_TAB,
   ALLOW_SEND_PINNED_TABS,
+  EXCLUDE_DOMAINS_FOR_SENDING,
   RESTORE_IN_NEW_WINDOW,
 } = ENUM_SETTINGS_PROPS;
 
@@ -171,6 +172,14 @@ async function getFilteredTabs(
     if (tab.pinned && !settings[ALLOW_SEND_PINNED_TABS]) {
       return false;
     }
+    const excludeDomainsString = settings[EXCLUDE_DOMAINS_FOR_SENDING] || '';
+    if (tab.url && excludeDomainsString) {
+      const isMatched = isUrlMatched(tab.url, excludeDomainsString);
+      if (!isMatched) {
+        return false;
+      }
+    }
+
     if (validator) {
       return validator(tab);
     }

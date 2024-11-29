@@ -112,6 +112,9 @@ function TabGroup({
   }, [tabList]);
 
   const [tabListLocal, setTabListLocal] = useState<TabItem[]>(tabList);
+  useEffect(() => {
+    setTabListLocal(tabList);
+  }, [tabList]);
 
   const removeDesc = useMemo(() => {
     const typeName = $fmt(`home.tabGroup`);
@@ -224,6 +227,9 @@ function TabGroup({
     }, 10);
     return () => clearTimeout(timer);
   }, [selected, tabList.length]);
+  // useEffect(() => {
+  //   setRendering(false);
+  // }, []);
 
   if (rendering) return <Skeleton />;
 

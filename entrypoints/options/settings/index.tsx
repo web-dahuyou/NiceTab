@@ -35,6 +35,7 @@ const {
   SHOW_SEND_TARGET_MODAL,
   AUTO_PIN_ADMIN_TAB,
   ALLOW_SEND_PINNED_TABS,
+  EXCLUDE_DOMAINS_FOR_SENDING,
   RESTORE_IN_NEW_WINDOW,
   DELETE_AFTER_RESTORE,
   SILENT_OPEN_TAB_MODIFIER_KEY,
@@ -189,6 +190,28 @@ export default function Settings() {
                 {$fmt(`${module}.${ALLOW_SEND_PINNED_TABS}.no`)}
               </Radio>
             </Radio.Group>
+          </Form.Item>
+          {/* 排除的域名 */}
+          <Form.Item<SettingsProps>
+            label={$fmt({
+              id: `${module}.${EXCLUDE_DOMAINS_FOR_SENDING}`,
+              values: { mark: '：' },
+            })}
+            name={EXCLUDE_DOMAINS_FOR_SENDING}
+            tooltip={{
+              color: token.colorBgElevated,
+              title: (
+                <Typography.Text>
+                  {$fmt(`${module}.${EXCLUDE_DOMAINS_FOR_SENDING}.tooltip`)}
+                </Typography.Text>
+              ),
+            }}
+          >
+            <Input.TextArea
+              style={{ width: '500px' }}
+              autoSize={{ minRows: 3, maxRows: 8 }}
+              placeholder={$fmt(`${module}.${EXCLUDE_DOMAINS_FOR_SENDING}.placeholder`)}
+            />
           </Form.Item>
           {/* 发送标签页后是否打开管理后台 */}
           <Form.Item<SettingsProps>

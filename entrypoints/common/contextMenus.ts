@@ -10,11 +10,12 @@ import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import type { SendTargetProps } from '~/entrypoints/types';
 import initStorageListener, { settingsUtils } from './storage';
 import { getCommandsHotkeys } from './commands';
-import { pick } from './utils';
+import { pick, isUrlMatched } from './utils';
 
 const {
   LANGUAGE,
   ALLOW_SEND_PINNED_TABS,
+  EXCLUDE_DOMAINS_FOR_SENDING,
   SHOW_PAGE_CONTEXT_MENUS,
   SHOW_SEND_TARGET_MODAL,
 } = ENUM_SETTINGS_PROPS;
@@ -50,6 +51,8 @@ const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> => {
   const { tab: adminTab } = await tabUtils.getAdminTabInfo();
   const currTab = tabs?.find((tab) => tab.highlighted);
   const filteredTabs = await tabUtils.getFilteredTabs(tabs, settings);
+  const excludeDomainsString = settings[EXCLUDE_DOMAINS_FOR_SENDING] || '';
+  const isCurrTabMatched = isUrlMatched(currTab?.url, excludeDomainsString);
 
   const hotkeysMap = await getMenuHotkeys();
   const contexts: Menus.ContextType[] = settings[SHOW_PAGE_CONTEXT_MENUS]
@@ -82,7 +85,8 @@ const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> => {
     enabled:
       !!currTab?.id &&
       currTab?.id != adminTab?.id &&
-      !(currTab?.pinned && !settings[ALLOW_SEND_PINNED_TABS]),
+      !(currTab?.pinned && !settings[ALLOW_SEND_PINNED_TABS])
+      && isCurrTabMatched,
   };
 
   const _sendOtherTabs: Menus.CreateCreatePropertiesType = {

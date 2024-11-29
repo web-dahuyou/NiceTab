@@ -113,6 +113,7 @@ export enum ENUM_SETTINGS_PROPS {
   CLOSE_TABS_AFTER_SEND_TABS = 'closeTabsAfterSendTabs', // 发送标签页后是否关闭标签页
   ACTION_AUTO_CLOSE_FLAGS = 'actionAutoCloseFlags', // 各种发送标签页操作的自动关闭标签页标志
   ALLOW_SEND_PINNED_TABS = 'allowSendPinnedTabs', // 是否发送固定标签页
+  EXCLUDE_DOMAINS_FOR_SENDING = 'excludeDomainsForSending', // 发送标签页时排除的域名
   RESTORE_IN_NEW_WINDOW = 'restoreInNewWindow', // 是否在新窗口打开标签组
   DELETE_AFTER_RESTORE = 'deleteAfterRestore', // 恢复标签页/标签组时是否从列表中删除
   SILENT_OPEN_TAB_MODIFIER_KEY = 'silentOpenTabModifierKey', // 静默打开标签页的修饰键
@@ -160,6 +161,13 @@ export const UNNAMED_GROUP = 'Unnamed Group';
 // 状态标识
 export const SUCCESS_KEY = 'success';
 export const FAILED_KEY = 'failed';
+
+// 默认排除的链接
+export const DEFAULT_EXCLUDE_DOMAINS = [
+  'about:blank',
+  'chrome://newtab/',
+  'edge://newtab/',
+];
 
 // 同步方式枚举
 export const syncTypeMap: Record<string, SyncType> = {
