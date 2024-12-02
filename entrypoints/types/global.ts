@@ -1,5 +1,6 @@
 import { ThemeConfig } from 'antd';
 import { MessageDescriptor } from 'react-intl';
+import type { MessageInstance } from 'antd/es/message/interface';
 
 // 扩展版本信息
 export type VersionInfo = { updateAvailable: boolean; version?: string };
@@ -22,6 +23,7 @@ export interface GlobalContextProps {
   version: string;
   colorPrimary: string;
   themeTypeConfig: ThemeTypeConfig;
+  $message: MessageInstance;
   setThemeType: (themeType: ThemeTypes) => void;
   setThemeData: (themeData: Partial<ThemeProps>) => void;
   setLocale: (language?: LanguageTypes, callback?: () => void) => Promise<void>;

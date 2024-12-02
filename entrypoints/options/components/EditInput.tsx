@@ -47,7 +47,7 @@ export default function EditInput({
 }: InputProps &
   CustomStyleProps & {
     value: string;
-    onValueChange: (value?: string) => void;
+    onValueChange?: (value?: string) => void;
     onEditingStatusChange?: (status: boolean) => void;
     stopPropagation?: boolean;
   }) {

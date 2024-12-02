@@ -1,18 +1,12 @@
 import { useEffect, useRef, useState, useMemo, memo } from 'react';
-import { theme, message, Modal, Space, Divider, Checkbox, Spin, Skeleton } from 'antd';
+import { theme, Skeleton, Modal, Space, Divider, Checkbox } from 'antd';
 import type { CheckboxProps } from 'antd';
 import { LockOutlined, StarOutlined, CloseOutlined } from '@ant-design/icons';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { GroupItem, TabItem } from '~/entrypoints/types';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { tabListUtils } from '@/entrypoints/common/storage';
-import DndComponent from '@/entrypoints/common/components/DndComponent';
-import DropComponent from '@/entrypoints/common/components/DropComponent';
 
-import { HomeContext } from './hooks/treeData';
-import { eventEmitter } from './hooks/homeCustomEvent';
 import EditInput from '../components/EditInput';
 import TabListItem from './TabListItem';
 import {
@@ -21,16 +15,6 @@ import {
   StyledTabActions,
   StyledTabListWrapper,
 } from './TabGroup.styled';
-import type {
-  DndTabItemProps,
-  DndTabItemOnDropCallback,
-  MoveToCallbackProps,
-} from './types';
-import { dndKeys } from './constants';
-import MoveToModal from './MoveToModal';
-import useMoveTo from './hooks/moveTo';
-
-const dndKey = dndKeys.tabItem;
 
 type TabGroupProps = GroupItem & {
   canDrag?: boolean;
@@ -38,30 +22,14 @@ type TabGroupProps = GroupItem & {
   allowGroupActions?: string[];
   allowTabActions?: string[];
   selected?: boolean;
-  onChange?: (data: Partial<GroupItem>) => void;
   onRemove?: () => void;
-  onRestore?: () => void;
-  onStarredChange?: (isStarred: boolean) => void;
-  onDedup?: () => void;
   onRecover?: () => void;
   onTabChange?: (data: TabItem) => void;
   onTabRemove?: (groupId: string, tabs: TabItem[]) => void;
-  onMoveTo?: ({ moveData, targetData, selected }: MoveToCallbackProps) => void;
 };
 
-const defaultGroupActions = [
-  'remove',
-  'rename',
-  'restore',
-  'lock',
-  'star',
-  'dedup',
-  'moveTo',
-  'copyLinks',
-];
-const defaultTabActions = ['remove', 'moveTo'];
-
-const blockSize = 50;
+const defaultGroupActions = ['remove', 'recover'];
+const defaultTabActions = ['remove'];
 
 function TabGroup({
   groupId,
@@ -73,40 +41,27 @@ function TabGroup({
   selected,
   allowGroupActions = defaultGroupActions,
   allowTabActions = defaultTabActions,
-  canDrag = true,
-  canDrop = true,
-  onChange,
   onRemove,
-  onRestore,
-  onStarredChange,
-  onDedup,
   onRecover,
   onTabChange,
   onTabRemove,
-  onMoveTo,
 }: TabGroupProps) {
   const { token } = theme.useToken();
-  const [messageApi, messageContextHolder] = message.useMessage();
   const { $fmt } = useIntlUtls();
   const groupRef = useRef<HTMLDivElement>(null);
+  const [rendering, setRendering] = useState(true);
   const [selectedTabIds, setSelectedTabIds] = useState<string[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [dedupModalVisible, setDedupModalVisible] = useState(false);
   const [recoverModalVisible, setRecoverModalVisible] = useState(false);
-
-  const {
-    modalVisible: moveToModalVisible,
-    openModal: openMoveToModal,
-    onConfirm: onMoveToConfirm,
-    onClose: onMoveToClose,
-    moveData,
-  } = useMoveTo();
-  const { treeDataHook } = useContext(HomeContext);
 
   const group = useMemo(
     () => ({ groupId, groupName, createTime, isLocked, isStarred, selected }),
     [groupId, groupName, createTime, isLocked, isStarred, selected]
   );
+
+  const tabListHeight = useMemo(() => {
+    return tabList.length * 24 || 24;
+  }, [tabList]);
 
   const removeDesc = useMemo(() => {
     const typeName = $fmt(`home.tabGroup`);
@@ -145,39 +100,11 @@ function TabGroup({
     setModalVisible(false);
     onRemove?.();
   };
-  const handleTabGroupDedup = () => {
-    setDedupModalVisible(false);
-    onDedup?.();
-  };
+
   const handleTabGroupRecover = () => {
     setRecoverModalVisible(false);
     onRecover?.();
   };
-
-  const tabLinks = useMemo(() => {
-    return tabListUtils.copyLinks(tabList);
-  }, [tabList]);
-
-  // 复制到剪切板
-  const handleCopy = (text: string, result: boolean) => {
-    if (result) {
-      messageApi.success($fmt('common.CopySuccess'));
-    } else {
-      messageApi.error($fmt('common.CopyFailed'));
-    }
-  };
-
-  const handleTabChange = useCallback((newData: TabItem) => {
-    if (onTabChange) {
-      // 给回收站使用
-      onTabChange(newData);
-      return;
-    }
-    eventEmitter.emit('home:treeDataHook', {
-      action: 'handleTabItemChange',
-      params: [{ key: group.groupId }, newData],
-    });
-  }, []);
 
   const handleTabRemove = useCallback((tabs: TabItem[]) => {
     setSelectedTabIds((selectedTabIds) =>
@@ -188,52 +115,25 @@ function TabGroup({
       onTabRemove(group.groupId, tabs);
       return;
     }
-    eventEmitter.emit('home:treeDataHook', {
-      action: 'handleTabItemRemove',
-      params: [group.groupId, tabs],
-    });
   }, []);
-
-  const handleTabItemDrop: DndTabItemOnDropCallback = useCallback((...params) => {
-    eventEmitter.emit('home:treeDataHook', {
-      action: 'handleTabItemDrop',
-      params,
-    });
-  }, []);
-
-  /* 下面是分段加载相关 */
-  const [rendering, setRendering] = useState(true);
-  const [loading, setLoading] = useState(true);
-  const tabListHeight = useMemo(() => {
-    return tabList.length * 24 || 24;
-  }, [tabList]);
-
-  const [blockIndex, setBlockIndex] = useState<number>(1);
-  const tabListLocal = useMemo(() => {
-    return tabList.slice(0, 10 + blockIndex * blockSize);
-  }, [tabList, blockIndex]);
-
-  const timerRef = useRef<{ timer: NodeJS.Timeout | string | number | undefined }>({
-    timer: undefined,
-  });
-  const recursion = (index: number = 1) => {
-    if (10 + index * blockSize >= tabList.length) {
-      setLoading(false);
-      return;
-    }
-    timerRef.current.timer = setTimeout(() => {
-      setBlockIndex((index) => index + 1);
-      recursion(index + 1);
-    }, 30);
-  };
 
   useEffect(() => {
-    setRendering(false);
-    recursion();
-    return () => {
-      clearTimeout(timerRef.current.timer);
-    };
-  }, []);
+    let timer = null;
+    if (selected || tabList.length < 120) {
+      setRendering(false);
+      return;
+    }
+
+    timer = setTimeout(() => {
+      setRendering(false);
+    }, 10);
+    return () => clearTimeout(timer);
+  }, [selected, tabList.length]);
+  // useEffect(() => {
+  //   setRendering(false);
+  // }, []);
+
+  if (rendering) return <Skeleton />;
 
   return (
     <>
@@ -278,7 +178,6 @@ function TabGroup({
               maxWidth={240}
               fontSize={20}
               iconSize={16}
-              onValueChange={(value) => onChange?.({ groupName: value || UNNAMED_GROUP })}
             ></EditInput>
           </div>
           <div className="group-header-right-part">
@@ -301,45 +200,6 @@ function TabGroup({
               {allowGroupActions.includes('remove') && !isLocked && (
                 <span className="action-btn" onClick={() => setModalVisible(true)}>
                   {$fmt('home.tabGroup.remove')}
-                </span>
-              )}
-              {allowGroupActions.includes('restore') && (
-                <span className="action-btn" onClick={() => onRestore?.()}>
-                  {$fmt('home.tabGroup.open')}
-                </span>
-              )}
-              {allowGroupActions.includes('lock') && (
-                <span
-                  className="action-btn"
-                  onClick={() => onChange?.({ isLocked: !isLocked })}
-                >
-                  {$fmt(isLocked ? 'home.tabGroup.unlock' : 'home.tabGroup.lock')}
-                </span>
-              )}
-              {allowGroupActions.includes('star') && (
-                <span
-                  className="action-btn"
-                  onClick={() => onStarredChange?.(!isStarred)}
-                >
-                  {$fmt(isStarred ? 'home.tabGroup.unstar' : 'home.tabGroup.star')}
-                </span>
-              )}
-              {allowGroupActions.includes('moveTo') && (
-                <span
-                  className="action-btn"
-                  onClick={() => openMoveToModal?.({ groupId })}
-                >
-                  {$fmt('common.moveTo')}
-                </span>
-              )}
-              {allowGroupActions.includes('copyLinks') && (
-                <CopyToClipboard text={tabLinks} onCopy={handleCopy}>
-                  <span className="action-btn">{$fmt('home.copyLinks')}</span>
-                </CopyToClipboard>
-              )}
-              {allowGroupActions.includes('dedup') && (
-                <span className="action-btn" onClick={() => setDedupModalVisible(true)}>
-                  {$fmt('common.dedup')}
                 </span>
               )}
               {allowGroupActions.includes('recover') && (
@@ -386,65 +246,34 @@ function TabGroup({
                     {$fmt('common.remove')}
                   </span>
                 )}
-                {allowTabActions.includes('moveTo') && (
-                  <span
-                    className="action-btn"
-                    onClick={() => openMoveToModal?.({ groupId, tabs: selectedTabs })}
-                  >
-                    {$fmt('common.moveTo')}
-                  </span>
-                )}
               </Space>
             )}
           </StyledTabActions>
         )}
 
         {/* tab 列表 */}
-        <DropComponent
-          data={{
-            index: 0,
-            groupId,
-            allowKeys: tabList?.length > 0 ? [] : [dndKey],
-          }}
-          canDrop={canDrop}
-          onDrop={handleTabItemDrop}
+        <StyledTabListWrapper
+          className="tab-list-wrapper"
+          style={{ minHeight: `${tabListHeight}px` }}
         >
-          <StyledTabListWrapper
-            className="tab-list-wrapper"
-            style={{ minHeight: `${tabListHeight}px` }}
+          <Checkbox.Group
+            className="tab-list-checkbox-group"
+            value={selectedTabIds}
+            onChange={setSelectedTabIds}
           >
-            { rendering ? <Skeleton title={false} paragraph={{ rows: 3 }}></Skeleton> : (
-              <Spin spinning={loading} size="large">
-                <Checkbox.Group
-                  className="tab-list-checkbox-group"
-                  value={selectedTabIds}
-                  onChange={setSelectedTabIds}
-                >
-                  {tabListLocal.map((tab, index) => (
-                    <DndComponent<DndTabItemProps>
-                      canDrag={canDrag && !isLocked && selectedTabIds.length === 0}
-                      key={tab.tabId || index}
-                      data={{ ...tab, index, groupId, dndKey }}
-                      dndKey={dndKey}
-                      onDrop={handleTabItemDrop}
-                    >
-                      <TabListItem
-                        key={tab.tabId || index}
-                        group={group}
-                        {...tab}
-                        onRemove={handleTabRemove}
-                        onChange={handleTabChange}
-                      />
-                    </DndComponent>
-                  ))}
-                </Checkbox.Group>
-              </Spin>
-            ) }
-          </StyledTabListWrapper>
-        </DropComponent>
+            {tabList.map((tab, index) => (
+              <TabListItem
+                key={tab.tabId || index}
+                group={group}
+                {...tab}
+                onRemove={handleTabRemove}
+                onChange={onTabChange}
+              />
+            ))}
+          </Checkbox.Group>
+        </StyledTabListWrapper>
       </StyledGroupWrapper>
 
-      {messageContextHolder}
       {/* 标签组删除确认弹窗 */}
       {modalVisible && (
         <Modal
@@ -457,18 +286,6 @@ function TabGroup({
           <div dangerouslySetInnerHTML={{ __html: removeDesc }}>
             {/* {$fmt({ id: 'home.removeDesc', values: { type: $fmt(`home.tabGroup`) } })} */}
           </div>
-        </Modal>
-      )}
-      {/* 标签组去重确认弹窗 */}
-      {dedupModalVisible && (
-        <Modal
-          title={$fmt('home.dedupTitle')}
-          width={400}
-          open={dedupModalVisible}
-          onOk={handleTabGroupDedup}
-          onCancel={() => setDedupModalVisible(false)}
-        >
-          <div>{$fmt('home.dedupDesc')}</div>
         </Modal>
       )}
       {/* 还原确认弹窗 */}
@@ -484,21 +301,6 @@ function TabGroup({
             {$fmt({ id: 'home.recoverDesc', values: { type: $fmt('home.tabGroup') } })}
           </div>
         </Modal>
-      )}
-      {/* 移动到弹窗 */}
-      {moveToModalVisible && (
-        <MoveToModal
-          visible={moveToModalVisible}
-          listData={treeDataHook.tagList}
-          moveData={moveData}
-          onOk={(targetData) => {
-            onMoveToConfirm(() => {
-              onMoveTo?.({ moveData, targetData, selected: !!selected });
-              setSelectedTabIds([]);
-            });
-          }}
-          onCancel={onMoveToClose}
-        />
       )}
     </>
   );

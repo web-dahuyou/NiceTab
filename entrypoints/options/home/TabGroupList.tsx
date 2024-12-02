@@ -1,6 +1,6 @@
 import { memo, useMemo, useContext } from 'react';
 import { Typography } from 'antd';
-import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
+import { Virtuoso, VirtuosoHandle, type FlatIndexLocationWithAlign } from 'react-virtuoso';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import type { TreeDataNodeTag, TreeDataNodeTabGroup, MoveToCallbackProps } from './types';
 import { StyledGroupList } from './Home.styled';
@@ -84,13 +84,23 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
   const { treeDataHook } = useContext(HomeContext);
   const { selectedTagKey, selectedTabGroupKey, selectedTag, refreshKey } = treeDataHook;
   const selectedTabGroupRef = useRef<HTMLDivElement>(null);
+  const virtuosoRef = useRef<VirtuosoHandle>(null);
 
   const counts = useMemo(() => {
     return getSelectedCounts(selectedTag.originData);
   }, [selectedTag.originData]);
 
-  const virtuosoRef = useRef<VirtuosoHandle>(null);
-
+  const initialConfig = useMemo(() => {
+    const index = selectedTag?.children?.findIndex(
+      (group) => group.key === selectedTabGroupKey
+    );
+    return {
+      index: index || 0,
+      align: 'start',
+      behavior: 'auto',
+      offset: -180,
+    } as FlatIndexLocationWithAlign;
+  }, [selectedTag, selectedTabGroupKey]);
   const [prevSelectedTagKey, setPrevSelectedTagKey] = useState(selectedTagKey);
   const scrollHandler = useCallback(() => {
     if (virtual && virtuosoRef.current) {
@@ -99,8 +109,9 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
       );
       virtuosoRef.current?.scrollToIndex({
         index: index || 0,
-        align: 'center',
+        align: 'start',
         behavior: 'auto',
+        offset: -180,
       });
     } else if (!virtual && selectedTabGroupRef.current) {
       // const offsetTop = selectedTabGroupRef.current?.offsetTop || 0;
@@ -150,6 +161,7 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
         <Virtuoso
           ref={virtuosoRef}
           useWindowScroll
+          initialTopMostItemIndex={initialConfig}
           overscan={12}
           increaseViewportBy={{ top: 400, bottom: 200 }}
           data={selectedTag?.children || []}

@@ -87,7 +87,12 @@ export default function App() {
         (t) => t.id !== tab.id && t.id !== adminTab?.id && !t.pinned
       );
       setTabs(newTabs);
-      tab.id && browser.tabs.remove(tab.id);
+      if (tab.id) {
+        await browser.tabs.remove(tab.id);
+        browser.tabs.query({ currentWindow: true }).then(async (allTabs) => {
+          setTabs(allTabs?.filter((t) => t.id !== adminTab?.id && !t.pinned));
+        });
+      }
     },
     [tabs]
   );
