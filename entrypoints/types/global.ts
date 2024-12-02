@@ -1,5 +1,6 @@
 import { ThemeConfig } from 'antd';
 import { MessageDescriptor } from 'react-intl';
+import type { MessageInstance } from 'antd/es/message/interface';
 
 // 扩展版本信息
 export type VersionInfo = { updateAvailable: boolean; version?: string };
@@ -22,6 +23,7 @@ export interface GlobalContextProps {
   version: string;
   colorPrimary: string;
   themeTypeConfig: ThemeTypeConfig;
+  $message: MessageInstance;
   setThemeType: (themeType: ThemeTypes) => void;
   setThemeData: (themeData: Partial<ThemeProps>) => void;
   setLocale: (language?: LanguageTypes, callback?: () => void) => Promise<void>;
@@ -103,6 +105,7 @@ export type SettingsProps = {
   showSendTargetModal?: boolean; // 发送标签页时是否显示目标分类选择弹窗
   autoPinAdminTab?: boolean; // 是否固定管理后台
   allowSendPinnedTabs?: boolean; // 是否发送固定标签页
+  excludeDomainsForSending?: string; // 发送标签页时排除的域名
   openAdminTabAfterSendTabs?: boolean; // 发送标签页后是否打开管理后台
   closeTabsAfterSendTabs?: boolean; // 发送标签页后是否关闭标签页
   actionAutoCloseFlags?: ActionNames[]; // 各种发送标签页操作是否自动关闭标签页的开关配置

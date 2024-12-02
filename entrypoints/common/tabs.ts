@@ -5,7 +5,7 @@ import {
   ENUM_SETTINGS_PROPS,
   defaultLanguage
 } from '~/entrypoints/common/constants';
-import { objectToUrlParams, getRandomId, isGroupSupported } from '~/entrypoints/common/utils';
+import { objectToUrlParams, getRandomId, isGroupSupported, isUrlMatched } from '~/entrypoints/common/utils';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 
 const {
@@ -15,6 +15,7 @@ const {
   ACTION_AUTO_CLOSE_FLAGS,
   AUTO_PIN_ADMIN_TAB,
   ALLOW_SEND_PINNED_TABS,
+  EXCLUDE_DOMAINS_FOR_SENDING,
   RESTORE_IN_NEW_WINDOW,
 } = ENUM_SETTINGS_PROPS;
 
@@ -171,6 +172,14 @@ async function getFilteredTabs(
     if (tab.pinned && !settings[ALLOW_SEND_PINNED_TABS]) {
       return false;
     }
+    const excludeDomainsString = settings[EXCLUDE_DOMAINS_FOR_SENDING] || '';
+    if (tab.url && excludeDomainsString) {
+      const isMatched = isUrlMatched(tab.url, excludeDomainsString);
+      if (!isMatched) {
+        return false;
+      }
+    }
+
     if (validator) {
       return validator(tab);
     }
@@ -213,6 +222,7 @@ async function sendAllTabs(targetData: SendTargetProps = {}) {
   // 获取插件设置
   const settings = await settingsUtils.getSettings();
   const filteredTabs = await getFilteredTabs(tabs, settings);
+  if (!filteredTabs?.length) return;
   const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs, targetData);
   await openAdminTab(settings, { tagId, groupId });
   const actionAutoCloseFlags = settings[ACTION_AUTO_CLOSE_FLAGS];
@@ -240,6 +250,7 @@ async function sendCurrentTab(targetData: SendTargetProps = {}) {
   let filteredTabs = await getFilteredTabs(tabs, settings);
   // 发送当前选中的标签页时，选中的标签页成组，不考虑原生标签组（即多选时，选中的非标签组的标签页和标签组中的标签页合并到一个组）
   filteredTabs = filteredTabs.map((tab) => ({ ...tab, groupId: -1 }));
+  if (!filteredTabs?.length) return;
   const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs, targetData);
   openAdminTab(settings, { tagId, groupId });
   const actionAutoCloseFlags = settings[ACTION_AUTO_CLOSE_FLAGS];
@@ -261,6 +272,7 @@ async function sendOtherTabs(targetData: SendTargetProps = {}) {
   });
   const settings = await settingsUtils.getSettings();
   const filteredTabs = await getFilteredTabs(tabs, settings);
+  if (!filteredTabs?.length) return;
   const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs, targetData);
   openAdminTab(settings, { tagId, groupId });
   const actionAutoCloseFlags = settings[ACTION_AUTO_CLOSE_FLAGS];
@@ -287,6 +299,7 @@ async function sendLeftTabs(targetData: SendTargetProps = {}, currTab?: Tabs.Tab
 
   const settings = await settingsUtils.getSettings();
   const filteredTabs = await getFilteredTabs(leftTabs, settings);
+  if (!filteredTabs?.length) return;
   const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs, targetData);
   openAdminTab(settings, { tagId, groupId });
   const actionAutoCloseFlags = settings[ACTION_AUTO_CLOSE_FLAGS];
@@ -313,6 +326,7 @@ async function sendRightTabs(targetData: SendTargetProps = {}, currTab?: Tabs.Ta
 
   const settings = await settingsUtils.getSettings();
   const filteredTabs = await getFilteredTabs(rightTabs, settings);
+  if (!filteredTabs?.length) return;
   const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs, targetData);
   openAdminTab(settings, { tagId, groupId });
   const actionAutoCloseFlags = settings[ACTION_AUTO_CLOSE_FLAGS];
