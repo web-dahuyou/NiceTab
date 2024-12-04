@@ -1,8 +1,7 @@
 import { memo, useMemo, useContext } from 'react';
 import { Typography } from 'antd';
-import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
+import { Virtuoso, VirtuosoHandle, type FlatIndexLocationWithAlign } from 'react-virtuoso';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
-import type { TabItem } from '~/entrypoints/types';
 import type { TreeDataNodeTag, TreeDataNodeTabGroup, MoveToCallbackProps } from './types';
 import { StyledGroupList } from './Home.styled';
 import TabGroup from './TabGroup';
@@ -15,7 +14,6 @@ const ListItem = memo(
     const {
       selectedTagKey,
       selectedTabGroupKey,
-      refreshKey,
       handleSelect,
       refreshTreeData,
       handleTabGroupRemove,
@@ -23,9 +21,6 @@ const ListItem = memo(
       handleTabGroupStarredChange,
       handleTabGroupDedup,
       handleTabGroupRestore,
-      handleTabItemDrop,
-      handleTabItemChange,
-      handleTabItemRemove,
     } = treeDataHook;
 
     // 移动单个标签组
@@ -67,9 +62,9 @@ const ListItem = memo(
       <TabGroup
         key={tabGroup.key}
         selected={tabGroup.key === selectedTabGroupKey}
-        refreshKey={
-          !virtual && tabGroup.key === selectedTabGroupKey ? refreshKey : undefined
-        }
+        // refreshKey={
+        //   !virtual && tabGroup.key === selectedTabGroupKey ? refreshKey : undefined
+        // }
         {...tabGroup.originData}
         onChange={(data) => handleTabGroupChange(tabGroup, data)}
         onRemove={() =>
@@ -78,9 +73,6 @@ const ListItem = memo(
         onRestore={() => handleTabGroupRestore(tabGroup)}
         onStarredChange={(isStarred) => handleTabGroupStarredChange(tabGroup, isStarred)}
         onDedup={() => handleTabGroupDedup(tabGroup)}
-        onDrop={handleTabItemDrop}
-        onTabChange={(tabItem: TabItem) => handleTabItemChange(tabGroup, tabItem)}
-        onTabRemove={handleTabItemRemove}
         onMoveTo={handleTabGroupMoveTo}
       ></TabGroup>
     );
@@ -92,13 +84,23 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
   const { treeDataHook } = useContext(HomeContext);
   const { selectedTagKey, selectedTabGroupKey, selectedTag, refreshKey } = treeDataHook;
   const selectedTabGroupRef = useRef<HTMLDivElement>(null);
+  const virtuosoRef = useRef<VirtuosoHandle>(null);
 
   const counts = useMemo(() => {
     return getSelectedCounts(selectedTag.originData);
   }, [selectedTag.originData]);
 
-  const virtuosoRef = useRef<VirtuosoHandle>(null);
-
+  const initialConfig = useMemo(() => {
+    const index = selectedTag?.children?.findIndex(
+      (group) => group.key === selectedTabGroupKey
+    );
+    return {
+      index: index || 0,
+      align: 'start',
+      behavior: 'auto',
+      offset: -180,
+    } as FlatIndexLocationWithAlign;
+  }, [selectedTag, selectedTabGroupKey]);
   const [prevSelectedTagKey, setPrevSelectedTagKey] = useState(selectedTagKey);
   const scrollHandler = useCallback(() => {
     if (virtual && virtuosoRef.current) {
@@ -107,8 +109,9 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
       );
       virtuosoRef.current?.scrollToIndex({
         index: index || 0,
-        align: 'center',
+        align: 'start',
         behavior: 'auto',
+        offset: -180,
       });
     } else if (!virtual && selectedTabGroupRef.current) {
       // const offsetTop = selectedTabGroupRef.current?.offsetTop || 0;
@@ -120,8 +123,8 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
       const groupTop = selectedTabGroupRef.current?.offsetTop || 0;
       if (groupTop < scrollTop + pagePaddingTop) {
         body.scrollTo(0, groupTop - pagePaddingTop - 60);
-      } else if (groupTop + pagePaddingTop + 80 > window.innerHeight + scrollTop) {
-        body.scrollTo(0, groupTop + pagePaddingTop - window.innerHeight + 300);
+      } else if (groupTop + pagePaddingTop + 240 > window.innerHeight + scrollTop) {
+        body.scrollTo(0, groupTop + pagePaddingTop - window.innerHeight + 400);
       }
     }
   }, [selectedTag, selectedTabGroupKey, refreshKey]);
@@ -158,6 +161,7 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
         <Virtuoso
           ref={virtuosoRef}
           useWindowScroll
+          initialTopMostItemIndex={initialConfig}
           overscan={12}
           increaseViewportBy={{ top: 400, bottom: 200 }}
           data={selectedTag?.children || []}

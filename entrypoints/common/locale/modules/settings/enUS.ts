@@ -17,6 +17,9 @@ export default {
   'settings.allowSendPinnedTabs': 'Send pinned tabs to NiceTab when sending tabs?',
   'settings.allowSendPinnedTabs.yes': 'Allowed',
   'settings.allowSendPinnedTabs.no': 'Not allowed (recommended)',
+  'settings.excludeDomainsForSending': 'Tabs from these domains will not be sent to the NiceTab Admin Page:',
+  'settings.excludeDomainsForSending.tooltip': '1.Multiple domain names can be separated by spaces or newlines. Supports "Regular Expression" syntax.',
+  'settings.excludeDomainsForSending.placeholder': 'Multiple domain names can be separated by spaces or newlines',
   'settings.openAdminTabAfterSendTabs': 'Open NiceTab Admin Page when sending tabs?',
   'settings.openAdminTabAfterSendTabs.yes': 'Automatically open (recommended)',
   'settings.openAdminTabAfterSendTabs.no': 'Do not',
@@ -50,4 +53,6 @@ export default {
   'settings.showPageContextMenus': 'Display ContextMenu on your webpage?',
   'settings.popupModuleDisplays': 'Choose the modules to be displayed in the "Popup Panel"',
   'settings.popupModuleDisplays.tooltip': 'If any panel module is selected, the Popup Panel will display when clicking the extension icon. Otherwise, the "Send All Tabs" action will be triggered directly.',
+
+  'settings.autoExpandHomeTree': 'Automatically expand the tree list when opening the Home Page?',
 }

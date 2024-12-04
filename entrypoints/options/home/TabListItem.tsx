@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, memo } from 'react';
 import { theme, Checkbox, Typography, Tooltip, Popover, QRCode } from 'antd';
 import { CloseOutlined, EditOutlined, QrcodeOutlined } from '@ant-design/icons';
 import { GroupItem, TabItem } from '~/entrypoints/types';
@@ -18,10 +18,9 @@ import {
 } from './TabListItem.styled';
 import TabItemEditModal from './TabItemEditModal';
 
-type TabItemProps = {
+type TabItemProps = TabItem & {
   group: Pick<GroupItem, 'groupId' | 'isLocked' | 'isStarred'>;
-  tab: TabItem;
-  onRemove?: () => void;
+  onRemove?: (tabs: TabItem[]) => void;
   onChange?: (data: TabItem) => void;
 };
 
@@ -29,7 +28,11 @@ const { DELETE_AFTER_RESTORE, SILENT_OPEN_TAB_MODIFIER_KEY } = ENUM_SETTINGS_PRO
 const osInfo = getOSInfo();
 
 // 标签页tooltip内容
-function TabItemTooltipMarkup({ tab }: { tab: TabItem }) {
+const TabItemTooltipMarkup = memo(function TabItemTooltipMarkup({
+  tab,
+}: {
+  tab: TabItem;
+}) {
   const { $fmt } = useIntlUtls();
   return (
     <StyledTabItemTooltip>
@@ -50,14 +53,27 @@ function TabItemTooltipMarkup({ tab }: { tab: TabItem }) {
       </div>
     </StyledTabItemTooltip>
   );
-}
+});
 
-export default function TabListItem({ tab, group, onRemove, onChange }: TabItemProps) {
+export default memo(function TabListItem({
+  tabId,
+  title,
+  url,
+  favIconUrl,
+  group,
+  onRemove,
+  onChange,
+}: TabItemProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const [modalVisible, setModalVisible] = useState(false);
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+
+  const tab = useMemo(
+    () => ({ tabId, title, url, favIconUrl }),
+    [tabId, title, url, favIconUrl]
+  );
 
   // 确认编辑
   const handleModalConfirm = useCallback(
@@ -65,8 +81,12 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
       onChange?.(newData);
       setModalVisible(false);
     },
-    [tab, onChange]
+    [onChange]
   );
+
+  const handleTabRemove = useCallback(() => {
+    onRemove?.([tab]);
+  }, [tab, onRemove]);
 
   // 点击打开标签页
   const onTabOpen = useMemo(() => {
@@ -82,7 +102,7 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
         openNewTab(tab.url, { active: !isMatched });
 
         if (settings[DELETE_AFTER_RESTORE]) {
-          onRemove?.();
+          onRemove?.([tab]);
         }
 
         setTimeout(() => {
@@ -90,8 +110,8 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
         }, 500);
       },
       { allowMissMatch: true, [modifierKey]: true }
-    )
-  }, [onRemove]);
+    );
+  }, [tab, onRemove]);
 
   const draggingListener = (value: boolean) => {
     setIsDragging(value);
@@ -146,7 +166,7 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
             $size="16"
             title={$fmt('common.remove')}
             $hoverColor={ENUM_COLORS.red}
-            onClick={onRemove}
+            onClick={handleTabRemove}
           >
             <CloseOutlined />
           </StyledActionIconBtn>
@@ -190,4 +210,4 @@ export default function TabListItem({ tab, group, onRemove, onChange }: TabItemP
       )}
     </>
   );
-}
+});

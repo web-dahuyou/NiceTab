@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ConfigProvider, theme } from 'antd';
+import { ConfigProvider, theme, message } from 'antd';
 import { IntlProvider } from 'react-intl';
 import { PRIMARY_COLOR, defaultLanguage } from '../constants';
 import {
@@ -12,6 +12,7 @@ import type { BrowserMessageProps, ThemeProps, LanguageTypes, ThemeTypes } from 
 import { themeUtils } from '~/entrypoints/common/storage';
 
 export default function Root({ children }: { children: React.ReactNode }) {
+  const [$message, messageContextHolder] = message.useMessage();
   const [version, setVersion] = useState('');
   const { locale: localeAntd, changeLocale: changeLocaleAntd } = useAntdLocale();
   const {
@@ -76,6 +77,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
   return (
     <IntlProvider locale={localeCustom} messages={messages}>
       <ConfigProvider
+        prefixCls="nicetab"
         locale={localeAntd}
         theme={{
           cssVar: true,
@@ -98,11 +100,13 @@ export default function Root({ children }: { children: React.ReactNode }) {
             version,
             colorPrimary: primaryColor,
             themeTypeConfig,
+            $message,
             setThemeType: handleThemeTypeChange,
             setThemeData: handleThemeChange,
             setLocale: handleLocaleChange,
           }}
         >
+          {messageContextHolder}
           {hasReady && children}
         </GlobalContext.Provider>
       </ConfigProvider>

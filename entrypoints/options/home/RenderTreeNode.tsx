@@ -9,15 +9,13 @@ import { RenderTreeNodeProps } from './types';
 import { dndKeys } from './constants';
 import EditInput from '../components/EditInput';
 import DropComponent from '@/entrypoints/common/components/DropComponent';
+import { type TreeDataHookProps } from './hooks/treeData';
+import { eventEmitter as homeEventEmitter } from './hooks/homeCustomEvent';
 
 const allowDropKey = dndKeys.tabItem;
 
 // 渲染 treeNode 节点
-function RenderTreeNode({
-  node,
-  onAction,
-  onTabItemDrop, // 这个 onTabItemDrop 只是为了方便右侧面板的标签页拖拽到左侧树的标签组，左侧树中的 分类和标签组的拖拽由 antd 的 Tree 组件自带实现
-}: RenderTreeNodeProps) {
+function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const nodeRef = useRef<HTMLDivElement>(null);
@@ -33,35 +31,67 @@ function RenderTreeNode({
     return node.type === 'tag' && !!node?.originData?.static;
   }, [node]);
 
-  const onMoveToClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onAction?.({ actionType: node.type, node, actionName: 'moveTo' });
-  };
-  const onRemoveClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onAction?.({ actionType: node.type, node, actionName: 'remove' });
-  };
-  const handleGroupCreate = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    node.type === 'tag' &&
-      onAction?.({ actionType: 'tabGroup', node, actionName: 'create' });
-  };
-  const handleRenameChange = (value?: string) => {
-    const fieldKey = node.type === 'tag' ? 'tagName' : 'groupName';
-    onAction?.({
-      actionType: node.type,
-      node,
-      actionName: 'rename',
-      data: { [fieldKey]: value || unnamedNodeName },
-    });
-  };
+  const onMoveToClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onAction?.({ actionType: node.type, node, actionName: 'moveTo' });
+    },
+    [onAction]
+  );
+
+  const onRemoveClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onAction?.({ actionType: node.type, node, actionName: 'remove' });
+    },
+    [onAction]
+  );
+
+  const handleGroupCreate = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      node.type === 'tag' &&
+        onAction?.({ actionType: 'tabGroup', node, actionName: 'create' });
+    },
+    [onAction]
+  );
+
+  const handleRenameChange = useCallback(
+    (value?: string) => {
+      const fieldKey = node.type === 'tag' ? 'tagName' : 'groupName';
+      onAction?.({
+        actionType: node.type,
+        node,
+        actionName: 'rename',
+        data: { [fieldKey]: value || unnamedNodeName },
+      });
+    },
+    [onAction]
+  );
+
+  // 这个 onTabItemDrop 只是为了方便右侧面板的标签页拖拽到左侧树的标签组，左侧树中的 分类和标签组的拖拽由 antd 的 Tree 组件自带实现
+  const onTabItemDrop: TreeDataHookProps['handleTabItemDrop'] = useCallback(
+    (...params) => {
+      homeEventEmitter.emit('home:treeDataHook', {
+        action: 'handleTabItemDrop',
+        params,
+      });
+    },
+    []
+  );
 
   // 编辑状态禁止node节点拖拽
   const handleEditingStatusChange = useCallback((status: boolean) => {
     // console.log('handleEditingStatusChange', status);
-    const draggableTreeNode = nodeRef.current?.closest('.ant-tree-treenode-draggable');
+    const draggableTreeNode = nodeRef.current?.closest(
+      '.nicetab-tree-treenode-draggable'
+    );
     draggableTreeNode?.setAttribute('draggable', status ? 'false' : 'true');
     eventEmitter.emit('home:set-editing-status', status);
+  }, []);
+
+  const handleInputClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
   }, []);
 
   return (
@@ -91,6 +121,7 @@ function RenderTreeNode({
                 iconSize={14}
                 onValueChange={handleRenameChange}
                 onEditingStatusChange={handleEditingStatusChange}
+                onClick={handleInputClick}
               ></EditInput>
             </span>
           )}
@@ -98,7 +129,7 @@ function RenderTreeNode({
           <span className="tree-node-icon-group">
             {node.type === 'tag' && (
               <>
-                { node.children?.length ? (
+                {node.children?.length ? (
                   <StyledActionIconBtn
                     className="btn-add"
                     $size="14"

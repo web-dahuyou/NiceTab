@@ -35,6 +35,7 @@ const {
   SHOW_SEND_TARGET_MODAL,
   AUTO_PIN_ADMIN_TAB,
   ALLOW_SEND_PINNED_TABS,
+  EXCLUDE_DOMAINS_FOR_SENDING,
   RESTORE_IN_NEW_WINDOW,
   DELETE_AFTER_RESTORE,
   SILENT_OPEN_TAB_MODIFIER_KEY,
@@ -46,6 +47,7 @@ const {
   SHOW_OPENED_TAB_COUNT,
   SHOW_PAGE_CONTEXT_MENUS,
   POPUP_MODULE_DISPLAYS,
+  AUTO_EXPAND_HOME_TREE,
 } = ENUM_SETTINGS_PROPS;
 
 const module = 'settings'; // locale module name
@@ -189,6 +191,28 @@ export default function Settings() {
               </Radio>
             </Radio.Group>
           </Form.Item>
+          {/* 排除的域名 */}
+          <Form.Item<SettingsProps>
+            label={$fmt({
+              id: `${module}.${EXCLUDE_DOMAINS_FOR_SENDING}`,
+              values: { mark: '：' },
+            })}
+            name={EXCLUDE_DOMAINS_FOR_SENDING}
+            tooltip={{
+              color: token.colorBgElevated,
+              title: (
+                <Typography.Text>
+                  {$fmt(`${module}.${EXCLUDE_DOMAINS_FOR_SENDING}.tooltip`)}
+                </Typography.Text>
+              ),
+            }}
+          >
+            <Input.TextArea
+              style={{ width: '500px' }}
+              autoSize={{ minRows: 3, maxRows: 8 }}
+              placeholder={$fmt(`${module}.${EXCLUDE_DOMAINS_FOR_SENDING}.placeholder`)}
+            />
+          </Form.Item>
           {/* 发送标签页后是否打开管理后台 */}
           <Form.Item<SettingsProps>
             label={
@@ -254,6 +278,37 @@ export default function Settings() {
               ) : null;
             }}
           </Form.Item>
+          {/* 发送标签页时-是否允许重复的标签组 */}
+          <Form.Item<SettingsProps>
+            label={$fmt({
+              id: `${module}.${ALLOW_DUPLICATE_GROUPS}`,
+              values: { mark: '：' },
+            })}
+            name={ALLOW_DUPLICATE_GROUPS}
+          >
+            <Radio.Group>
+              <Radio value={true}>
+                {$fmt(`${module}.${ALLOW_DUPLICATE_GROUPS}.yes`)}
+              </Radio>
+              <Radio value={false}>
+                {$fmt(`${module}.${ALLOW_DUPLICATE_GROUPS}.no`)}
+              </Radio>
+            </Radio.Group>
+          </Form.Item>
+
+          {/* 发送标签页时-是否允许重复的标签页 */}
+          <Form.Item<SettingsProps>
+            label={$fmt({
+              id: `${module}.${ALLOW_DUPLICATE_TABS}`,
+              values: { mark: '：' },
+            })}
+            name={ALLOW_DUPLICATE_TABS}
+          >
+            <Radio.Group>
+              <Radio value={true}>{$fmt(`${module}.${ALLOW_DUPLICATE_TABS}.yes`)}</Radio>
+              <Radio value={false}>{$fmt(`${module}.${ALLOW_DUPLICATE_TABS}.no`)}</Radio>
+            </Radio.Group>
+          </Form.Item>
 
           <Divider orientation="left">{$fmt('settings.block.openTabs')}</Divider>
 
@@ -311,38 +366,6 @@ export default function Settings() {
               <Radio value={false}>
                 {$fmt(`${module}.${DELETE_UNLOCKED_EMPTY_GROUP}.no`)}
               </Radio>
-            </Radio.Group>
-          </Form.Item>
-
-          {/* 是否允许重复的标签组 */}
-          <Form.Item<SettingsProps>
-            label={$fmt({
-              id: `${module}.${ALLOW_DUPLICATE_GROUPS}`,
-              values: { mark: '：' },
-            })}
-            name={ALLOW_DUPLICATE_GROUPS}
-          >
-            <Radio.Group>
-              <Radio value={true}>
-                {$fmt(`${module}.${ALLOW_DUPLICATE_GROUPS}.yes`)}
-              </Radio>
-              <Radio value={false}>
-                {$fmt(`${module}.${ALLOW_DUPLICATE_GROUPS}.no`)}
-              </Radio>
-            </Radio.Group>
-          </Form.Item>
-
-          {/* 是否允许重复的标签页 */}
-          <Form.Item<SettingsProps>
-            label={$fmt({
-              id: `${module}.${ALLOW_DUPLICATE_TABS}`,
-              values: { mark: '：' },
-            })}
-            name={ALLOW_DUPLICATE_TABS}
-          >
-            <Radio.Group>
-              <Radio value={true}>{$fmt(`${module}.${ALLOW_DUPLICATE_TABS}.yes`)}</Radio>
-              <Radio value={false}>{$fmt(`${module}.${ALLOW_DUPLICATE_TABS}.no`)}</Radio>
             </Radio.Group>
           </Form.Item>
 
@@ -439,6 +462,17 @@ export default function Settings() {
             }}
           >
             <Checkbox.Group options={popupModuleDisplayOptions}></Checkbox.Group>
+          </Form.Item>
+
+          {/* 进入列表页时，是否自动展开全部节点 */}
+          <Form.Item<SettingsProps>
+            label={$fmt(`${module}.${AUTO_EXPAND_HOME_TREE}`)}
+            name={AUTO_EXPAND_HOME_TREE}
+          >
+            <Radio.Group>
+              <Radio value={true}>{$fmt('common.yes')}</Radio>
+              <Radio value={false}>{$fmt('common.no')}</Radio>
+            </Radio.Group>
           </Form.Item>
 
           <Form.Item>

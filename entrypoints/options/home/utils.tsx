@@ -1,3 +1,4 @@
+import type { TreeProps } from 'antd';
 import { PushpinOutlined, TagOutlined, ProductOutlined } from '@ant-design/icons';
 import { getLocaleMessages } from '~/entrypoints/common/utils';
 import type { TagItem } from '~/entrypoints/types';
@@ -34,6 +35,34 @@ export const getSelectedCounts = (tag: TagItem) => {
     tabCount += group.tabList?.length || 0;
   });
   return { groupCount, tabCount };
+};
+
+// 判断能否拖拽到节点上
+export const checkAllowDrop: TreeProps<TreeDataNodeUnion>['allowDrop'] = ({
+  dragNode,
+  dropNode,
+  dropPosition,
+}) => {
+  // console.log('checkAllowDrop--dragNode', dragNode)
+  // console.log('checkAllowDrop--dropNode', dropNode)
+  // console.log('checkAllowDrop--dropPosition', dropPosition)
+
+  // dropPosition = 0 时表示，拖放到目标 node 的子集
+  // dropPosition = 1 时表示，拖放到目标 node 的同级之后
+  // dropPosition = -1 时表示，拖放到目标 node 的同级之前
+  if (
+    (dragNode.type === 'tag' && dragNode?.originData?.static) ||
+    (dropNode.type === 'tag' && dropNode?.originData?.static && dropPosition == -1)
+  ) {
+    // 中转站永远置顶，不允许其他分类排到它前面
+    return false;
+  }
+
+  return (
+    (dragNode.type === 'tabGroup' && dropNode.type === 'tabGroup') ||
+    (dragNode.type === 'tag' && dropNode.type === 'tag' && dropPosition !== 0) ||
+    (dragNode.type === 'tabGroup' && dropNode.type === 'tag' && dropPosition >= 0)
+  );
 };
 
 // 生成Cascader级联数据

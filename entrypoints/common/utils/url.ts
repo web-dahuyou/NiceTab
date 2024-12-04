@@ -56,6 +56,34 @@ export function getFaviconURL(pageUrl: string, size: number = 16) {
   return `https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${pageOrigin}&size=${size}`;
 }
 
+/**
+ * @description: url是否匹配，排除某些域名
+ * @param {string} url 链接
+ * @param {string} excludeString 排除的域名列表字符串（可通过空格和换行分隔）
+ * @return {boolean} 是否匹配（不在排除列表中）
+ */
+export function isUrlMatched(
+  url: string | undefined,
+  excludeString: string | undefined
+): boolean {
+  if (url && excludeString) {
+    const excludeDomainList = excludeString
+      .replace(/\n/g, ' ')
+      .replace(/\s+/g, ' ')
+      ?.split(' ')
+      ?.filter(Boolean);
+    const baseUrl = url?.split('?')?.[0] || url;
+    for (let domain of excludeDomainList) {
+      const reg = new RegExp(domain);
+      if (reg.test(baseUrl)) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
 export default {
   handleUrlWidthParams,
   getUrlParams,

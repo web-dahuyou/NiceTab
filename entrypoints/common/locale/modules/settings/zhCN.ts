@@ -17,6 +17,9 @@ export default {
   'settings.allowSendPinnedTabs': '发送标签页时-是否发送固定标签页到NiceTab{mark}',
   'settings.allowSendPinnedTabs.yes': '允许发送固定标签页',
   'settings.allowSendPinnedTabs.no': '不要发送固定标签页（推荐）',
+  'settings.excludeDomainsForSending': '发送标签页时-以下域名的标签页不会发送到管理后台：',
+  'settings.excludeDomainsForSending.tooltip': '多个域名可使用空格或者换行分隔；支持正则表达式；',
+  'settings.excludeDomainsForSending.placeholder': '多个域名可使用空格或者换行分隔',
   'settings.openAdminTabAfterSendTabs': '发送标签页时-是否打开NiceTab管理后台{mark}',
   'settings.openAdminTabAfterSendTabs.yes': '自动打开NiceTab管理后台（推荐）',
   'settings.openAdminTabAfterSendTabs.no': '不要自动打开NiceTab管理后台',
@@ -50,4 +53,6 @@ export default {
   'settings.showPageContextMenus': '是否在网页中显示NiceTab右键菜单：',
   'settings.popupModuleDisplays': 'Popup面板模块展示设置：',
   'settings.popupModuleDisplays.tooltip': '只要选择了任意面板模块，则点击扩展图标时将展示 Popup 面板，否则将直接发送所有标签页。',
+
+  'settings.autoExpandHomeTree': '进入列表页时-是否自动展开全部节点：',
 }

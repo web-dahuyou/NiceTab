@@ -8,13 +8,37 @@ import type { CascaderOption } from './types';
 import { getTotalCascaderData } from './utils';
 
 const StyledCascaderWrapper = styled.div`
-  .ant-cascader-panel {
+  .nicetab-cascader-panel {
+    position: relative;
     overflow-x: visible;
   }
-  .ant-cascader-menu {
+  // .nicetab-cascader-menus {
+  //   position: relative;
+  //   box-shadow: none;
+  // }
+  .nicetab-cascader-menu {
     min-height: 180px;
     max-height: 360px;
     overflow: auto;
+    &::-webkit-scrollbar {
+      width: 8px !important;
+      height: 8px !important;
+    }
+
+    &::-webkit-scrollbar-track {
+      border-radius: 4px;
+      background: ${(props) => props.theme.colorBgContainer || '#fff'};
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 4px;
+      background: ${(props) => `${props.theme.type === 'light' ? '#d9d9d9' : '#555'} !important`};
+      box-shadow:inset 0 0 4px rgba(0, 0, 0, .3);
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: ${(props) => `${props.theme.type === 'light' ? '#bfbfbf' : '#888'} !important`};
+    }
   }
   .cascader-label-custom {
     display: flex;
@@ -74,26 +98,24 @@ export default function SendTargetModal({
       onOk={handleSending}
       onCancel={onCancel}
     >
-      <Flex vertical gap="middle">
-        <StyledCascaderWrapper>
-          <Cascader.Panel
-            options={options}
-            value={targetValue}
-            changeOnSelect
-            onChange={onCascaderChange}
-          ></Cascader.Panel>
-          {!targetOptions?.length && (
-            <div style={{ marginTop: '12px', fontSize: '12px' }}>
-              <Typography.Text type="danger">
-                {$fmt({
-                  id: 'home.moveTo.missingTip',
-                  values: { type: $fmt(`home.tag`) },
-                })}
-              </Typography.Text>
-            </div>
-          )}
-        </StyledCascaderWrapper>
-      </Flex>
+      <StyledCascaderWrapper>
+        <Cascader.Panel
+          options={options}
+          value={targetValue}
+          changeOnSelect
+          onChange={onCascaderChange}
+        ></Cascader.Panel>
+        {!targetOptions?.length && (
+          <div style={{ marginTop: '12px', fontSize: '12px' }}>
+            <Typography.Text type="danger">
+              {$fmt({
+                id: 'home.moveTo.missingTip',
+                values: { type: $fmt(`home.tag`) },
+              })}
+            </Typography.Text>
+          </div>
+        )}
+      </StyledCascaderWrapper>
     </Modal>
   );
 }
