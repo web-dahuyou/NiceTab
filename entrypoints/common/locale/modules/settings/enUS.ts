@@ -32,7 +32,7 @@ export default {
   'settings.deleteAfterRestore': 'Remove tabs when opening tabs or tab group?',
   'settings.deleteAfterRestore.yes': 'Remove (pinned tabs remain)',
   'settings.deleteAfterRestore.no': 'All remain (recommended)',
-  'settings.silentOpenTabModifierKey': 'Modifier key for silently opening tabs:',
+  'settings.silentOpenTabModifierKey': 'Modifier key for silently opening a tab:',
   'settings.deleteUnlockedEmptyGroup': 'Remove empty groups when clearing tabs?',
   'settings.deleteUnlockedEmptyGroup.yes': 'Automatically remove (retain locked groups)',
   'settings.deleteUnlockedEmptyGroup.no': 'Do not',
