@@ -47,6 +47,8 @@ export default {
     one {# Group}
     other {# Groups}
   }`,
+  'home.tabGroup.name': 'Group Name',
+  'home.tabGroup.createTime': 'Create Time',
   'home.tab.count': `{count, plural,
     =0 {No Tabs}
     one {# Tab}

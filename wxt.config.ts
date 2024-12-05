@@ -1,9 +1,13 @@
 import { defineConfig } from 'wxt';
+import svgr from "vite-plugin-svgr";
 
 export default defineConfig({
   // entrypointLoader: 'jiti',
   // extensionApi: 'chrome',
   modules: ['@wxt-dev/module-react'],
+  vite: () => ({
+    plugins: [svgr({ svgrOptions: { icon: true } })],
+  }),
   manifest: {
     name: 'Nice Tab Manager | 标签页管理器',
     permissions: [

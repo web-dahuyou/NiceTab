@@ -43,6 +43,8 @@ export default {
   'home.tabGroup.open': '打开该组',
 
   'home.tabGroup.count': '{count}个标签组',
+  'home.tabGroup.name': '标签组名称',
+  'home.tabGroup.createTime': '创建时间',
   'home.tab.count': '{count}个标签页',
   'home.tab.name': '名称',
   'home.tab.url': '网址',
