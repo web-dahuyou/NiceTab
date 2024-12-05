@@ -143,8 +143,8 @@ export default forwardRef((_, ref) => {
   const searchListRef = useRef<HTMLDivElement>(null);
 
   const onAction: ActionCallbackFn = (type, option) => {
-    const { tagId, groupId } = option;
-    let params: Partial<TreeDataNodeUnion> = {};
+    const { tagId, groupId, tabId } = option;
+    let params: Partial<TreeDataNodeUnion & { tabId: string }> = {};
     if (type === 'tag') {
       params = { type: 'tag', key: tagId };
     } else {
@@ -152,6 +152,7 @@ export default forwardRef((_, ref) => {
         type: 'tabGroup',
         key: groupId,
         parentKey: tagId,
+        tabId,
       };
     }
     setTimeout(() => {
