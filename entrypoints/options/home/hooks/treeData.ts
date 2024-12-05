@@ -36,6 +36,7 @@ export function useTreeData() {
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [refreshKey, setRefreshKey] = useState<string>(getRandomId());
+  const [highlightTabId, setHighlightTabId] = useState<string | undefined>();
 
   const urlParams = useMemo(() => {
     const params: Record<string, string> = {};
@@ -126,6 +127,7 @@ export function useTreeData() {
       }
       setSelectedKeys([node.key]);
       setRefreshKey(getRandomId());
+      setHighlightTabId(undefined);
     },
     []
   );
@@ -137,11 +139,13 @@ export function useTreeData() {
   );
 
   const selectedKeyChange = useCallback(
-    ({ type, key, parentKey }: Partial<TreeDataNodeUnion>, callback?: () => void) => {
+    ({ type, key, parentKey, tabId }: Partial<TreeDataNodeUnion & { tabId: string }>, callback?: () => void) => {
       if (!key) return;
       handleSelect(treeData, [key], {
         node: { type, key, parentKey } as TreeDataNodeUnion,
       });
+      setHighlightTabId(tabId);
+
       setTimeout(() => {
         callback?.();
       }, 300);
@@ -404,6 +408,7 @@ export function useTreeData() {
     setTreeData(treeData);
     // console.log('refresh-treeData', treeData);
     setCountInfo(tabListUtils.countInfo);
+    setHighlightTabId(undefined);
     autoScroll && setRefreshKey(getRandomId());
     callback?.(treeData);
   };
@@ -522,6 +527,8 @@ export function useTreeData() {
     setExpandedKeys,
     selectedTag,
     refreshKey,
+    highlightTabId,
+    setHighlightTabId,
     handleSelect,
     onSelect,
     handleMoreItemClick,

@@ -80,7 +80,6 @@ export const StyledTabActions = styled.div<{ theme: StyledThemeProps }>`
 export const StyledTabListWrapper = styled.div`
   min-height: 24px;
   margin-top: 8px;
-  padding-left: 20px;
   .tab-list-checkbox-group {
     width: 100%;
     display: block;

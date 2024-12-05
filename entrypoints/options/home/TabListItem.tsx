@@ -1,4 +1,4 @@
-import { useCallback, useState, memo } from 'react';
+import { useCallback, useState, memo, useRef } from 'react';
 import { theme, Checkbox, Typography, Tooltip, Popover, QRCode } from 'antd';
 import { CloseOutlined, EditOutlined, QrcodeOutlined } from '@ant-design/icons';
 import { GroupItem, TabItem } from '~/entrypoints/types';
@@ -20,6 +20,7 @@ import TabItemEditModal from './TabItemEditModal';
 
 type TabItemProps = TabItem & {
   group: Pick<GroupItem, 'groupId' | 'isLocked' | 'isStarred'>;
+  highlight?: boolean;
   onRemove?: (tabs: TabItem[]) => void;
   onChange?: (data: TabItem) => void;
 };
@@ -61,6 +62,7 @@ export default memo(function TabListItem({
   url,
   favIconUrl,
   group,
+  highlight,
   onRemove,
   onChange,
 }: TabItemProps) {
@@ -69,6 +71,8 @@ export default memo(function TabListItem({
   const [modalVisible, setModalVisible] = useState(false);
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+
+  const tabRef = useRef<HTMLDivElement>(null);
 
   const tab = useMemo(
     () => ({ tabId, title, url, favIconUrl }),
@@ -118,6 +122,17 @@ export default memo(function TabListItem({
     if (value) setTooltipVisible(false);
   };
 
+  const scrollToTab = useCallback(() => {
+    if (highlight && tabRef.current) {
+      setTimeout(() => {
+        tabRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }, [highlight]);
+  useEffect(() => {
+    scrollToTab();
+  }, []);
+
   useEffect(() => {
     eventEmitter.on('home:is-dragging', draggingListener);
     return () => {
@@ -127,7 +142,11 @@ export default memo(function TabListItem({
 
   return (
     <>
-      <StyledTabItemWrapper className="tab-list-item">
+      <StyledTabItemWrapper
+        className="tab-list-item"
+        ref={tabRef}
+        $bgColor={highlight ? token.colorWarningHover : ''}
+      >
         {/* checkbox */}
         {!group?.isLocked && (
           <Checkbox className="checkbox-item" value={tab.tabId}></Checkbox>

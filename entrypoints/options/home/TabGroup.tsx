@@ -413,7 +413,9 @@ function TabGroup({
             className="tab-list-wrapper"
             style={{ minHeight: `${tabListHeight}px` }}
           >
-            { rendering ? <Skeleton title={false} paragraph={{ rows: 3 }}></Skeleton> : (
+            {rendering ? (
+              <Skeleton title={false} paragraph={{ rows: 3 }}></Skeleton>
+            ) : (
               <Spin spinning={loading} size="large">
                 <Checkbox.Group
                   className="tab-list-checkbox-group"
@@ -432,6 +434,10 @@ function TabGroup({
                         key={tab.tabId || index}
                         group={group}
                         {...tab}
+                        highlight={
+                          tab.tabId != undefined &&
+                          treeDataHook?.highlightTabId === tab.tabId
+                        }
                         onRemove={handleTabRemove}
                         onChange={handleTabChange}
                       />
@@ -439,7 +445,7 @@ function TabGroup({
                   ))}
                 </Checkbox.Group>
               </Spin>
-            ) }
+            )}
           </StyledTabListWrapper>
         </DropComponent>
       </StyledGroupWrapper>

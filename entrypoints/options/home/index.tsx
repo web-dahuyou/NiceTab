@@ -82,11 +82,21 @@ export default function Home() {
     setConfirmModalVisible(false);
   };
 
-  // 排序
-  const onSort = useCallback(
+  // 按名称排序
+  const onNameSort = useCallback(
     async (sortType: string) => {
       if (!selectedTagKey) return;
-      await tabListUtils.groupListSort(sortType, selectedTagKey);
+      await tabListUtils.groupListSortbyName(sortType, selectedTagKey);
+      refreshTreeData();
+    },
+    [selectedTagKey]
+  );
+
+  // 按创建时间排序
+  const onCreateTimeSort = useCallback(
+    async (sortType: string) => {
+      if (!selectedTagKey) return;
+      await tabListUtils.groupListSortbyCreateTime(sortType, selectedTagKey);
       refreshTreeData();
     },
     [selectedTagKey]
@@ -112,7 +122,8 @@ export default function Home() {
                 collapsed={sidebarCollapsed}
                 onCollapseChange={onCollapseChange}
               ></ToggleSidebarBtn>
-              {selectedTagKey ? <SortingBtns onSort={onSort}></SortingBtns> : null}
+              {selectedTagKey ? <SortingBtns onSort={onNameSort}></SortingBtns> : null}
+              {selectedTagKey ? <SortingBtns sortBy="createTime" onSort={onCreateTimeSort}></SortingBtns> : null}
             </div>
 
             <div className="sidebar-inner-content">

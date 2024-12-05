@@ -8,6 +8,7 @@ import type {
   TabItem,
   CountInfo,
 } from '~/entrypoints/types';
+import dayjs from 'dayjs';
 import { ENUM_SETTINGS_PROPS, UNNAMED_TAG, UNNAMED_GROUP } from '../constants';
 import {
   isGroupSupported,
@@ -636,8 +637,8 @@ export default class TabListUtils {
     await this.setTagList(tagList);
     return { targetTagId: undefined };
   }
-  // 标签组排序
-  async groupListSort(sortType: string, tagId: Key) {
+  // 标签组按名称排序
+  async groupListSortbyName(sortType: string, tagId: Key) {
     const tagList = await this.getTagList();
     const tag = tagList.find((t) => t.tagId === tagId);
     if (!tag) return;
@@ -654,6 +655,26 @@ export default class TabListUtils {
       doSortList?.sort((a, b) => a.groupName.localeCompare(b.groupName));
     } else {
       doSortList?.sort((a, b) => b.groupName.localeCompare(a.groupName));
+    }
+
+    tag.groupList = tag.groupList?.slice(0, unstarredIndex).concat(doSortList);
+    await this.setTagList(tagList);
+  }
+
+  // 标签组按名称排序
+  async groupListSortbyCreateTime(sortType: string, tagId: Key) {
+    const tagList = await this.getTagList();
+    const tag = tagList.find((t) => t.tagId === tagId);
+    if (!tag) return;
+
+    const unstarredIndex =
+      tag.groupList?.findIndex((g) => !g.isStarred) ?? tag.groupList.length;
+    const doSortList = unstarredIndex > -1 ? tag?.groupList?.slice(unstarredIndex) : [];
+
+    if (sortType === 'ascending') {
+      doSortList?.sort((a, b) => dayjs(a.createTime).valueOf() - dayjs(b.createTime).valueOf());
+    } else {
+      doSortList?.sort((a, b) => dayjs(b.createTime).valueOf() - dayjs(a.createTime).valueOf());
     }
 
     tag.groupList = tag.groupList?.slice(0, unstarredIndex).concat(doSortList);
