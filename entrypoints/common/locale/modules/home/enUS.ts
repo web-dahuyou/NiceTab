@@ -85,5 +85,5 @@ export default {
   'home.tip.tooManyTabs': 'The number of tabs exceeds the set value, enabling virtual scrolling.',
   'home.tip.addScope': 'The next version will add new features, which require additional authorization. After the new version is released, it will be automatically disabled. If you wish to continue using it, please manually enable it.',
 
-  'recycleBin.tip.autoClear': 'Note: Recycle bin will be automatically cleared once a day!',
+  'recycleBin.tip.autoClear': 'Note: The recycle bin will be automatically cleared once a day!',
 }
