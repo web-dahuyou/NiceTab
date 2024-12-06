@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { theme, Collapse, Space, Button, Modal, Empty } from 'antd';
+import { theme, Collapse, Space, Button, Modal, Empty, Alert } from 'antd';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { TagItem, GroupItem, TabItem } from '@/entrypoints/types';
 import { recycleUtils } from '~/entrypoints/common/storage';
@@ -123,6 +123,12 @@ export default function RecycleBin() {
           >
             {$fmt('home.clearAll')}
           </Button>
+          <Alert
+            className="warning-tip"
+            type="warning"
+            showIcon
+            message={$fmt('recycleBin.tip.autoClear')}
+          />
         </Space>
       </StickyBox>
       <Collapse

@@ -1,4 +1,5 @@
 // import { storage } from 'wxt/storage';
+import dayjs from 'dayjs';
 import type { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
 
 import Store from './instanceStore';
@@ -13,9 +14,11 @@ export default class RecycleBinUtils extends TabListUtils {
     tabCount: 0,
   };
   storageKey: `local:${string}` = 'local:recycleBin';
+  clearStatusKey: `local:${string}` = 'local:clearStatus';
 
   constructor() {
     super();
+    this.checkAndClear();
   }
 
   async getTagList() {
@@ -208,5 +211,20 @@ export default class RecycleBinUtils extends TabListUtils {
     }
     await this.setTagList(tagList);
     return tagList;
+  }
+  // 每天检查并清空回收站
+  async checkAndClear() {
+    const status = await storage.getItem<{ clearedFlag: boolean; date: string }>(
+      this.clearStatusKey
+    );
+    const { clearedFlag, date } = status || {};
+    const isToday = dayjs().isSame(dayjs(date), 'day');
+    if (isToday && clearedFlag) return;
+
+    storage.setItem(this.clearStatusKey, {
+      clearedFlag: true,
+      date: dayjs().format('YYYY-MM-DD'),
+    });
+    this.setTagList([]);
   }
 }

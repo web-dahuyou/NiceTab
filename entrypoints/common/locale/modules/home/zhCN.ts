@@ -76,4 +76,6 @@ export default {
   'home.moveTo.mergeTip.2': '2、勾选后，如果移动标签组，则与目标分类中同名的标签组合并，标签页去重。',
   'home.tip.tooManyTabs': '当前分类中标签页数量超过预定值, 已开启虚拟滚动。',
   'home.tip.addScope': '下一个版本将添加快捷键等功能，需要新增授权，新版本发布后可能会自动停用，如需继续使用请手动启用。',
+
+  'recycleBin.tip.autoClear': '注意：回收站的数据每天会自动清空一次！',
 }
