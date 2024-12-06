@@ -95,7 +95,7 @@ export type ActionNames =
   | 'sendRightTabs';
 
 // popup 弹窗中的模块名称
-export type PopupModuleNames = 'extensionInfo' | 'goto' | 'theme' | 'openedTabs';
+export type PopupModuleNames = 'extensionInfo' | 'goto' | 'actions' | 'theme' | 'openedTabs';
 
 // 管理后台-设置信息
 export type SettingsProps = {
