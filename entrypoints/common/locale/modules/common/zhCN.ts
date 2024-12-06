@@ -12,6 +12,7 @@ export default {
   'common.sendRightTabs': '发送右侧标签页',
   'common.sendPinnedTabs': '发送固定标签页',
   'common.openAdminTab': '打开NiceTab管理后台',
+  'common.actions': '操作',
   'common.save': '保存',
   'common.saveSuccess': '保存成功',
   'common.actionSuccess': '{action}成功',
@@ -79,4 +80,5 @@ export default {
   'common.bindShortcuts': '绑定快捷键',
   'common.sendTo': '发送到',
   'common.search': '搜索',
+  'common.reload': '重新加载',
 };

@@ -2,14 +2,7 @@ import React, { useContext, useCallback, useEffect, useState } from 'react';
 import { browser, Tabs } from 'wxt/browser';
 import { ThemeProvider } from 'styled-components';
 import { theme, Space, Divider } from 'antd';
-import {
-  CloseOutlined,
-  HomeOutlined,
-  // SettingOutlined,
-  // ImportOutlined,
-  // SyncOutlined,
-  // RestOutlined,
-} from '@ant-design/icons';
+import { CloseOutlined } from '@ant-design/icons';
 import {
   classNames,
   sendBrowserMessage,
@@ -35,7 +28,7 @@ import {
 } from '~/entrypoints/common/style/Common.styled';
 import { StyledContainer, StyledList, StyledFavIcon } from './App.styled';
 
-function handleQuickAction(route: { path: string; query?: Record<string, any> }) {
+function handleQuickJump(route: { path: string; query?: Record<string, any> }) {
   sendBrowserMessage('openAdminRoutePage', route);
 }
 
@@ -47,23 +40,31 @@ export default function App() {
   const [tabs, setTabs] = useState<Tabs.Tab[]>([]);
   const [modules, setModules] = useState<PopupModuleNames[]>([]);
 
-  // 快捷按钮
-  const quickActionBtns = [
+  // 快捷跳转
+  const quickJumpBtns = [
     {
       path: '/home',
       label: $fmt('common.adminPage'),
-      icon: <HomeOutlined />,
-      onClick: () => handleQuickAction({ path: '/home' }),
+      onClick: () => handleQuickJump({ path: '/home' }),
     },
     {
       path: '/shortcuts',
       label: $fmt('common.bindShortcuts'),
-      icon: <HomeOutlined />,
       onClick: () => {
         openNewTab('chrome://extensions/shortcuts', {
           active: true,
           openToNext: true,
         });
+      },
+    },
+  ];
+  // 操作按钮
+  const actionBtns = [
+    {
+      action: 'reload',
+      label: $fmt('common.reload'),
+      onClick: () => {
+        browser.runtime.reload();
       },
     },
   ];
@@ -147,8 +148,25 @@ export default function App() {
                   <Divider type="vertical" style={{ background: token.colorBorder }} />
                 }
               >
-                {quickActionBtns.map((item) => (
+                {quickJumpBtns.map((item) => (
                   <span className="action-btn" key={item.path} onClick={item.onClick}>
+                    {item.label}
+                  </span>
+                ))}
+              </Space>
+            </div>
+          )}
+          {modules.includes('actions') && (
+            <div className="block quick-actions">
+              <span className="block-title">{$fmt('common.actions')}：</span>
+              <Space
+                size={0}
+                split={
+                  <Divider type="vertical" style={{ background: token.colorBorder }} />
+                }
+              >
+                {actionBtns.map((item) => (
+                  <span className="action-btn" key={item.action} onClick={item.onClick}>
                     {item.label}
                   </span>
                 ))}

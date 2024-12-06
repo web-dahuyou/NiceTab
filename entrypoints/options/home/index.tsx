@@ -3,7 +3,7 @@ import { theme, Flex, Button, Dropdown, Modal, Drawer, Space, Typography, Toolti
 import { QuestionCircleOutlined, MoreOutlined, ClearOutlined } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { classNames } from '~/entrypoints/common/utils';
-import { tabListUtils, settingsUtils, stateUtils } from '@/entrypoints/common/storage';
+import { tabListUtils, settingsUtils, stateUtils, recycleUtils } from '@/entrypoints/common/storage';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { openNewTab } from '@/entrypoints/common/tabs';
 
@@ -106,6 +106,10 @@ export default function Home() {
     setSidebarCollapsed(status);
     stateUtils.setState({ 'home:sidebarCollapsed': status });
   };
+
+  useEffect(() => {
+    recycleUtils.checkAndClear();
+  }, []);
 
   return (
     <HomeContext.Provider value={{ treeDataHook }}>

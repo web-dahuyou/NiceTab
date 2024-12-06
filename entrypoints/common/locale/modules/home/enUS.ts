@@ -84,4 +84,6 @@ export default {
   'home.moveTo.mergeTip.2': '2. If checked, when moving a tab group, it will be merged to the group of the same name in the target category (tag).',
   'home.tip.tooManyTabs': 'The number of tabs exceeds the set value, enabling virtual scrolling.',
   'home.tip.addScope': 'The next version will add new features, which require additional authorization. After the new version is released, it will be automatically disabled. If you wish to continue using it, please manually enable it.',
+
+  'recycleBin.tip.autoClear': 'Note: Recycle bin will be automatically cleared once a day!',
 }

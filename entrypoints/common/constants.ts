@@ -89,6 +89,7 @@ export const SEND_TAB_ACTION_NAMES = [
 export const POPUP_MODULE_NAMES: PopupModuleNames[] = [
   'extensionInfo', // 插件信息
   'goto', // 前往
+  'actions', // 操作
   'theme', // 主题色
   'openedTabs', // 已打开的标签页
 ];

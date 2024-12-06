@@ -3,7 +3,6 @@ import { Form, Button, Radio, Input, Divider, Space, Upload, message } from 'ant
 import type { FormProps, UploadProps, RadioChangeEvent } from 'antd';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
-// import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { saveAs } from 'file-saver';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { tabListUtils } from '~/entrypoints/common/storage';
@@ -33,7 +32,6 @@ export default function ImportExport() {
   const [importMode, setImportMode] = useState('append');
   const [exportFormatType, setExportFormatType] = useState(1);
   const [importLoading, setImportLoading] = useState(false);
-  // const [exportLoading, setExportLoading] = useState(false);
   const [downloadLoading, setDownloadLoading] = useState(false);
 
   // 导入操作
@@ -71,13 +69,7 @@ export default function ImportExport() {
   const onExportFormatTypeChange = (e: RadioChangeEvent) => {
     setExportFormatType(e.target.value);
   };
-  // const handlePreview = async () => {
-  //   setExportLoading(true);
-  //   setTimeout(async () => {
-  //     await getExportContent();
-  //     setExportLoading(false);
-  //   }, 500);
-  // };
+
   // 获取导出文本内容
   const getExportContent = useCallback(async () => {
     const formatType = exportFormatType || 1;
@@ -93,14 +85,7 @@ export default function ImportExport() {
       return '';
     }
   }, [exportFormatType]);
-  // 复制到剪切板
-  const handleCopy = (text: string, result: boolean) => {
-    if (result) {
-      messageApi.success($fmt('importExport.CopySuccess'));
-    } else {
-      messageApi.error($fmt('importExport.CopyFailed'));
-    }
-  };
+
   // 导出文件
   const handleDownload = useCallback(async () => {
     setDownloadLoading(true);
@@ -111,17 +96,11 @@ export default function ImportExport() {
       const fileName = `export_${
         exportFormatType == 1 ? 'nice-tab' : 'one-tab'
       }_${now}.${ext}`;
-      const content = exportContent || (await getExportContent());
+      const content = await getExportContent();
       saveAs(new Blob([content], { type: `${fileType};charset=utf-8` }), fileName);
       setDownloadLoading(false);
     }, 500);
   }, [exportFormatType]);
-
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     getExportContent();
-  //   }, 300);
-  // }, [exportFormatType]);
 
   return (
     <>
@@ -202,24 +181,8 @@ export default function ImportExport() {
               ))}
             </Radio.Group>
           </Form.Item>
-          {/* <Form.Item label={$fmt('importExport.exportContent')}>
-            <Input.TextArea
-              readOnly
-              autoSize={{ minRows: 6, maxRows: 16 }}
-              value={exportContent}
-              style={{ color: '#999' }}
-            />
-          </Form.Item> */}
           <Form.Item>
             <Space size={12} align="center">
-              {/* <Button type="primary" loading={exportLoading} onClick={handlePreview}>
-                {$fmt('importExport.getContent')}
-              </Button>
-              {exportContent && (
-                <CopyToClipboard text={exportContent} onCopy={handleCopy}>
-                  <Button type="primary">{$fmt('importExport.copy')}</Button>
-                </CopyToClipboard>
-              )} */}
               <Button type="primary" loading={downloadLoading} onClick={handleDownload}>
                 {$fmt('importExport.exportToFile')}
               </Button>

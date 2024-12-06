@@ -12,6 +12,7 @@ export default {
   'common.sendRightTabs': 'Send Right Tabs',
   'common.sendPinnedTabs': 'Send Pinned Tabs',
   'common.openAdminTab': 'Open NiceTab Admin Page',
+  'common.actions': 'Actions',
   'common.save': 'Save',
   'common.saveSuccess': 'Save Successful',
   'common.actionSuccess': '{action} Successful',
@@ -79,4 +80,5 @@ export default {
   'common.bindShortcuts': 'Bind Shortcuts',
   'common.sendTo': 'Send To',
   'common.search': 'Search',
+  'common.reload': 'Reload',
 };

@@ -14,6 +14,7 @@ import {
   Tooltip,
   Typography,
   FloatButton,
+  type MenuProps,
 } from 'antd';
 import {
   HomeOutlined,
@@ -26,7 +27,10 @@ import {
   MoonOutlined,
   SunOutlined,
   SmileOutlined,
-  SendOutlined
+  SendOutlined,
+  MenuOutlined,
+  ReloadOutlined,
+  KeyOutlined,
 } from '@ant-design/icons';
 import styled, { ThemeProvider } from 'styled-components';
 import '~/assets/css/reset.css';
@@ -215,6 +219,27 @@ function AppLayout() {
     actionHandler(ENUM_ACTION_NAME.SEND_ALL_TABS);
   }, []);
 
+  // 插件操作选项
+  const extActionOptions: MenuProps['items'] = [
+    { key: 'sendAllTabs', icon: <SendOutlined />, label: $fmt('common.sendAllTabs') },
+    { key: 'bindShortcuts', icon: <KeyOutlined />, label: $fmt('common.bindShortcuts') },
+    { key: 'reload', icon: <ReloadOutlined />, label: $fmt('common.reload') },
+  ];
+
+  const handleExtActionClick: MenuProps['onClick'] = ({ key }) => {
+    console.log('handleExtActionClick-key', key);
+    if (key === 'sendAllTabs') {
+      handleSendAllTabs();
+    } else if (key === 'reload') {
+      browser.runtime.reload();
+    } else if (key === 'bindShortcuts') {
+      openNewTab('chrome://extensions/shortcuts', {
+        active: true,
+        openToNext: true,
+      });
+    }
+  };
+
   useEffect(() => {
     const nav = navs.find((item) => item.path === location.pathname);
     setSelectedKeys([nav?.key || 'home']);
@@ -293,6 +318,17 @@ function AppLayout() {
             >
               <StyledActionIconBtn $size={18} title={$fmt('common.language')}>
                 <TranslationOutlined />
+              </StyledActionIconBtn>
+            </Dropdown>
+            {/* ext actions */}
+            <Dropdown
+              menu={{
+                items: extActionOptions,
+                onClick: handleExtActionClick,
+              }}
+            >
+              <StyledActionIconBtn $size={18} title={$fmt('common.actions')}>
+                <MenuOutlined />
               </StyledActionIconBtn>
             </Dropdown>
             {/* github */}
