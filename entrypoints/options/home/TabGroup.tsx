@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useMemo, memo } from 'react';
 import { theme, message, Modal, Space, Divider, Checkbox, Spin, Skeleton } from 'antd';
 import type { CheckboxProps } from 'antd';
 import { LockOutlined, StarOutlined, CloseOutlined } from '@ant-design/icons';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
+import copyToClipboard from 'copy-to-clipboard';
 import { GroupItem, TabItem } from '~/entrypoints/types';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
@@ -154,18 +154,15 @@ function TabGroup({
     onRecover?.();
   };
 
-  const tabLinks = useMemo(() => {
-    return tabListUtils.copyLinks(tabList);
-  }, [tabList]);
-
-  // 复制到剪切板
-  const handleCopy = (text: string, result: boolean) => {
+  const handleCopy = useCallback(() => {
+    const tabLinks = tabListUtils.copyLinks(tabList);
+    const result = copyToClipboard(tabLinks);
     if (result) {
       messageApi.success($fmt('common.CopySuccess'));
     } else {
       messageApi.error($fmt('common.CopyFailed'));
     }
-  };
+  }, [tabList]);
 
   const handleTabChange = useCallback((newData: TabItem) => {
     if (onTabChange) {
@@ -333,9 +330,9 @@ function TabGroup({
                 </span>
               )}
               {allowGroupActions.includes('copyLinks') && (
-                <CopyToClipboard text={tabLinks} onCopy={handleCopy}>
-                  <span className="action-btn">{$fmt('home.copyLinks')}</span>
-                </CopyToClipboard>
+                <span className="action-btn" onClick={handleCopy}>
+                  {$fmt('home.copyLinks')}
+                </span>
               )}
               {allowGroupActions.includes('dedup') && (
                 <span className="action-btn" onClick={() => setDedupModalVisible(true)}>
