@@ -45,7 +45,6 @@ export default function SortingBtns({
             id: 'common.ascending',
             values: { sortBy: $fmt('home.tabGroup.createTime') },
           }),
-          // icon: <ArrowDownOutlined />,
           icon: <IconTimeAscending />,
         },
         descending: {
@@ -53,7 +52,6 @@ export default function SortingBtns({
             id: 'common.descending',
             values: { sortBy: $fmt('home.tabGroup.createTime') },
           }),
-          // icon: <ArrowUpOutlined />,
           icon: <IconTimeDescending />,
         },
       };
