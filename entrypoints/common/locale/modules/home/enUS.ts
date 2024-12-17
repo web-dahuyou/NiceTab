@@ -56,6 +56,11 @@ export default {
   }`,
   'home.tab.name': 'Name',
   'home.tab.url': 'URL',
+  'home.tab.removeSelected': `Are you sure you want to remove {count, plural,
+    =0 {no tabs}
+    one {the tab}
+    other {these # tabs}
+  }?`,
 
   'home.help.content': `
     <li>The left-side list displays the tags, and the secondary menus represent the tab groups. The list supports searching for both tags and tab groups. The right-side panel displays all the tab groups and the tabs within each tab group.</li>

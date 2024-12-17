@@ -40,6 +40,7 @@ const {
   DELETE_AFTER_RESTORE,
   SILENT_OPEN_TAB_MODIFIER_KEY,
   DELETE_UNLOCKED_EMPTY_GROUP,
+  CONFIRM_BEFORE_DELETING_TABS,
   ALLOW_DUPLICATE_TABS,
   ALLOW_DUPLICATE_GROUPS,
   LINK_TEMPLATE,
@@ -366,6 +367,19 @@ export default function Settings() {
               <Radio value={false}>
                 {$fmt(`${module}.${DELETE_UNLOCKED_EMPTY_GROUP}.no`)}
               </Radio>
+            </Radio.Group>
+          </Form.Item>
+          {/* 删除标签页前是否需要确认 */}
+          <Form.Item<SettingsProps>
+            label={$fmt({
+              id: `${module}.${CONFIRM_BEFORE_DELETING_TABS}`,
+              values: { mark: '：' },
+            })}
+            name={CONFIRM_BEFORE_DELETING_TABS}
+          >
+            <Radio.Group>
+              <Radio value={true}>{$fmt('common.yes')}</Radio>
+              <Radio value={false}>{$fmt('common.no')}</Radio>
             </Radio.Group>
           </Form.Item>
 

@@ -17,6 +17,7 @@ const {
   DELETE_AFTER_RESTORE,
   SILENT_OPEN_TAB_MODIFIER_KEY,
   DELETE_UNLOCKED_EMPTY_GROUP,
+  CONFIRM_BEFORE_DELETING_TABS,
   ALLOW_DUPLICATE_TABS,
   ALLOW_DUPLICATE_GROUPS,
   LINK_TEMPLATE,
@@ -44,6 +45,7 @@ export default class SettingsUtils {
     [DELETE_AFTER_RESTORE]: false, // 恢复标签页/标签组时是否从列表中删除
     [SILENT_OPEN_TAB_MODIFIER_KEY]: 'alt', // 静默打开标签页的修饰键
     [DELETE_UNLOCKED_EMPTY_GROUP]: true, // 是否删除未锁定的空标签组
+    [CONFIRM_BEFORE_DELETING_TABS]: false, // 删除标签页前是否需要确认
     [ALLOW_DUPLICATE_TABS]: true, // 同一个标签组中是否允许重复的标签页
     [ALLOW_DUPLICATE_GROUPS]: true, // 同一个分类中是否允许重复的标签组
     [LINK_TEMPLATE]: '{{url}} | {{title}}', // 复制的链接模板

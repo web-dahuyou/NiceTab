@@ -113,6 +113,7 @@ export type SettingsProps = {
   deleteAfterRestore?: boolean; // 恢复标签页/标签组时是否从列表中删除
   silentOpenTabModifierKey?: string; // 静默打开标签页的修饰键
   deleteUnlockedEmptyGroup?: boolean; // 是否删除未锁定的空标签组
+  confirmBeforeDeletingTabs?: boolean; // 删除标签页前是否确认
   allowDuplicateTabs?: boolean; // 同一个标签组中是否允许重复的标签页
   allowDuplicateGroups?: boolean; // 同一个分类中是否允许重复的标签组
   linkTemplate?: string; // 链接模板
