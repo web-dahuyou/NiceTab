@@ -48,6 +48,11 @@ export default {
   'home.tab.count': '{count}个标签页',
   'home.tab.name': '名称',
   'home.tab.url': '网址',
+  'home.tab.removeSelected': `您确定要删除{count, plural,
+    =0 {标签页}
+    =1 {这个标签页}
+    other {这#个标签页}
+  }吗？`,
 
   'home.help.content': `
     <li>左侧列表一级菜单表示分类，二级菜单表示标签组，左侧列表支持分类和标签组的搜索；右侧面板展示的是当前选中分类中的所有标签组以及标签组中的标签页。</li>

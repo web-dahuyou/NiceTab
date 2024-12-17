@@ -1,5 +1,5 @@
 import { useCallback, useState, memo, useRef } from 'react';
-import { theme, Checkbox, Typography, Tooltip, Popover, QRCode } from 'antd';
+import { theme, Checkbox, Typography, Tooltip, Popover, Modal, QRCode } from 'antd';
 import { CloseOutlined, EditOutlined, QrcodeOutlined } from '@ant-design/icons';
 import { GroupItem, TabItem } from '~/entrypoints/types';
 import { getFaviconURL } from '~/entrypoints/common/utils';
@@ -25,7 +25,11 @@ type TabItemProps = TabItem & {
   onChange?: (data: TabItem) => void;
 };
 
-const { DELETE_AFTER_RESTORE, SILENT_OPEN_TAB_MODIFIER_KEY } = ENUM_SETTINGS_PROPS;
+const {
+  DELETE_AFTER_RESTORE,
+  CONFIRM_BEFORE_DELETING_TABS,
+  SILENT_OPEN_TAB_MODIFIER_KEY,
+} = ENUM_SETTINGS_PROPS;
 const osInfo = getOSInfo();
 
 // 标签页tooltip内容
@@ -68,6 +72,7 @@ export default memo(function TabListItem({
 }: TabItemProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
+  const [removeModal, removeContextHolder] = Modal.useModal();
   const [modalVisible, setModalVisible] = useState(false);
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -88,9 +93,34 @@ export default memo(function TabListItem({
     [onChange]
   );
 
-  const handleTabRemove = useCallback(() => {
-    onRemove?.([tab]);
-  }, [tab, onRemove]);
+  const handleTabRemove = useCallback(async () => {
+    const settings = settingsUtils.settings || {};
+    if (!settings[CONFIRM_BEFORE_DELETING_TABS]) {
+      onRemove?.([tab]);
+      return;
+    }
+
+    const removeDesc = $fmt({
+      id: 'home.removeDesc',
+      values: {
+        type: `${$fmt(
+          'home.tab'
+        )}${` <div style="display: inline-flex; align-items: center; font-weight: bold;">
+          [<strong style="display: inline-block; max-width: 280px" class="ellipsis">
+            ${tab.title}</strong>
+          ]</div>
+        `}`,
+      },
+    });
+    const confirmed = await removeModal.confirm({
+      title: $fmt('home.removeTitle'),
+      content: <div dangerouslySetInnerHTML={{ __html: removeDesc }}></div>,
+    });
+    console.log('tab-remove-confirmed', confirmed);
+    if (confirmed) {
+      onRemove?.([tab]);
+    }
+  }, [$fmt, tab, onRemove]);
 
   // 点击打开标签页
   const onTabOpen = useMemo(() => {
@@ -218,6 +248,9 @@ export default memo(function TabListItem({
           </Tooltip>
         </StyledTabTitle>
       </StyledTabItemWrapper>
+
+      {/* 删除确认弹窗holder */}
+      {removeContextHolder}
 
       {modalVisible && (
         <TabItemEditModal
