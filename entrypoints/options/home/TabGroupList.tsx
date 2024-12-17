@@ -93,9 +93,9 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
   const initialConfig = useMemo(() => {
     const index = selectedTag?.children?.findIndex(
       (group) => group.key === selectedTabGroupKey
-    );
+    ) || 0;
     return {
-      index: index || 0,
+      index: index > -1 ? index : 0,
       align: 'start',
       behavior: 'auto',
       offset: -180,
@@ -106,9 +106,9 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
     if (virtual && virtuosoRef.current) {
       const index = selectedTag?.children?.findIndex(
         (group) => group.key === selectedTabGroupKey
-      );
+      ) || 0;
       virtuosoRef.current?.scrollToIndex({
-        index: index || 0,
+        index: index > -1 ? index : 0,
         align: 'start',
         behavior: 'auto',
         offset: -180,
