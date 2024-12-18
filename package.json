@@ -2,7 +2,7 @@
   "name": "nice-tab",
   "description": "OneTab的升级替代品, 功能丰富易用并且开源的标签页管理器 | A nice, convenient, powerful tab manager [open source]",
   "private": true,
-  "version": "2.5.11",
+  "version": "2.5.12",
   "type": "module",
   "scripts": {
     "dev": "wxt",
