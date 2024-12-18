@@ -36,7 +36,7 @@ export default {
   'settings.deleteUnlockedEmptyGroup': 'Remove empty groups when clearing tabs?',
   'settings.deleteUnlockedEmptyGroup.yes': 'Automatically remove (retain locked groups)',
   'settings.deleteUnlockedEmptyGroup.no': 'Do not',
-  'settings.confirmBeforeDeletingTabs': 'Comfirm before removing tabs?',
+  'settings.confirmBeforeDeletingTabs': 'Confirm before deleting tabs?',
 
   'settings.allowDuplicateTabs': 'Retain duplicate tabs when sending tabs?',
   'settings.allowDuplicateTabs.yes': 'Retain',
