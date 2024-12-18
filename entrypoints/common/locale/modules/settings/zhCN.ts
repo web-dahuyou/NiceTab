@@ -36,6 +36,7 @@ export default {
   'settings.deleteUnlockedEmptyGroup': '清空标签页时-是否自动删除该标签组{mark}',
   'settings.deleteUnlockedEmptyGroup.yes': '自动删除（仍保留锁定的空标签组）',
   'settings.deleteUnlockedEmptyGroup.no': '不自动删除',
+  'settings.confirmBeforeDeletingTabs': '删除标签页前是否需要确认：',
 
   'settings.allowDuplicateTabs': '发送标签页时-是否保留重复的标签页{mark}',
   'settings.allowDuplicateTabs.yes': '保留',

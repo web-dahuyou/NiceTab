@@ -5,9 +5,13 @@ import { LockOutlined, StarOutlined, CloseOutlined } from '@ant-design/icons';
 import copyToClipboard from 'copy-to-clipboard';
 import { GroupItem, TabItem } from '~/entrypoints/types';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
-import { ENUM_COLORS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
+import {
+  ENUM_COLORS,
+  UNNAMED_GROUP,
+  ENUM_SETTINGS_PROPS,
+} from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { tabListUtils } from '@/entrypoints/common/storage';
+import { tabListUtils, settingsUtils } from '@/entrypoints/common/storage';
 import DndComponent from '@/entrypoints/common/components/DndComponent';
 import DropComponent from '@/entrypoints/common/components/DropComponent';
 
@@ -31,6 +35,7 @@ import MoveToModal from './MoveToModal';
 import useMoveTo from './hooks/moveTo';
 
 const dndKey = dndKeys.tabItem;
+const { CONFIRM_BEFORE_DELETING_TABS } = ENUM_SETTINGS_PROPS;
 
 type TabGroupProps = GroupItem & {
   canDrag?: boolean;
@@ -44,8 +49,8 @@ type TabGroupProps = GroupItem & {
   onStarredChange?: (isStarred: boolean) => void;
   onDedup?: () => void;
   onRecover?: () => void;
-  onTabChange?: (data: TabItem) => void;
-  onTabRemove?: (groupId: string, tabs: TabItem[]) => void;
+  // onTabChange?: (data: TabItem) => void;
+  // onTabRemove?: (groupId: string, tabs: TabItem[]) => void;
   onMoveTo?: ({ moveData, targetData, selected }: MoveToCallbackProps) => void;
 };
 
@@ -81,13 +86,12 @@ function TabGroup({
   onStarredChange,
   onDedup,
   onRecover,
-  onTabChange,
-  onTabRemove,
   onMoveTo,
 }: TabGroupProps) {
   const { token } = theme.useToken();
   const [messageApi, messageContextHolder] = message.useMessage();
   const { $fmt } = useIntlUtls();
+  const [tabsRemoveModal, tabsRemoveContextHolder] = Modal.useModal();
   const groupRef = useRef<HTMLDivElement>(null);
   const [selectedTabIds, setSelectedTabIds] = useState<string[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -165,11 +169,6 @@ function TabGroup({
   }, [tabList]);
 
   const handleTabChange = useCallback((newData: TabItem) => {
-    if (onTabChange) {
-      // 给回收站使用
-      onTabChange(newData);
-      return;
-    }
     eventEmitter.emit('home:treeDataHook', {
       action: 'handleTabItemChange',
       params: [{ key: group.groupId }, newData],
@@ -177,19 +176,39 @@ function TabGroup({
   }, []);
 
   const handleTabRemove = useCallback((tabs: TabItem[]) => {
-    setSelectedTabIds((selectedTabIds) =>
-      selectedTabIds.filter((id) => !tabs.some((tab) => tab.tabId === id))
-    );
-    if (onTabRemove) {
-      // 给回收站使用
-      onTabRemove(group.groupId, tabs);
-      return;
-    }
     eventEmitter.emit('home:treeDataHook', {
       action: 'handleTabItemRemove',
       params: [group.groupId, tabs],
     });
+
+    setTimeout(() => {
+      setSelectedTabIds((selectedTabIds) =>
+        selectedTabIds.filter((id) => !tabs.some((tab) => tab.tabId === id))
+      );
+    }, 0);
   }, []);
+  // 删除确认
+  const handleTabRemoveConfirm = useCallback(async () => {
+    const settings = settingsUtils.settings || {};
+    if (!settings[CONFIRM_BEFORE_DELETING_TABS]) {
+      handleTabRemove(selectedTabs);
+      return;
+    }
+
+    const confirmed = await tabsRemoveModal.confirm({
+      title: $fmt('common.confirm'),
+      content: $fmt({
+        id: 'home.tab.removeSelected',
+        values: {
+          count: selectedTabs.length,
+        },
+      }),
+    });
+
+    if (confirmed) {
+      handleTabRemove(selectedTabs);
+    }
+  }, [$fmt, selectedTabs]);
 
   const handleTabItemDrop: DndTabItemOnDropCallback = useCallback((...params) => {
     eventEmitter.emit('home:treeDataHook', {
@@ -373,13 +392,7 @@ function TabGroup({
                 }
               >
                 {allowTabActions.includes('remove') && (
-                  <span
-                    className="action-btn"
-                    onClick={() => {
-                      setSelectedTabIds([]);
-                      handleTabRemove(selectedTabs);
-                    }}
-                  >
+                  <span className="action-btn" onClick={handleTabRemoveConfirm}>
                     {$fmt('common.remove')}
                   </span>
                 )}
@@ -448,6 +461,8 @@ function TabGroup({
       </StyledGroupWrapper>
 
       {messageContextHolder}
+      {tabsRemoveContextHolder}
+
       {/* 标签组删除确认弹窗 */}
       {modalVisible && (
         <Modal

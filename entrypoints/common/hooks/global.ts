@@ -43,7 +43,7 @@ export function useAntdLocale() {
   }, [language]);
 
   const changeLocale = async (language: LanguageTypes = defaultLanguage) => {
-    const settings = settingsUtils.settings;
+    const settings = await settingsUtils.getSettings();
     let lang = language;
     if (!antdMap[language]) {
       lang = defaultLanguage;
@@ -70,7 +70,7 @@ export function useCustomLocale() {
   );
 
   const changeLocale = async (language: LanguageTypes = defaultLanguage) => {
-    const settings = settingsUtils.settings;
+    const settings = await settingsUtils.getSettings();
     await settingsUtils.setSettings({ ...settings, language });
     setLocale(language);
   };
@@ -88,7 +88,7 @@ export function useThemeTypeConfig() {
   const [themeTypeConfig, setThemeTypeConfig] = useState<ThemeTypeConfig>(THEME_TYPE_CONFIG.light);
 
   const changeThemeType = async (themeType: ThemeTypes = defaultThemeType) => {
-    const settings = settingsUtils.settings;
+    const settings = await settingsUtils.getSettings();
     await settingsUtils.setSettings({ ...settings, themeType });
     setThemeTypeConfig({ ...THEME_TYPE_CONFIG[themeType] });
   };

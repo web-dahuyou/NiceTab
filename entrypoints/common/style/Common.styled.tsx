@@ -74,6 +74,10 @@ export const GlobalStyle = createGlobalStyle`
     color: ${(props) => props.theme.colorText || 'rgba(0, 0, 0, 0.88)'};
 	}
 
+  .ellipsis {
+    ${StyledEllipsis}
+  }
+
   ::-webkit-scrollbar, .nicetab-tree-list-scrollbar {
     width: 8px !important;
     height: 8px !important;
