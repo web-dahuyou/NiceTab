@@ -134,18 +134,16 @@ export default memo(function TabListItem({
       ({ isMatched }) => {
         // 如果直接单击未按下alt键，则打开新标签页并激活(active: true)，如果按下了alt键，则后台静默打开新标签页(active: false)
         openNewTab(tab.url, { active: !isMatched });
-
-        if (settings[DELETE_AFTER_RESTORE]) {
-          onRemove?.([tab]);
-        }
-
         setTimeout(() => {
+          if (settings[DELETE_AFTER_RESTORE] && !group?.isLocked) {
+            onRemove?.([tab]);
+          }
           setTooltipVisible(false);
         }, 500);
       },
       { allowMissMatch: true, [modifierKey]: true }
     );
-  }, [tab, onRemove]);
+  }, [tab, group.isLocked, onRemove]);
 
   const draggingListener = (value: boolean) => {
     setIsDragging(value);
