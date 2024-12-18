@@ -295,7 +295,7 @@ export function useTreeData() {
         tabGroup.originData.groupName,
         tabGroup.originData.tabList.map((tab) => tab.url)
       );
-      if (settings?.[DELETE_AFTER_RESTORE]) {
+      if (settings?.[DELETE_AFTER_RESTORE] && !tabGroup.originData?.isLocked) {
         await tabListUtils.removeTabGroup(tag.key, tabGroup.key);
         refreshTreeData((treeData) => handleSelect(treeData, [tag.key], { node: tag }));
       }
