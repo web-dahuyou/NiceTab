@@ -12,9 +12,13 @@ import type {
 import {
   extContentImporter,
   getRandomId,
+  sendBrowserMessage
 } from '~/entrypoints/common/utils';
+import { sendTabMessage } from '~/entrypoints/common/tabs';
 import { SUCCESS_KEY, FAILED_KEY, syncTypeMap } from '~/entrypoints/common/constants';
 import Store from './instanceStore';
+
+type ModuleType = 'tabList' | 'settings';
 
 export default class syncWebDAVUtils {
   storageConfigKey: `local:${string}` = 'local:syncWevDAVConfig';
@@ -25,6 +29,10 @@ export default class syncWebDAVUtils {
 
   webDAVDirectory: string = '/__NiceTab_web_dav__';
   webDAVFilename: string = '__NiceTab_web_dav__.json';
+  fileNameConfig: Record<ModuleType, string> = {
+    tabList: '__NiceTab_web_dav__.json',
+    settings: '__NiceTab_settings_web_dav__.json',
+  };
 
   constructor() {
     this.getConfig();
@@ -172,8 +180,9 @@ export default class syncWebDAVUtils {
     return content;
   }
 
-  getRemoteFilepath() {
-    return `${this.webDAVDirectory?.replace(/\/$/, '') || ''}/${this.webDAVFilename}`;
+  getRemoteFilepath(moduleType: ModuleType) {
+    const fileName = this.fileNameConfig[moduleType];
+    return `${this.webDAVDirectory?.replace(/\/$/, '') || ''}/${fileName}`;
   }
 
   // 根据syncType执行不同的操作
@@ -182,13 +191,22 @@ export default class syncWebDAVUtils {
     configItem: SyncConfigItemWebDAVProps,
     syncType: SyncType
   ) {
-    const filepath = this.getRemoteFilepath();
+    const filepath = this.getRemoteFilepath('tabList');
+    const settingsFilepath = this.getRemoteFilepath('settings');
 
     if (syncType === syncTypeMap.MANUAL_PUSH_FORCE) {
       const localContent = await this.getSyncContent();
       const result = await client.putFileContents(filepath, localContent);
       console.log('putFileContentsRes--MANUAL_PUSH_FORCE', result);
       await this.handleSyncResult(configItem.key, syncType, result);
+      // 同步设置信息失败单独catch, 不影响列表的同步
+      try {
+        const localSettings = await Store.settingsUtils.getSettings();
+        const settingsContent = JSON.stringify(localSettings);
+        await client.putFileContents(settingsFilepath, settingsContent);
+      } catch (error) {
+        console.error(error);
+      }
       return;
     }
 
@@ -201,6 +219,33 @@ export default class syncWebDAVUtils {
     if (!!remoteFileContent && syncType === syncTypeMap.MANUAL_PULL_FORCE) {
       await Store.tabListUtils.clearAll();
     }
+
+    // 同步设置信息（重要性比较低）
+    let remoteSettingsContent = '';
+    const isSettingsFileExists = await client.exists(settingsFilepath);
+    if (isSettingsFileExists) {
+      remoteSettingsContent = await client.getFileContents(settingsFilepath, { format: "text" }) as string;
+    }
+
+    if (!!remoteSettingsContent) {
+      try {
+        let settings = JSON.parse(remoteSettingsContent);
+        if (syncType === syncTypeMap.MANUAL_PUSH_MERGE) {
+          const localSettings = await Store.settingsUtils.getSettings();
+          settings = {
+            ...settings,
+            ...localSettings,
+          };
+        }
+        await Store.settingsUtils.setSettings(settings);
+        await client.putFileContents(settingsFilepath, JSON.stringify(settings));
+        sendBrowserMessage('setLocale', { locale: settings.language });
+        sendTabMessage({ msgType: 'setLocale', data: { locale: settings.language } });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
     const tagList = extContentImporter.niceTab(remoteFileContent || '');
     await Store.tabListUtils.importTags(tagList, 'merge');
     if (syncType === syncTypeMap.MANUAL_PUSH_MERGE) {

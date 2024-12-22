@@ -27,6 +27,7 @@ export default {
   'sync.tip.tokenChange': '修改access token会清空本地{type}的同步历史记录',
   // 'sync.tip.contentTooLarge': '远程文件内容太大，返回的内容被 gist API 截断了，取消合并到本地',
   'sync.tip.syncHistory': '同步历史只保留最近的50条记录，您还可以手动清空历史记录',
+  'sync.tip.supportTip': '远程同步已支持标签页列表和偏好设置同步，同步操作时会同时同步标签页列表和偏好设置数据，不支持分开同步。',
   'sync.getYourToken': '前往获取/设置 token',
   'sync.syncHistory': '同步历史记录',
   'sync.noSyncHistory': '暂无历史同步记录',
