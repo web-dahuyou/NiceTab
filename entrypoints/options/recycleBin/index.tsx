@@ -77,25 +77,19 @@ export default function RecycleBin() {
   // 还原所有
   const handleRecoverConfirm = useCallback(async () => {
     await recycleUtils.recoverAll();
+    setRecoverModalVisible(false);
     getRecycleBinData();
   }, []);
   // 清空回收站
   const handleClearConfirm = useCallback(async () => {
     await recycleUtils.setTagList([]);
+    setConfirmModalVisible(false);
     getRecycleBinData();
   }, []);
 
   useEffect(() => {
     getRecycleBinData();
   }, []);
-
-  if (!tagList?.length) {
-    return (
-      <StyledEmptyBox className="no-data">
-        <Empty description={$fmt('home.emptyTip')}></Empty>
-      </StyledEmptyBox>
-    );
-  }
 
   return (
     <StyledRecycleBinWrapper className="recycle-bin-wrapper">
@@ -131,51 +125,58 @@ export default function RecycleBin() {
           />
         </Space>
       </StickyBox>
-      <Collapse
-        bordered={false}
-        size="large"
-        ghost
-        activeKey={activeKey}
-        onChange={setActiveKey}
-        items={tagList.map((tag) => {
-          return {
-            key: tag.tagId,
-            label: (
-              <TagNodeMarkup
-                tag={tag}
-                onRemove={getRecycleBinData}
-                onRecover={getRecycleBinData}
-              />
-            ),
-            style: {
-              marginBottom: 16,
-              background: token.colorFillContent,
-              borderRadius: token.borderRadiusLG,
-              border: 'none',
-            },
-            children: (
-              <div className="tab-group-list">
-                {tag.groupList.map((group) => (
-                  <TabGroup
-                    key={group.groupId}
-                    {...group}
-                    canDrag={false}
-                    canDrop={false}
-                    allowGroupActions={['remove', 'recover']}
-                    allowTabActions={['remove', 'recover']}
-                    onRemove={() => handleTabGroupRemove(tag, group)}
-                    onRecover={() => handleTabGroupRecover(tag, group)}
-                    onTabChange={(tabItem: TabItem) =>
-                      handleTabItemChange(tag, group, tabItem)
-                    }
-                    onTabRemove={handleTabItemRemove}
-                  ></TabGroup>
-                ))}
-              </div>
-            ),
-          };
-        })}
-      />
+
+      {tagList?.length > 0 ? (
+        <Collapse
+          bordered={false}
+          size="large"
+          ghost
+          activeKey={activeKey}
+          onChange={setActiveKey}
+          items={tagList.map((tag) => {
+            return {
+              key: tag.tagId,
+              label: (
+                <TagNodeMarkup
+                  tag={tag}
+                  onRemove={getRecycleBinData}
+                  onRecover={getRecycleBinData}
+                />
+              ),
+              style: {
+                marginBottom: 16,
+                background: token.colorFillContent,
+                borderRadius: token.borderRadiusLG,
+                border: 'none',
+              },
+              children: (
+                <div className="tab-group-list">
+                  {tag.groupList.map((group) => (
+                    <TabGroup
+                      key={group.groupId}
+                      {...group}
+                      canDrag={false}
+                      canDrop={false}
+                      allowGroupActions={['remove', 'recover']}
+                      allowTabActions={['remove', 'recover']}
+                      onRemove={() => handleTabGroupRemove(tag, group)}
+                      onRecover={() => handleTabGroupRecover(tag, group)}
+                      onTabChange={(tabItem: TabItem) =>
+                        handleTabItemChange(tag, group, tabItem)
+                      }
+                      onTabRemove={handleTabItemRemove}
+                    ></TabGroup>
+                  ))}
+                </div>
+              ),
+            };
+          })}
+        />
+      ) : (
+        <StyledEmptyBox className="no-data">
+          <Empty description={$fmt('home.emptyTip')}></Empty>
+        </StyledEmptyBox>
+      )}
 
       {/* 清空全部提示 */}
       <Modal
