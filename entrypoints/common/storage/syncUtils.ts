@@ -71,7 +71,7 @@ export default class SyncUtils {
   // 同步的文件名配置（标签页列表，设置项）
   gistFileNameConfig = {
     tabList: '__NiceTab_gist__.json',
-    settings: '__NiceTab_gist_settings__.json',
+    settings: '__NiceTab_settings_gist__.json',
   };
 
   constructor() {
