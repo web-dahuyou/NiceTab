@@ -20,6 +20,8 @@ import { StyledSidebarWrapper, StyledMainWrapper } from './Sync.styled';
 import SidebarContentModuleGist from './components/gist/SidebarContentModule';
 import SidebarContentModuleWebDAV from './components/webdav/SidebarContentModule';
 import SyncResultList from './SyncResultList';
+import StickyFooter from '~/entrypoints/common/components/StickyFooter';
+import Footer from './footer/index';
 
 interface ChildComponentHandle {
   getSyncInfo: () => void;
@@ -182,6 +184,11 @@ export default function SyncPage() {
           <SyncResultList resultList={resultList}></SyncResultList>
         </div>
       </StyledMainWrapper>
+
+      {/* 吸底footer */}
+      <StickyFooter bottomGap={0} fullWidth>
+        <Footer></Footer>
+      </StickyFooter>
     </>
   );
 }
