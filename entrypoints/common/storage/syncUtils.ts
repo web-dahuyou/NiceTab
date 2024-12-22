@@ -13,7 +13,9 @@ import type {
 import {
   extContentImporter,
   fetchApi,
+  sendBrowserMessage,
 } from '~/entrypoints/common/utils';
+import { sendTabMessage } from '~/entrypoints/common/tabs';
 import { SUCCESS_KEY, FAILED_KEY, syncTypeMap } from '~/entrypoints/common/constants';
 import Store from './instanceStore';
 
@@ -65,7 +67,12 @@ export default class SyncUtils {
     github: 'https://api.github.com/gists',
   };
   gistDescKey: string = '__NiceTab_gist_key__';
-  gistFileName: string = '__NiceTab_gist__.json';
+
+  // 同步的文件名配置（标签页列表，设置项）
+  gistFileNameConfig = {
+    tabList: '__NiceTab_gist__.json',
+    settings: '__NiceTab_gist_settings__.json',
+  };
 
   constructor() {
     this.getConfig();
@@ -134,26 +141,35 @@ export default class SyncUtils {
   // 获取需要同步的内容
   async getSyncContent() {
     const tagList = await Store.tabListUtils.exportTags();
+    const settings = await Store.settingsUtils.getSettings();
     let content = '[]';
+    let settingsContent = '{}';
     try {
       content = JSON.stringify(tagList);
+      settingsContent = JSON.stringify(settings);
     } catch (error) {
       console.error(error);
     }
-    return content;
+    return {
+      tabList: content,
+      settings: settingsContent,
+    };
   }
   // 获取同步的gist参数
   async getApiParams() {
-    let content = await this.getSyncContent();
+    let contentResult = await this.getSyncContent();
     // 需要注意，如果title中包含emoji字符，提交gist接口会报错，所以将emoji标签给过滤掉
     const emojiReg = emojiRegex();
-    content = content.replaceAll(emojiReg, '');
+    const tabListContent = contentResult?.tabList?.replaceAll(emojiReg, '') || '[]';
 
     return {
       description: this.gistDescKey,
       files: {
-        [this.gistFileName]: {
-          content,
+        [this.gistFileNameConfig.tabList]: {
+          content: tabListContent,
+        },
+        [this.gistFileNameConfig.settings]: {
+          content: contentResult.settings,
         },
       },
     };
@@ -244,7 +260,8 @@ export default class SyncUtils {
     } else {
       const { files } = gistData || {};
       let fileContent = '';
-      const fileInfo = files?.[this.gistFileName];
+      const settingsFileInfo = files?.[this.gistFileNameConfig.settings];
+      const fileInfo = files?.[this.gistFileNameConfig.tabList];
       // https://docs.github.com/en/rest/gists/gists#truncation
       // 通过 raw_url 获取的文件内容小于 10M
       if (fileInfo?.truncated && fileInfo?.raw_url) {
@@ -253,13 +270,31 @@ export default class SyncUtils {
           this.handleSyncResult(remoteType, syncType, result, 'contentTooLarge');
           return;
         }
-        fileContent = await fetchApi(fileInfo?.raw_url) as string || '';
+        fileContent = ((await fetchApi(fileInfo?.raw_url)) as string) || '';
       } else {
         fileContent = fileInfo?.content || '';
       }
 
       if (!!fileContent && syncType === syncTypeMap.MANUAL_PULL_FORCE) {
         await Store.tabListUtils.clearAll();
+      }
+
+      if (!!settingsFileInfo?.content) {
+        try {
+          let settings = JSON.parse(settingsFileInfo?.content || '{}');
+          if (syncType === syncTypeMap.MANUAL_PUSH_MERGE) {
+            const localSettings = await Store.settingsUtils.getSettings();
+            settings = {
+              ...settings,
+              ...localSettings,
+            };
+          }
+          await Store.settingsUtils.setSettings(settings);
+          sendBrowserMessage('setLocale', { locale: settings.language });
+          sendTabMessage({ msgType: 'setLocale', data: { locale: settings.language } });
+        } catch (error) {
+          console.error(error);
+        }
       }
       const tagList = extContentImporter.niceTab(fileContent || '');
       await Store.tabListUtils.importTags(tagList, 'merge');
@@ -320,7 +355,12 @@ export default class SyncUtils {
     } catch (error: any) {
       console.log(error);
       if (error?.status == 401) {
-        await this.handleSyncResult(remoteType, syncType, {} as GistResponseItemProps, 'authFailed');
+        await this.handleSyncResult(
+          remoteType,
+          syncType,
+          {} as GistResponseItemProps,
+          'authFailed'
+        );
       } else {
         await this.handleSyncResult(remoteType, syncType, {} as GistResponseItemProps);
       }

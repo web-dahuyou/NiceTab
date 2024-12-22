@@ -2,8 +2,12 @@ import { useEffect, useState, useRef } from 'react';
 import { theme, Flex, Button, Modal } from 'antd';
 import { CloudUploadOutlined, ClearOutlined } from '@ant-design/icons';
 import { classNames } from '~/entrypoints/common/utils';
-import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { syncUtils, syncWebDAVUtils } from '~/entrypoints/common/storage';
+import {
+  eventEmitter,
+  useIntlUtls,
+  GlobalContext,
+} from '~/entrypoints/common/hooks/global';
+import { settingsUtils, syncUtils, syncWebDAVUtils } from '~/entrypoints/common/storage';
 import type {
   SyncTargetType,
   SyncRemoteType,
@@ -23,8 +27,9 @@ interface ChildComponentHandle {
 
 export default function SyncPage() {
   const [modal, modalContextHolder] = Modal.useModal();
-  const { token } = theme.useToken();
+  // const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
+  const NiceGlobalContext = useContext(GlobalContext);
   const gistRef = useRef<ChildComponentHandle>(null);
   const webDAVRef = useRef<ChildComponentHandle>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
@@ -58,6 +63,9 @@ export default function SyncPage() {
     } else if (targetType === 'webdav') {
       getWebDavConfig();
     }
+
+    const { language } = settingsUtils.settings;
+    NiceGlobalContext.setLocale(language);
   }, []);
 
   const clearSyncResult = async () => {
@@ -110,7 +118,7 @@ export default function SyncPage() {
       setSelectedTargetType('webdav');
       setSelectedKey(configList[0]?.key || '');
     }
-  }
+  };
 
   useEffect(() => {
     init();

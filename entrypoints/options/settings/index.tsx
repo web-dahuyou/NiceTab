@@ -23,7 +23,8 @@ import {
   defaultLanguage,
 } from '~/entrypoints/common/constants';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { getKeysByOS } from '@/entrypoints/common/utils';
+import { getKeysByOS, sendBrowserMessage } from '@/entrypoints/common/utils';
+import { sendTabMessage } from '~/entrypoints/common/tabs';
 import QuickActions from './QuickActions';
 
 const {
@@ -90,6 +91,8 @@ export default function Settings() {
 
     await settingsUtils.setSettings(newSettings);
     NiceGlobalContext.setLocale(newSettings.language);
+    sendBrowserMessage('setLocale', { locale: newSettings.language });
+    sendTabMessage({ msgType: 'setLocale', data: { locale: newSettings.language } });
     const customMessages = getCustomLocaleMessages(
       newSettings.language || defaultLanguage
     );
