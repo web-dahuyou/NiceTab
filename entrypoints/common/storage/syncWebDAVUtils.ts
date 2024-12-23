@@ -236,9 +236,9 @@ export default class syncWebDAVUtils {
             ...settings,
             ...localSettings,
           };
+          await client.putFileContents(settingsFilepath, JSON.stringify(settings));
         }
         await Store.settingsUtils.setSettings(settings);
-        await client.putFileContents(settingsFilepath, JSON.stringify(settings));
         sendBrowserMessage('setLocale', { locale: settings.language });
         sendTabMessage({ msgType: 'setLocale', data: { locale: settings.language } });
       } catch (error) {
