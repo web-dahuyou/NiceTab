@@ -159,7 +159,7 @@ export default function Settings() {
             </Radio.Group>
           </Form.Item>
 
-          <Divider orientation="left">{$fmt('settings.block.sendTabs')}</Divider>
+          <Divider>{$fmt('settings.block.sendTabs')}</Divider>
           {/* 是否展示目录选择弹窗 */}
           <Form.Item<SettingsProps>
             label={$fmt(`${module}.${SHOW_SEND_TARGET_MODAL}`)}
@@ -314,7 +314,7 @@ export default function Settings() {
             </Radio.Group>
           </Form.Item>
 
-          <Divider orientation="left">{$fmt('settings.block.openTabs')}</Divider>
+          <Divider>{$fmt('settings.block.openTabs')}</Divider>
 
           {/* 是否在新窗口打开标签组 */}
           <Form.Item<SettingsProps>
@@ -354,7 +354,7 @@ export default function Settings() {
             </Radio.Group>
           </Form.Item>
 
-          <Divider orientation="left">{$fmt('settings.block.otherActions')}</Divider>
+          <Divider>{$fmt('settings.block.otherActions')}</Divider>
           {/* 是否删除未锁定的空标签组 */}
           <Form.Item<SettingsProps>
             label={$fmt({
@@ -442,7 +442,7 @@ export default function Settings() {
             </Space>
           </Form.Item>
 
-          <Divider orientation="left">{$fmt('settings.block.display')}</Divider>
+          <Divider>{$fmt('settings.block.display')}</Divider>
           {/* 扩展图标上是否展示当前打开的标签页数 */}
           <Form.Item<SettingsProps>
             label={$fmt(`${module}.${SHOW_OPENED_TAB_COUNT}`)}
