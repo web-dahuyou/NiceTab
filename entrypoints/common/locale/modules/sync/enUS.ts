@@ -27,7 +27,7 @@ export default {
   'sync.tip.tokenChange': 'Changing the access token will clear the local {type} sync history',
   // 'sync.tip.contentTooLarge': 'Remote file too large, truncated by gist API; cannot merge to local.',
   'sync.tip.syncHistory': 'Sync history only retains the last 50 records, you can also clear the history manually.',
-  'sync.tip.supportTip': 'Now supports tab list and settings syncing. Both of them will be synced at the same time, separate syncing is not supported.',
+  'sync.tip.supportTip': 'Now NiceTab supports tab list and settings synchronization. Both will be synchronized simultaneously, while separate synchronization is not supported.',
   'sync.getYourToken': 'Get/Set your access token',
   'sync.syncHistory': 'Sync History',
   'sync.noSyncHistory': 'No Sync History',
