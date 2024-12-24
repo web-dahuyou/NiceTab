@@ -4,9 +4,14 @@ import type { FormProps, UploadProps, RadioChangeEvent } from 'antd';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
 import { saveAs } from 'file-saver';
-import { useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { tabListUtils } from '~/entrypoints/common/storage';
-import { extContentImporter, extContentExporter } from '~/entrypoints/common/utils';
+import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { tabListUtils, settingsUtils } from '~/entrypoints/common/storage';
+import {
+  extContentImporter,
+  extContentExporter,
+  sendBrowserMessage,
+} from '~/entrypoints/common/utils';
+import { sendTabMessage } from '~/entrypoints/common/tabs';
 import { initialValues, formatTypeOptions, importModeOptions } from './constants';
 
 const StyledWrapper = styled.div`
@@ -18,27 +23,25 @@ const StyledWrapper = styled.div`
   }
 `;
 
-type CustomImportProps = {
-  formatType: number | string;
-  importContent: string;
-};
-
 export default function ImportExport() {
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const { $fmt } = useIntlUtls();
+  const NiceGlobalContext = useContext(GlobalContext);
   const [exportContent, setExportContent] = useState('');
   const [formatType, setFormatType] = useState(1);
   const [importMode, setImportMode] = useState('append');
   const [exportFormatType, setExportFormatType] = useState(1);
   const [importLoading, setImportLoading] = useState(false);
   const [downloadLoading, setDownloadLoading] = useState(false);
+  const [settingsImportLoading, setSettingsImportLoading] = useState(false);
+  const [settingsDownloadLoading, setSettingsDownloadLoading] = useState(false);
 
   // 导入操作
-  const handleImport: FormProps<CustomImportProps>['onFinish'] = async (values) => {
+  const handleImport = async (value?: string) => {
+    const importContent = value || form.getFieldValue('importContent');
     setImportLoading(true);
     setTimeout(async () => {
-      const { formatType, importContent } = values;
       const formatOption = formatTypeOptions.find((option) => option.type === formatType);
       const funcName = formatOption?.funcName || 'niceTab';
       try {
@@ -60,7 +63,7 @@ export default function ImportExport() {
     const reader = new FileReader();
     reader.onload = () => {
       const content = reader.result as string;
-      handleImport({ formatType, importContent: content });
+      handleImport(content);
     };
     reader.readAsText(file);
     return false;
@@ -102,10 +105,48 @@ export default function ImportExport() {
     }, 500);
   }, [exportFormatType]);
 
+  // 选择设置文件导入
+  const handleSelectSettingsFile: UploadProps['beforeUpload'] = (file) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      setSettingsImportLoading(true);
+      const content = reader.result as string;
+      try {
+        const settings = JSON.parse(content);
+        settingsUtils.setSettings(settings);
+        NiceGlobalContext.setLocale(settings.language);
+        sendBrowserMessage('setLocale', { locale: settings.language });
+        sendTabMessage({ msgType: 'setLocale', data: { locale: settings.language } });
+        messageApi.success(
+          $fmt({ id: 'common.actionSuccess', values: { action: $fmt('common.import') } })
+        );
+      } catch (err) {
+        console.error(err);
+      }
+      setSettingsImportLoading(false);
+    };
+    reader.readAsText(file);
+    return false;
+  };
+
+  // 导出设置文件
+  const handleSettingsDownload = useCallback(async () => {
+    setSettingsDownloadLoading(true);
+    setTimeout(async () => {
+      const now = dayjs().format('YYYY-MM-DD_HHmmss');
+      const fileName = `export_nice-tab_settings_${now}.json`;
+      const settings = await settingsUtils.getSettings();
+      const content = JSON.stringify(settings);
+      saveAs(new Blob([content], { type: `application/json;charset=utf-8` }), fileName);
+      setSettingsDownloadLoading(false);
+    }, 100);
+  }, [exportFormatType]);
+
   return (
     <>
       {contextHolder}
       <StyledWrapper>
+        {/* 标签导入 */}
         <Divider>
           {$fmt({ id: 'importExport.moduleTitle', values: { action: 'import' } })}
         </Divider>
@@ -114,7 +155,6 @@ export default function ImportExport() {
           name="imports"
           layout="vertical"
           initialValues={initialValues}
-          onFinish={handleImport}
           autoComplete="off"
         >
           <Form.Item
@@ -149,7 +189,11 @@ export default function ImportExport() {
           </Form.Item>
           <Form.Item>
             <Space size={12} align="center">
-              <Button type="primary" htmlType="submit" loading={importLoading}>
+              <Button
+                type="primary"
+                loading={importLoading}
+                onClick={() => handleImport()}
+              >
                 {$fmt('importExport.importFromText')}
               </Button>
               <Upload
@@ -165,7 +209,7 @@ export default function ImportExport() {
           </Form.Item>
         </Form>
 
-        {/* 导出模块 */}
+        {/* 标签导出模块 */}
         <Divider>
           {$fmt({ id: 'importExport.moduleTitle', values: { action: 'export' } })}
         </Divider>
@@ -190,6 +234,31 @@ export default function ImportExport() {
           </Form.Item>
         </Form>
       </StyledWrapper>
+
+      {/* 偏好设置导入模块 */}
+      <Divider>{$fmt('importExport.settingsModuleTitle')}</Divider>
+      <Form name="settingsImports" layout="vertical" autoComplete="off">
+        <Form.Item>
+          <Space size={12} align="center">
+            <Upload
+              accept={'.json'}
+              showUploadList={false}
+              beforeUpload={handleSelectSettingsFile}
+            >
+              <Button type="primary" loading={settingsImportLoading}>
+                {$fmt('importExport.importFromFile')}
+              </Button>
+            </Upload>
+            <Button
+              type="primary"
+              loading={settingsDownloadLoading}
+              onClick={handleSettingsDownload}
+            >
+              {$fmt('importExport.exportToFile')}
+            </Button>
+          </Space>
+        </Form.Item>
+      </Form>
     </>
   );
 }

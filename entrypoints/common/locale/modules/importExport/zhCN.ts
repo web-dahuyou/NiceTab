@@ -25,6 +25,7 @@ export default {
   'importExport.importFromFile': '从文件导入',
   'importExport.importSuccess': '导入成功',
   'importExport.importFailed': '导入失败，请检查格式是否正确',
+  'importExport.settingsModuleTitle': `偏好设置导入导出`,
 
   'importExport.exportContent': '导出内容：',
   'importExport.getContent': '生成内容',

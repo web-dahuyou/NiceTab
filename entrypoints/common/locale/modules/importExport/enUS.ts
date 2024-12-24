@@ -27,4 +27,5 @@ export default {
   'importExport.exportToFile': 'Export to Local File',
   'importExport.CopySuccess': 'Copy Successful',
   'importExport.CopyFailed': 'Copy Failed',
+  'importExport.settingsModuleTitle': `Import/Export Settings`,
 }

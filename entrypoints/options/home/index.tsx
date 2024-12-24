@@ -69,9 +69,7 @@ export default function Home() {
   const moreItems: MenuProps['items'] = useMemo(() => [
     {
       key: 'clear',
-      label: (
-        <span onClick={() => setConfirmModalVisible(true)}>{$fmt('home.clearAll')}</span>
-      ),
+      label: $fmt('home.clearAll'),
       icon: <ClearOutlined />,
     },
   ], [$fmt]);
@@ -80,6 +78,12 @@ export default function Home() {
   const handleClearConfirm = () => {
     handleMoreItemClick('clear');
     setConfirmModalVisible(false);
+  };
+
+  const onMoreItemClick: MenuProps['onClick'] = ({ key }) => {
+    if (key === 'clear') {
+      setConfirmModalVisible(true);
+    }
   };
 
   // 按名称排序
@@ -164,7 +168,7 @@ export default function Home() {
                   {$fmt('home.addTag')}
                 </Button>
 
-                <Dropdown menu={{ items: moreItems }} placement="bottomLeft">
+                <Dropdown menu={{ items: moreItems, onClick: onMoreItemClick }} placement="bottomLeft">
                   <StyledActionIconBtn className="btn-more" $size="20" title="更多">
                     <MoreOutlined />
                   </StyledActionIconBtn>

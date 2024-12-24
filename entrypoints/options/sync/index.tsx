@@ -2,8 +2,12 @@ import { useEffect, useState, useRef } from 'react';
 import { theme, Flex, Button, Modal } from 'antd';
 import { CloudUploadOutlined, ClearOutlined } from '@ant-design/icons';
 import { classNames } from '~/entrypoints/common/utils';
-import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { syncUtils, syncWebDAVUtils } from '~/entrypoints/common/storage';
+import {
+  eventEmitter,
+  useIntlUtls,
+  GlobalContext,
+} from '~/entrypoints/common/hooks/global';
+import { settingsUtils, syncUtils, syncWebDAVUtils } from '~/entrypoints/common/storage';
 import type {
   SyncTargetType,
   SyncRemoteType,
@@ -16,6 +20,8 @@ import { StyledSidebarWrapper, StyledMainWrapper } from './Sync.styled';
 import SidebarContentModuleGist from './components/gist/SidebarContentModule';
 import SidebarContentModuleWebDAV from './components/webdav/SidebarContentModule';
 import SyncResultList from './SyncResultList';
+import StickyFooter from '~/entrypoints/common/components/StickyFooter';
+import Footer from './footer/index';
 
 interface ChildComponentHandle {
   getSyncInfo: () => void;
@@ -23,8 +29,9 @@ interface ChildComponentHandle {
 
 export default function SyncPage() {
   const [modal, modalContextHolder] = Modal.useModal();
-  const { token } = theme.useToken();
+  // const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
+  const NiceGlobalContext = useContext(GlobalContext);
   const gistRef = useRef<ChildComponentHandle>(null);
   const webDAVRef = useRef<ChildComponentHandle>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
@@ -58,6 +65,9 @@ export default function SyncPage() {
     } else if (targetType === 'webdav') {
       getWebDavConfig();
     }
+
+    const { language } = settingsUtils.settings;
+    NiceGlobalContext.setLocale(language);
   }, []);
 
   const clearSyncResult = async () => {
@@ -110,7 +120,7 @@ export default function SyncPage() {
       setSelectedTargetType('webdav');
       setSelectedKey(configList[0]?.key || '');
     }
-  }
+  };
 
   useEffect(() => {
     init();
@@ -174,6 +184,11 @@ export default function SyncPage() {
           <SyncResultList resultList={resultList}></SyncResultList>
         </div>
       </StyledMainWrapper>
+
+      {/* 吸底footer */}
+      <StickyFooter bottomGap={0} fullWidth>
+        <Footer></Footer>
+      </StickyFooter>
     </>
   );
 }
