@@ -7,7 +7,10 @@ export function useSyncResult(resultData?: SyncResultItemProps) {
   const { $fmt } = useIntlUtls();
 
   const syncTypeTextMap = {
-    [syncTypeMap.AUTO]: $fmt('sync.syncType.auto'),
+    [syncTypeMap.AUTO_PULL_MERGE]: $fmt('sync.syncType.autoPullMerge'),
+    [syncTypeMap.AUTO_PULL_FORCE]: $fmt('sync.syncType.autoPullForce'),
+    [syncTypeMap.AUTO_PUSH_MERGE]: $fmt('sync.syncType.autoPushMerge'),
+    [syncTypeMap.AUTO_PUSH_FORCE]: $fmt('sync.syncType.autoPushForce'),
     [syncTypeMap.MANUAL_PULL_MERGE]: $fmt('sync.syncType.manualPullMerge'),
     [syncTypeMap.MANUAL_PULL_FORCE]: $fmt('sync.syncType.manualPullForce'),
     [syncTypeMap.MANUAL_PUSH_MERGE]: $fmt('sync.syncType.manualPushMerge'),
@@ -15,7 +18,10 @@ export function useSyncResult(resultData?: SyncResultItemProps) {
   };
 
   const syncTypeTipMap = {
-    [syncTypeMap.AUTO]: $fmt('sync.tip.auto'),
+    [syncTypeMap.AUTO_PULL_MERGE]: $fmt('sync.tip.autoPullMerge'),
+    [syncTypeMap.AUTO_PULL_FORCE]: $fmt('sync.tip.autoPullForce'),
+    [syncTypeMap.AUTO_PUSH_MERGE]: $fmt('sync.tip.autoPushMerge'),
+    [syncTypeMap.AUTO_PUSH_FORCE]: $fmt('sync.tip.autoPushForce'),
     [syncTypeMap.MANUAL_PULL_MERGE]: $fmt('sync.tip.manualPullMerge'),
     [syncTypeMap.MANUAL_PULL_FORCE]: $fmt('sync.tip.manualPullForce'),
     [syncTypeMap.MANUAL_PUSH_MERGE]: $fmt('sync.tip.manualPushMerge'),

@@ -173,7 +173,10 @@ export const DEFAULT_EXCLUDE_DOMAINS = [
 
 // 同步方式枚举
 export const syncTypeMap: Record<string, SyncType> = {
-  AUTO: 'auto',
+  AUTO_PULL_MERGE: 'auto-pull-merge',
+  AUTO_PULL_FORCE: 'auto-pull-force',
+  AUTO_PUSH_MERGE: 'auto-push-merge',
+  AUTO_PUSH_FORCE: 'auto-push-force',
   MANUAL_PULL_MERGE: 'manual-pull-merge',
   MANUAL_PULL_FORCE: 'manual-pull-force',
   MANUAL_PUSH_MERGE: 'manual-push-merge',

@@ -15,12 +15,11 @@ export type SyncConfigProps = {
   gitee: SyncConfigItemProps;
   github: SyncConfigItemProps;
 };
-export type SyncType =
-  | 'auto'
-  | 'manual-pull-merge'
-  | 'manual-pull-force'
-  | 'manual-push-merge'
-  | 'manual-push-force';
+
+export type AutoSyncType = 'auto-pull-merge' | 'auto-pull-force' | 'auto-push-merge' | 'auto-push-force';
+export type ManualSyncType = 'manual-pull-merge' | 'manual-pull-force' | 'manual-push-merge' | 'manual-push-force';
+// 同步类型
+export type SyncType = AutoSyncType | ManualSyncType;
 // 单次同步结果类型
 export type SyncResultItemProps = {
   syncTime: string;
@@ -42,7 +41,7 @@ export type SyncResultProps = {
   [key: string]: SyncResultItemProps[] | undefined;
 };
 
-// webDAV 配置
+/***** webDAV 配置 *****/
 export type SyncConfigItemWebDAVProps = WebDAVClientOptions & {
   key: string;
   label: string;
@@ -53,8 +52,34 @@ export type SyncConfigItemWebDAVProps = WebDAVClientOptions & {
   syncResult?: SyncResultItemProps[];
 };
 export type SyncConfigWebDAVProps = {
-  configList: SyncConfigItemWebDAVProps[],
+  configList: SyncConfigItemWebDAVProps[];
 };
 
+/***** 同步事件相关 *****/
+// gists同步状态变化
+interface SyncStatusChangeGistEvent {
+  type: SyncRemoteType;
+  status: SyncStatus;
+}
+// webDAV同步状态变化
+interface SyncStatusChangeWebDAVEvent {
+  key: string;
+  status: SyncStatus;
+}
+
+// gist同步状态变化事件参数
+export type SyncStatusChangeEventProps<T extends SyncTargetType = 'gist'> =
+  T extends 'gist'
+    ? SyncStatusChangeGistEvent
+    : T extends 'webdav'
+    ? SyncStatusChangeWebDAVEvent
+    : never;
+
+
+// 开始同步事件参数
+export type SyncStartEventProps = {
+  targetType: SyncTargetType;
+  syncType: SyncType;
+};
 
 export default { name: 'sync-types' };

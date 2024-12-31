@@ -10,6 +10,7 @@ import type {
   SyncStatusProps,
   SyncType,
 } from '~/entrypoints/types';
+import { eventEmitter } from '~/entrypoints/common/hooks/global';
 import {
   extContentImporter,
   fetchApi,
@@ -120,6 +121,10 @@ export default class SyncUtils {
   }
   setSyncStatus(type: SyncRemoteType, status: SyncStatus) {
     this.syncStatus[type] = status;
+    eventEmitter.emit('sync:sync-status-change--gist', {
+      type,
+      status,
+    });
   }
   async getSyncResult() {
     let result = await storage.getItem<SyncResultProps>(this.storageResultKey);
@@ -255,7 +260,10 @@ export default class SyncUtils {
       return;
     }
     let result: GistResponseItemProps = {} as GistResponseItemProps;
-    if (syncType === syncTypeMap.MANUAL_PUSH_FORCE) {
+    if (
+      syncType === syncTypeMap.MANUAL_PUSH_FORCE ||
+      syncType === syncTypeMap.AUTO_PUSH_FORCE
+    ) {
       result = await this.updateGist(remoteType);
     } else {
       const { files } = gistData || {};
@@ -275,14 +283,21 @@ export default class SyncUtils {
         fileContent = fileInfo?.content || '';
       }
 
-      if (!!fileContent && syncType === syncTypeMap.MANUAL_PULL_FORCE) {
+      if (
+        !!fileContent &&
+        (syncType === syncTypeMap.MANUAL_PULL_FORCE ||
+          syncType === syncTypeMap.AUTO_PULL_FORCE)
+      ) {
         await Store.tabListUtils.clearAll();
       }
 
       if (!!settingsFileInfo?.content) {
         try {
           let settings = JSON.parse(settingsFileInfo?.content || '{}');
-          if (syncType === syncTypeMap.MANUAL_PUSH_MERGE) {
+          if (
+            syncType === syncTypeMap.MANUAL_PUSH_MERGE ||
+            syncType === syncTypeMap.AUTO_PUSH_MERGE
+          ) {
             const localSettings = await Store.settingsUtils.getSettings();
             settings = {
               ...settings,
@@ -298,7 +313,10 @@ export default class SyncUtils {
       }
       const tagList = extContentImporter.niceTab(fileContent || '');
       await Store.tabListUtils.importTags(tagList, 'merge');
-      if (syncType === syncTypeMap.MANUAL_PUSH_MERGE) {
+      if (
+        syncType === syncTypeMap.MANUAL_PUSH_MERGE ||
+        syncType === syncTypeMap.AUTO_PUSH_MERGE
+      ) {
         result = await this.updateGist(remoteType);
       } else {
         result = { id: gistData?.id } as GistResponseItemProps;
@@ -367,5 +385,15 @@ export default class SyncUtils {
     }
 
     this.setSyncStatus(remoteType, 'idle');
+  }
+
+  // 自动同步
+  async autoSyncStart(data: { syncType: SyncType }) {
+    // console.log('syncEventListener--gist-init');
+    // console.log('syncEventListener--gist--data', data);
+    const { syncType } = data || {};
+    ['github', 'gitee'].forEach((remoteType) => {
+      this.syncStart(remoteType as SyncRemoteType, syncType);
+    });
   }
 }

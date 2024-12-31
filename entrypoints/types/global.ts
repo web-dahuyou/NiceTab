@@ -1,6 +1,7 @@
 import { ThemeConfig } from 'antd';
 import { MessageDescriptor } from 'react-intl';
 import type { MessageInstance } from 'antd/es/message/interface';
+import type { SyncStatusChangeEventProps, SyncStartEventProps } from './sync';
 
 // 扩展版本信息
 export type VersionInfo = { updateAvailable: boolean; version?: string };
@@ -16,6 +17,9 @@ export type EventsEmitterProps = {
   'home:set-tree-searchValue': string;
   'home:set-editing-status': boolean;
   'sync:push-to-all-remotes': undefined;
+  'sync:sync-status-change--gist': SyncStatusChangeEventProps<'gist'>;
+  'sync:sync-status-change--webdav': SyncStatusChangeEventProps<'webdav'>;
+  'sync:sync-start': SyncStartEventProps;
 };
 
 // 全局 Context

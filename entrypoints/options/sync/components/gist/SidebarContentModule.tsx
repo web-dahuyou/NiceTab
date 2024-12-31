@@ -10,6 +10,7 @@ import type {
   SyncConfigProps,
   SyncStatusProps,
   SyncResultProps,
+  SyncStatusChangeEventProps,
 } from '~/entrypoints/types';
 import { syncTypeMap } from '~/entrypoints/common/constants';
 import type { RemoteOptionProps, BaseCardItemProps } from '../../types';
@@ -23,7 +24,7 @@ type SideBarContentProps = {
   selectedKey?: string;
   onSelect?: (selectedKey: string) => void;
   onConfigChange?: (config: SyncConfigProps) => void;
-  onAction?: (option: RemoteOptionProps, actionType: string) => void;
+  onAction?: (option: RemoteOptionProps, actionType?: string) => void;
 };
 
 function CardTitle({
@@ -102,11 +103,11 @@ export default forwardRef(
           setDrawerVisible(true);
         } else {
           setActionTime(dayjs().format('YYYY-MM-DD_HH:mm:ss'));
-          syncUtils.setSyncStatus(option.key, 'syncing');
-          setSyncStatus(syncUtils.getSyncStatus());
+          // syncUtils.setSyncStatus(option.key, 'syncing');
+          // setSyncStatus(syncUtils.getSyncStatus());
           await syncUtils.syncStart(option.key, actionType as SyncType);
-          syncUtils.setSyncStatus(option.key, 'idle');
-          getSyncInfo();
+          // syncUtils.setSyncStatus(option.key, 'idle');
+          // getSyncInfo();
           onAction?.(option, actionType);
         }
       },
@@ -133,11 +134,21 @@ export default forwardRef(
       setSyncResult(syncUtils.syncResult);
     };
 
+    // 同步状态变化
+    const onSyncStatusChange = async (data: SyncStatusChangeEventProps<'gist'>) => {
+      getSyncInfo();
+      const { type } = data || {};
+      const option = remoteOptions.find((item) => item.key === type);
+      option && onAction?.(option);
+    };
+
     useEffect(() => {
       getSyncInfo();
       eventEmitter.on('sync:push-to-all-remotes', pushToAllRemotes);
+      eventEmitter.on('sync:sync-status-change--gist', onSyncStatusChange);
       return () => {
         eventEmitter.off('sync:push-to-all-remotes', pushToAllRemotes);
+        eventEmitter.off('sync:sync-status-change--gist', onSyncStatusChange);
       };
     }, []);
 

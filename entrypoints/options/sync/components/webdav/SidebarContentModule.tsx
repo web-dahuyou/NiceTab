@@ -9,6 +9,7 @@ import type {
   SyncType,
   SyncConfigItemWebDAVProps,
   SyncConfigWebDAVProps,
+  SyncStatusChangeEventProps,
 } from '~/entrypoints/types';
 import { syncTypeMap } from '~/entrypoints/common/constants';
 import { StyledCard } from '../../Sync.styled';
@@ -22,7 +23,7 @@ type SideBarContentProps = {
   onConfigChange?: (config: SyncConfigWebDAVProps) => void;
   onAction?: (
     option: SyncConfigItemWebDAVProps,
-    actionType: string
+    actionType?: string
   ) => void;
 };
 
@@ -80,11 +81,11 @@ export default forwardRef(
           setDrawerVisible(true);
         } else {
           setActionTime(dayjs().format('YYYY-MM-DD_HH:mm:ss'));
-          await syncWebDAVUtils.setSyncStatus(option.key, 'syncing');
-          await getSyncInfo();
+          // await syncWebDAVUtils.setSyncStatus(option.key, 'syncing');
+          // await getSyncInfo();
           await syncWebDAVUtils.syncStart(option, actionType as SyncType);
-          syncWebDAVUtils.setSyncStatus(option.key, 'idle');
-          await getSyncInfo();
+          // syncWebDAVUtils.setSyncStatus(option.key, 'idle');
+          // await getSyncInfo();
           onAction?.(option, actionType);
         }
       },
@@ -99,12 +100,22 @@ export default forwardRef(
         handleAction(option, syncTypeMap.MANUAL_PUSH_FORCE);
       });
     };
+    // 同步状态变化
+    const onSyncStatusChange = async (data: SyncStatusChangeEventProps<'webdav'>) => {
+      getSyncInfo();
+      const { key } = data || {};
+      const config = await syncWebDAVUtils.getConfig();
+      const option = config.configList?.find((item) => item.key === key);
+      option && onAction?.(option);
+    };
 
     useEffect(() => {
       getSyncInfo();
       eventEmitter.on('sync:push-to-all-remotes', pushToAllRemotes);
+      eventEmitter.on('sync:sync-status-change--webdav', onSyncStatusChange);
       return () => {
         eventEmitter.off('sync:push-to-all-remotes', pushToAllRemotes);
+        eventEmitter.off('sync:sync-status-change--webdav', onSyncStatusChange);
       };
     }, []);
 
