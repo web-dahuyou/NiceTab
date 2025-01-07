@@ -26,8 +26,8 @@ export const syncWebDAVUtils = Store.syncWebDAVUtils;
 export const stateUtils = Store.stateUtils;
 
 // 监听storage变化
-export default function initStorageListener(callback: (settings: SettingsProps) => void) {
-  storage.watch<SettingsProps>('local:settings', (settings) => {
-    callback(settings || settingsUtils.initialSettings);
+export default function initStorageListener(callback: (settings: SettingsProps, oldSettings: SettingsProps) => void) {
+  storage.watch<SettingsProps>('local:settings', (settings, oldSettings) => {
+    callback(settings || settingsUtils.initialSettings, oldSettings || settingsUtils.initialSettings);
   });
 }

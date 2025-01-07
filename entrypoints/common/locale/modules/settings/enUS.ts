@@ -3,6 +3,7 @@ export default {
   'settings.block.openTabs': 'Settings: Opening Tabs',
   'settings.block.otherActions': 'Settings: Other Actions',
   'settings.block.display': 'Settings: Displays',
+  'settings.block.autoSync': 'Settings: Auto Sync',
   'settings.language': 'Language{mark}',
   'settings.language.ChineseSimplified': 'Chinese Simplified',
   'settings.language.English': 'English',
@@ -56,4 +57,16 @@ export default {
   'settings.popupModuleDisplays.tooltip': 'If any panel module is selected, the Popup Panel will display when clicking the extension icon. Otherwise, the "Send All Tabs" action will be triggered directly.',
 
   'settings.autoExpandHomeTree': 'Automatically expand the tree list on Home Page?',
+
+  'settings.autoSync': 'Auto Sync Enable?',
+  'settings.autoSyncInterval': 'Auto Sync Interval (minutes)',
+  'settings.autoSyncType': 'Auto Sync Type',
+  'settings.syncType.autoPullMerge': 'Auto Pull (Merge): Pull remote data, merge to local data.',
+  'settings.syncType.autoPullForce': 'Auto Pull (Force): Force overwrite local data.',
+  'settings.syncType.autoPushMerge': 'Auto Push (Merge): merge to local, then push to remote (recommended).',
+  'settings.syncType.autoPushForce': 'Auto Push (Force): Force overwrite remote data.',
+  'settings.syncType.manualPullMerge': 'Manual Pull (Merge): Pull remote data, merge to local data.',
+  'settings.syncType.manualPullForce': 'Manual Pull (Force): Force overwrite local data.',
+  'settings.syncType.manualPushMerge': 'Manual Push (Merge): merge to local, then push to remote (recommended).',
+  'settings.syncType.manualPushForce': 'Manual Push (Force): Force overwrite remote data.',
 }

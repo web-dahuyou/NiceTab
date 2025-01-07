@@ -10,6 +10,7 @@ import type {
   SyncStatusProps,
   SyncType,
 } from '~/entrypoints/types';
+import { eventEmitter } from '~/entrypoints/common/hooks/global';
 import {
   extContentImporter,
   fetchApi,
@@ -41,6 +42,7 @@ type GistResponseItemProps = {
 export default class SyncUtils {
   storageConfigKey: `local:${string}` = 'local:syncConfig';
   storageResultKey: `local:${string}` = 'local:syncResult';
+  storageStatusKey: `local:${string}` = 'local:syncStatus';
   initialConfig: SyncConfigProps = {
     gitee: {
       accessToken: '',
@@ -115,11 +117,22 @@ export default class SyncUtils {
     this.config[remoteType] = { ...currConfig, ...config };
     return await storage.setItem<SyncConfigProps>(this.storageConfigKey, this.config);
   }
-  getSyncStatus() {
-    return this.syncStatus || {};
+  async getSyncStatus() {
+    const syncStatus = await storage.getItem<SyncStatusProps>(this.storageStatusKey);
+    this.syncStatus = { gitee: 'idle', github: "idle", ...syncStatus };
+    return this.syncStatus;
   }
-  setSyncStatus(type: SyncRemoteType, status: SyncStatus) {
+  async setSyncStatus(type: SyncRemoteType, status: SyncStatus) {
     this.syncStatus[type] = status;
+    await storage.setItem<SyncStatusProps>(this.storageStatusKey, this.syncStatus);
+    eventEmitter.emit('sync:sync-status-change--gist', {
+      type,
+      status,
+    });
+    sendBrowserMessage('sync:sync-status-change--gist', {
+      type,
+      status,
+    });
   }
   async getSyncResult() {
     let result = await storage.getItem<SyncResultProps>(this.storageResultKey);
@@ -128,7 +141,8 @@ export default class SyncUtils {
     return this.syncResult;
   }
   async addSyncResult(remoteType: SyncRemoteType, currResult: SyncResultItemProps) {
-    const _syncResultList = [currResult, ...(this.syncResult[remoteType] || [])];
+    const syncResult = await this.getSyncResult();
+    const _syncResultList = [currResult, ...(syncResult[remoteType] || [])];
     // 最多保留 50 条
     this.syncResult[remoteType] = _syncResultList.slice(0, 50);
     return await storage.setItem<SyncResultProps>(this.storageResultKey, this.syncResult);
@@ -255,7 +269,10 @@ export default class SyncUtils {
       return;
     }
     let result: GistResponseItemProps = {} as GistResponseItemProps;
-    if (syncType === syncTypeMap.MANUAL_PUSH_FORCE) {
+    if (
+      syncType === syncTypeMap.MANUAL_PUSH_FORCE ||
+      syncType === syncTypeMap.AUTO_PUSH_FORCE
+    ) {
       result = await this.updateGist(remoteType);
     } else {
       const { files } = gistData || {};
@@ -275,14 +292,21 @@ export default class SyncUtils {
         fileContent = fileInfo?.content || '';
       }
 
-      if (!!fileContent && syncType === syncTypeMap.MANUAL_PULL_FORCE) {
+      if (
+        !!fileContent &&
+        (syncType === syncTypeMap.MANUAL_PULL_FORCE ||
+          syncType === syncTypeMap.AUTO_PULL_FORCE)
+      ) {
         await Store.tabListUtils.clearAll();
       }
 
       if (!!settingsFileInfo?.content) {
         try {
           let settings = JSON.parse(settingsFileInfo?.content || '{}');
-          if (syncType === syncTypeMap.MANUAL_PUSH_MERGE) {
+          if (
+            syncType === syncTypeMap.MANUAL_PUSH_MERGE ||
+            syncType === syncTypeMap.AUTO_PUSH_MERGE
+          ) {
             const localSettings = await Store.settingsUtils.getSettings();
             settings = {
               ...settings,
@@ -298,7 +322,10 @@ export default class SyncUtils {
       }
       const tagList = extContentImporter.niceTab(fileContent || '');
       await Store.tabListUtils.importTags(tagList, 'merge');
-      if (syncType === syncTypeMap.MANUAL_PUSH_MERGE) {
+      if (
+        syncType === syncTypeMap.MANUAL_PUSH_MERGE ||
+        syncType === syncTypeMap.AUTO_PUSH_MERGE
+      ) {
         result = await this.updateGist(remoteType);
       } else {
         result = { id: gistData?.id } as GistResponseItemProps;
@@ -327,8 +354,9 @@ export default class SyncUtils {
 
   // 开始同步入口
   async syncStart(remoteType: SyncRemoteType, syncType: SyncType) {
-    const { accessToken, gistId, autoSync } = this.config[remoteType] || {};
+    const { accessToken, gistId } = this.config[remoteType] || {};
     if (!accessToken) return;
+    if (this.syncStatus[remoteType] === 'syncing') return;
     this.setSyncStatus(remoteType, 'syncing');
 
     try {
@@ -367,5 +395,14 @@ export default class SyncUtils {
     }
 
     this.setSyncStatus(remoteType, 'idle');
+  }
+
+  // 自动同步
+  async autoSyncStart(data: { syncType: SyncType }) {
+    const { syncType } = data || {};
+    await this.getConfig();
+    ['github', 'gitee'].forEach(async (remoteType) => {
+      await this.syncStart(remoteType as SyncRemoteType, syncType);
+    });
   }
 }

@@ -1,6 +1,11 @@
 import { ThemeConfig } from 'antd';
 import { MessageDescriptor } from 'react-intl';
 import type { MessageInstance } from 'antd/es/message/interface';
+import type {
+  SyncStatusChangeEventProps,
+  SyncStartEventProps,
+  AutoSyncType,
+} from './sync';
 
 // 扩展版本信息
 export type VersionInfo = { updateAvailable: boolean; version?: string };
@@ -16,6 +21,9 @@ export type EventsEmitterProps = {
   'home:set-tree-searchValue': string;
   'home:set-editing-status': boolean;
   'sync:push-to-all-remotes': undefined;
+  'sync:sync-status-change--gist': SyncStatusChangeEventProps<'gist'>;
+  'sync:sync-status-change--webdav': SyncStatusChangeEventProps<'webdav'>;
+  'sync:sync-start': SyncStartEventProps;
 };
 
 // 全局 Context
@@ -95,7 +103,12 @@ export type ActionNames =
   | 'sendRightTabs';
 
 // popup 弹窗中的模块名称
-export type PopupModuleNames = 'extensionInfo' | 'goto' | 'actions' | 'theme' | 'openedTabs';
+export type PopupModuleNames =
+  | 'extensionInfo'
+  | 'goto'
+  | 'actions'
+  | 'theme'
+  | 'openedTabs';
 
 // 管理后台-设置信息
 export type SettingsProps = {
@@ -122,6 +135,9 @@ export type SettingsProps = {
   showPageContextMenus?: boolean; // 网页中是否显示NiceTab右键菜单
   popupModuleDisplays?: PopupModuleNames[]; // popup面板中需要展示的模块
   autoExpandHomeTree?: boolean; // 进入列表页时，是否自动展开全部节点
+  autoSync?: boolean; // 是否开启自动同步
+  autoSyncInterval?: number; // 自动同步间隔时间
+  autoSyncType?: AutoSyncType; // 自动同步方式
 };
 
 // 状态相关

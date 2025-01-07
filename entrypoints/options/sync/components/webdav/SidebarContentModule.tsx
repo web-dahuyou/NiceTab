@@ -9,6 +9,8 @@ import type {
   SyncType,
   SyncConfigItemWebDAVProps,
   SyncConfigWebDAVProps,
+  SyncStatusChangeEventProps,
+  BrowserMessageProps,
 } from '~/entrypoints/types';
 import { syncTypeMap } from '~/entrypoints/common/constants';
 import { StyledCard } from '../../Sync.styled';
@@ -20,10 +22,7 @@ type SideBarContentProps = {
   selectedKey?: string;
   onSelect?: (tselectedKey: string) => void;
   onConfigChange?: (config: SyncConfigWebDAVProps) => void;
-  onAction?: (
-    option: SyncConfigItemWebDAVProps,
-    actionType: string
-  ) => void;
+  onAction?: (option: SyncConfigItemWebDAVProps, actionType?: string) => void;
 };
 
 export default forwardRef(
@@ -80,11 +79,7 @@ export default forwardRef(
           setDrawerVisible(true);
         } else {
           setActionTime(dayjs().format('YYYY-MM-DD_HH:mm:ss'));
-          await syncWebDAVUtils.setSyncStatus(option.key, 'syncing');
-          await getSyncInfo();
           await syncWebDAVUtils.syncStart(option, actionType as SyncType);
-          syncWebDAVUtils.setSyncStatus(option.key, 'idle');
-          await getSyncInfo();
           onAction?.(option, actionType);
         }
       },
@@ -99,12 +94,33 @@ export default forwardRef(
         handleAction(option, syncTypeMap.MANUAL_PUSH_FORCE);
       });
     };
+    // 同步状态变化
+    const onSyncStatusChange = async (data: SyncStatusChangeEventProps<'webdav'>) => {
+      getSyncInfo();
+      setActionTime(dayjs().format('YYYY-MM-DD_HH:mm:ss'));
+      const { key } = data || {};
+      const config = await syncWebDAVUtils.getConfig();
+      const option = config.configList?.find((item) => item.key === key);
+      option && onAction?.(option);
+    };
+
+    // 监听同步状态变化message
+    const onSyncStatusChangeMessage = async (message: unknown) => {
+      const { msgType, data } = message as BrowserMessageProps;
+      if (msgType === 'sync:sync-status-change--webdav') {
+        onSyncStatusChange(data);
+      }
+    };
 
     useEffect(() => {
       getSyncInfo();
       eventEmitter.on('sync:push-to-all-remotes', pushToAllRemotes);
+      eventEmitter.on('sync:sync-status-change--webdav', onSyncStatusChange);
+      browser.runtime.onMessage.addListener(onSyncStatusChangeMessage);
       return () => {
         eventEmitter.off('sync:push-to-all-remotes', pushToAllRemotes);
+        eventEmitter.off('sync:sync-status-change--webdav', onSyncStatusChange);
+        browser.runtime.onMessage.removeListener(onSyncStatusChangeMessage);
       };
     }, []);
 
