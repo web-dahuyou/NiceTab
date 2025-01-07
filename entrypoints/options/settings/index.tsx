@@ -9,6 +9,7 @@ import {
   Button,
   Radio,
   Typography,
+  Slider,
   theme,
   message,
 } from 'antd';
@@ -26,6 +27,7 @@ import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { getKeysByOS, sendBrowserMessage } from '@/entrypoints/common/utils';
 import { sendTabMessage } from '~/entrypoints/common/tabs';
 import QuickActions from './QuickActions';
+import { useSyncType } from '../sync/hooks/syncType';
 
 const {
   LANGUAGE,
@@ -50,6 +52,9 @@ const {
   SHOW_PAGE_CONTEXT_MENUS,
   POPUP_MODULE_DISPLAYS,
   AUTO_EXPAND_HOME_TREE,
+  AUTO_SYNC,
+  AUTO_SYNC_INTERVAL,
+  AUTO_SYNC_TYPE,
 } = ENUM_SETTINGS_PROPS;
 
 const module = 'settings'; // locale module name
@@ -64,6 +69,7 @@ export default function Settings() {
   const [messageApi, contextHolder] = message.useMessage();
 
   const [form] = Form.useForm();
+  const { autoSyncTypeOptions } = useSyncType();
 
   // 发送标签页自动关闭标签页的操作选项
   const actionAutoCloseFlagOptions = useMemo(() => {
@@ -159,6 +165,7 @@ export default function Settings() {
             </Radio.Group>
           </Form.Item>
 
+          {/* ******************* 发送标签页相关设置 ******************* */}
           <Divider>{$fmt('settings.block.sendTabs')}</Divider>
           {/* 是否展示目录选择弹窗 */}
           <Form.Item<SettingsProps>
@@ -314,8 +321,8 @@ export default function Settings() {
             </Radio.Group>
           </Form.Item>
 
+          {/* ******************* 打开标签页相关设置 ******************* */}
           <Divider>{$fmt('settings.block.openTabs')}</Divider>
-
           {/* 是否在新窗口打开标签组 */}
           <Form.Item<SettingsProps>
             label={$fmt({
@@ -354,6 +361,7 @@ export default function Settings() {
             </Radio.Group>
           </Form.Item>
 
+          {/* ******************* 其他操作相关设置 ******************* */}
           <Divider>{$fmt('settings.block.otherActions')}</Divider>
           {/* 是否删除未锁定的空标签组 */}
           <Form.Item<SettingsProps>
@@ -442,6 +450,7 @@ export default function Settings() {
             </Space>
           </Form.Item>
 
+          {/* ******************* 展示相关设置 ******************* */}
           <Divider>{$fmt('settings.block.display')}</Divider>
           {/* 扩展图标上是否展示当前打开的标签页数 */}
           <Form.Item<SettingsProps>
@@ -492,6 +501,47 @@ export default function Settings() {
             </Radio.Group>
           </Form.Item>
 
+          {/* ******************* 远程同步相关设置 ******************* */}
+          <Divider>{$fmt('settings.block.autoSync')}</Divider>
+          {/* 是否开启自动同步 */}
+          <Form.Item<SettingsProps>
+            label={$fmt(`${module}.${AUTO_SYNC}`)}
+            name={AUTO_SYNC}
+          >
+            <Radio.Group>
+              <Radio value={true}>{$fmt('common.yes')}</Radio>
+              <Radio value={false}>{$fmt('common.no')}</Radio>
+            </Radio.Group>
+          </Form.Item>
+          {/* 自动同步间隔时间 */}
+          <Form.Item<SettingsProps> label={$fmt(`${module}.${AUTO_SYNC_INTERVAL}`)}>
+            {/* 嵌套一下没有别的意思，只是为了给slider的tooltip留出点空间 */}
+            <Form.Item<SettingsProps> name={AUTO_SYNC_INTERVAL}>
+              <Slider
+                min={5}
+                max={100}
+                step={5}
+                tooltip={{ open: true, placement: 'bottom', autoAdjustOverflow: false }}
+              />
+            </Form.Item>
+          </Form.Item>
+          {/* 自动同步方式 */}
+          <Form.Item<SettingsProps>
+            label={$fmt(`${module}.${AUTO_SYNC_TYPE}`)}
+            name={AUTO_SYNC_TYPE}
+          >
+            <Radio.Group>
+              <Space direction="vertical">
+                {autoSyncTypeOptions.map((item) => (
+                  <Radio key={item.type} value={item.type}>
+                    {item.label}
+                  </Radio>
+                ))}
+              </Space>
+            </Radio.Group>
+          </Form.Item>
+
+          {/* ******************* 保存 ******************* */}
           <Form.Item>
             <Button type="primary" htmlType="submit">
               {$fmt('common.save')}

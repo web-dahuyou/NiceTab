@@ -39,9 +39,9 @@ export default function SyncResultList({ resultList }: SyncResultListProps) {
           <QuestionCircleOutlined />
         </Tooltip>
       </Space>
-      {resultList.map((result) => (
+      {resultList.map((result, index) => (
         <Alert
-          key={result.syncTime}
+          key={`${result.syncTime}__${index}`}
           message={
             <Flex vertical gap={2}>
               <Typography.Text type="secondary">

@@ -11,6 +11,7 @@ import type {
   SyncStatusProps,
   SyncResultProps,
   SyncStatusChangeEventProps,
+  BrowserMessageProps,
 } from '~/entrypoints/types';
 import { syncTypeMap } from '~/entrypoints/common/constants';
 import type { RemoteOptionProps, BaseCardItemProps } from '../../types';
@@ -103,11 +104,7 @@ export default forwardRef(
           setDrawerVisible(true);
         } else {
           setActionTime(dayjs().format('YYYY-MM-DD_HH:mm:ss'));
-          // syncUtils.setSyncStatus(option.key, 'syncing');
-          // setSyncStatus(syncUtils.getSyncStatus());
           await syncUtils.syncStart(option.key, actionType as SyncType);
-          // syncUtils.setSyncStatus(option.key, 'idle');
-          // getSyncInfo();
           onAction?.(option, actionType);
         }
       },
@@ -124,8 +121,8 @@ export default forwardRef(
     };
 
     const getSyncInfo = async () => {
-      syncUtils.getSyncStatus();
-      setSyncStatus(syncUtils.syncStatus);
+      const status = await syncUtils.getSyncStatus();
+      setSyncStatus(status);
 
       await syncUtils.getConfig();
       setSyncConfig(syncUtils.config);
@@ -136,19 +133,30 @@ export default forwardRef(
 
     // 同步状态变化
     const onSyncStatusChange = async (data: SyncStatusChangeEventProps<'gist'>) => {
-      getSyncInfo();
+      await getSyncInfo();
+      setActionTime(dayjs().format('YYYY-MM-DD_HH:mm:ss'));
       const { type } = data || {};
       const option = remoteOptions.find((item) => item.key === type);
       option && onAction?.(option);
+    };
+
+    // 监听同步状态变化message
+    const onSyncStatusChangeMessage = async (message: unknown) => {
+      const { msgType, data } = message as BrowserMessageProps;
+      if (msgType === 'sync:sync-status-change--gist') {
+        onSyncStatusChange(data);
+      }
     };
 
     useEffect(() => {
       getSyncInfo();
       eventEmitter.on('sync:push-to-all-remotes', pushToAllRemotes);
       eventEmitter.on('sync:sync-status-change--gist', onSyncStatusChange);
+      browser.runtime.onMessage.addListener(onSyncStatusChangeMessage);
       return () => {
         eventEmitter.off('sync:push-to-all-remotes', pushToAllRemotes);
         eventEmitter.off('sync:sync-status-change--gist', onSyncStatusChange);
+        browser.runtime.onMessage.removeListener(onSyncStatusChangeMessage);
       };
     }, []);
 
@@ -176,13 +184,14 @@ export default forwardRef(
                   option={option}
                   isActive={targetType === 'gist' && selectedKey === option.key}
                   syncConfig={syncConfig?.[option.key] || {}}
-                  syncStatus={syncStatus?.[option.key] || {}}
+                  syncStatus={syncStatus?.[option.key] || 'idle'}
                   syncResult={syncResult?.[option.key] || []}
                   cardTitle={
                     <CardTitle
+                      key={`${option.key}_${actionTime}`}
                       option={option}
                       syncConfig={syncConfig?.[option.key] || {}}
-                      syncStatus={syncStatus?.[option.key] || []}
+                      syncStatus={syncStatus?.[option.key] || 'idle'}
                     />
                   }
                   onAction={handleAction}

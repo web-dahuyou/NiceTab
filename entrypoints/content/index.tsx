@@ -11,7 +11,7 @@ export default defineContentScript({
   // cssInjectionMode: 'manual',
 
   async main(ctx) {
-    console.log('content-script: Hello Nice-Tab.');
+    // console.log('content-script: Hello Nice-Tab.');
     // createShadowRootUi 方式
     const ui = await createShadowRootUi(ctx, {
       name: "nicetab-message",

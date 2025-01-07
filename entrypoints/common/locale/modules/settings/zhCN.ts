@@ -3,6 +3,7 @@ export default {
   'settings.block.openTabs': '打开标签页相关配置',
   'settings.block.otherActions': '其他操作配置',
   'settings.block.display': '展示配置',
+  'settings.block.autoSync': '自动同步配置',
   'settings.language': '语言{mark}',
   // 'settings.language.ChineseSimplified': '简体中文',
   // 'settings.language.English': '英文',
@@ -56,4 +57,16 @@ export default {
   'settings.popupModuleDisplays.tooltip': '只要选择了任意面板模块，则点击扩展图标时将展示 Popup 面板，否则将直接发送所有标签页。',
 
   'settings.autoExpandHomeTree': '进入列表页时-是否自动展开全部节点：',
+
+  'settings.autoSync': '是否开启自动同步：',
+  'settings.autoSyncInterval': '自动同步间隔时间（分钟）：',
+  'settings.autoSyncType': '自动同步方式：',
+  'settings.syncType.autoPullMerge': '自动拉取-合并到本地',
+  'settings.syncType.autoPullForce': '自动拉取-覆盖本地数据',
+  'settings.syncType.autoPushMerge': '自动同步-合并推送（推荐）',
+  'settings.syncType.autoPushForce': '自动同步-覆盖推送',
+  'settings.syncType.manualPullMerge': '手动拉取-合并到本地',
+  'settings.syncType.manualPullForce': '手动拉取-覆盖本地数据',
+  'settings.syncType.manualPushMerge': '手动同步-合并推送（推荐）',
+  'settings.syncType.manualPushForce': '手动同步-覆盖推送',
 }

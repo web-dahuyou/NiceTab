@@ -1,10 +1,14 @@
-import contextMenusRegister, { strategyHandler, handleSendTabsAction } from '~/entrypoints/common/contextMenus';
+import contextMenusRegister, {
+  strategyHandler,
+  handleSendTabsAction,
+} from '~/entrypoints/common/contextMenus';
 import commandsRegister from '~/entrypoints/common/commands';
 import tabUtils from '~/entrypoints/common/tabs';
 import initStorageListener, {
   themeUtils,
   settingsUtils,
 } from '~/entrypoints/common/storage';
+import { autoSyncAlarm } from '~/entrypoints/common/alarms';
 import {
   PRIMARY_COLOR,
   // TAB_EVENTS,
@@ -65,15 +69,19 @@ export default defineBackground(() => {
   setBadge();
   // 初始化 popup 交互
   initPopup();
-  initStorageListener(async () => {
+  initStorageListener(async (settings, oldSettings) => {
     setBadge();
     initPopup();
+    autoSyncAlarm.checkReset(settings, oldSettings);
   });
 
   // 注册 contextMenus
   contextMenusRegister();
   // 注册 commands
   commandsRegister();
+
+  // 创建自动同步闹钟
+  autoSyncAlarm.create();
 
   // 左键点击图标 (如果有 popup 是不会触发的，可以执行 browser.action.setPopup({ popup: '' }) 来监听事件)
   // Fired when an action icon is clicked. This event will not fire if the action has a popup.
@@ -86,6 +94,7 @@ export default defineBackground(() => {
   });
 
   browser.runtime.onInstalled.addListener(async () => {
+    // console.log('browser.runtime.onInstalled');
     const settings = await settingsUtils.getSettings();
     if (settings[OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH]) {
       tabUtils.openAdminRoutePage({ path: '/home' });

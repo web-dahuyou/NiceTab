@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { theme, Flex, Button, Modal } from 'antd';
-import { CloudUploadOutlined, ClearOutlined, SyncOutlined } from '@ant-design/icons';
+import { CloudUploadOutlined, ClearOutlined } from '@ant-design/icons';
 import { classNames } from '~/entrypoints/common/utils';
 import {
   eventEmitter,
@@ -93,11 +93,6 @@ export default function SyncPage() {
     eventEmitter.emit('sync:push-to-all-remotes');
   };
 
-  const autoSyncStart = async () => {
-    syncUtils.autoSyncStart({ syncType: 'auto-push-merge' });
-    syncWebDAVUtils.autoSyncStart({ syncType: 'auto-push-merge' });
-  };
-
   const getSyncInfo = async () => {
     await syncUtils.getSyncResult();
     setSyncResult(syncUtils.syncResult);
@@ -162,13 +157,6 @@ export default function SyncPage() {
                 onClick={clearSyncResult}
               >
                 <Button icon={<ClearOutlined />}></Button>
-              </div>
-              <div
-                className="action-icon"
-                title={$fmt('sync.autoSync')}
-                onClick={autoSyncStart}
-              >
-                <Button icon={<SyncOutlined />}></Button>
               </div>
             </div>
             <div className="sidebar-inner-content">

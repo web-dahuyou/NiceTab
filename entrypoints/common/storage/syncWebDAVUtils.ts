@@ -80,9 +80,14 @@ export default class syncWebDAVUtils {
     };
     await this.setConfig(this.config);
     eventEmitter.emit('sync:sync-status-change--webdav', { key, status });
+    sendBrowserMessage('sync:sync-status-change--webdav', {
+      key,
+      status,
+    });
   }
   async addSyncResult(key: string, resultItem: SyncResultItemProps) {
-    for (let item of this.config.configList) {
+    const config = await this.getConfig();
+    for (let item of config.configList) {
       if (item.key !== key) continue;
       (item.syncResult = item.syncResult || []).unshift(resultItem);
       // 最多保留 50 条
@@ -207,7 +212,6 @@ export default class syncWebDAVUtils {
     ) {
       const localContent = await this.getSyncContent();
       const result = await client.putFileContents(filepath, localContent);
-      console.log('putFileContentsRes--MANUAL_PUSH_FORCE', result);
       await this.handleSyncResult(configItem.key, syncType, result);
       // 同步设置信息失败单独catch, 不影响列表的同步
       try {
@@ -275,7 +279,6 @@ export default class syncWebDAVUtils {
     ) {
       const localContent = await this.getSyncContent();
       const result = await client.putFileContents(filepath, localContent);
-      console.log('putFileContentsRes--MANUAL_PUSH_MERGE', result);
       await this.handleSyncResult(configItem.key, syncType, result);
     } else {
       await this.handleSyncResult(configItem.key, syncType, true);
@@ -285,6 +288,11 @@ export default class syncWebDAVUtils {
   // 开始同步入口
   async syncStart(configItem: SyncConfigItemWebDAVProps, syncType: SyncType) {
     if (!configItem.webdavConnectionUrl) return;
+    const syncStatus = this.config.configList?.find(
+      (item) => item.key === configItem.key
+    )?.syncStatus;
+
+    if (syncStatus === 'syncing') return;
     this.setSyncStatus(configItem.key, 'syncing');
 
     const { webdavConnectionUrl, username, password } = configItem;
@@ -311,8 +319,6 @@ export default class syncWebDAVUtils {
 
   // 自动同步
   async autoSyncStart(data: { syncType: SyncType }) {
-    // console.log('syncEventListener--webdav-init');
-    // console.log('syncEventListener--webdav--data', data);
     const { syncType } = data || {};
     const config = await this.getConfig();
     const configList = config.configList?.filter((item) => !!item.webdavConnectionUrl);
