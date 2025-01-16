@@ -14,6 +14,7 @@ import {
   message,
 } from 'antd';
 import type { FormProps } from 'antd';
+import styled from 'styled-components';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import type { SettingsProps } from '~/entrypoints/types';
 import { settingsUtils } from '~/entrypoints/common/storage';
@@ -24,8 +25,9 @@ import {
   defaultLanguage,
 } from '~/entrypoints/common/constants';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { getKeysByOS, sendBrowserMessage } from '@/entrypoints/common/utils';
+import { getKeysByOS, sendBrowserMessage } from '~/entrypoints/common/utils';
 import { sendTabMessage } from '~/entrypoints/common/tabs';
+import { StickyBox } from '~/entrypoints/common/components/StickyBox';
 import QuickActions from './QuickActions';
 import { useSyncType } from '../sync/hooks/syncType';
 
@@ -62,6 +64,15 @@ const module = 'settings'; // locale module name
 const defaultTemplate = String.raw`{{url}} | {{title}}`;
 
 const modifierKeyLabels = getKeysByOS();
+
+const StyledHeaderActionWrapper = styled.div`
+  .header-action-btns {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 0;
+  }
+`;
 
 export default function Settings() {
   const NiceGlobalContext = useContext(GlobalContext);
@@ -126,6 +137,15 @@ export default function Settings() {
           onFinish={onFinish}
           autoComplete="off"
         >
+          <StickyBox topGap={60} fullWidth bgColor={token.colorBgContainer}>
+            <StyledHeaderActionWrapper>
+              <Space className="header-action-btns">
+                <Button type="primary" htmlType="submit">
+                  {$fmt('common.save')}
+                </Button>
+              </Space>
+            </StyledHeaderActionWrapper>
+          </StickyBox>
           <Form.Item<SettingsProps>
             label={$fmt({ id: `${module}.${LANGUAGE}`, values: { mark: '：' } })}
             name={LANGUAGE}
