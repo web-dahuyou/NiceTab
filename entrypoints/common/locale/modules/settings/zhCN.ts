@@ -33,6 +33,7 @@ export default {
   'settings.deleteAfterRestore': '打开标签页/标签组时-是否自动删除标签页{mark}',
   'settings.deleteAfterRestore.yes': '从NiceTab列表中删除（仍保留固定标签页）',
   'settings.deleteAfterRestore.no': '保留在NiceTab列表中（推荐）',
+  'settings.unnamedGroupRestoreAsGroup': '恢复未命名标签组时-是否以标签组形式打开到浏览器：',
   'settings.silentOpenTabModifierKey': '静默打开标签页使用的修饰键：',
   'settings.deleteUnlockedEmptyGroup': '清空标签页时-是否自动删除该标签组{mark}',
   'settings.deleteUnlockedEmptyGroup.yes': '自动删除（仍保留锁定的空标签组）',

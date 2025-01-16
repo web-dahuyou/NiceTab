@@ -15,7 +15,7 @@ import {
 } from '../types';
 import { getTreeData } from '../utils';
 
-const { DELETE_AFTER_RESTORE, AUTO_EXPAND_HOME_TREE } = ENUM_SETTINGS_PROPS;
+const { DELETE_AFTER_RESTORE, UNNAMED_GROUP_RESTORE_AS_GROUP, AUTO_EXPAND_HOME_TREE } = ENUM_SETTINGS_PROPS;
 
 export type TreeDataHookProps = ReturnType<typeof useTreeData>;
 interface HomeContextProps {
@@ -292,7 +292,7 @@ export function useTreeData() {
       const settings = settingsUtils.settings;
       console.log('tabGroup.originData', tabGroup.originData)
       // 未命名的标签组，不以原生标签组形式打开
-      if (tabGroup?.originData?.groupName === UNNAMED_GROUP) {
+      if (tabGroup?.originData?.groupName === UNNAMED_GROUP && !settings?.[UNNAMED_GROUP_RESTORE_AS_GROUP]) {
         // 打开标签组 (标签页单独打开)
         tabGroup?.originData?.tabList.forEach((tab) => {
           openNewTab(tab.url);
