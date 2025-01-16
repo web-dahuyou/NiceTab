@@ -11,9 +11,9 @@ import {
   ENUM_SETTINGS_PROPS,
 } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { tabListUtils, settingsUtils } from '@/entrypoints/common/storage';
-import DndComponent from '@/entrypoints/common/components/DndComponent';
-import DropComponent from '@/entrypoints/common/components/DropComponent';
+import { tabListUtils, settingsUtils } from '~/entrypoints/common/storage';
+import DndComponent from '~/entrypoints/common/components/DndComponent';
+import DropComponent from '~/entrypoints/common/components/DropComponent';
 
 import { HomeContext } from './hooks/treeData';
 import { eventEmitter } from './hooks/homeCustomEvent';

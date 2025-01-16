@@ -5,7 +5,7 @@ import type { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types
 import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
 import { openNewTab, openNewGroup } from '~/entrypoints/common/tabs';
 import { ENUM_SETTINGS_PROPS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
-import { getRandomId } from '@/entrypoints/common/utils';
+import { getRandomId } from '~/entrypoints/common/utils';
 import {
   TreeDataNodeTabGroup,
   TreeDataNodeTag,

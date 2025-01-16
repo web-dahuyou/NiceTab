@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import type { StyledThemeProps } from '@/entrypoints/types';
+import type { StyledThemeProps } from '~/entrypoints/types';
 
 export const StyledBaseSidebarWrapper = styled.div<{
   theme: StyledThemeProps;

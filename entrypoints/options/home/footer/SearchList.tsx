@@ -10,8 +10,8 @@ import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import {
   StyledEllipsis,
   StyledActionIconBtn,
-} from '@/entrypoints/common/style/Common.styled';
-import type { TagItem, GroupItem, TabItem } from '@/entrypoints/types';
+} from '~/entrypoints/common/style/Common.styled';
+import type { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
 import type { TreeDataNodeUnion } from '../types';
 import { HomeContext } from '../hooks/treeData';
 
