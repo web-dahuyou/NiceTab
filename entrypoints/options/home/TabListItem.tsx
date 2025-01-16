@@ -184,6 +184,7 @@ export default memo(function TabListItem({
           <Popover
             color="#fbfbfb"
             destroyTooltipOnHide
+            trigger="click"
             content={<QRCode value={tab.url} color="#000" bordered={false} />}
           >
             <StyledActionIconBtn
