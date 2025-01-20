@@ -34,7 +34,7 @@
 - 支持分类、标签组、标签页管理，包括一键收集保存、恢复、星标、锁定、增删改查、拖拽排序等功能。
 - 分类支持展开/收起，支持创建分类和标签组，方便移动其他标签组/标签页到新分类/新标签组。
 - 支持多种插件格式的 **导入/导出** 功能，支持导出到本地。目前支持 `NiceTab`、`OneTab` 格式的交叉导入导出（比如：可选择导入OneTab格式并导出为NiceTab格式；或者将NiceTab格式导出为OneTab格式），后续可根据需求增加其他插件格式的导入导出功能。
-- 支持**远程同步功能**：
+- 支持**远程同步功能**（注意，合并推送不进行diff对比删除操作，而是合并远程和本地，然后推送到远程，所以标签页是会增多的，想要同步删除操作，请删除标签页后手动覆盖推送到远程）：
   - gists同步: 您可根据需求将标签页同步到自己的 github 和 gitee 账号，只需要配置自己的 access token 即可（注意 token 权限只勾选 gists 操作），后期看看能否扩展配置其他平台方案。
   - webDAV同步: 您可根据需求将标签页同步到自己的 webDAV 网盘，只需要配置 webDAV 的 url，username，password即可（支持配置多个 webDAV 账号）。
   - 自动同步: 支持自动同步功能，可设置开启/关闭、同步频率、同步方式。
@@ -110,10 +110,15 @@
 ![NiceTab-导入导出](https://github.com/user-attachments/assets/e2ea4b00-3531-4819-b67a-e45f09b4e948)
 
 ### 远程同步功能
-您可根据需求将标签页同步到自己的 github 和 gitee 账号，只需要配置自己的 access token 即可。    
-**注意**：token 权限只勾选 gists 操作，后期看看能否扩展配置其他平台方案
+远程同步支持 gitee gists, github gists 和 webdav 同步。
+- gists 同步：您可根据需求将标签页同步到自己的 github 和 gitee 账号，只需要配置自己的 access token 即可。    
+- webdav 同步：您可根据需求将标签页同步到自己的 webDAV 网盘，只需要配置 webDAV 的 url，username，password即可（支持配置多个 webDAV 账号）。
 
-现已支持 webdav 方式远程同步, 截图暂未更新。
+**注意**：
+- gists token 权限只勾选 gists 操作
+- 合并推送不进行diff对比删除操作，而是合并远程和本地，然后推送到远程，所以标签页是会逐渐增多的，想要同步删除操作的话，请删除标签页后手动覆盖推送到远程
+
+webdav 方式远程同步截图暂未更新。
 
 ![NiceTab-远程同步功能](https://github.com/user-attachments/assets/1d082c8f-4660-4f8e-9ac9-7cf468178ee1)
 
