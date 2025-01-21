@@ -31,10 +31,12 @@ export interface GlobalContextProps {
   version: string;
   colorPrimary: string;
   themeTypeConfig: ThemeTypeConfig;
+  pageWidthType: PageWidthTypes;
   $message: MessageInstance;
   setThemeType: (themeType: ThemeTypes) => void;
   setThemeData: (themeData: Partial<ThemeProps>) => void;
   setLocale: (language?: LanguageTypes, callback?: () => void) => Promise<void>;
+  setPageWidthType: (pageWidthType: PageWidthTypes) => void;
 }
 
 // 语言
@@ -110,6 +112,8 @@ export type PopupModuleNames =
   | 'theme'
   | 'openedTabs';
 
+export type PageWidthTypes = 'fixed' | 'responsive';
+
 // 管理后台-设置信息
 export type SettingsProps = {
   language?: LanguageTypes; // 语言
@@ -124,6 +128,7 @@ export type SettingsProps = {
   actionAutoCloseFlags?: ActionNames[]; // 各种发送标签页操作是否自动关闭标签页的开关配置
   restoreInNewWindow?: boolean; // 是否在新窗口打开标签组
   deleteAfterRestore?: boolean; // 恢复标签页/标签组时是否从列表中删除
+  unnamedGroupRestoreAsGroup?: boolean; // 是否以标签组形式恢复未命名标签组
   silentOpenTabModifierKey?: string; // 静默打开标签页的修饰键
   deleteUnlockedEmptyGroup?: boolean; // 是否删除未锁定的空标签组
   confirmBeforeDeletingTabs?: boolean; // 删除标签页前是否确认
@@ -135,6 +140,7 @@ export type SettingsProps = {
   showPageContextMenus?: boolean; // 网页中是否显示NiceTab右键菜单
   popupModuleDisplays?: PopupModuleNames[]; // popup面板中需要展示的模块
   autoExpandHomeTree?: boolean; // 进入列表页时，是否自动展开全部节点
+  pageWidthType?: PageWidthTypes; // 主内容区宽度设置
   autoSync?: boolean; // 是否开启自动同步
   autoSyncInterval?: number; // 自动同步间隔时间
   autoSyncType?: AutoSyncType; // 自动同步方式

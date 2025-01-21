@@ -53,14 +53,17 @@ import {
   StyledActionIconBtn,
   GlobalStyle,
 } from '~/entrypoints/common/style/Common.styled';
-import type { StyledThemeProps } from '~/entrypoints/types';
+import type { StyledThemeProps, PageWidthTypes } from '~/entrypoints/types';
 import Home from './home/index.tsx';
 import Settings from './settings/index.tsx';
 import ImportExport from './importExport/index.tsx';
 import SyncPage from './sync/index.tsx';
 import RecycleBin from './recycleBin/index.tsx';
 
-const StyledPageContainer = styled.div<{ theme: StyledThemeProps }>`
+const StyledPageContainer = styled.div<{
+  theme: StyledThemeProps;
+  $widthType: PageWidthTypes;
+}>`
   .header-navbar {
     position: fixed;
     top: 0;
@@ -104,7 +107,7 @@ const StyledPageContainer = styled.div<{ theme: StyledThemeProps }>`
   }
   @media screen and (min-width: 1200px) {
     .main-content {
-      width: 1120px;
+      width: ${(props) => (props.$widthType === 'fixed' ? '1120px' : '100%')};
     }
   }
 `;
@@ -176,7 +179,7 @@ function AppLayout() {
   const { updateDetail, updateReload } = useUpdate();
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const { $fmt, locale } = useIntlUtls();
-  const { version, themeTypeConfig } = NiceGlobalContext;
+  const { version, themeTypeConfig, pageWidthType } = NiceGlobalContext;
   const navs = useMemo(() => {
     return navsTemplate.map((item) => {
       return { ...item, label: $fmt(item.label) };
@@ -247,7 +250,7 @@ function AppLayout() {
 
   return (
     <ThemeProvider theme={{ ...themeTypeConfig, ...token }}>
-      <StyledPageContainer className="page-container">
+      <StyledPageContainer $widthType={pageWidthType} className="page-container">
         <GlobalStyle />
         <div className="header-navbar select-none">
           {/* <div className="logo"></div> */}

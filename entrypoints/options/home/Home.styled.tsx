@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
-import type { StyledThemeProps } from '@/entrypoints/types';
+import type { StyledThemeProps } from '~/entrypoints/types';
 import { StyledBaseSidebarWrapper, StyledBaseMainWrapper } from '../Layout.styled';
 
 export const StyledMainWrapper = StyledBaseMainWrapper;

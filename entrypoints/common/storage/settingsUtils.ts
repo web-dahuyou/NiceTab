@@ -1,5 +1,5 @@
 // import { storage } from 'wxt/storage';
-import type { LanguageTypes, SettingsProps } from '~/entrypoints/types';
+import type { LanguageTypes, SettingsProps, PageWidthTypes } from '~/entrypoints/types';
 import {
   ENUM_SETTINGS_PROPS,
   POPUP_MODULE_NAMES,
@@ -22,6 +22,7 @@ const {
   AUTO_PIN_ADMIN_TAB,
   RESTORE_IN_NEW_WINDOW,
   DELETE_AFTER_RESTORE,
+  UNNAMED_GROUP_RESTORE_AS_GROUP,
   SILENT_OPEN_TAB_MODIFIER_KEY,
   DELETE_UNLOCKED_EMPTY_GROUP,
   CONFIRM_BEFORE_DELETING_TABS,
@@ -33,6 +34,7 @@ const {
   SHOW_PAGE_CONTEXT_MENUS,
   POPUP_MODULE_DISPLAYS,
   AUTO_EXPAND_HOME_TREE,
+  MAIN_CONTENT_WIDTH_TYPE,
   AUTO_SYNC,
   AUTO_SYNC_INTERVAL,
   AUTO_SYNC_TYPE,
@@ -53,6 +55,7 @@ export default class SettingsUtils {
     [ACTION_AUTO_CLOSE_FLAGS]: [], // 各种操作的自动关闭标签页标志
     [RESTORE_IN_NEW_WINDOW]: false, // 是否在新窗口打开标签组
     [DELETE_AFTER_RESTORE]: false, // 恢复标签页/标签组时是否从列表中删除
+    [UNNAMED_GROUP_RESTORE_AS_GROUP]: true, // 是否以标签组形式恢复未命名标签组
     [SILENT_OPEN_TAB_MODIFIER_KEY]: 'alt', // 静默打开标签页的修饰键
     [DELETE_UNLOCKED_EMPTY_GROUP]: true, // 是否删除未锁定的空标签组
     [CONFIRM_BEFORE_DELETING_TABS]: false, // 删除标签页前是否需要确认
@@ -65,6 +68,7 @@ export default class SettingsUtils {
     [SHOW_PAGE_CONTEXT_MENUS]: true, // 网页中是否显示NiceTab右键菜单
     [POPUP_MODULE_DISPLAYS]: POPUP_MODULE_NAMES, // popup面板中需要展示的模块
     [AUTO_EXPAND_HOME_TREE]: false, // 进入列表页时，是否自动展开全部节点
+    [MAIN_CONTENT_WIDTH_TYPE]: 'fixed' as PageWidthTypes, // 主内容区域宽度类型
 
     [AUTO_SYNC]: false, // 是否开启自动同步
     [AUTO_SYNC_INTERVAL]: 30, // 自动同步间隔时间

@@ -9,7 +9,7 @@ import { settingsUtils } from '~/entrypoints/common/storage';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { getOSInfo } from '@/entrypoints/common/utils';
+import { getOSInfo } from '~/entrypoints/common/utils';
 import {
   StyledTabItemWrapper,
   StyledTabTitle,
@@ -184,6 +184,7 @@ export default memo(function TabListItem({
           <Popover
             color="#fbfbfb"
             destroyTooltipOnHide
+            trigger="click"
             content={<QRCode value={tab.url} color="#000" bordered={false} />}
           >
             <StyledActionIconBtn

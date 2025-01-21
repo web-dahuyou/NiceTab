@@ -118,6 +118,7 @@ export enum ENUM_SETTINGS_PROPS {
   EXCLUDE_DOMAINS_FOR_SENDING = 'excludeDomainsForSending', // 发送标签页时排除的域名
   RESTORE_IN_NEW_WINDOW = 'restoreInNewWindow', // 是否在新窗口打开标签组
   DELETE_AFTER_RESTORE = 'deleteAfterRestore', // 恢复标签页/标签组时是否从列表中删除
+  UNNAMED_GROUP_RESTORE_AS_GROUP = 'unnamedGroupRestoreAsGroup', // 是否以标签组形式恢复未命名标签组
   SILENT_OPEN_TAB_MODIFIER_KEY = 'silentOpenTabModifierKey', // 静默打开标签页的修饰键
   DELETE_UNLOCKED_EMPTY_GROUP = 'deleteUnlockedEmptyGroup', // 是否删除未锁定的空标签组
   CONFIRM_BEFORE_DELETING_TABS = 'confirmBeforeDeletingTabs', // 删除标签页前是否需要确认
@@ -129,6 +130,7 @@ export enum ENUM_SETTINGS_PROPS {
   SHOW_PAGE_CONTEXT_MENUS = 'showPageContextMenus', // 网页中是否显示NiceTab右键菜单
   POPUP_MODULE_DISPLAYS = 'popupModuleDisplays', // popup弹窗中需要展示的模块
   AUTO_EXPAND_HOME_TREE = 'autoExpandHomeTree', // 进入列表页时，是否自动展开全部节点
+  MAIN_CONTENT_WIDTH_TYPE = 'pageWidthType', // 主内容区域宽度类型
   AUTO_SYNC = 'autoSync', // 是否开启自动同步
   AUTO_SYNC_INTERVAL = 'autoSyncInterval', // 自动同步间隔时间
   AUTO_SYNC_TYPE = 'autoSyncType', // 自动同步方式

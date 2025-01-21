@@ -8,7 +8,13 @@ import {
   useCustomLocale,
   useThemeTypeConfig,
 } from '~/entrypoints/common/hooks/global';
-import type { BrowserMessageProps, ThemeProps, LanguageTypes, ThemeTypes } from '~/entrypoints/types';
+import type {
+  BrowserMessageProps,
+  ThemeProps,
+  LanguageTypes,
+  ThemeTypes,
+  PageWidthTypes,
+} from '~/entrypoints/types';
 import { themeUtils } from '~/entrypoints/common/storage';
 
 export default function Root({ children }: { children: React.ReactNode }) {
@@ -23,6 +29,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
   const { themeTypeConfig, changeThemeType } = useThemeTypeConfig();
   const [hasReady, setHasReady] = useState(false);
   const [primaryColor, setPrimaryColor] = useState(PRIMARY_COLOR);
+  const [pageWidthType, setPageWidthType] = useState<PageWidthTypes>('fixed');
 
   const handleLocaleChange = async (languange?: LanguageTypes) => {
     changeLocaleAntd(languange);
@@ -35,6 +42,9 @@ export default function Root({ children }: { children: React.ReactNode }) {
     const theme = await themeUtils.setThemeData(themeData);
     setPrimaryColor(theme.colorPrimary);
   };
+  const handlePageWidthTypeChange = async (type: PageWidthTypes) => {
+    setPageWidthType(type);
+  };
 
   const initThemeData = async () => {
     const theme = await themeUtils.getThemeData();
@@ -45,7 +55,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
   const getManifest = async () => {
     const manifestInfo = await browser.runtime.getManifest();
     setVersion(manifestInfo?.version || '888.888.888');
-  }
+  };
   // 监听消息
   const messageListener = async (msg: unknown) => {
     // console.log('browser.runtime.onMessage--Root', msg);
@@ -100,10 +110,12 @@ export default function Root({ children }: { children: React.ReactNode }) {
             version,
             colorPrimary: primaryColor,
             themeTypeConfig,
+            pageWidthType,
             $message,
             setThemeType: handleThemeTypeChange,
             setThemeData: handleThemeChange,
             setLocale: handleLocaleChange,
+            setPageWidthType: handlePageWidthTypeChange,
           }}
         >
           {messageContextHolder}

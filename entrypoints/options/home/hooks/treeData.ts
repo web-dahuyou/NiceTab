@@ -3,9 +3,9 @@ import { useSearchParams } from 'react-router-dom';
 import type { TreeProps } from 'antd';
 import type { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
 import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
-import { openNewGroup } from '~/entrypoints/common/tabs';
-import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
-import { getRandomId } from '@/entrypoints/common/utils';
+import { openNewTab, openNewGroup } from '~/entrypoints/common/tabs';
+import { ENUM_SETTINGS_PROPS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
+import { getRandomId } from '~/entrypoints/common/utils';
 import {
   TreeDataNodeTabGroup,
   TreeDataNodeTag,
@@ -15,7 +15,7 @@ import {
 } from '../types';
 import { getTreeData } from '../utils';
 
-const { DELETE_AFTER_RESTORE, AUTO_EXPAND_HOME_TREE } = ENUM_SETTINGS_PROPS;
+const { DELETE_AFTER_RESTORE, UNNAMED_GROUP_RESTORE_AS_GROUP, AUTO_EXPAND_HOME_TREE } = ENUM_SETTINGS_PROPS;
 
 export type TreeDataHookProps = ReturnType<typeof useTreeData>;
 interface HomeContextProps {
@@ -290,11 +290,20 @@ export function useTreeData() {
       const tagKey = tabGroup.parentKey;
       const tag = treeData.find((tag) => tag.key === tagKey) as TreeDataNodeTag;
       const settings = settingsUtils.settings;
-      // 打开标签组 (保持标签组形式)
-      openNewGroup(
-        tabGroup.originData.groupName,
-        tabGroup.originData.tabList.map((tab) => tab.url)
-      );
+      console.log('tabGroup.originData', tabGroup.originData)
+      // 未命名的标签组，不以原生标签组形式打开
+      if (tabGroup?.originData?.groupName === UNNAMED_GROUP && !settings?.[UNNAMED_GROUP_RESTORE_AS_GROUP]) {
+        // 打开标签组 (标签页单独打开)
+        tabGroup?.originData?.tabList.forEach((tab) => {
+          openNewTab(tab.url);
+        });
+      } else {
+        // 打开标签组 (保持标签组形式)
+        openNewGroup(
+          tabGroup.originData.groupName,
+          tabGroup.originData.tabList.map((tab) => tab.url)
+        );
+      }
       if (settings?.[DELETE_AFTER_RESTORE] && !tabGroup.originData?.isLocked) {
         await tabListUtils.removeTabGroup(tag.key, tabGroup.key);
         refreshTreeData((treeData) => handleSelect(treeData, [tag.key], { node: tag }));

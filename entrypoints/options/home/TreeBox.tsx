@@ -1,4 +1,5 @@
 import { useState, memo, useCallback, useRef, useLayoutEffect } from 'react';
+import { debounce } from 'lodash-es';
 import { Tree, Button, Input, Empty, Spin } from 'antd';
 import type { TreeDataNode, TreeProps } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
@@ -154,14 +155,21 @@ function TreeBox() {
     []
   );
 
+  const handleResize = debounce(() => {
+    const listHeight = listRef.current?.offsetHeight || 400;
+    setTreeBoxHeight(listHeight);
+  }, 300);
+
   useEffect(() => {
     const listHeight = listRef.current?.offsetHeight || 400;
     setTreeBoxHeight(listHeight);
     eventEmitter.on('home:set-tree-searchValue', setSearchValue);
     eventEmitter.on('home:set-editing-status', setIsediting);
+    window.addEventListener('resize', handleResize);
     return () => {
       eventEmitter.off('home:set-tree-searchValue', setSearchValue);
       eventEmitter.off('home:set-editing-status', setIsediting);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 

@@ -1,11 +1,11 @@
 import { theme } from 'antd';
 import { ENUM_COLORS, THEME_COLOR_NAMES } from '~/entrypoints/common/constants';
-import type { ColorItem, ThemeColors } from '@/entrypoints/types';
+import type { ColorItem, ThemeColors } from '~/entrypoints/types';
 
 export default function useThemeColors() {
   const token = theme.useToken();
 
-  const ENUM_COLORS: Record<ThemeColors, string> = useMemo(() => {
+  const MAP_ENUM_COLORS: Record<ThemeColors, string> = useMemo(() => {
     return THEME_COLOR_NAMES.reduce((map, name) => {
       const colorItem = (token as any)?.[name];
       if (typeof colorItem === 'string') {
@@ -28,5 +28,5 @@ export default function useThemeColors() {
     });
   }, [token]);
 
-  return { ENUM_COLORS, THEME_COLORS };
+  return { ENUM_COLORS: MAP_ENUM_COLORS, THEME_COLORS };
 }

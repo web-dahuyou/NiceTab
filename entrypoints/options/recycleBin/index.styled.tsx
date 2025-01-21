@@ -13,10 +13,7 @@ export const StyledRecycleBinWrapper = styled.div`
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 20px;
-    button {
-      font-size: 12px;
-    }
+    padding: 16px 0;
   }
 `;
 

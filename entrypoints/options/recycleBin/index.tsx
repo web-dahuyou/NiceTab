@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { theme, Collapse, Space, Button, Modal, Empty, Alert } from 'antd';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { TagItem, GroupItem, TabItem } from '@/entrypoints/types';
+import { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
 import { recycleUtils } from '~/entrypoints/common/storage';
 import { StyledEmptyBox, StyledRecycleBinWrapper } from './index.styled';
-import { StickyBox } from '@/entrypoints/common/components/StickyBox';
+import { StickyBox } from '~/entrypoints/common/components/StickyBox';
 import TagNodeMarkup from './TagNode';
 import TabGroup from '../home/TabGroupRecycle';
 
@@ -105,14 +105,12 @@ export default function RecycleBin() {
           */}
           <Button
             type="primary"
-            size="small"
             onClick={() => setRecoverModalVisible(true)}
           >
             {$fmt('home.recoverAll')}
           </Button>
           <Button
             type="primary"
-            size="small"
             onClick={() => setConfirmModalVisible(true)}
           >
             {$fmt('home.clearAll')}

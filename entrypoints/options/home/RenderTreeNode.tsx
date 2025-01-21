@@ -8,7 +8,7 @@ import { StyledTreeNodeItem } from './Home.styled';
 import { RenderTreeNodeProps } from './types';
 import { dndKeys } from './constants';
 import EditInput from '../components/EditInput';
-import DropComponent from '@/entrypoints/common/components/DropComponent';
+import DropComponent from '~/entrypoints/common/components/DropComponent';
 import { type TreeDataHookProps } from './hooks/treeData';
 import { eventEmitter as homeEventEmitter } from './hooks/homeCustomEvent';
 

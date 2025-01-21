@@ -21,6 +21,7 @@ export const GlobalContext = createContext<GlobalContextProps>({
   version: '888.888.888',
   colorPrimary: PRIMARY_COLOR,
   themeTypeConfig: THEME_TYPE_CONFIG[defaultThemeType],
+  pageWidthType: 'fixed',
   $message: (() => {}) as any,
   setThemeType: async (themeType = defaultThemeType) => {
     settingsUtils.setSettings({ ...settingsUtils.settings, themeType });
@@ -31,6 +32,9 @@ export const GlobalContext = createContext<GlobalContextProps>({
   setLocale: async (language = defaultLanguage, callback) => {
     settingsUtils.setSettings({ ...settingsUtils.settings, language });
     callback?.();
+  },
+  setPageWidthType: async (pageWidthType = 'fixed') => {
+    settingsUtils.setSettings({ ...settingsUtils.settings, pageWidthType });
   },
 });
 

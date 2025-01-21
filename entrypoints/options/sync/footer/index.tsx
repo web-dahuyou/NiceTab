@@ -1,5 +1,5 @@
 import { Alert } from 'antd';
-import { useIntlUtls } from '@/entrypoints/common/hooks/global';
+import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { StyledFooterWrapper } from './Footer.styled';
 
 export default function Footer() {

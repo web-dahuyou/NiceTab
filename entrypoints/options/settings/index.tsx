@@ -14,6 +14,7 @@ import {
   message,
 } from 'antd';
 import type { FormProps } from 'antd';
+import styled from 'styled-components';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import type { SettingsProps } from '~/entrypoints/types';
 import { settingsUtils } from '~/entrypoints/common/storage';
@@ -24,8 +25,9 @@ import {
   defaultLanguage,
 } from '~/entrypoints/common/constants';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { getKeysByOS, sendBrowserMessage } from '@/entrypoints/common/utils';
+import { getKeysByOS, sendBrowserMessage } from '~/entrypoints/common/utils';
 import { sendTabMessage } from '~/entrypoints/common/tabs';
+import { StickyBox } from '~/entrypoints/common/components/StickyBox';
 import QuickActions from './QuickActions';
 import { useSyncType } from '../sync/hooks/syncType';
 
@@ -42,6 +44,7 @@ const {
   RESTORE_IN_NEW_WINDOW,
   DELETE_AFTER_RESTORE,
   SILENT_OPEN_TAB_MODIFIER_KEY,
+  UNNAMED_GROUP_RESTORE_AS_GROUP,
   DELETE_UNLOCKED_EMPTY_GROUP,
   CONFIRM_BEFORE_DELETING_TABS,
   ALLOW_DUPLICATE_TABS,
@@ -52,6 +55,7 @@ const {
   SHOW_PAGE_CONTEXT_MENUS,
   POPUP_MODULE_DISPLAYS,
   AUTO_EXPAND_HOME_TREE,
+  MAIN_CONTENT_WIDTH_TYPE,
   AUTO_SYNC,
   AUTO_SYNC_INTERVAL,
   AUTO_SYNC_TYPE,
@@ -61,6 +65,15 @@ const module = 'settings'; // locale module name
 const defaultTemplate = String.raw`{{url}} | {{title}}`;
 
 const modifierKeyLabels = getKeysByOS();
+
+const StyledHeaderActionWrapper = styled.div`
+  .header-action-btns {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 0;
+  }
+`;
 
 export default function Settings() {
   const NiceGlobalContext = useContext(GlobalContext);
@@ -99,6 +112,8 @@ export default function Settings() {
     NiceGlobalContext.setLocale(newSettings.language);
     sendBrowserMessage('setLocale', { locale: newSettings.language });
     sendTabMessage({ msgType: 'setLocale', data: { locale: newSettings.language } });
+    NiceGlobalContext.setPageWidthType(newSettings.pageWidthType || 'fixed');
+
     const customMessages = getCustomLocaleMessages(
       newSettings.language || defaultLanguage
     );
@@ -125,6 +140,15 @@ export default function Settings() {
           onFinish={onFinish}
           autoComplete="off"
         >
+          <StickyBox topGap={60} fullWidth bgColor={token.colorBgContainer}>
+            <StyledHeaderActionWrapper>
+              <Space className="header-action-btns">
+                <Button type="primary" htmlType="submit">
+                  {$fmt('common.save')}
+                </Button>
+              </Space>
+            </StyledHeaderActionWrapper>
+          </StickyBox>
           <Form.Item<SettingsProps>
             label={$fmt({ id: `${module}.${LANGUAGE}`, values: { mark: '：' } })}
             name={LANGUAGE}
@@ -360,6 +384,16 @@ export default function Settings() {
               <Radio value="shift">{modifierKeyLabels.shift.symbol}</Radio>
             </Radio.Group>
           </Form.Item>
+          {/* 是否以标签组形式恢复未命名标签组 */}
+          <Form.Item<SettingsProps>
+            label={$fmt(`${module}.${UNNAMED_GROUP_RESTORE_AS_GROUP}`)}
+            name={UNNAMED_GROUP_RESTORE_AS_GROUP}
+          >
+            <Radio.Group>
+              <Radio value={true}>{$fmt('common.yes')}</Radio>
+              <Radio value={false}>{$fmt('common.no')}</Radio>
+            </Radio.Group>
+          </Form.Item>
 
           {/* ******************* 其他操作相关设置 ******************* */}
           <Divider>{$fmt('settings.block.otherActions')}</Divider>
@@ -498,6 +532,21 @@ export default function Settings() {
             <Radio.Group>
               <Radio value={true}>{$fmt('common.yes')}</Radio>
               <Radio value={false}>{$fmt('common.no')}</Radio>
+            </Radio.Group>
+          </Form.Item>
+
+          {/* 页面主内容宽度设置 */}
+          <Form.Item<SettingsProps>
+            label={$fmt(`${module}.${MAIN_CONTENT_WIDTH_TYPE}`)}
+            name={MAIN_CONTENT_WIDTH_TYPE}
+          >
+            <Radio.Group>
+              <Radio value="fixed">
+                {$fmt(`settings.${MAIN_CONTENT_WIDTH_TYPE}.fixed`)}
+              </Radio>
+              <Radio value="responsive">
+                {$fmt(`settings.${MAIN_CONTENT_WIDTH_TYPE}.responsive`)}
+              </Radio>
             </Radio.Group>
           </Form.Item>
 

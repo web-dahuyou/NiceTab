@@ -33,6 +33,7 @@ export default {
   'settings.deleteAfterRestore': 'Remove tabs when opening tabs or tab group?',
   'settings.deleteAfterRestore.yes': 'Remove (pinned tabs remain)',
   'settings.deleteAfterRestore.no': 'All remain (recommended)',
+  'settings.unnamedGroupRestoreAsGroup': 'Restore unnamed group as a browser tab group?',
   'settings.silentOpenTabModifierKey': 'Modifier key for silently opening a tab:',
   'settings.deleteUnlockedEmptyGroup': 'Remove empty groups when clearing tabs?',
   'settings.deleteUnlockedEmptyGroup.yes': 'Automatically remove (retain locked groups)',
@@ -57,6 +58,9 @@ export default {
   'settings.popupModuleDisplays.tooltip': 'If any panel module is selected, the Popup Panel will display when clicking the extension icon. Otherwise, the "Send All Tabs" action will be triggered directly.',
 
   'settings.autoExpandHomeTree': 'Automatically expand the tree list on Home Page?',
+  'settings.pageWidthType': 'Width of the page content area:',
+  'settings.pageWidthType.fixed': 'Fixed',
+  'settings.pageWidthType.responsive': 'Responsive',
 
   'settings.autoSync': 'Enable Auto Sync?',
   'settings.autoSyncInterval': 'Auto Sync Interval (in minutes)',

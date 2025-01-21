@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { PRIMARY_COLOR } from '~/entrypoints/common/constants';
-import type { StyledThemeProps } from '@/entrypoints/types';
+import type { StyledThemeProps } from '~/entrypoints/types';
 
 export const StyledGroupWrapper = styled.div<{ $bgColor?: string }>`
   position: relative;
