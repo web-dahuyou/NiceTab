@@ -31,10 +31,12 @@ export interface GlobalContextProps {
   version: string;
   colorPrimary: string;
   themeTypeConfig: ThemeTypeConfig;
+  pageWidthType: PageWidthTypes;
   $message: MessageInstance;
   setThemeType: (themeType: ThemeTypes) => void;
   setThemeData: (themeData: Partial<ThemeProps>) => void;
   setLocale: (language?: LanguageTypes, callback?: () => void) => Promise<void>;
+  setPageWidthType: (pageWidthType: PageWidthTypes) => void;
 }
 
 // 语言
@@ -110,6 +112,8 @@ export type PopupModuleNames =
   | 'theme'
   | 'openedTabs';
 
+export type PageWidthTypes = 'fixed' | 'responsive';
+
 // 管理后台-设置信息
 export type SettingsProps = {
   language?: LanguageTypes; // 语言
@@ -136,6 +140,7 @@ export type SettingsProps = {
   showPageContextMenus?: boolean; // 网页中是否显示NiceTab右键菜单
   popupModuleDisplays?: PopupModuleNames[]; // popup面板中需要展示的模块
   autoExpandHomeTree?: boolean; // 进入列表页时，是否自动展开全部节点
+  pageWidthType?: PageWidthTypes; // 主内容区宽度设置
   autoSync?: boolean; // 是否开启自动同步
   autoSyncInterval?: number; // 自动同步间隔时间
   autoSyncType?: AutoSyncType; // 自动同步方式

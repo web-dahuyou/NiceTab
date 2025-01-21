@@ -1,5 +1,5 @@
 // import { storage } from 'wxt/storage';
-import type { LanguageTypes, SettingsProps } from '~/entrypoints/types';
+import type { LanguageTypes, SettingsProps, PageWidthTypes } from '~/entrypoints/types';
 import {
   ENUM_SETTINGS_PROPS,
   POPUP_MODULE_NAMES,
@@ -34,6 +34,7 @@ const {
   SHOW_PAGE_CONTEXT_MENUS,
   POPUP_MODULE_DISPLAYS,
   AUTO_EXPAND_HOME_TREE,
+  MAIN_CONTENT_WIDTH_TYPE,
   AUTO_SYNC,
   AUTO_SYNC_INTERVAL,
   AUTO_SYNC_TYPE,
@@ -67,6 +68,7 @@ export default class SettingsUtils {
     [SHOW_PAGE_CONTEXT_MENUS]: true, // 网页中是否显示NiceTab右键菜单
     [POPUP_MODULE_DISPLAYS]: POPUP_MODULE_NAMES, // popup面板中需要展示的模块
     [AUTO_EXPAND_HOME_TREE]: false, // 进入列表页时，是否自动展开全部节点
+    [MAIN_CONTENT_WIDTH_TYPE]: 'fixed' as PageWidthTypes, // 主内容区域宽度类型
 
     [AUTO_SYNC]: false, // 是否开启自动同步
     [AUTO_SYNC_INTERVAL]: 30, // 自动同步间隔时间

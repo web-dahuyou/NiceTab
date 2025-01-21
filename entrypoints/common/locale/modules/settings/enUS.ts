@@ -58,6 +58,9 @@ export default {
   'settings.popupModuleDisplays.tooltip': 'If any panel module is selected, the Popup Panel will display when clicking the extension icon. Otherwise, the "Send All Tabs" action will be triggered directly.',
 
   'settings.autoExpandHomeTree': 'Automatically expand the tree list on Home Page?',
+  'settings.pageWidthType': 'Width of the page content area:',
+  'settings.pageWidthType.fixed': 'Fixed',
+  'settings.pageWidthType.responsive': 'Responsive',
 
   'settings.autoSync': 'Enable Auto Sync?',
   'settings.autoSyncInterval': 'Auto Sync Interval (in minutes)',

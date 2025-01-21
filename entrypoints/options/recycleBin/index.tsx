@@ -105,14 +105,12 @@ export default function RecycleBin() {
           */}
           <Button
             type="primary"
-            size="small"
             onClick={() => setRecoverModalVisible(true)}
           >
             {$fmt('home.recoverAll')}
           </Button>
           <Button
             type="primary"
-            size="small"
             onClick={() => setConfirmModalVisible(true)}
           >
             {$fmt('home.clearAll')}

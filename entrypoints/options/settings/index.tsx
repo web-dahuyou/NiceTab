@@ -55,6 +55,7 @@ const {
   SHOW_PAGE_CONTEXT_MENUS,
   POPUP_MODULE_DISPLAYS,
   AUTO_EXPAND_HOME_TREE,
+  MAIN_CONTENT_WIDTH_TYPE,
   AUTO_SYNC,
   AUTO_SYNC_INTERVAL,
   AUTO_SYNC_TYPE,
@@ -111,6 +112,8 @@ export default function Settings() {
     NiceGlobalContext.setLocale(newSettings.language);
     sendBrowserMessage('setLocale', { locale: newSettings.language });
     sendTabMessage({ msgType: 'setLocale', data: { locale: newSettings.language } });
+    NiceGlobalContext.setPageWidthType(newSettings.pageWidthType || 'fixed');
+
     const customMessages = getCustomLocaleMessages(
       newSettings.language || defaultLanguage
     );
@@ -529,6 +532,21 @@ export default function Settings() {
             <Radio.Group>
               <Radio value={true}>{$fmt('common.yes')}</Radio>
               <Radio value={false}>{$fmt('common.no')}</Radio>
+            </Radio.Group>
+          </Form.Item>
+
+          {/* 页面主内容宽度设置 */}
+          <Form.Item<SettingsProps>
+            label={$fmt(`${module}.${MAIN_CONTENT_WIDTH_TYPE}`)}
+            name={MAIN_CONTENT_WIDTH_TYPE}
+          >
+            <Radio.Group>
+              <Radio value="fixed">
+                {$fmt(`settings.${MAIN_CONTENT_WIDTH_TYPE}.fixed`)}
+              </Radio>
+              <Radio value="responsive">
+                {$fmt(`settings.${MAIN_CONTENT_WIDTH_TYPE}.responsive`)}
+              </Radio>
             </Radio.Group>
           </Form.Item>
 
