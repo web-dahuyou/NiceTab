@@ -94,11 +94,21 @@ export default function ImportExport() {
     setDownloadLoading(true);
     setTimeout(async () => {
       const now = dayjs().format('YYYY-MM-DD_HHmmss');
-      const ext = exportFormatType == 1 ? 'json' : 'txt';
-      const fileType = exportFormatType == 1 ? 'application/json' : 'text/plain';
-      const fileName = `export_${
-        exportFormatType == 1 ? 'nice-tab' : 'one-tab'
-      }_${now}.${ext}`;
+      let ext = 'json';
+      let fileType = 'application/json';
+      if (exportFormatType == 2) {
+        ext = 'txt';
+        fileType = 'text/plain';
+      }
+      let fileNameType = '';
+      for (let v of formatTypeOptions) {
+        if (exportFormatType == v.type) {
+          fileNameType = v.label;
+          break;
+        }
+      }
+      formatTypeOptions
+      const fileName = `export_${fileNameType}_${now}.${ext}`;
       const content = await getExportContent();
       saveAs(new Blob([content], { type: `${fileType};charset=utf-8` }), fileName);
       setDownloadLoading(false);
@@ -197,7 +207,7 @@ export default function ImportExport() {
                 {$fmt('importExport.importFromText')}
               </Button>
               <Upload
-                accept={formatType === 1 ? '.json' : '.txt'}
+                accept={formatType === 2 ? '.txt' : '.json'}
                 showUploadList={false}
                 beforeUpload={handleSelectFile}
               >

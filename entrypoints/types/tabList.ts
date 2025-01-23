@@ -32,13 +32,33 @@ export interface CountInfo {
   tabCount: number;
 }
 
+// keptab
+export interface KepTabItem {
+  url: string;
+  title: string;
+  favIconUrl: string;
+  pinned: boolean;
+  muted: boolean;
+}
+
+export interface KepTabGroup {
+  _id: number;
+  title: string;
+  tabs: KepTabItem[];
+  urls: string[];
+  tags: string[];
+  time: number;
+  lock: boolean;
+  star: boolean;
+}
+
 export interface SendTargetProps {
   targetTagId?: string;
   targetGroupId?: string;
 }
 
 /* 导入导出相关 */
-export type ExtContentParserFuncName = 'niceTab' | 'oneTab';
+export type ExtContentParserFuncName = 'niceTab' | 'oneTab' | 'keptab';
 export type ExtContentImporterProps = {
   [key in ExtContentParserFuncName]: (content: string) => TagItem[];
 };
