@@ -2,7 +2,7 @@ import type { BaseOptionItem, FormatTypeOptionItem } from './types';
 
 // 初始数据
 export const initialValues = {
-  formatType: 1, // 1-NiceTab格式 2-OneTab格式
+  formatType: 1, // 1-NiceTab格式 2-OneTab格式 3-KepTab格式
   content: '',
   importMode: 'append',
 }
@@ -10,6 +10,7 @@ export const initialValues = {
 export const formatTypeOptions: FormatTypeOptionItem[] = [
   { type: 1, label: 'NiceTab', funcName: 'niceTab' },
   { type: 2, label: 'OneTab', funcName: 'oneTab' },
+  { type: 3, label: 'KepTab', funcName: 'keptab' },
 ];
 // 导入模式选项
 export const importModeOptions: BaseOptionItem[] = [
