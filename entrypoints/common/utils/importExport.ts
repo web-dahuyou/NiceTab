@@ -99,9 +99,9 @@ export const extContentExporter: ExtContentExporterProps = {
   keptab(tagList): string {
     let resultList: KepTabGroup[] = [];
     try {
-      (tagList as TagItem[]).forEach((tag, idx) => {
-        const tabList = [] as KepTabItem[];
-        tag?.groupList?.forEach((group) => {
+      (tagList as TagItem[]).forEach((tag, tagIdx) => {
+        tag?.groupList?.forEach((group, grpIdx) => {
+          const tabList = [] as KepTabItem[];
           group?.tabList?.forEach((tab) => {
             tabList.push({
               url: tab.url,
@@ -112,7 +112,7 @@ export const extContentExporter: ExtContentExporterProps = {
             } as KepTabItem);
           });
           resultList.push({
-            _id: idx + 1,
+            _id: tagIdx + grpIdx + 1,
             title: group.groupName,
             tabs: tabList,
             urls: tabList.map(v => v.url),
