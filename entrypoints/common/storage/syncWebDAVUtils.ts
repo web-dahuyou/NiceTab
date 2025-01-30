@@ -16,7 +16,13 @@ import {
   sendBrowserMessage,
 } from '~/entrypoints/common/utils';
 import { sendTabMessage } from '~/entrypoints/common/tabs';
-import { SUCCESS_KEY, FAILED_KEY, syncTypeMap } from '~/entrypoints/common/constants';
+import {
+  SUCCESS_KEY,
+  FAILED_KEY,
+  syncTypeMap,
+  defaultLanguage,
+} from '~/entrypoints/common/constants';
+import { getCreatedIntl } from '~/entrypoints/common/locale';
 import Store from './instanceStore';
 
 type ModuleType = 'tabList' | 'settings';
@@ -214,13 +220,9 @@ export default class syncWebDAVUtils {
       const result = await client.putFileContents(filepath, localContent);
       await this.handleSyncResult(configItem.key, syncType, result);
       // 同步设置信息失败单独catch, 不影响列表的同步
-      try {
-        const localSettings = await Store.settingsUtils.getSettings();
-        const settingsContent = JSON.stringify(localSettings);
-        await client.putFileContents(settingsFilepath, settingsContent);
-      } catch (error) {
-        console.error(error);
-      }
+      const localSettings = await Store.settingsUtils.getSettings();
+      const settingsContent = JSON.stringify(localSettings);
+      await client.putFileContents(settingsFilepath, settingsContent);
       return;
     }
 
@@ -301,17 +303,23 @@ export default class syncWebDAVUtils {
       username,
       password,
     });
-
     try {
       // client 自带的方法虽然不影响功能, 但会有一次请求报错, 所以自己递归处理
       await this.createDirectory(client, this.webDAVDirectory);
       await this.handleBySyncType(client, configItem, syncType);
     } catch (error: any) {
-      if (error?.message?.includes('401')) {
-        await this.handleSyncResult(configItem.key, syncType, false, 'authFailed');
-      } else {
-        await this.handleSyncResult(configItem.key, syncType, false);
-      }
+      const settings = await Store.settingsUtils.getSettings();
+      const createdIntl = getCreatedIntl(settings.language || defaultLanguage);
+      await this.handleSyncResult(
+        configItem.key,
+        syncType,
+        false,
+        error.message ||
+          createdIntl.formatMessage(
+            { id: `common.actionFailed` },
+            { action: createdIntl.formatMessage({ id: 'common.sync' }) }
+          )
+      );
     }
 
     this.setSyncStatus(configItem.key, 'idle');
