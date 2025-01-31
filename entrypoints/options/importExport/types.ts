@@ -7,4 +7,6 @@ export type BaseOptionItem = {
 };
 export type FormatTypeOptionItem = BaseOptionItem & {
   funcName: ExtContentParserFuncName;
+  extname: string;
+  fileType: string;
 };

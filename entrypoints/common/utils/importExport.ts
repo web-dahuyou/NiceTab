@@ -1,4 +1,10 @@
-import type { TagItem, TabItem } from '~/entrypoints/types';
+import type {
+  TagItem,
+  TabItem,
+  KepTabItem,
+  KepTabGroup,
+  GroupItem,
+} from '~/entrypoints/types';
 import { tabListUtils } from '~/entrypoints/common/storage';
 import type {
   ExtContentImporterProps,
@@ -8,8 +14,38 @@ import { getRandomId, newCreateTime } from '~/entrypoints/common/utils';
 
 // 解析 NiceTab、OneTab等 插件的导入内容
 export const extContentImporter: ExtContentImporterProps = {
+  keptab(content: string): TagItem[] {
+    const groupList: GroupItem[] = [];
+    const keptabList = JSON.parse(content || '[]') as KepTabGroup[];
+    for (let tabGroup of keptabList) {
+      if (tabGroup.tabs.length === 0) {
+        continue;
+      }
+      if (tabGroup.title === '') {
+        tabGroup.title = `keptab-${getRandomId()}`;
+      }
+      let tabList: TabItem[] = [];
+      for (let tabItem of tabGroup.tabs) {
+        tabList.push({
+          tabId: getRandomId(),
+          title: tabItem.title,
+          url: tabItem.url,
+        });
+      }
+      const newGroupItem = tabListUtils.getInitialTabGroup();
+      groupList.push({
+        ...newGroupItem,
+        groupName: tabGroup.title,
+        tabList: [...tabList],
+      });
+    }
+    const newTag = tabListUtils.getInitialTag();
+    newTag.tagName = 'KepTab';
+    newTag.groupList = groupList || [];
+    return [newTag];
+  },
   oneTab(content: string): TagItem[] {
-    const groupList = [];
+    const groupList = [] as GroupItem[];
     let tabList: TabItem[] = [];
     for (let line of content.split('\n')) {
       if (!line.trim()) {
@@ -66,6 +102,43 @@ export const extContentImporter: ExtContentImporterProps = {
 
 // 将内容导出为 NiceTab、OneTab 等格式
 export const extContentExporter: ExtContentExporterProps = {
+  keptab(tagList): string {
+    let resultList: KepTabGroup[] = [];
+    try {
+      (tagList as TagItem[]).forEach((tag, tagIdx) => {
+        tag?.groupList?.forEach((group, grpIdx) => {
+          const tabList: KepTabItem[] = [];
+          const tabUrls: string[] = [];
+          group?.tabList?.forEach((tab) => {
+            if (tab.url) {
+              tabList.push({
+                url: tab.url,
+                title: tab.title || '',
+                favIconUrl: tab.favIconUrl || '',
+                pinned: false,
+                muted: false,
+              });
+
+              tabUrls.push(tab.url);
+            }
+          });
+          resultList.push({
+            _id: new Date().getTime() - Number(String(tagIdx) + grpIdx),
+            title: group.groupName,
+            tabs: tabList,
+            urls: tabUrls,
+            tags: [],
+            time: Date.now(),
+            lock: false,
+            star: false,
+          });
+        });
+      });
+      return JSON.stringify(resultList || []);
+    } catch {
+      return JSON.stringify([]);
+    }
+  },
   oneTab(tagList): string {
     let resultList: string[] = [];
     try {

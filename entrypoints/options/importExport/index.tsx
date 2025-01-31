@@ -37,6 +37,12 @@ export default function ImportExport() {
   const [settingsImportLoading, setSettingsImportLoading] = useState(false);
   const [settingsDownloadLoading, setSettingsDownloadLoading] = useState(false);
 
+  const importFileExtname = useMemo(() => {
+    const option =
+      formatTypeOptions.find((option) => option.type === formatType) ||
+      formatTypeOptions[0];
+    return option.extname;
+  }, [formatType]);
   // 导入操作
   const handleImport = async (value?: string) => {
     const importContent = value || form.getFieldValue('importContent');
@@ -94,11 +100,10 @@ export default function ImportExport() {
     setDownloadLoading(true);
     setTimeout(async () => {
       const now = dayjs().format('YYYY-MM-DD_HHmmss');
-      const ext = exportFormatType == 1 ? 'json' : 'txt';
-      const fileType = exportFormatType == 1 ? 'application/json' : 'text/plain';
-      const fileName = `export_${
-        exportFormatType == 1 ? 'nice-tab' : 'one-tab'
-      }_${now}.${ext}`;
+      const { label, extname, fileType } =
+        formatTypeOptions.find((item) => item.type == exportFormatType) ||
+        formatTypeOptions[0];
+      const fileName = `export_${label}_${now}.${extname}`;
       const content = await getExportContent();
       saveAs(new Blob([content], { type: `${fileType};charset=utf-8` }), fileName);
       setDownloadLoading(false);
@@ -197,7 +202,7 @@ export default function ImportExport() {
                 {$fmt('importExport.importFromText')}
               </Button>
               <Upload
-                accept={formatType === 1 ? '.json' : '.txt'}
+                accept={`.${importFileExtname}`}
                 showUploadList={false}
                 beforeUpload={handleSelectFile}
               >
