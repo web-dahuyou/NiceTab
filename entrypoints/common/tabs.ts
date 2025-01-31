@@ -127,8 +127,10 @@ export async function openAdminRoutePage(
     paramsStr ? `?${paramsStr}` : ''
   }`;
 
-  // 如果发送标签页后不需要打开管理后台页面，则刷新管理后台页
-  if (!needOpen && tab?.id) {
+  // 如果发送标签页后不需要打开管理后台页面
+  if (!needOpen) {
+    if (!tab?.id) return;
+    // 如果存在打开的nicetab管理后台页，则刷新管理后台页
     browser.tabs.update(tab.id, { url: urlWithParams });
     return;
   }

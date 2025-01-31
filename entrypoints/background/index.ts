@@ -94,7 +94,7 @@ export default defineBackground(() => {
   });
 
   browser.runtime.onInstalled.addListener(async () => {
-    // console.log('browser.runtime.onInstalled');
+    console.log('browser.runtime.onInstalled');
     const settings = await settingsUtils.getSettings();
     if (settings[OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH]) {
       tabUtils.openAdminRoutePage({ path: '/home' });

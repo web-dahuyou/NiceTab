@@ -11,7 +11,7 @@ import { classNames } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { syncTypeMap } from '~/entrypoints/common/constants';
 import type { RemoteOptionProps, BaseCardItemProps } from '../types';
-import { StyledCardTitle, StyledLabel } from '../Sync.styled';
+import { StyledCardTitle, StyledResult, StyledLabel, StyledText } from '../Sync.styled';
 import { useSyncResult } from '../hooks/syncResult';
 
 export default function BaseCardItem<T extends { label: string } = RemoteOptionProps>({
@@ -97,8 +97,12 @@ export default function BaseCardItem<T extends { label: string } = RemoteOptionP
             </Typography.Text>
             {lastSyncInfo.reason && (
               <Typography.Text type="danger">
-                <StyledLabel>{$fmt('common.failedReason')}: </StyledLabel>
-                {$fmt(`sync.reason.${lastSyncInfo.reason}`)}
+                <StyledResult>
+                  <StyledLabel>{$fmt('common.failedReason')}: </StyledLabel>
+                  <StyledText title={lastSyncInfo.reason}>
+                    {lastSyncInfo.reason}
+                  </StyledText>
+                </StyledResult>
               </Typography.Text>
             )}
           </>

@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { StyledBaseSidebarWrapper, StyledBaseMainWrapper } from '../Layout.styled';
+import { StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
 
 export const StyledMainWrapper = StyledBaseMainWrapper;
 
@@ -37,8 +38,18 @@ export const StyledCardTitle = styled.div`
   }
 `;
 
+export const StyledResult = styled.div`
+  display: flex;
+  align-items: center;
+`;
 export const StyledLabel = styled.span`
+  flex-shrink: 0;
   margin-right: 8px;
+`;
+export const StyledText = styled.span`
+  flex: 1;
+  width: 0;
+  ${StyledEllipsis}
 `;
 
 export default {

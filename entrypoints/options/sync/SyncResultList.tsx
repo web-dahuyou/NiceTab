@@ -3,7 +3,7 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 import type { SyncResultItemProps } from '~/entrypoints/types';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { SUCCESS_KEY } from '~/entrypoints/common/constants';
-import { StyledLabel } from './Sync.styled';
+import { StyledResult, StyledLabel, StyledText } from './Sync.styled';
 import { useSyncResult } from './hooks/syncResult';
 
 type SyncResultListProps = {
@@ -64,8 +64,10 @@ export default function SyncResultList({ resultList }: SyncResultListProps) {
               </Typography.Text>
               {result.reason && (
                 <Typography.Text type="danger">
-                  <StyledLabel>{$fmt('common.failedReason')}: </StyledLabel>
-                  {$fmt(`sync.reason.${result.reason}`)}
+                  <StyledResult>
+                    <StyledLabel>{$fmt('common.failedReason')}: </StyledLabel>
+                    <StyledText title={result.reason}>{result.reason}</StyledText>
+                  </StyledResult>
                 </Typography.Text>
               )}
             </Flex>

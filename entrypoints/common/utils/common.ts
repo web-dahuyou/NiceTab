@@ -158,14 +158,14 @@ export const fetchApi = (
 
   return new Promise((resolve, reject) => {
     fetch(_url, _options)
-      .then((res) => {
+      .then(async (res) => {
         if (res.ok) {
           resolve(res.json());
         }
-        reject(res);
+        reject(await res.json());
       })
-      .catch((e) => {
-        reject(e);
+      .catch((err) => {
+        reject(err);
       });
   });
 };

@@ -17,7 +17,13 @@ import {
   sendBrowserMessage,
 } from '~/entrypoints/common/utils';
 import { sendTabMessage } from '~/entrypoints/common/tabs';
-import { SUCCESS_KEY, FAILED_KEY, syncTypeMap } from '~/entrypoints/common/constants';
+import {
+  SUCCESS_KEY,
+  FAILED_KEY,
+  syncTypeMap,
+  defaultLanguage,
+} from '~/entrypoints/common/constants';
+import { getCreatedIntl } from '~/entrypoints/common/locale';
 import Store from './instanceStore';
 
 type GistFilesProps = {
@@ -119,7 +125,7 @@ export default class SyncUtils {
   }
   async getSyncStatus() {
     const syncStatus = await storage.getItem<SyncStatusProps>(this.storageStatusKey);
-    this.syncStatus = { gitee: 'idle', github: "idle", ...syncStatus };
+    this.syncStatus = { gitee: 'idle', github: 'idle', ...syncStatus };
     return this.syncStatus;
   }
   async setSyncStatus(type: SyncRemoteType, status: SyncStatus) {
@@ -284,7 +290,14 @@ export default class SyncUtils {
       if (fileInfo?.truncated && fileInfo?.raw_url) {
         // 如果内容大小超过 10M，则取消合并到本地
         if (fileInfo.size && fileInfo.size > 10 * 1024 * 1024) {
-          this.handleSyncResult(remoteType, syncType, result, 'contentTooLarge');
+          const settings = await Store.settingsUtils.getSettings();
+          const createdIntl = getCreatedIntl(settings.language || defaultLanguage);
+          this.handleSyncResult(
+            remoteType,
+            syncType,
+            result,
+            createdIntl.formatMessage({ id: 'sync.reason.contentTooLarge' })
+          );
           return;
         }
         fileContent = ((await fetchApi(fileInfo?.raw_url)) as string) || '';
@@ -381,17 +394,18 @@ export default class SyncUtils {
         }
       }
     } catch (error: any) {
-      console.log(error);
-      if (error?.status == 401) {
-        await this.handleSyncResult(
-          remoteType,
-          syncType,
-          {} as GistResponseItemProps,
-          'authFailed'
-        );
-      } else {
-        await this.handleSyncResult(remoteType, syncType, {} as GistResponseItemProps);
-      }
+      const settings = await Store.settingsUtils.getSettings();
+      const createdIntl = getCreatedIntl(settings.language || defaultLanguage);
+      await this.handleSyncResult(
+        remoteType,
+        syncType,
+        {} as GistResponseItemProps,
+        error.message ||
+          createdIntl.formatMessage(
+            { id: `common.actionFailed` },
+            { action: createdIntl.formatMessage({ id: 'common.sync' }) }
+          )
+      );
     }
 
     this.setSyncStatus(remoteType, 'idle');
