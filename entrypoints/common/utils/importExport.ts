@@ -1,4 +1,10 @@
-import type { TagItem, TabItem, KepTabItem, KepTabGroup, GroupItem } from '~/entrypoints/types';
+import type {
+  TagItem,
+  TabItem,
+  KepTabItem,
+  KepTabGroup,
+  GroupItem,
+} from '~/entrypoints/types';
 import { tabListUtils } from '~/entrypoints/common/storage';
 import type {
   ExtContentImporterProps,
@@ -9,14 +15,14 @@ import { getRandomId, newCreateTime } from '~/entrypoints/common/utils';
 // 解析 NiceTab、OneTab等 插件的导入内容
 export const extContentImporter: ExtContentImporterProps = {
   keptab(content: string): TagItem[] {
-    const groupList = [] as GroupItem[];
+    const groupList: GroupItem[] = [];
     const keptabList = JSON.parse(content || '[]') as KepTabGroup[];
     for (let tabGroup of keptabList) {
       if (tabGroup.tabs.length === 0) {
-        continue
+        continue;
       }
-      if (tabGroup.title === "") {
-        tabGroup.title = `keptab-${getRandomId()}`
+      if (tabGroup.title === '') {
+        tabGroup.title = `keptab-${getRandomId()}`;
       }
       let tabList: TabItem[] = [];
       for (let tabItem of tabGroup.tabs) {
@@ -24,14 +30,14 @@ export const extContentImporter: ExtContentImporterProps = {
           tabId: getRandomId(),
           title: tabItem.title,
           url: tabItem.url,
-        } as TabItem)
+        });
       }
       const newGroupItem = tabListUtils.getInitialTabGroup();
       groupList.push({
         ...newGroupItem,
         groupName: tabGroup.title,
         tabList: [...tabList],
-      } as GroupItem)
+      });
     }
     const newTag = tabListUtils.getInitialTag();
     newTag.tagName = 'KepTab';
@@ -101,26 +107,31 @@ export const extContentExporter: ExtContentExporterProps = {
     try {
       (tagList as TagItem[]).forEach((tag, tagIdx) => {
         tag?.groupList?.forEach((group, grpIdx) => {
-          const tabList = [] as KepTabItem[];
+          const tabList: KepTabItem[] = [];
+          const tabUrls: string[] = [];
           group?.tabList?.forEach((tab) => {
-            tabList.push({
-              url: tab.url,
-              title: tab.title,
-              favIconUrl: tab.favIconUrl,
-              pinned: false,
-              muted: false,
-            } as KepTabItem);
+            if (tab.url) {
+              tabList.push({
+                url: tab.url,
+                title: tab.title || '',
+                favIconUrl: tab.favIconUrl || '',
+                pinned: false,
+                muted: false,
+              });
+
+              tabUrls.push(tab.url);
+            }
           });
           resultList.push({
-            _id: tagIdx + grpIdx + 1,
+            _id: new Date().getTime() - Number(String(tagIdx) + grpIdx),
             title: group.groupName,
             tabs: tabList,
-            urls: tabList.map(v => v.url),
-            tags: [] as string[],
+            urls: tabUrls,
+            tags: [],
             time: Date.now(),
             lock: false,
             star: false,
-          } as KepTabGroup);
+          });
         });
       });
       return JSON.stringify(resultList || []);

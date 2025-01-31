@@ -37,6 +37,12 @@ export default function ImportExport() {
   const [settingsImportLoading, setSettingsImportLoading] = useState(false);
   const [settingsDownloadLoading, setSettingsDownloadLoading] = useState(false);
 
+  const importFileExtname = useMemo(() => {
+    const option =
+      formatTypeOptions.find((option) => option.type === formatType) ||
+      formatTypeOptions[0];
+    return option.extname;
+  }, [formatType]);
   // 导入操作
   const handleImport = async (value?: string) => {
     const importContent = value || form.getFieldValue('importContent');
@@ -94,21 +100,10 @@ export default function ImportExport() {
     setDownloadLoading(true);
     setTimeout(async () => {
       const now = dayjs().format('YYYY-MM-DD_HHmmss');
-      let ext = 'json';
-      let fileType = 'application/json';
-      if (exportFormatType == 2) {
-        ext = 'txt';
-        fileType = 'text/plain';
-      }
-      let fileNameType = '';
-      for (let v of formatTypeOptions) {
-        if (exportFormatType == v.type) {
-          fileNameType = v.label;
-          break;
-        }
-      }
-      formatTypeOptions
-      const fileName = `export_${fileNameType}_${now}.${ext}`;
+      const { label, extname, fileType } =
+        formatTypeOptions.find((item) => item.type == exportFormatType) ||
+        formatTypeOptions[0];
+      const fileName = `export_${label}_${now}.${extname}`;
       const content = await getExportContent();
       saveAs(new Blob([content], { type: `${fileType};charset=utf-8` }), fileName);
       setDownloadLoading(false);
@@ -207,7 +202,7 @@ export default function ImportExport() {
                 {$fmt('importExport.importFromText')}
               </Button>
               <Upload
-                accept={formatType === 2 ? '.txt' : '.json'}
+                accept={`.${importFileExtname}`}
                 showUploadList={false}
                 beforeUpload={handleSelectFile}
               >
