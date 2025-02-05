@@ -649,6 +649,8 @@ export default class TabListUtils {
 
     const unstarredIndex =
       tag.groupList?.findIndex((g) => !g.isStarred) ?? tag.groupList.length;
+
+    if (unstarredIndex === -1) return;
     const doSortList = unstarredIndex > -1 ? tag?.groupList?.slice(unstarredIndex) : [];
 
     if (sortType === 'ascending') {
@@ -669,6 +671,8 @@ export default class TabListUtils {
 
     const unstarredIndex =
       tag.groupList?.findIndex((g) => !g.isStarred) ?? tag.groupList.length;
+
+    if (unstarredIndex === -1) return;
     const doSortList = unstarredIndex > -1 ? tag?.groupList?.slice(unstarredIndex) : [];
 
     if (sortType === 'ascending') {
