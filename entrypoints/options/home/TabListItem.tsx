@@ -233,7 +233,7 @@ export default memo(function TabListItem({
           <Tooltip
             open={!isDragging && tooltipVisible}
             placement="topLeft"
-            overlayStyle={{ maxWidth: '360px', width: '360px' }}
+            styles={{ root: { maxWidth: '360px', width: '360px' } }}
             title={<TabItemTooltipMarkup tab={tab} />}
             color={token.colorBgElevated}
             destroyTooltipOnHide

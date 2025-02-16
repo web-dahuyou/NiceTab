@@ -5,7 +5,7 @@ import App from './App.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <Root>
+    <Root pageContext="popupPage">
       <App />
     </Root>
   </React.StrictMode>,

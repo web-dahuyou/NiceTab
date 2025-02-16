@@ -9,9 +9,9 @@ import { tabListUtils, settingsUtils } from '~/entrypoints/common/storage';
 import {
   extContentImporter,
   extContentExporter,
-  sendBrowserMessage,
+  sendRuntimeMessage,
 } from '~/entrypoints/common/utils';
-import { sendTabMessage } from '~/entrypoints/common/tabs';
+import { reloadOtherAdminPage } from '~/entrypoints/common/tabs';
 import { initialValues, formatTypeOptions, importModeOptions } from './constants';
 
 const StyledWrapper = styled.div`
@@ -113,15 +113,15 @@ export default function ImportExport() {
   // 选择设置文件导入
   const handleSelectSettingsFile: UploadProps['beforeUpload'] = (file) => {
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       setSettingsImportLoading(true);
       const content = reader.result as string;
       try {
         const settings = JSON.parse(content);
-        settingsUtils.setSettings(settings);
+        await settingsUtils.setSettings(settings);
         NiceGlobalContext.setLocale(settings.language);
-        sendBrowserMessage('setLocale', { locale: settings.language });
-        sendTabMessage({ msgType: 'setLocale', data: { locale: settings.language } });
+        sendRuntimeMessage({ msgType: 'setLocale', data: { locale: settings.language } });
+        reloadOtherAdminPage();
         messageApi.success(
           $fmt({ id: 'common.actionSuccess', values: { action: $fmt('common.import') } })
         );

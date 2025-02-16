@@ -11,7 +11,7 @@ import type {
   SyncStatusProps,
   SyncResultProps,
   SyncStatusChangeEventProps,
-  BrowserMessageProps,
+  RuntimeMessageEventProps,
 } from '~/entrypoints/types';
 import { syncTypeMap } from '~/entrypoints/common/constants';
 import type { RemoteOptionProps, BaseCardItemProps } from '../../types';
@@ -129,6 +129,8 @@ export default forwardRef(
 
       await syncUtils.getSyncResult();
       setSyncResult(syncUtils.syncResult);
+
+      setDrawerVisible(false);
     };
 
     // 同步状态变化
@@ -142,7 +144,7 @@ export default forwardRef(
 
     // 监听同步状态变化message
     const onSyncStatusChangeMessage = async (message: unknown) => {
-      const { msgType, data } = message as BrowserMessageProps;
+      const { msgType, data } = message as RuntimeMessageEventProps;
       if (msgType === 'sync:sync-status-change--gist') {
         onSyncStatusChange(data);
       }

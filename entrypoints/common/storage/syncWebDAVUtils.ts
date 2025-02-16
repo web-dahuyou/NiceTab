@@ -13,9 +13,9 @@ import { eventEmitter } from '~/entrypoints/common/hooks/global';
 import {
   extContentImporter,
   getRandomId,
-  sendBrowserMessage,
+  sendRuntimeMessage,
 } from '~/entrypoints/common/utils';
-import { sendTabMessage } from '~/entrypoints/common/tabs';
+import { reloadOtherAdminPage } from '~/entrypoints/common/tabs';
 import {
   SUCCESS_KEY,
   FAILED_KEY,
@@ -86,9 +86,13 @@ export default class syncWebDAVUtils {
     };
     await this.setConfig(this.config);
     eventEmitter.emit('sync:sync-status-change--webdav', { key, status });
-    sendBrowserMessage('sync:sync-status-change--webdav', {
-      key,
-      status,
+    sendRuntimeMessage({
+      msgType: 'sync:sync-status-change--webdav',
+      data: {
+        key,
+        status,
+      },
+      targetPageContexts: ['optionsPage']
     });
   }
   async addSyncResult(key: string, resultItem: SyncResultItemProps) {
@@ -266,8 +270,7 @@ export default class syncWebDAVUtils {
           await client.putFileContents(settingsFilepath, JSON.stringify(settings));
         }
         await Store.settingsUtils.setSettings(settings);
-        sendBrowserMessage('setLocale', { locale: settings.language });
-        sendTabMessage({ msgType: 'setLocale', data: { locale: settings.language } });
+        sendRuntimeMessage({ msgType: 'setLocale', data: { locale: settings.language } });
       } catch (error) {
         console.error(error);
       }
@@ -285,6 +288,8 @@ export default class syncWebDAVUtils {
     } else {
       await this.handleSyncResult(configItem.key, syncType, true);
     }
+
+    reloadOtherAdminPage();
   }
 
   // 开始同步入口

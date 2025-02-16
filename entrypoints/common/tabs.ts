@@ -1,11 +1,21 @@
 import { Tabs } from 'wxt/browser';
+import { debounce } from 'lodash-es';
 import { settingsUtils, tabListUtils } from './storage';
-import type { SettingsProps, ActionNames, SendTargetProps } from '~/entrypoints/types';
+import type {
+  SettingsProps,
+  ActionNames,
+  SendTargetProps,
+  SendTabMsgEventProps,
+} from '~/entrypoints/types';
+import { ENUM_SETTINGS_PROPS, defaultLanguage } from '~/entrypoints/common/constants';
 import {
-  ENUM_SETTINGS_PROPS,
-  defaultLanguage
-} from '~/entrypoints/common/constants';
-import { objectToUrlParams, getRandomId, isGroupSupported, isUrlMatched } from '~/entrypoints/common/utils';
+  objectToUrlParams,
+  setUrlParams,
+  getRandomId,
+  isGroupSupported,
+  isUrlMatched,
+  sendRuntimeMessage,
+} from '~/entrypoints/common/utils';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 
 const {
@@ -27,11 +37,8 @@ export async function sendTabMessage(
     msgType,
     data,
     onlyCurrentTab = false,
-  }: {
-    msgType: string;
-    data: Record<string, any>;
-    onlyCurrentTab?: boolean;
-  },
+    onlyCurrentWindow = false,
+  }: SendTabMsgEventProps,
   errorCallback?: () => void
 ) {
   const { tab: adminTab } = await getAdminTabInfo();
@@ -52,21 +59,31 @@ export async function sendTabMessage(
     return;
   }
 
-  const allTabs = await getAllTabs();
-  const filteredTabs = allTabs.filter((tab) => {
-    if (!tab?.id) return false;
-    if (adminTab && adminTab.id === tab.id) return false;
-    return true;
-  });
+  let windows = [];
+  if (onlyCurrentWindow) {
+    windows = [await browser.windows.getCurrent({ populate: true })];
+  } else {
+    windows = await browser.windows.getAll({ populate: true, windowTypes: ['normal'] });
+  }
 
-  filteredTabs.forEach(async (tab) => {
-    try {
-      const res = await browser.tabs.sendMessage(tab.id!, { msgType, data });
-      console.log('browser.tabs.sendMessage__result', res);
-    } catch (error) {
-      console.log('browser.tabs.sendMessage__error', error);
-    }
-  });
+  for (const win of windows) {
+    const { tab: adminTab } = await getAdminTabInfo(win.id);
+    const allTabs = await getAllTabs(win.id);
+    const filteredTabs = allTabs.filter((tab) => {
+      if (!tab?.id) return false;
+      if (adminTab && adminTab.id === tab.id) return false;
+      return true;
+    });
+
+    filteredTabs?.forEach(async (tab) => {
+      try {
+        const res = await browser.tabs.sendMessage(tab.id!, { msgType, data });
+        console.log('browser.tabs.sendMessage__result', res);
+      } catch (error) {
+        console.log('browser.tabs.sendMessage__error', error);
+      }
+    });
+  }
 }
 // 执行contentScript展示message提示
 export async function executeContentScript(
@@ -107,9 +124,15 @@ export async function executeContentScript(
   }
 }
 
-export async function getAdminTabInfo() {
+export async function getAdminTabInfo(windowId?: number) {
   const adminTabUrl = browser.runtime.getURL('/options.html');
-  const [tab] = await browser.tabs.query({ url: `${adminTabUrl}*`, currentWindow: true });
+  const queryInfo: Tabs.QueryQueryInfoType = { url: `${adminTabUrl}*` };
+  if (windowId) {
+    queryInfo.windowId = windowId;
+  } else {
+    queryInfo.currentWindow = true;
+  }
+  const [tab] = await browser.tabs.query(queryInfo);
 
   return { tab, adminTabUrl };
 }
@@ -151,6 +174,25 @@ export async function openAdminRoutePage(
     });
   }
 }
+// 多窗口时，刷新其他窗口的管理后台页面
+export async function reloadOtherAdminPage() {
+  const currWindow = await browser.windows.getCurrent();
+  sendRuntimeMessage({
+    msgType: 'reloadAdminPage',
+    data: { currWindowId: currWindow.id },
+    targetPageContexts: ['optionsPage'],
+  });
+}
+// 更新管理后台页面的URL参数，页面判断params中的randomId有更新则重新加载数据
+export async function updateAdminPageUrl() {
+  const { tab } = await getAdminTabInfo();
+  if (!tab?.id) return;
+
+  const newUrl = setUrlParams(tab.url || '', { randomId: getRandomId(6) });
+  await browser.tabs.update(tab.id, { url: newUrl });
+}
+export const updateAdminPageUrlDebounced = debounce(updateAdminPageUrl, 500);
+
 // 打开管理后台
 export async function openAdminTab(
   settingsData?: SettingsProps,
@@ -210,8 +252,14 @@ async function cancelHighlightTabs(tabs?: Tabs.Tab[]) {
   }
 }
 // 获取全部标签页
-export async function getAllTabs() {
-  return await browser.tabs.query({ currentWindow: true });
+export async function getAllTabs(windowId?: number) {
+  const queryInfo: Tabs.QueryQueryInfoType = {};
+  if (windowId) {
+    queryInfo.windowId = windowId;
+  } else {
+    queryInfo.currentWindow = true;
+  }
+  return await browser.tabs.query(queryInfo);
 }
 
 // 发送标签页逻辑
@@ -406,6 +454,9 @@ export default {
   getAdminTabInfo,
   openAdminRoutePage,
   openAdminTab,
+  reloadOtherAdminPage,
+  updateAdminPageUrl,
+  updateAdminPageUrlDebounced,
   getFilteredTabs,
   getAllTabs,
   sendAllTabs,

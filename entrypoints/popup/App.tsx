@@ -5,14 +5,14 @@ import { theme, Space, Divider } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import {
   classNames,
-  sendBrowserMessage,
+  sendRuntimeMessage,
   getFaviconURL,
 } from '~/entrypoints/common/utils';
 import '~/assets/css/reset.css';
 import '~/assets/css/index.css';
 import './App.css';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { sendTabMessage, getAdminTabInfo, openNewTab } from '~/entrypoints/common/tabs';
+import { getAdminTabInfo, openNewTab } from '~/entrypoints/common/tabs';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import type { PopupModuleNames } from '~/entrypoints/types';
 import {
@@ -29,7 +29,11 @@ import {
 import { StyledContainer, StyledList, StyledFavIcon } from './App.styled';
 
 function handleQuickJump(route: { path: string; query?: Record<string, any> }) {
-  sendBrowserMessage('openAdminRoutePage', route);
+  sendRuntimeMessage({
+    msgType: 'openAdminRoutePage',
+    data: route,
+    targetPageContexts: ['background'],
+  });
 }
 
 export default function App() {
@@ -73,8 +77,7 @@ export default function App() {
   const handleThemeChange = (color: string) => {
     const themeData = { colorPrimary: color };
     NiceGlobalContext.setThemeData(themeData);
-    sendBrowserMessage('setPrimaryColor', themeData);
-    sendTabMessage({ msgType: 'setPrimaryColor', data: themeData });
+    sendRuntimeMessage({ msgType: 'setPrimaryColor', data: themeData });
   };
   const handleTabItemClick = useCallback((tab: Tabs.Tab) => {
     browser.tabs.highlight({ tabs: [tab.index] });

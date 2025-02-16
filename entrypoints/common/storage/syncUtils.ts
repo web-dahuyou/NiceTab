@@ -14,9 +14,9 @@ import { eventEmitter } from '~/entrypoints/common/hooks/global';
 import {
   extContentImporter,
   fetchApi,
-  sendBrowserMessage,
+  sendRuntimeMessage,
 } from '~/entrypoints/common/utils';
-import { sendTabMessage } from '~/entrypoints/common/tabs';
+import { reloadOtherAdminPage } from '~/entrypoints/common/tabs';
 import {
   SUCCESS_KEY,
   FAILED_KEY,
@@ -135,9 +135,13 @@ export default class SyncUtils {
       type,
       status,
     });
-    sendBrowserMessage('sync:sync-status-change--gist', {
-      type,
-      status,
+    sendRuntimeMessage({
+      msgType: 'sync:sync-status-change--gist',
+      data: {
+        type,
+        status,
+      },
+      targetPageContexts: ['optionsPage']
     });
   }
   async getSyncResult() {
@@ -327,8 +331,10 @@ export default class SyncUtils {
             };
           }
           await Store.settingsUtils.setSettings(settings);
-          sendBrowserMessage('setLocale', { locale: settings.language });
-          sendTabMessage({ msgType: 'setLocale', data: { locale: settings.language } });
+          sendRuntimeMessage({
+            msgType: 'setLocale',
+            data: { locale: settings.language },
+          });
         } catch (error) {
           console.error(error);
         }
@@ -346,6 +352,7 @@ export default class SyncUtils {
     }
 
     this.handleSyncResult(remoteType, syncType, result);
+    reloadOtherAdminPage();
   }
   // 处理同步结果并保存
   async handleSyncResult(

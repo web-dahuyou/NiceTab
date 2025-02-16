@@ -188,13 +188,14 @@ export default class TabListUtils {
     // 必须保证中转站排在第一位
     if (!tagList?.length || staticIndex == -1) {
       tagList = [this.createStagingAreaTag(), ...(tagList || [])];
+      await this.setTagList(tagList);
     } else if (staticIndex > 0) {
       const staticTag = tagList.splice(staticIndex, 1);
       tagList = [staticTag[0], ...tagList];
+      await this.setTagList(tagList);
     }
-    this.tagList = tagList;
-    await this.setTagList(tagList);
 
+    this.tagList = tagList;
     this.setCountInfo();
     return this.tagList;
   }

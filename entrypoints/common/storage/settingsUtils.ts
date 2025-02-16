@@ -74,14 +74,15 @@ export default class SettingsUtils {
     [AUTO_SYNC_INTERVAL]: 30, // 自动同步间隔时间
     [AUTO_SYNC_TYPE]: defaultAutoSyncType, // 自动同步方式
   };
+  storageKey: `local:${string}` = 'local:settings';
   settings: SettingsProps = this.initialSettings;
 
   async setSettings(settings: SettingsProps) {
     this.settings = { ...this.initialSettings, ...settings };
-    return await storage.setItem('local:settings', this.settings);
+    return await storage.setItem(this.storageKey, this.settings);
   }
   async getSettings() {
-    const settings = await storage.getItem<SettingsProps>('local:settings');
+    const settings = await storage.getItem<SettingsProps>(this.storageKey);
     const _savedBefore = !!settings;
     this.settings = {
       ...this.initialSettings,

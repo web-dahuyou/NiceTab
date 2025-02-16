@@ -91,7 +91,7 @@ importers:
         specifier: ^5.5.4
         version: 5.7.3
       wxt:
-        specifier: ^0.19.16
+        specifier: ^0.19.26
         version: 0.19.26(@types/node@22.13.1)(rollup@4.34.3)
 
 packages:
