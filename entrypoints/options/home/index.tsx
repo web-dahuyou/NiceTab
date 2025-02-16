@@ -1,11 +1,28 @@
 import { useState, useMemo, useCallback } from 'react';
-import { theme, Flex, Button, Dropdown, Modal, Drawer, Space, Typography, Tooltip, type MenuProps } from 'antd';
+import {
+  theme,
+  Flex,
+  Button,
+  Dropdown,
+  Modal,
+  Drawer,
+  Space,
+  Typography,
+  Tooltip,
+  type MenuProps,
+} from 'antd';
 import { QuestionCircleOutlined, MoreOutlined, ClearOutlined } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { classNames } from '~/entrypoints/common/utils';
-import { tabListUtils, settingsUtils, stateUtils, recycleUtils } from '~/entrypoints/common/storage';
+import {
+  tabListUtils,
+  settingsUtils,
+  stateUtils,
+  recycleUtils,
+  initTabListStorageListener,
+} from '~/entrypoints/common/storage';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
-import { openNewTab } from '~/entrypoints/common/tabs';
+import { openNewTab, updateAdminPageUrlDebounced } from '~/entrypoints/common/tabs';
 
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import {
@@ -66,13 +83,16 @@ export default function Home() {
     };
   }, [selectedTag.originData, countInfo?.groupCount]);
 
-  const moreItems: MenuProps['items'] = useMemo(() => [
-    {
-      key: 'clear',
-      label: $fmt('home.clearAll'),
-      icon: <ClearOutlined />,
-    },
-  ], [$fmt]);
+  const moreItems: MenuProps['items'] = useMemo(
+    () => [
+      {
+        key: 'clear',
+        label: $fmt('home.clearAll'),
+        icon: <ClearOutlined />,
+      },
+    ],
+    [$fmt]
+  );
 
   // 确认清空全部
   const handleClearConfirm = () => {
@@ -113,6 +133,13 @@ export default function Home() {
 
   useEffect(() => {
     recycleUtils.checkAndClear();
+
+    return initTabListStorageListener(async (tabList) => {
+      const currWindow = await browser.windows.getCurrent();
+      if (!currWindow.focused) {
+        updateAdminPageUrlDebounced();
+      }
+    });
   }, []);
 
   return (
@@ -131,7 +158,9 @@ export default function Home() {
                 onCollapseChange={onCollapseChange}
               ></ToggleSidebarBtn>
               {selectedTagKey ? <SortingBtns onSort={onNameSort}></SortingBtns> : null}
-              {selectedTagKey ? <SortingBtns sortBy="createTime" onSort={onCreateTimeSort}></SortingBtns> : null}
+              {selectedTagKey ? (
+                <SortingBtns sortBy="createTime" onSort={onCreateTimeSort}></SortingBtns>
+              ) : null}
             </div>
 
             <div className="sidebar-inner-content">
@@ -168,7 +197,10 @@ export default function Home() {
                   {$fmt('home.addTag')}
                 </Button>
 
-                <Dropdown menu={{ items: moreItems, onClick: onMoreItemClick }} placement="bottomLeft">
+                <Dropdown
+                  menu={{ items: moreItems, onClick: onMoreItemClick }}
+                  placement="bottomLeft"
+                >
                   <StyledActionIconBtn className="btn-more" $size="20" title="更多">
                     <MoreOutlined />
                   </StyledActionIconBtn>
@@ -252,7 +284,7 @@ export default function Home() {
                     </Typography.Text>
                   </Flex>
                 }
-                overlayStyle={{ maxWidth: '300px', width: '300px' }}
+                styles={{ root: { maxWidth: '300px', width: '300px' } }}
               >
                 <QuestionCircleOutlined style={{ marginLeft: '4px' }} />
               </Tooltip>

@@ -14,16 +14,27 @@ export function handleUrlWidthParams(
 }
 
 // 解析url参数
-export function getUrlParams(url?: string): Record<string, string> {
-  const urlObj = new URL(url || window.location.href);
-  const searchParams = new URLSearchParams(urlObj.search);
-  const params: Record<string, string> = {};
+export function getUrlParams(url: string): Record<string, string> {
+  const params: { [key: string]: string } = {};
+  const queryString = url.split('?')[1];
+  if (!queryString) return params;
 
-  for (const [key, value] of searchParams.entries()) {
-    params[key] = value;
+  const pairs = queryString.split('&');
+  for (const pair of pairs) {
+    const [key, value] = pair.split('=');
+    if (key) {
+      params[decodeURIComponent(key)] = decodeURIComponent(value || '');
+    }
   }
 
   return params;
+}
+// 设置url参数
+export function setUrlParams(url: string, params: Record<string, any>): string {
+  const _params = getUrlParams(url);
+  const baseUrl = url.split('?')[0];
+  const queryString = objectToUrlParams({ ..._params, ...params });
+  return `${baseUrl}?${queryString}`;
 }
 // 对象转化为url参数
 export function objectToUrlParams(params: Record<string, any>): string {

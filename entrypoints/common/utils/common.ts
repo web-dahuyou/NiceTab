@@ -128,11 +128,6 @@ export function getMergedList<T, K extends keyof T>(
   return [...resultMap.values()];
 }
 
-// 向插件发送消息
-export function sendBrowserMessage(msgType: string, data: Record<string, any>) {
-  browser.runtime.sendMessage({ msgType, data });
-}
-
 // 请求api
 export const fetchApi = (
   url: string,
@@ -180,6 +175,5 @@ export default {
   groupBySize,
   getUniqueList,
   getMergedList,
-  sendBrowserMessage,
   fetchApi,
 };

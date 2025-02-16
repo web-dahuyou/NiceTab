@@ -21,7 +21,7 @@ type SearchListItemProps = Pick<TagItem, 'tagId' | 'tagName' | 'static'> &
 
 type ActionCallbackFn = (
   type: 'tag' | 'tabGroup' | 'tab',
-  option: SearchListItemProps
+  option?: SearchListItemProps
 ) => void;
 
 const StyledSearchList = styled.div`
@@ -143,7 +143,7 @@ export default forwardRef((_, ref) => {
   const searchListRef = useRef<HTMLDivElement>(null);
 
   const onAction: ActionCallbackFn = (type, option) => {
-    const { tagId, groupId, tabId } = option;
+    const { tagId, groupId, tabId } = option || {};
     let params: Partial<TreeDataNodeUnion & { tabId: string }> = {};
     if (type === 'tag') {
       params = { type: 'tag', key: tagId };
@@ -203,7 +203,7 @@ export default forwardRef((_, ref) => {
 
   const onChange = (
     value: string,
-    option: SearchListItemProps | SearchListItemProps[]
+    option?: SearchListItemProps | SearchListItemProps[]
   ) => {
     onAction('tab', Array.isArray(option) ? option[0] : option);
     setSearchValue(value || '');

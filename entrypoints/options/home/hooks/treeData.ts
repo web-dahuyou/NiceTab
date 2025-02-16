@@ -6,6 +6,7 @@ import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
 import { openNewTab, openNewGroup } from '~/entrypoints/common/tabs';
 import { ENUM_SETTINGS_PROPS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { getRandomId } from '~/entrypoints/common/utils';
+import useUrlParams from '~/entrypoints/common/hooks/urlParams';
 import {
   TreeDataNodeTabGroup,
   TreeDataNodeTag,
@@ -37,14 +38,6 @@ export function useTreeData() {
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [refreshKey, setRefreshKey] = useState<string>(getRandomId());
   const [highlightTabId, setHighlightTabId] = useState<string | undefined>();
-
-  const urlParams = useMemo(() => {
-    const params: Record<string, string> = {};
-    for (let [key, value] of searchParams.entries()) {
-      params[key] = value;
-    }
-    return params;
-  }, [searchParams]);
 
   const selectedTag: TreeDataNodeTag = useMemo(() => {
     const tag =
@@ -289,8 +282,7 @@ export function useTreeData() {
     async (tabGroup: TreeDataNodeTabGroup) => {
       const tagKey = tabGroup.parentKey;
       const tag = treeData.find((tag) => tag.key === tagKey) as TreeDataNodeTag;
-      const settings = settingsUtils.settings;
-      console.log('tabGroup.originData', tabGroup.originData)
+      const settings = await settingsUtils.getSettings();
       // 未命名的标签组，不以原生标签组形式打开
       if (tabGroup?.originData?.groupName === UNNAMED_GROUP && !settings?.[UNNAMED_GROUP_RESTORE_AS_GROUP]) {
         // 打开标签组 (标签页单独打开)
@@ -421,6 +413,9 @@ export function useTreeData() {
     autoScroll && setRefreshKey(getRandomId());
     callback?.(treeData);
   };
+
+  const { urlParams } = useUrlParams();
+
   // 初始化
   const init = async () => {
     const tagList = await tabListUtils.getTagList();
@@ -516,12 +511,32 @@ export function useTreeData() {
 
   useEffect(() => {
     init();
-  }, [urlParams]);
+  }, [urlParams.tagId, urlParams.groupId]);
 
   useEffect(() => {
     setLoading(true);
     init();
   }, []);
+
+
+  // 多窗口数据同步（通过监听randomId变化）
+  async function multiWindowDataSync() {
+    const tagList = await tabListUtils.getTagList();
+    setTagList(tagList);
+    refreshTreeData((treeData) => {
+      const tag = treeData.find(t => t.key === selectedTagKey) as TreeDataNodeTag;
+      const tabGroup = (tag || treeData?.[0])?.children?.find(g => g.key === selectedTabGroupKey) as TreeDataNodeTabGroup;
+
+      if (tabGroup) {
+        handleSelect(treeData, [tabGroup.key], { node: tabGroup });
+      } else if (tag) {
+        handleSelect(treeData, [tag.key], { node: tag });
+      }
+    });
+  }
+  useEffect(() => {
+    multiWindowDataSync();
+  }, [urlParams.randomId]);
 
   return {
     urlParams,

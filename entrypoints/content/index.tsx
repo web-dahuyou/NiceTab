@@ -25,7 +25,7 @@ export default defineContentScript({
         const root = ReactDOM.createRoot(wrapper);
         // root.render(<App />);
         root.render(
-          <Root>
+          <Root pageContext="contentScriptPage">
             <App />
           </Root>
         );

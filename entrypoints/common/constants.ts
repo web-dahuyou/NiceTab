@@ -21,6 +21,7 @@ import type {
   SyncType,
   AutoSyncType,
   PopupModuleNames,
+  PageContextType,
 } from '~/entrypoints/types';
 
 export const GITHUB_URL = 'https://github.com/web-dahuyou/NiceTab';
@@ -59,7 +60,6 @@ export const THEME_COLORS: ColorItem[] = THEME_COLOR_NAMES.map((name) => {
     color: ENUM_COLORS?.[name],
   };
 });
-
 
 // 主题类型
 export const THEME_TYPE_CONFIG: Record<ThemeTypes, ThemeTypeConfig> = {
@@ -103,7 +103,7 @@ export enum ENUM_ACTION_NAME {
   SEND_LEFT_TABS = 'action:sendLeftTabs', // 发送左侧标签页
   SEND_RIGHT_TABS = 'action:sendRightTabs', // 发送右侧标签页
   OPEN_ADMIN_TAB = 'action:openAdminTab', // 打开管理后台
-};
+}
 // 设置项枚举
 export enum ENUM_SETTINGS_PROPS {
   LANGUAGE = 'language', // 语言
@@ -134,7 +134,7 @@ export enum ENUM_SETTINGS_PROPS {
   AUTO_SYNC = 'autoSync', // 是否开启自动同步
   AUTO_SYNC_INTERVAL = 'autoSyncInterval', // 自动同步间隔时间
   AUTO_SYNC_TYPE = 'autoSyncType', // 自动同步方式
-};
+}
 
 // tab 事件
 export const TAB_EVENTS: Array<keyof Pick<Tabs.Static, TabEvents>> = [
@@ -190,6 +190,13 @@ export const syncTypeMap: Record<string, SyncType> = {
 };
 
 export const defaultAutoSyncType: AutoSyncType = 'auto-push-merge';
+
+// 页面上下文类型枚举
+export const pageContextTypes: PageContextType[] = [
+  'optionsPage',
+  'popupPage',
+  'contentScriptPage',
+];
 
 export default {
   ENUM_COLORS,

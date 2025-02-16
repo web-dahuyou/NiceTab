@@ -4,7 +4,7 @@ import contextMenusRegister, {
 } from '~/entrypoints/common/contextMenus';
 import commandsRegister from '~/entrypoints/common/commands';
 import tabUtils from '~/entrypoints/common/tabs';
-import initStorageListener, {
+import initSettingsStorageListener, {
   themeUtils,
   settingsUtils,
 } from '~/entrypoints/common/storage';
@@ -16,7 +16,7 @@ import {
   POPUP_MODULE_NAMES,
   ENUM_ACTION_NAME,
 } from '~/entrypoints/common/constants';
-import type { BrowserMessageProps } from '~/entrypoints/types';
+import type { RuntimeMessageEventProps } from '~/entrypoints/types';
 
 const {
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
@@ -69,7 +69,7 @@ export default defineBackground(() => {
   setBadge();
   // 初始化 popup 交互
   initPopup();
-  initStorageListener(async (settings, oldSettings) => {
+  initSettingsStorageListener(async (settings, oldSettings) => {
     setBadge();
     initPopup();
     autoSyncAlarm.checkReset(settings, oldSettings);
@@ -101,15 +101,31 @@ export default defineBackground(() => {
     }
   });
 
-  browser.runtime.onMessage.addListener(async (msg, msgSender, sendResponse) => {
-    // console.log('browser.runtime.onMessage--background', msg, msgSender);
-    const { msgType, data } = (msg || {}) as BrowserMessageProps;
+  browser.runtime.onMessage.addListener(async (msg: unknown, msgSender, sendResponse) => {
+    // console.log('browser.runtime.onMessage--background--msg', msg);
+    const { msgType, data, targetPageContext = 'background' } = (msg || {}) as RuntimeMessageEventProps;
+
     if (msgType === 'setPrimaryColor') {
       const colorPrimary = data?.colorPrimary || PRIMARY_COLOR;
       await themeUtils.setThemeData({ colorPrimary });
+      if (targetPageContext === 'contentScriptPage') {
+        tabUtils.sendTabMessage({ msgType: 'setThemeData', data: { colorPrimary } });
+      }
       setBadge();
     } else if (msgType === 'setThemeData') {
       await themeUtils.setThemeData(data);
+      if (targetPageContext === 'contentScriptPage') {
+        tabUtils.sendTabMessage({ msgType: 'setThemeData', data });
+      }
+      setBadge();
+    } else if (msgType === 'setThemeType') {
+      if (targetPageContext === 'contentScriptPage') {
+        tabUtils.sendTabMessage({ msgType: 'setThemeType', data });
+      }
+    } else if (msgType === 'setLocale') {
+      if (targetPageContext === 'contentScriptPage') {
+        tabUtils.sendTabMessage({ msgType: 'setLocale', data });
+      }
       setBadge();
     } else if (msgType === 'openAdminRoutePage') {
       tabUtils.openAdminRoutePage(data || {});

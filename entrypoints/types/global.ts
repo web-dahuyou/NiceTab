@@ -10,11 +10,6 @@ import type {
 // 扩展版本信息
 export type VersionInfo = { updateAvailable: boolean; version?: string };
 
-export interface BrowserMessageProps {
-  msgType: string; // 消息类型
-  data: any; // 消息内容
-}
-
 // 订阅事件类型
 export type EventsEmitterProps = {
   'home:is-dragging': boolean;

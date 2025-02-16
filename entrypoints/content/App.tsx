@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { theme, message } from 'antd';
 import { ThemeProvider } from 'styled-components';
-import { sendBrowserMessage } from '~/entrypoints/common/utils';
+import { sendRuntimeMessage } from '~/entrypoints/common/utils';
 import { GlobalContext } from '~/entrypoints/common/hooks/global';
-import type { BrowserMessageProps, SendTargetProps } from '~/entrypoints/types';
+import type { SendTabMsgEventProps, SendTargetProps } from '~/entrypoints/types';
 import SendTargetModal from '~/entrypoints/options/home/SendTargetModal';
 
 export default function App() {
@@ -21,7 +21,11 @@ export default function App() {
 
   const handleSend = useCallback(
     async (targetData: SendTargetProps) => {
-      sendBrowserMessage('sendTabsActionConfirm', { actionName, targetData });
+      sendRuntimeMessage({
+        msgType: 'sendTabsActionConfirm',
+        data: { actionName, targetData },
+        targetPageContexts: ['background'],
+      });
       handleClose();
     },
     [actionName]
@@ -30,7 +34,7 @@ export default function App() {
   useEffect(() => {
     browser.runtime.onMessage.addListener(async (msg: unknown) => {
       // console.log('browser.runtime.onMessage--contentScript', msg);
-      const { msgType, data } = (msg || {}) as BrowserMessageProps;
+      const { msgType, data } = (msg || {}) as SendTabMsgEventProps;
 
       if (msgType === 'action:open-send-target-modal') {
         setActionName(data?.actionName || '');

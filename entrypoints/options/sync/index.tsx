@@ -7,13 +7,20 @@ import {
   useIntlUtls,
   GlobalContext,
 } from '~/entrypoints/common/hooks/global';
-import { settingsUtils, syncUtils, syncWebDAVUtils } from '~/entrypoints/common/storage';
+import useUrlParams from '~/entrypoints/common/hooks/urlParams';
+import {
+  settingsUtils,
+  syncUtils,
+  syncWebDAVUtils,
+  initSyncStorageListener,
+} from '~/entrypoints/common/storage';
 import type {
   SyncTargetType,
   SyncRemoteType,
   SyncResultProps,
   SyncConfigWebDAVProps,
 } from '~/entrypoints/types';
+import { updateAdminPageUrlDebounced } from '~/entrypoints/common/tabs';
 
 import { StyledSidebarWrapper, StyledMainWrapper } from './Sync.styled';
 // import ToggleSidebarBtn from '../components/ToggleSidebarBtn';
@@ -122,8 +129,24 @@ export default function SyncPage() {
     }
   };
 
+  const { urlParams } = useUrlParams();
+
+  useEffect(() => {
+    getSyncInfo();
+    gistRef.current?.getSyncInfo();
+    getWebDavConfig();
+    webDAVRef.current?.getSyncInfo();
+  }, [urlParams]);
+
   useEffect(() => {
     init();
+
+    return initSyncStorageListener(async () => {
+      const currWindow = await browser.windows.getCurrent();
+      if (!currWindow.focused) {
+        updateAdminPageUrlDebounced();
+      }
+    });
   }, []);
 
   return (

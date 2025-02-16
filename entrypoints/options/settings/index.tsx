@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useMemo } from 'react';
 import {
   Space,
   Form,
@@ -25,8 +25,9 @@ import {
   defaultLanguage,
 } from '~/entrypoints/common/constants';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { getKeysByOS, sendBrowserMessage } from '~/entrypoints/common/utils';
-import { sendTabMessage } from '~/entrypoints/common/tabs';
+import useUrlParams from '~/entrypoints/common/hooks/urlParams';
+import { getKeysByOS, sendRuntimeMessage } from '~/entrypoints/common/utils';
+import { reloadOtherAdminPage } from '~/entrypoints/common/tabs';
 import { StickyBox } from '~/entrypoints/common/components/StickyBox';
 import QuickActions from './QuickActions';
 import { useSyncType } from '../sync/hooks/syncType';
@@ -110,8 +111,8 @@ export default function Settings() {
 
     await settingsUtils.setSettings(newSettings);
     NiceGlobalContext.setLocale(newSettings.language);
-    sendBrowserMessage('setLocale', { locale: newSettings.language });
-    sendTabMessage({ msgType: 'setLocale', data: { locale: newSettings.language } });
+    sendRuntimeMessage({ msgType: 'setLocale', data: { locale: newSettings.language } });
+    reloadOtherAdminPage();
     NiceGlobalContext.setPageWidthType(newSettings.pageWidthType || 'fixed');
 
     const customMessages = getCustomLocaleMessages(
@@ -123,6 +124,13 @@ export default function Settings() {
   useEffect(() => {
     form?.setFieldValue(LANGUAGE, locale);
   }, [locale]);
+
+  const { urlParams } = useUrlParams();
+  useEffect(() => {
+    settingsUtils.getSettings().then((settings) => {
+      form?.setFieldsValue(settings);
+    });
+  }, [urlParams]);
   useEffect(() => {
     settingsUtils.getSettings().then((settings) => {
       form?.setFieldsValue(settings);

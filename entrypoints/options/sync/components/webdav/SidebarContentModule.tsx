@@ -10,7 +10,7 @@ import type {
   SyncConfigItemWebDAVProps,
   SyncConfigWebDAVProps,
   SyncStatusChangeEventProps,
-  BrowserMessageProps,
+  RuntimeMessageEventProps,
 } from '~/entrypoints/types';
 import { syncTypeMap } from '~/entrypoints/common/constants';
 import { StyledCard } from '../../Sync.styled';
@@ -47,6 +47,8 @@ export default forwardRef(
     const getSyncInfo = async () => {
       const config = await syncWebDAVUtils.getConfig();
       setSyncConfig(config);
+
+      setDrawerVisible(false);
     };
 
     const validator = useCallback(
@@ -106,7 +108,7 @@ export default forwardRef(
 
     // 监听同步状态变化message
     const onSyncStatusChangeMessage = async (message: unknown) => {
-      const { msgType, data } = message as BrowserMessageProps;
+      const { msgType, data } = message as RuntimeMessageEventProps;
       if (msgType === 'sync:sync-status-change--webdav') {
         onSyncStatusChange(data);
       }

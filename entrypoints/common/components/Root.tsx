@@ -1,3 +1,4 @@
+import type { Runtime } from 'wxt/browser';
 import React, { useEffect, useState } from 'react';
 import { ConfigProvider, theme, message } from 'antd';
 import { IntlProvider } from 'react-intl';
@@ -9,15 +10,23 @@ import {
   useThemeTypeConfig,
 } from '~/entrypoints/common/hooks/global';
 import type {
-  BrowserMessageProps,
+  PageContextType,
+  RuntimeMessageEventProps,
   ThemeProps,
   LanguageTypes,
   ThemeTypes,
   PageWidthTypes,
 } from '~/entrypoints/types';
 import { themeUtils } from '~/entrypoints/common/storage';
+import { updateAdminPageUrlDebounced } from '~/entrypoints/common/tabs';
 
-export default function Root({ children }: { children: React.ReactNode }) {
+export default function Root({
+  pageContext = 'optionsPage',
+  children,
+}: {
+  pageContext: PageContextType;
+  children: React.ReactNode;
+}) {
   const [$message, messageContextHolder] = message.useMessage();
   const [version, setVersion] = useState('');
   const { locale: localeAntd, changeLocale: changeLocaleAntd } = useAntdLocale();
@@ -57,9 +66,10 @@ export default function Root({ children }: { children: React.ReactNode }) {
     setVersion(manifestInfo?.version || '888.888.888');
   };
   // 监听消息
-  const messageListener = async (msg: unknown) => {
-    // console.log('browser.runtime.onMessage--Root', msg);
-    const { msgType, data } = (msg || {}) as BrowserMessageProps;
+  const messageListener = async (msg: unknown, msgSender: Runtime.MessageSender) => {
+    const { msgType, data, targetPageContext } = (msg || {}) as RuntimeMessageEventProps;
+    if (targetPageContext && targetPageContext !== pageContext) return;
+
     if (msgType === 'setPrimaryColor') {
       const colorPrimary = data.colorPrimary || PRIMARY_COLOR;
       await themeUtils.setThemeData({ colorPrimary });
@@ -71,6 +81,11 @@ export default function Root({ children }: { children: React.ReactNode }) {
       handleThemeTypeChange(data.themeType);
     } else if (msgType === 'setLocale') {
       handleLocaleChange(data.locale);
+    } else if (msgType === 'reloadAdminPage') {
+      const currWindow = await browser.windows.getCurrent();
+      if (data.currWindowId !== currWindow.id) {
+        updateAdminPageUrlDebounced();
+      }
     }
   };
 

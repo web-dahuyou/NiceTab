@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { theme, Collapse, Space, Button, Modal, Empty, Alert } from 'antd';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import useUrlParams from '~/entrypoints/common/hooks/urlParams';
 import { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
-import { recycleUtils } from '~/entrypoints/common/storage';
+import { recycleUtils, initRecycleStorageListener } from '~/entrypoints/common/storage';
+import { updateAdminPageUrlDebounced } from '~/entrypoints/common/tabs';
 import { StyledEmptyBox, StyledRecycleBinWrapper } from './index.styled';
 import { StickyBox } from '~/entrypoints/common/components/StickyBox';
 import TagNodeMarkup from './TagNode';
@@ -87,8 +89,20 @@ export default function RecycleBin() {
     getRecycleBinData();
   }, []);
 
+  const { urlParams } = useUrlParams();
+
   useEffect(() => {
     getRecycleBinData();
+  }, [urlParams]);
+
+  useEffect(() => {
+    getRecycleBinData();
+    return initRecycleStorageListener(async (tabList) => {
+      const currWindow = await browser.windows.getCurrent();
+      if (!currWindow.focused) {
+        updateAdminPageUrlDebounced();
+      }
+    });
   }, []);
 
   return (
@@ -103,16 +117,10 @@ export default function RecycleBin() {
             {$fmt('home.collapseAll')}
           </Button>
           */}
-          <Button
-            type="primary"
-            onClick={() => setRecoverModalVisible(true)}
-          >
+          <Button type="primary" onClick={() => setRecoverModalVisible(true)}>
             {$fmt('home.recoverAll')}
           </Button>
-          <Button
-            type="primary"
-            onClick={() => setConfirmModalVisible(true)}
-          >
+          <Button type="primary" onClick={() => setConfirmModalVisible(true)}>
             {$fmt('home.clearAll')}
           </Button>
           <Alert

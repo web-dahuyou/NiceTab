@@ -188,13 +188,14 @@ export default class TabListUtils {
     // 必须保证中转站排在第一位
     if (!tagList?.length || staticIndex == -1) {
       tagList = [this.createStagingAreaTag(), ...(tagList || [])];
+      await this.setTagList(tagList);
     } else if (staticIndex > 0) {
       const staticTag = tagList.splice(staticIndex, 1);
       tagList = [staticTag[0], ...tagList];
+      await this.setTagList(tagList);
     }
-    this.tagList = tagList;
-    await this.setTagList(tagList);
 
+    this.tagList = tagList;
     this.setCountInfo();
     return this.tagList;
   }
@@ -649,6 +650,8 @@ export default class TabListUtils {
 
     const unstarredIndex =
       tag.groupList?.findIndex((g) => !g.isStarred) ?? tag.groupList.length;
+
+    if (unstarredIndex === -1) return;
     const doSortList = unstarredIndex > -1 ? tag?.groupList?.slice(unstarredIndex) : [];
 
     if (sortType === 'ascending') {
@@ -669,6 +672,8 @@ export default class TabListUtils {
 
     const unstarredIndex =
       tag.groupList?.findIndex((g) => !g.isStarred) ?? tag.groupList.length;
+
+    if (unstarredIndex === -1) return;
     const doSortList = unstarredIndex > -1 ? tag?.groupList?.slice(unstarredIndex) : [];
 
     if (sortType === 'ascending') {

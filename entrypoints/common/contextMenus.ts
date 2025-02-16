@@ -8,7 +8,7 @@ import {
 import tabUtils from '~/entrypoints/common/tabs';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import type { SendTargetProps } from '~/entrypoints/types';
-import initStorageListener, { settingsUtils } from './storage';
+import initSettingsStorageListener, { settingsUtils } from './storage';
 import { getCommandsHotkeys } from './commands';
 import { pick, isUrlMatched } from './utils';
 
@@ -202,9 +202,10 @@ export async function strategyHandler(actionName: string) {
   if (!settings[SHOW_SEND_TARGET_MODAL]) {
     handleSendTabsAction(actionName);
   } else {
+    const currWindow = await browser.windows.getCurrent();
     tabUtils.sendTabMessage({
       msgType: 'action:open-send-target-modal',
-      data: { actionName },
+      data: { actionName, currWindowId: currWindow.id },
       onlyCurrentTab: true,
     }, () => {
       actionHandler(actionName);
@@ -221,12 +222,17 @@ export default async function contextMenusRegister() {
     });
   });
 
-  initStorageListener(handleContextMenusUpdate);
+  initSettingsStorageListener(handleContextMenusUpdate);
 
   // 点击右键菜单
   browser.contextMenus.onClicked.addListener(async (info, tab) => {
     // console.log('info', info);
     // console.log('tab', tab);
+
+    // 当右键点击其他窗口的扩展图标时，窗口不会被激活，所以需要手动激活窗口，然后发送消息到该窗口
+    if (tab?.windowId) {
+      await browser.windows.update(tab.windowId, { focused: true });
+    }
 
     const actionName = String(info.menuItemId);
     strategyHandler(actionName);
