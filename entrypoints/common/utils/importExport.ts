@@ -9,41 +9,31 @@ import { tabListUtils } from '~/entrypoints/common/storage';
 import type {
   ExtContentImporterProps,
   ExtContentExporterProps,
+  ExtContentParserFuncName,
 } from '~/entrypoints/types';
 import { getRandomId, newCreateTime } from '~/entrypoints/common/utils';
 
+// 识别内容格式
+export const extContentFormatCheck = (content: string): ExtContentParserFuncName => {
+  try {
+    const contentValue = JSON.parse(content.trim());
+    if (Array.isArray(contentValue)) {
+      const firstItem = contentValue[0];
+      if (firstItem?.tagName) {
+        return 'niceTab';
+      } else if (Array.isArray(firstItem?.tabs)) {
+        return 'KepTab';
+      }
+    }
+
+    return 'niceTab';
+  } catch (e) {
+    return 'oneTab';
+  }
+};
+
 // 解析 NiceTab、OneTab等 插件的导入内容
 export const extContentImporter: ExtContentImporterProps = {
-  keptab(content: string): TagItem[] {
-    const groupList: GroupItem[] = [];
-    const keptabList = JSON.parse(content || '[]') as KepTabGroup[];
-    for (let tabGroup of keptabList) {
-      if (tabGroup.tabs.length === 0) {
-        continue;
-      }
-      if (tabGroup.title === '') {
-        tabGroup.title = `keptab-${getRandomId()}`;
-      }
-      let tabList: TabItem[] = [];
-      for (let tabItem of tabGroup.tabs) {
-        tabList.push({
-          tabId: getRandomId(),
-          title: tabItem.title,
-          url: tabItem.url,
-        });
-      }
-      const newGroupItem = tabListUtils.getInitialTabGroup();
-      groupList.push({
-        ...newGroupItem,
-        groupName: tabGroup.title,
-        tabList: [...tabList],
-      });
-    }
-    const newTag = tabListUtils.getInitialTag();
-    newTag.tagName = 'KepTab';
-    newTag.groupList = groupList || [];
-    return [newTag];
-  },
   oneTab(content: string): TagItem[] {
     const groupList = [] as GroupItem[];
     let tabList: TabItem[] = [];
@@ -98,11 +88,64 @@ export const extContentImporter: ExtContentImporterProps = {
     });
     return tagList;
   },
+  KepTab(content: string): TagItem[] {
+    const groupList: GroupItem[] = [];
+    const keptabList = JSON.parse(content || '[]') as KepTabGroup[];
+    for (let tabGroup of keptabList) {
+      if (tabGroup.tabs.length === 0) {
+        continue;
+      }
+      if (tabGroup.title === '') {
+        tabGroup.title = `keptab-${getRandomId()}`;
+      }
+      let tabList: TabItem[] = [];
+      for (let tabItem of tabGroup.tabs) {
+        tabList.push({
+          tabId: getRandomId(),
+          title: tabItem.title,
+          url: tabItem.url,
+        });
+      }
+      const newGroupItem = tabListUtils.getInitialTabGroup();
+      groupList.push({
+        ...newGroupItem,
+        groupName: tabGroup.title,
+        tabList: [...tabList],
+      });
+    }
+    const newTag = tabListUtils.getInitialTag();
+    newTag.tagName = 'KepTab';
+    newTag.groupList = groupList || [];
+    return [newTag];
+  },
 };
 
 // 将内容导出为 NiceTab、OneTab 等格式
 export const extContentExporter: ExtContentExporterProps = {
-  keptab(tagList): string {
+  oneTab(tagList): string {
+    let resultList: string[] = [];
+    try {
+      tagList.forEach((tag) => {
+        tag?.groupList?.forEach((group) => {
+          group?.tabList?.forEach((tab) => {
+            resultList.push(`${tab.url} | ${tab.title}\n`);
+          });
+          resultList.push('\n');
+        });
+      });
+      return resultList.join('');
+    } catch {
+      return '';
+    }
+  },
+  niceTab(tagList): string {
+    try {
+      return JSON.stringify(tagList || []);
+    } catch {
+      return '';
+    }
+  },
+  KepTab(tagList): string {
     let resultList: KepTabGroup[] = [];
     try {
       (tagList as TagItem[]).forEach((tag, tagIdx) => {
@@ -137,29 +180,6 @@ export const extContentExporter: ExtContentExporterProps = {
       return JSON.stringify(resultList || []);
     } catch {
       return JSON.stringify([]);
-    }
-  },
-  oneTab(tagList): string {
-    let resultList: string[] = [];
-    try {
-      tagList.forEach((tag) => {
-        tag?.groupList?.forEach((group) => {
-          group?.tabList?.forEach((tab) => {
-            resultList.push(`${tab.url} | ${tab.title}\n`);
-          });
-          resultList.push('\n');
-        });
-      });
-      return resultList.join('');
-    } catch {
-      return '';
-    }
-  },
-  niceTab(tagList): string {
-    try {
-      return JSON.stringify(tagList || []);
-    } catch {
-      return '';
     }
   },
 };

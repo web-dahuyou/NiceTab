@@ -58,7 +58,7 @@ export interface SendTargetProps {
 }
 
 /* 导入导出相关 */
-export type ExtContentParserFuncName = 'niceTab' | 'oneTab' | 'keptab';
+export type ExtContentParserFuncName = 'niceTab' | 'oneTab' | 'KepTab';
 export type ExtContentImporterProps = {
   [key in ExtContentParserFuncName]: (content: string) => TagItem[];
 };

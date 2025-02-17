@@ -7,6 +7,7 @@ import { saveAs } from 'file-saver';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { tabListUtils, settingsUtils } from '~/entrypoints/common/storage';
 import {
+  extContentFormatCheck,
   extContentImporter,
   extContentExporter,
   sendRuntimeMessage,
@@ -48,8 +49,8 @@ export default function ImportExport() {
     const importContent = value || form.getFieldValue('importContent');
     setImportLoading(true);
     setTimeout(async () => {
-      const formatOption = formatTypeOptions.find((option) => option.type === formatType);
-      const funcName = formatOption?.funcName || 'niceTab';
+      // 防止导入的内容与所选的格式不匹配，先自动识别格式
+      const funcName = extContentFormatCheck(importContent) || 'niceTab';
       try {
         const tagList = extContentImporter?.[funcName]?.(importContent);
         await tabListUtils.importTags(tagList, importMode);

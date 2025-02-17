@@ -25,7 +25,7 @@ export const formatTypeOptions: FormatTypeOptionItem[] = [
   {
     type: 3,
     label: 'KepTab',
-    funcName: 'keptab',
+    funcName: 'KepTab',
     extname: 'json',
     fileType: 'application/json',
   },
