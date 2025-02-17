@@ -90,3 +90,10 @@ export function initSyncStorageListener(callback: () => void) {
     webdavUnwatch();
   }
 }
+
+// 监听state storage变化
+export function initStateStorageListener(callback: () => void) {
+  return storage.watch(stateUtils.storageKey, () => {
+    callback();
+  });
+}

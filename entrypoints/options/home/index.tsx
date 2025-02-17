@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useLayoutEffect } from 'react';
 import {
   theme,
   Flex,
@@ -22,7 +22,11 @@ import {
   initTabListStorageListener,
 } from '~/entrypoints/common/storage';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
-import { openNewTab, updateAdminPageUrlDebounced } from '~/entrypoints/common/tabs';
+import {
+  openNewTab,
+  reloadOtherAdminPage,
+  updateAdminPageUrlDebounced,
+} from '~/entrypoints/common/tabs';
 
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import {
@@ -65,10 +69,9 @@ export default function Home() {
 
   const { hotkeyList } = useHotkeys({ onAction: handleHotkeyAction });
 
-  const state = stateUtils.getState();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(
-    state['home:sidebarCollapsed'] || false
-  );
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => {
+    return stateUtils.state?.home?.sidebarCollapsed || false;
+  });
   const [confirmModalVisible, setConfirmModalVisible] = useState<boolean>(false);
   const [helpDrawerVisible, setHelpDrawerVisible] = useState<boolean>(false);
 
@@ -128,7 +131,8 @@ export default function Home() {
 
   const onCollapseChange = (status: boolean) => {
     setSidebarCollapsed(status);
-    stateUtils.setState({ 'home:sidebarCollapsed': status });
+    stateUtils.setStateByModule('home', { sidebarCollapsed: status });
+    reloadOtherAdminPage();
   };
 
   useEffect(() => {
