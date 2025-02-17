@@ -1,7 +1,7 @@
 import React, { useContext, useCallback, useEffect, useState } from 'react';
 import { browser, Tabs } from 'wxt/browser';
 import { ThemeProvider } from 'styled-components';
-import { theme, Space, Divider } from 'antd';
+import { theme, Button } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import {
   classNames,
@@ -13,7 +13,9 @@ import '~/assets/css/index.css';
 import './App.css';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { getAdminTabInfo, openNewTab } from '~/entrypoints/common/tabs';
+import { getMenus, strategyHandler } from '~/entrypoints/common/contextMenus';
 import { settingsUtils } from '~/entrypoints/common/storage';
+import { TAB_EVENTS } from '~/entrypoints/common/constants';
 import type { PopupModuleNames } from '~/entrypoints/types';
 import {
   GITHUB_URL,
@@ -27,6 +29,13 @@ import {
   GlobalStyle,
 } from '~/entrypoints/common/style/Common.styled';
 import { StyledContainer, StyledList, StyledFavIcon } from './App.styled';
+
+interface ActionBtnItem {
+  action?: string;
+  label?: string;
+  disabled?: boolean;
+  onClick?: () => void;
+}
 
 function handleQuickJump(route: { path: string; query?: Record<string, any> }) {
   sendRuntimeMessage({
@@ -43,6 +52,7 @@ export default function App() {
   const { version, themeTypeConfig } = NiceGlobalContext;
   const [tabs, setTabs] = useState<Tabs.Tab[]>([]);
   const [modules, setModules] = useState<PopupModuleNames[]>([]);
+  const [actionBtns, setActionBtns] = useState<ActionBtnItem[]>([]);
 
   // 快捷跳转
   const quickJumpBtns = [
@@ -63,15 +73,29 @@ export default function App() {
     },
   ];
   // 操作按钮
-  const actionBtns = [
-    {
-      action: 'reload',
-      label: $fmt('common.reload'),
-      onClick: () => {
-        browser.runtime.reload();
+  const getActionBtns = async () => {
+    const menus = await getMenus();
+    return [
+      ...menus.map((menu) => ({
+        action: menu.id,
+        label: menu.title,
+        disabled: menu.enabled === false,
+        onClick: async () => {
+          await strategyHandler(String(menu.id));
+          setTimeout(() => {
+            init();
+          }, 500);
+        },
+      })),
+      {
+        action: 'reload',
+        label: $fmt('common.reload'),
+        onClick: () => {
+          browser.runtime.reload();
+        },
       },
-    },
-  ];
+    ];
+  };
 
   // 切换主题
   const handleThemeChange = (color: string) => {
@@ -106,6 +130,8 @@ export default function App() {
     const modules =
       settings[ENUM_SETTINGS_PROPS.POPUP_MODULE_DISPLAYS] || POPUP_MODULE_NAMES;
     setModules(modules);
+    const _actionBtns = await getActionBtns();
+    setActionBtns(_actionBtns);
 
     if (modules.includes('openedTabs')) {
       browser.tabs.query({ currentWindow: true }).then(async (allTabs) => {
@@ -117,6 +143,10 @@ export default function App() {
 
   useEffect(() => {
     init();
+    TAB_EVENTS.forEach((event) => browser.tabs[event]?.addListener(init));
+    return () => {
+      TAB_EVENTS.forEach((event) => browser.tabs[event]?.removeListener(init));
+    };
   }, []);
 
   return (
@@ -145,35 +175,30 @@ export default function App() {
           {modules.includes('goto') && (
             <div className="block quick-actions">
               <span className="block-title">{$fmt('common.goto')}：</span>
-              <Space
-                size={0}
-                split={
-                  <Divider type="vertical" style={{ background: token.colorBorder }} />
-                }
-              >
+              <div className="block-content">
                 {quickJumpBtns.map((item) => (
-                  <span className="action-btn" key={item.path} onClick={item.onClick}>
+                  <Button size="small" key={item.path} onClick={item.onClick}>
                     {item.label}
-                  </span>
+                  </Button>
                 ))}
-              </Space>
+              </div>
             </div>
           )}
           {modules.includes('actions') && (
             <div className="block quick-actions">
               <span className="block-title">{$fmt('common.actions')}：</span>
-              <Space
-                size={0}
-                split={
-                  <Divider type="vertical" style={{ background: token.colorBorder }} />
-                }
-              >
+              <div className="block-content">
                 {actionBtns.map((item) => (
-                  <span className="action-btn" key={item.action} onClick={item.onClick}>
+                  <Button
+                    key={item.action}
+                    size="small"
+                    disabled={item.disabled}
+                    onClick={item.onClick}
+                  >
                     {item.label}
-                  </span>
+                  </Button>
                 ))}
-              </Space>
+              </div>
             </div>
           )}
           {modules.includes('theme') && (

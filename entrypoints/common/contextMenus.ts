@@ -42,7 +42,7 @@ export const getMenuHotkeys = async () => {
   }, {});
 };
 
-const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> => {
+export const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> => {
   const settings = await settingsUtils.getSettings();
   const language = settings[LANGUAGE] || defaultLanguage;
   const customMessages = getCustomLocaleMessages(language);
@@ -95,7 +95,7 @@ const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> => {
       customMessages['common.sendOtherTabs'] +
       ` (${hotkeysMap?.[ENUM_ACTION_NAME.SEND_OTHER_TABS]})`,
     contexts,
-    enabled: !!currTab?.id,
+    enabled: !!currTab?.id && filteredTabs?.length > 1,
   };
 
   const _sendLeftTabs: Menus.CreateCreatePropertiesType = {
