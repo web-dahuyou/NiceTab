@@ -20,19 +20,30 @@ export const StyledContainer = styled.div<{theme: StyledThemeProps}>`
     padding: 10px;
     border-bottom: 1px solid #0505050f;
     gap: 8px;
+    font-size: 13px;
     .block-title {
-      font-size: 14px;
+      flex-shrink: 0;
       font-weight: bold;
     }
     button { font-size: 12px; }
+    .block-content {
+      flex: 1;
+      width: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
     &.quick-actions {
       .action-btn {
         display: inline-flex;
-        font-size: 12px;
         color: ${props => props.theme.colorTextSecondary || '#333'};
         cursor: pointer;
-        &:hover {
+        &:not(.disabled):hover {
           color: ${(props) => props.theme.colorPrimary};
+        }
+        &.disabled {
+          color: ${props => props.theme.colorTextQuaternary || 'rgba(0, 0, 0, 0.25)'};
+          cursor: not-allowed;
         }
       }
     }

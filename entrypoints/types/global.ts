@@ -99,6 +99,9 @@ export type ActionNames =
   | 'sendLeftTabs'
   | 'sendRightTabs';
 
+// 页面模块名称
+export type PageModuleNames = 'home' | 'settings' | 'import-export' | 'sync' | 'recycle-bin';
+
 // popup 弹窗中的模块名称
 export type PopupModuleNames =
   | 'extensionInfo'
@@ -140,11 +143,6 @@ export type SettingsProps = {
   autoSyncInterval?: number; // 自动同步间隔时间
   autoSyncType?: AutoSyncType; // 自动同步方式
 };
-
-// 状态相关
-export interface StateProps {
-  'home:sidebarCollapsed'?: boolean;
-}
 
 export interface HotkeyOption {
   macKey: string;

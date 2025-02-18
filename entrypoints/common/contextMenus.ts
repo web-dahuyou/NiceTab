@@ -42,7 +42,7 @@ export const getMenuHotkeys = async () => {
   }, {});
 };
 
-const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> => {
+export const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> => {
   const settings = await settingsUtils.getSettings();
   const language = settings[LANGUAGE] || defaultLanguage;
   const customMessages = getCustomLocaleMessages(language);
@@ -95,25 +95,37 @@ const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> => {
       customMessages['common.sendOtherTabs'] +
       ` (${hotkeysMap?.[ENUM_ACTION_NAME.SEND_OTHER_TABS]})`,
     contexts,
-    enabled: !!currTab?.id,
+    enabled: !!currTab?.id && filteredTabs?.length > 1,
   };
 
+  async function hasFilteredLeftTabs() {
+    if (!currTab?.id || currTab?.index <= 0) return false;
+    const filteredRightTabs = await tabUtils.getFilteredTabs(tabs.slice(0, (currTab?.index || 0)), settings);
+    return filteredRightTabs?.length > 0;
+  }
+  const _hasFilteredLeftTabs = await hasFilteredLeftTabs();
   const _sendLeftTabs: Menus.CreateCreatePropertiesType = {
     id: ENUM_ACTION_NAME.SEND_LEFT_TABS,
     title:
       customMessages['common.sendLeftTabs'] +
       ` (${hotkeysMap?.[ENUM_ACTION_NAME.SEND_LEFT_TABS]})`,
     contexts,
-    enabled: !!currTab?.id && currTab?.index > 0,
+    enabled: _hasFilteredLeftTabs,
   };
 
+  async function hasFilteredRightTabs() {
+    if (!currTab?.id || currTab?.index >= tabs.length - 1) return false;
+    const filteredRightTabs = await tabUtils.getFilteredTabs(tabs.slice((currTab?.index || 0) + 1), settings);
+    return filteredRightTabs?.length > 0;
+  }
+  const _hasFilteredRightTabs = await hasFilteredRightTabs();
   const _sendRightTabs: Menus.CreateCreatePropertiesType = {
     id: ENUM_ACTION_NAME.SEND_RIGHT_TABS,
     title:
       customMessages['common.sendRightTabs'] +
       ` (${hotkeysMap?.[ENUM_ACTION_NAME.SEND_RIGHT_TABS]})`,
     contexts,
-    enabled: !!currTab?.id && currTab?.index < tabs.length - 1,
+    enabled: _hasFilteredRightTabs,
   };
 
   return [

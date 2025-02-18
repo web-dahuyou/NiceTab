@@ -53,7 +53,7 @@ import {
   StyledActionIconBtn,
   GlobalStyle,
 } from '~/entrypoints/common/style/Common.styled';
-import type { StyledThemeProps, PageWidthTypes } from '~/entrypoints/types';
+import type { StyledThemeProps, PageModuleNames, PageWidthTypes } from '~/entrypoints/types';
 import Home from './home/index.tsx';
 import Settings from './settings/index.tsx';
 import ImportExport from './importExport/index.tsx';
@@ -113,7 +113,7 @@ const StyledPageContainer = styled.div<{
 `;
 
 interface NavProps {
-  key: string;
+  key: PageModuleNames;
   label: string;
   path: string;
   icon?: JSX.Element;
@@ -150,7 +150,7 @@ const navsTemplate: NavProps[] = [
     element: <SyncPage />,
   },
   {
-    key: 'recycleBin',
+    key: 'recycle-bin',
     label: 'common.recycleBin',
     path: '/recycle',
     icon: <RestOutlined />,
@@ -187,7 +187,7 @@ function AppLayout() {
   }, [$fmt]);
 
   // 导航菜单
-  const onSelect = useCallback(({ key }: { key: NavProps['key'] }) => {
+  const onSelect = useCallback(({ key }: { key: string }) => {
     const nav = navs.find((item) => item.key === key);
     if (nav) {
       nav && navigate(nav.path);
