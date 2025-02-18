@@ -1,9 +1,12 @@
 import type {
   TagItem,
   TabItem,
+  GroupItem,
   KepTabItem,
   KepTabGroup,
-  GroupItem,
+  TobyItem,
+  TobyGroup,
+  TobyData,
 } from '~/entrypoints/types';
 import { tabListUtils } from '~/entrypoints/common/storage';
 import type {
@@ -22,7 +25,11 @@ export const extContentFormatCheck = (content: string): ExtContentParserFuncName
       if (firstItem?.tagName) {
         return 'niceTab';
       } else if (Array.isArray(firstItem?.tabs)) {
-        return 'KepTab';
+        return 'kepTab';
+      }
+    } else {
+      if (Array.isArray(contentValue?.lists)) {
+        return 'toby';
       }
     }
 
@@ -88,14 +95,14 @@ export const extContentImporter: ExtContentImporterProps = {
     });
     return tagList;
   },
-  KepTab(content: string): TagItem[] {
+  kepTab(content: string): TagItem[] {
     const groupList: GroupItem[] = [];
     const keptabList = JSON.parse(content || '[]') as KepTabGroup[];
     for (let tabGroup of keptabList) {
-      if (tabGroup.tabs.length === 0) {
+      if (!tabGroup.tabs?.length) {
         continue;
       }
-      if (tabGroup.title === '') {
+      if (!tabGroup?.title?.trim()) {
         tabGroup.title = `keptab-${getRandomId()}`;
       }
       let tabList: TabItem[] = [];
@@ -115,6 +122,33 @@ export const extContentImporter: ExtContentImporterProps = {
     }
     const newTag = tabListUtils.getInitialTag();
     newTag.tagName = 'KepTab';
+    newTag.groupList = groupList || [];
+    return [newTag];
+  },
+  toby(content: string): TagItem[] {
+    const groupList: GroupItem[] = [];
+    const tobyData = JSON.parse(content || '{}') as TobyData;
+    for (let tabGroup of tobyData.lists || []) {
+      if (!tabGroup.cards?.length) {
+        continue;
+      }
+      if (!tabGroup?.title?.trim()) {
+        tabGroup.title = `toby-${getRandomId()}`;
+      }
+      const tabList = tabGroup.cards.map((tabItem) => ({
+        tabId: getRandomId(),
+        title: tabItem.customTitle || tabItem.title,
+        url: tabItem.url,
+      }));
+      const newGroupItem = tabListUtils.getInitialTabGroup();
+      groupList.push({
+        ...newGroupItem,
+        groupName: tabGroup.title,
+        tabList: [...tabList],
+      });
+    }
+    const newTag = tabListUtils.getInitialTag();
+    newTag.tagName = 'Toby';
     newTag.groupList = groupList || [];
     return [newTag];
   },
@@ -145,7 +179,7 @@ export const extContentExporter: ExtContentExporterProps = {
       return '';
     }
   },
-  KepTab(tagList): string {
+  kepTab(tagList): string {
     let resultList: KepTabGroup[] = [];
     try {
       (tagList as TagItem[]).forEach((tag, tagIdx) => {
@@ -178,6 +212,37 @@ export const extContentExporter: ExtContentExporterProps = {
         });
       });
       return JSON.stringify(resultList || []);
+    } catch {
+      return JSON.stringify([]);
+    }
+  },
+  toby(tagList): string {
+    const groupList: TobyGroup[] = [];
+    try {
+      (tagList as TagItem[]).forEach((tag, tagIdx) => {
+        tag?.groupList?.forEach((group, grpIdx) => {
+          const tabList: TobyItem[] = [];
+          group?.tabList?.forEach((tab) => {
+            if (tab.url) {
+              tabList.push({
+                url: tab.url,
+                title: tab.title || '',
+                customTitle: '',
+                customDescription: '',
+              });
+            }
+          });
+          groupList.push({
+            title: group.groupName,
+            cards: tabList,
+            labels: [],
+          });
+        });
+      });
+      return JSON.stringify({
+        version: 3,
+        lists: groupList || [],
+      });
     } catch {
       return JSON.stringify([]);
     }

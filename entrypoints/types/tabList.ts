@@ -25,14 +25,8 @@ export interface TagItem {
   isLocked?: boolean;
   isStarred?: boolean;
 }
-// 分类、标签组、标签页统计信息
-export interface CountInfo {
-  tagCount: number;
-  groupCount: number;
-  tabCount: number;
-}
 
-// keptab
+/* keptab 格式相关  */
 export interface KepTabItem {
   url: string;
   title: string;
@@ -52,18 +46,48 @@ export interface KepTabGroup {
   star: boolean;
 }
 
-export interface SendTargetProps {
-  targetTagId?: string;
-  targetGroupId?: string;
+export type KepTabData = KepTabGroup[];
+
+
+/* toby 格式相关  */
+export interface TobyItem {
+  url: string;
+  title: string;
+  customTitle: string;
+  customDescription: string;
 }
 
+export interface TobyGroup {
+  title: string;
+  cards: TobyItem[];
+  labels: string[];
+}
+
+export interface TobyData {
+  version: number;
+  lists: TobyGroup[];
+};
+
 /* 导入导出相关 */
-export type ExtContentParserFuncName = 'niceTab' | 'oneTab' | 'KepTab';
+export type ExtContentParserFuncName = 'niceTab' | 'oneTab' | 'kepTab' | 'toby';
 export type ExtContentImporterProps = {
   [key in ExtContentParserFuncName]: (content: string) => TagItem[];
 };
 export type ExtContentExporterProps = {
   [key in ExtContentParserFuncName]: (content: Partial<TagItem>[]) => string;
 };
+
+// 分类、标签组、标签页统计信息
+export interface CountInfo {
+  tagCount: number;
+  groupCount: number;
+  tabCount: number;
+}
+
+// 发送到指定目录参数
+export interface SendTargetProps {
+  targetTagId?: string;
+  targetGroupId?: string;
+}
 
 export default { name: 'tabList-types' };
