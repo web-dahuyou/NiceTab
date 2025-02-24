@@ -3,183 +3,201 @@
 ![NiceTab](https://github.com/user-attachments/assets/6099f21e-fc0a-4bb5-8280-e497be3fb0ae)
 
 <p>
-  中文 | <a href="./README-en.md">English</a>
+  English | <a href="./README-zh.md">中文</a>
 </p>
 
-## 扩展安装
-- 谷歌 Chrome 应用商店：[Chrome Web Store](https://chromewebstore.google.com/detail/fonflmjnjbkigocpoommgmhljdpljain)
-- 微软 Edge 商店：[Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/ompjiaelpibiggcnanhbdblkhfdmkgnl) （（由于审核周期比较长，版本发布会比Chrome版本慢））
-- Firefox 暂未发布。
+## Extension Installation
 
-## 基础介绍
-- 本项目是一个方便快捷管理浏览器标签页的浏览器插件。
-- 取名 `NiceTab` 是希望它是一个用起来很 nice 的 tab 标签页管理工具（不过本人的UI和交互设计太差，只能凑合凑合了）。 
-- 类似于 `OneTab`、`Toby`、`N-Tab`、`KepTab` 等标签页管理插件，支持**谷歌Chrome**、**Firefox**、**微软Edge**等浏览器。
-- 采用 `react` 语言，基于[wxt框架](https://wxt.dev/)开发（wxt框架内置 `vanilla | vue | react | svelte | solid` 语言的初始化模板）。
-- UI直接使用了 `Ant Design` 这个常用的 UI 框架。
+- Google Chrome Web Store: [Chrome Web Store](https://chromewebstore.google.com/detail/fonflmjnjbkigocpoommgmhljdpljain)
+- Microsoft Edge Add-ons: [Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/ompjiaelpibiggcnanhbdblkhfdmkgnl)  
+  (Note that due to longer review times, the Edge store release may lag behind the Chrome version.)
+- Firefox: Not yet available.
 
-## 项目初衷
-我本人有点强迫症，浏览器标签页开多了就会焦虑，而且想要在众多标签页中切换到指定的页面也比较费劲儿。   
-后来用上 OneTab 之后，管理标签页方便了不少，提升了效率也节省了内存。因此很长一段时间一直使用 OneTab 插件来管理浏览器标签页。   
+## Overview
 
-经过一段时间对 OneTab 的使用体验，个人感觉有几个点不是特别顺手：
-- 标签组虽然能重命名，但是导出后再导入就会丢失。
-- 由于标签组重命名会丢失，所以我懒得花时间重命名，当标签组积累多了之后，很难找到指定的标签组。
-- 插件图标右键菜单经常会出现好几个重复的菜单组，其中只有一个菜单组是能用的，但是你得挨个试才知道。
-- 有时候我只是想要将一些标签页收藏进列表，并不想关闭它们，但是 OneTab 没有对应的设置项（这个只是我个人体验）。
-- 还有就是，我想将某个标签组中的标签页移动到新的标签组，但是又没办法创建标签组，只能通过插件图标发送标签页到 OneTab 列表来创建新标签页。
-- 。。。
+- NiceTab is a browser extension that makes managing your browser tabs quick and convenient.
+- Named `NiceTab` with the hope that it would be a "nice" tab management tool.
+- Similar to other tab management extensions like `OneTab`, `Toby`, `N-Tab`, and `KepTab`. it supports browsers such as Chrome, Firefox, Microsoft Edge, and any Chromium based browser.
+- Developed using `React` and based on the [`wxt framework`](https://wxt.dev/), which provides built-in templates for `Vanilla`, `Vue`, `React`, `Svelte`, and `Solid`.
+- The UI is powered by the popular [`Ant Design`](https://ant-design.antgroup.com/) library.
 
-另外，N-Tab 插件是开源的，当我看了它的源码后发现技术栈相对比较老旧，想参与共建有心无力了。
+## Motivation
 
-基于上面几点原因，最终促使我开发了 NiceTab 这个插件，在借鉴 `OneTab`、`N-Tab` 等插件现有部分功能的基础上，添加了一些其他的功能。
+I personally get anxious when there are too many tabs open, and switching to a specific tab among them is a hassle. After using OneTab, managing tabs became much easier, improving efficiency and saving memory, so I used it for a long time.
 
-## 功能介绍
-- 支持分类、标签组、标签页管理，包括一键收集保存、恢复、星标、锁定、增删改查、拖拽排序等功能。
-- 分类支持展开/收起，支持创建分类和标签组，方便移动其他标签组/标签页到新分类/新标签组。
-- 支持多种插件格式的 **导入/导出** 功能，支持导出到本地。目前支持 `NiceTab`、`OneTab`、`Toby`、`KepTab` 格式的交叉导入导出（比如：可选择导入OneTab格式并导出为NiceTab格式；或者将NiceTab格式导出为OneTab格式），后续可根据需求增加其他插件格式的导入导出功能。
-- 支持**远程同步功能**（注意，合并推送不进行diff对比删除操作，而是合并远程和本地，然后推送到远程，所以标签页是会增多的，想要同步删除操作，请删除标签页后手动覆盖推送到远程）：
-  - gists同步: 您可根据需求将标签页同步到自己的 github 和 gitee 账号，只需要配置自己的 access token 即可（注意 token 权限只勾选 gists 操作），后期看看能否扩展配置其他平台方案。
-  - webDAV同步: 您可根据需求将标签页同步到自己的 webDAV 网盘，只需要配置 webDAV 的 url，username，password即可（支持配置多个 webDAV 账号）。
-  - 自动同步: 支持自动同步功能，可设置开启/关闭、同步频率、同步方式。
-- 支持手动切换**亮色/暗黑主题**。
-- 支持**皮肤主题切换**，目前暂时设置了有限的几种主题色提供选择，后续可根据需求扩大选择范围。
-- 支持**多语言**，目前暂时支持中英文切换 (非地道英语，期待英语大佬帮忙校正)。
-- 支持**回收站功能**，回收站中的标签页可还原到标签列表或者彻底删除。标签列表和回收站支持根据分类和标签组归类合并，方便管理。
-- 支持浏览器快捷命令（打开NiceTab管理后台、发送所有标签页、发送当前标签页等）。
-- 支持设置 **启动浏览器时是否自动打开NiceTab管理后台**。
-- 支持设置 **是否固定NiceTab管理后台**。
-- 支持设置 **发送标签页时-是否发送固定标签页到NiceTab**。
-- 支持设置 **发送标签页时-是否打开NiceTab管理后台**。
-- 支持设置 **发送标签页时-是否自动关闭标签页**。
-- 支持设置 **发送标签页时-是否保留重复的标签组**。
-- 支持设置 **发送标签页时-是否保留重复的标签页**。
-- 发送标签页支持选择指定目录。
-- 发送标签页支持配置域名排除。
-- 支持设置 **是否在新窗口打开标签组**。
-- 支持设置 **打开标签页/标签组时-是否自动删除标签页**。
-- 支持设置 **静默打开标签页的修饰键**。
-- 支持设置 **清空标签页时-是否自动删除该标签组**。
-- 支持设置 **标签组-复制链接模板格式**。
-- 支持设置 **是否在扩展图标上显示打开的标签页数量**。
-- 支持设置 **是否在网页中显示NiceTab右键菜单**。
-- 支持 **Popup面板模块展示设置**，如果不选择面板模块，则左击扩展图标直接发送所有标签页。
-- 支持设置 **进入列表页时-是否自动展开全部节点**。
-- 支持标签页手动去重。
-- 支持一键发送 所有标签页、当前标签页、其他标签页、左侧标签页、右侧标签页。
-- 支持发送新版浏览器自带的标签组到NiceTab, 支持以标签组形式打开到浏览器。
-- 支持列表页快捷键（目前只添加了分类、标签组的上下移动排序的快捷键操作，后续可根据需求添加其他功能的快捷键操作）。
-- 标签页支持自定义编辑修改标题和url。
-- 添加固定置顶的特殊分类-**中转站**，发送标签页/标签组时自动收集到中转站中。
-- 添加标签组按名称和创建时间排序功能。
-- 支持一键复制标签组所有标签页的链接, 复制链接支持自定义模板。
-- 支持标签页和url搜索，选择标签页后跳转定位到指定标签页。
-- 支持标签页和偏好设置的导入导出和远程同步。
+However, I felt a few aspects weren’t quite smooth:
 
+- Group names are lost after exporting and re-importing tabs.
+- Because renaming group names isn't persisted, I gave up on renaming them. Once many groups accumulate, locating a specific group is difficult.
+- The right-click menu on the extension icon often shows several duplicate menu groups, but only one group of menus actually works, you have to try each to find out.
+- Sometimes I just want to bookmark some tabs without closing them, but OneTab lacks an option for that (a personal preference).
+- There's no straightforward way to create a new group within OneTab directly and move tabs from an existing group into that new group.
+- And a few more smaller issues...
 
-## 功能截图
-### 点击扩展图标
-- 默认点击扩展图标，弹出popup面板 (如果配置项中未配置popup面板模块， 则单击效果为直接发送全部标签页)。
-- popup面板，可快速访问 列表页，设置页面，导入导出页面，远程同步页面，回收站页面。
-- popup面板，可快捷切换主题色。
-- popup面板，可快捷访问和关闭当前打开的标签页。
+Additionally, the `N-Tab` extension is open-source, but after reviewing it, I found the tech stack a bit outdated, making it difficult to contribute effectively.
 
-![NiceTab-扩展图标点击](https://github.com/user-attachments/assets/cf65a363-3a2b-465a-936c-8fc8274856dc)
+Based on the above reasons, I decided to develop the `NiceTab` extension. incorporate additional features upon some features from `OneTab`, `N-Tab`, to enhance the experience.
 
-![NiceTab-扩展图标点击](https://github.com/user-attachments/assets/899bfd01-c426-4c5b-af5e-0beb52882edf)
+## Features
 
-### 右键菜单
-右击扩展图标，展示右键菜单，可打开扩展管理后台页面。支持 一键发送 所有标签页、当前标签页、其他标签页、左侧标签页、右侧标签页。
+- Manage categories, tab groups, and tabs. Includes easy saving, restoring, starring (favorites), locking, adding, deleting, editing, searching, and drag-and-drop reordering, etc.
+- Categories support expand/collapse, creation of categories and tab groups, making it easy to move other tab groups/tabs to new categories/groups.
+- Offers **import/export** in multiple formats, with local file saving supported. Currently supports cross-import/export for `NiceTab`, `Toby`, `OneTab`, and `KepTab`. (e.g., import OneTab format then export to NiceTab format, or export from NiceTab to OneTab format.) More formats can be added later as needed.
+- Supports **remote syncing** (note that merging push do not perform a diff-comparison delete; it merges remote and local, then pushes to remote. To sync deletions, remove them locally and then manually overwrite the remote):
+  - Gists Sync: You can sync your data to GitHub or Gitee by configuring your personal access token (note, token permissions only check `gists` scope). Potentially more platforms may be supported in the future.
+  - WebDAV Sync: You can sync your data to a WebDAV service by configuring the WebDAV URL, username, and password (supports multiple WebDAV accounts).
+  - Auto Sync: Automatic synchronization is supported; you can enable/disable it and set syncing frequency and method.
+- Supports manual switch for **Light/Dark** themes.
+- Supports **Theme color switch**, currently with several preset theme colors(More can be added later as needed).
+- **Multilingual support**, currently Chinese and English (contributions for more natural English or additional languages are welcome).
+- Supports **Recycle Bin** feature: deleted tabs, tab groups, and categories go to a recycle bin where you can restore or permanently delete them.
+- Supports browser command shortcuts (open the NiceTab-Admin-Page, send all tabs, send the current tab, etc.).
+- Option to **Open NiceTab Admin Page after launching the browser**.
+- Option to **Pin the NiceTab Admin Page**.
+- Option to **Send pinned tabs to NiceTab when sending tabs**.
+- Option to **Open NiceTab Admin Page when sending tabs**.
+- Option to **Automatically close tabs when sending tabs**.
+- Option to **Show "Send To" modal when sending tabs**.
+- Option to **Retain duplicate groups when sending tabs**.
+- Option to **Retain duplicate tabs when sending tabs**.
+- Configurable **Exclude domains for sending tabs** (regex supported) so certain sites or pages are never sent to NiceTab.
+- Option to **Open tab group in a new window when opening**.
+- Option to **Remove tabs when opening tabs or tab group**.
+- Option to **Restore the unnamed group as a browser tab group**.
+- Option to **Modifier key for silently opening a tab**.
+- Option to **Remove empty groups when clearing tabs**.
+- Option to **Confirm before removing tabs**.
+- Configurable **Copy links format template for tab groups**.
+- Option to **Display the number of open tabs on the extension icon**.
+- Option to **Display ContextMenu on your webpage**.
+- Configurable **popup panel modules**: you can configure which modules to display in the popup. If none are selected, clicking the extension icon sends all tabs to NiceTab by default.
+- Option to **Automatically expand the tree list on Home Page**.
+- Supports send all tabs, current tab, other tabs, left-side tabs, and right-side tabs in just one click.
+- Supports sending native browser tab groups into NiceTab, and re-open them as native tab groups in your browser.
+- Supports keyboard shortcuts for certain operations, such as reordering categories or tab groups.
+- Tabs support custom editing of title and URL.
+- "**Staging Area**" category is fixed at the top; tabs/tab groups sent will be automatically save to the category.
+- Supports sorting tab groups by group name or creation time.
+- Supports one-click copying of all links in a tab group, with a customizable link template.
+- Supports tab and URL search, and jump straight to the result.
+- Supports import/export and remote sync for both tabs (existing) and preference settings (newly supported).
 
-![NiceTab-扩展图标右键菜单](https://github.com/user-attachments/assets/2fe82628-9dde-4cba-b336-6ca59b2ec5eb)
+## Screenshots of Features
 
-### 扩展管理后台-列表页
-- 管理发送到NiceTab的标签页，支持分类，标签组管理。
-- 左侧列表支持拖拽和快捷键排序，右侧面板展示当前分类中的所有标签组和标签页，可进行相应的操作。
-- 支持标签组删除和跨分类移动，以及多选标签页删除和跨标签组移动。
+### Extension Icon (Popup)
 
-![NiceTab-列表页](https://github.com/user-attachments/assets/03a534d0-c034-4b9a-98fd-2d8d084ebcd3)
+- By default, clicking the `NiceTab` extension icon opens a popup panel where you can quickly access the  list page, settings page, import/export page, sync page and recycle bin page.
+- You can quickly switch theme colors or view/close the current open tab.
+- If none popup modules are configured in preferences, clicking the extension icon will sends all tabs to NiceTab by default.
 
-### 扩展管理后台-偏好设置页
-您可根据自己的喜好，进行相应的偏好设置。
+Screenshots of other actions are not yet updated.
 
-截图待更新。
-![NiceTab-偏好设置页](https://github.com/user-attachments/assets/90e19998-206b-42de-9329-410e553955a4)
+![NiceTab-extension-icon-1](https://github.com/user-attachments/assets/cf65a363-3a2b-465a-936c-8fc8274856dc)
 
-### 扩展管理后台-导入导出
-导入导出功能目前支持 `NiceTab` 和 `OneTab`、`Toby`、`KepTab` 格式的交叉导入导出。
-- 支持导入 `OneTab`、`Toby`、`KepTab` 格式的列表并解析为 `NiceTab` 格式。
-- 支持将 `NiceTab`格式的列表导出为 `NiceTab`、`OneTab`、`Toby`、`KepTab` 格式。
+![NiceTab-extension-icon-2](https://github.com/user-attachments/assets/899bfd01-c426-4c5b-af5e-0beb52882edf)
 
-`Toby` 和 `KepTab` 格式导入导出的截图暂未更新。
-![NiceTab-导入导出](https://github.com/user-attachments/assets/e2ea4b00-3531-4819-b67a-e45f09b4e948)
+### Right-Click Menu
 
-### 远程同步功能
-远程同步支持 gitee gists, github gists 和 webdav 同步。
-- gists 同步：您可根据需求将标签页同步到自己的 github 和 gitee 账号，只需要配置自己的 access token 即可。    
-- webdav 同步：您可根据需求将标签页同步到自己的 webDAV 网盘，只需要配置 webDAV 的 url，username，password即可（支持配置多个 webDAV 账号）。
+- Right-clicking the extension icon reveals a quick-access context menu, you can open the `NiceTab Admin Page` (aka `Dashboard`) or try one-click actions to send all tabs, the current tab, other tabs, left-side tabs, or right-side tabs.
 
-**注意**：
-- gists token 权限只勾选 gists 操作
-- 合并推送不进行diff对比删除操作，而是合并远程和本地，然后推送到远程，所以标签页是会逐渐增多的，想要同步删除操作的话，请删除标签页后手动覆盖推送到远程
+![NiceTab-right-click-menu](https://github.com/user-attachments/assets/2fe82628-9dde-4cba-b336-6ca59b2ec5eb)
 
-webdav 方式远程同步截图暂未更新。
+### Tab List
 
-![NiceTab-远程同步功能](https://github.com/user-attachments/assets/1d082c8f-4660-4f8e-9ac9-7cf468178ee1)
+- Manage sent tabs in categories and groups.
+- The left panel supports drag-and-drop reordering and shortcuts sorting. The right panel displays all tab groups and tabs for the current category, and allows corresponding operations.
+- You can easily delete tab groups or move them to other categories. Multiple tabs can also be selected and moved or deleted in bulk.
 
-### 主题色切换
-插件支持主题色切换，您可以在扩展管理后台页或者 popup 弹窗中进行切换。
+![NiceTab-list-page](https://github.com/user-attachments/assets/03a534d0-c034-4b9a-98fd-2d8d084ebcd3)
 
-![NiceTab-主题色切换](https://github.com/user-attachments/assets/9e6dce98-8b6e-4fe7-846d-d5a00f410e6d)
+### Preferences
 
-### 亮色/暗黑主题切换
-插件支持亮色/暗黑主题切换，您可以在扩展管理后台页中进行切换。
+- Customize various preference settings according to your own preferences.
 
-![NiceTab-亮色-黑暗主题切换](https://github.com/user-attachments/assets/8d7a6f02-9feb-4289-b9f8-f066ab02f32e)
+![NiceTab-preferences](https://github.com/user-attachments/assets/90e19998-206b-42de-9329-410e553955a4)
 
-### 切换语言
-插件支持语言切换，您可以在扩展管理后台页进行切换。
+### Import/Export
 
-![NiceTab-切换语言](https://github.com/user-attachments/assets/2d6b2348-a666-4996-bdd9-8653dfabf1d4)
+- Currently supports cross-import/export for `NiceTab`, `Toby`, `OneTab`, and `KepTab` formats.
+- You can import `OneTab`, `Toby` or `KepTab` data, and parsed into `NiceTab` format.
+- You can export `NiceTab` data to `NiceTab`, `OneTab`, `Toby` or `KepTab` format.
 
-### 扩展管理后台-回收站
-- 分类、标签组、标签页删除后，会保留到回收站，您可将回收站的分类、标签组等还原到列表页或者彻底删除。
+Screenshots of KepTab and Toby format imports/exports are not yet updated.
 
-![NiceTab-回收站](https://github.com/user-attachments/assets/016cb266-fe12-4063-b786-c979288f01fb)
+![NiceTab-import-export](https://github.com/user-attachments/assets/e2ea4b00-3531-4819-b67a-e45f09b4e948)
 
+### Remote Sync
 
-## 使用
-- 点击扩展图标，打开popup面板，显示当前已打开的标签页列表，可快速访问扩展管理后台，快速切换主题。
-- 右击扩展图标，展示快捷操作菜单，可发送标签页到扩展管理后台。
-- 打开**管理后台**，可进行语言切换和主题切换。
-- 打开**管理后台**，可进行亮色/暗黑主题切换。
-- 打开**管理后台 > 标签列表**页，查看已发送的标签页列表，支持分类和标签组管理。
-- 打开**管理后台 > 设置**页，可保存扩展的偏好设置。
-- 打开**管理后台 > 导入导出**页，可进行 NiceTab、OneTab、Toby、KepTab 格式的标签页导入导出操作。
-- 打开**管理后台 > 同步**页，可根据需求将标签页同步到自己的 github 和 gitee 账号，只需要配置自己的 access token 即可（注意 token 权限只勾选 gists 操作）。
-- 打开**管理后台 > 回收站**页，可查看和管理从标签列表页中删除的分类、标签组、标签页，并进行还原和删除操作。
+Supports syncing via Gitee Gists, GitHub Gists, and WebDAV:
+- Gists Sync: You can sync your data to your Github and Gitee accounts as needed, just configure your access token.
+- WebDAV Sync: You can sync your data to a WebDAV service by configuring the WebDAV URL, username, and password (supports multiple WebDAV accounts).
 
+**Note**:
+- For gists, token permissions only check `gists` scope.
+- Merging push sync does not perform a diff-comparison delete. It merges remote and local data, then pushes to remote, so tabs increase cumulatively. To sync deletions, remove them locally and then manually overwrite the remote.
 
-## 沟通交流
+Screenshots of WebDAV sync are not yet updated.
 
-### QQ群: 924270240
+![NiceTab-remote-sync](https://github.com/user-attachments/assets/1d082c8f-4660-4f8e-9ac9-7cf468178ee1)
 
-<img width="300" alt="NiceTab交流群" src="https://github.com/user-attachments/assets/f773c96e-8f4f-4e53-9ffa-20c11690675a">
+### Theme Color Switching
 
-## 参考链接
-- [Chrome for Developers - Extensions > API 参考](https://developer.chrome.com/docs/extensions/reference/api?hl=zh-cn)
-- [WXT 官网](https://wxt.dev/)
-- [Ant Design](https://ant-design.antgroup.com/index-cn)
-- [React Router](https://reactrouter.com/)
-- [styled-components](https://styled-components.com/)
-- [react-intl](https://formatjs.io/docs/react-intl)
-- [pragmatic-drag-and-drop](https://atlassian.design/components/pragmatic-drag-and-drop/about)
-- [【干货】Chrome插件(扩展)开发全攻略](https://www.cnblogs.com/liuxianan/p/chrome-plugin-develop.html)
+You can easily switch theme colors in the management dashboard or the popup panel.
 
+![NiceTab-theme-color-switch](https://github.com/user-attachments/assets/9e6dce98-8b6e-4fe7-846d-d5a00f410e6d)
 
-## 插件开发
+### Light/Dark Mode
 
-- 依赖安装：`pnpm install`
-- 启动插件服务：`pnpm run dev`
-- 
-**注意**：每个js文件都必须有 `export default` 默认导出，否则本地启动服务时会报错。
+Light and dark themes are available, which can be toggled in the management dashboard.
+
+![NiceTab-light-dark-switch](https://github.com/user-attachments/assets/8d7a6f02-9feb-4289-b9f8-f066ab02f32e)
+
+### Language Switching
+
+Switch between Chinese and English in the management dashboard.
+
+![NiceTab-language-switch](https://github.com/user-attachments/assets/2d6b2348-a666-4996-bdd9-8653dfabf1d4)
+
+### Recycle Bin
+
+- Deleted categories, tab groups, or tabs go into the recycle bin.
+- You can restore them back to the tab list or permanently delete them.
+
+![NiceTab-recycle-bin](https://github.com/user-attachments/assets/016cb266-fe12-4063-b786-c979288f01fb)
+
+## Usage
+
+- Click the extension icon to open the popup panel displaying the currently open tabs. From there, you can access the Admin Page or quickly switch themes, etc.
+- Right-click the extension icon to display context menu items for sending tabs to NiceTab.
+- In the Dashboard (Admin Page), you can switch languages and themes, or toggle light/dark mode.
+- In `Dashboard > List` page, view all sent tabs organized by category and group.
+- In `Dashboard > Settings` page, manage the extension's preferences.
+- In `Dashboard > Import & Export` page, import or export tabs in NiceTab, OneTab, Toby or KepTab formats.
+- In `Dashboard > Sync` page, sync tabs to your Github and Gitee accounts as needed, just configure your access token (note, token permissions only check `gists` scope).
+- In `Dashboard > Recycle Bin` page, view and manage any deleted categories, tab groups, or tabs. You can restore or permanently delete them.
+
+## Community & Feedback
+
+Feel free to join our QQ group: 924270240
+
+<img width="300" alt="NiceTab Community" src="https://github.com/user-attachments/assets/f773c96e-8f4f-4e53-9ffa-20c11690675a">
+
+## References
+
+- [Chrome for Developers - Extensions API Docs](https://developer.chrome.com/docs/extensions/reference/api?hl=zh-cn)  
+- [WXT Official Site](https://wxt.dev/)  
+- [Ant Design](https://ant-design.antgroup.com/)  
+- [React Router](https://reactrouter.com/)  
+- [styled-components](https://styled-components.com/)  
+- [react-intl](https://formatjs.io/docs/react-intl)  
+- [pragmatic-drag-and-drop](https://atlassian.design/components/pragmatic-drag-and-drop/about)  
+- [“Complete Guide to Developing Chrome Extensions” (Chinese)](https://www.cnblogs.com/liuxianan/p/chrome-plugin-develop.html)
+
+## Extension Development
+
+- Install dependencies:  
+  `pnpm install`
+- Start the dev server:  
+  `pnpm run dev`
+
+Important: Each `.js .ts .tsx` file must have an `export default` statement. Otherwise, you'll encounter errors when running the local service.
