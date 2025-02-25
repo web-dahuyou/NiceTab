@@ -1,8 +1,8 @@
 import React, { useContext, useCallback, useEffect, useState } from 'react';
 import { browser, Tabs } from 'wxt/browser';
 import { ThemeProvider } from 'styled-components';
-import { theme, Button } from 'antd';
-import { CloseOutlined } from '@ant-design/icons';
+import { theme, Space, Dropdown, Button, type MenuProps } from 'antd';
+import { CloseOutlined, DownOutlined, CoffeeOutlined } from '@ant-design/icons';
 import {
   classNames,
   sendRuntimeMessage,
@@ -12,10 +12,10 @@ import '~/assets/css/reset.css';
 import '~/assets/css/index.css';
 import './App.css';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { getAdminTabInfo, openNewTab } from '~/entrypoints/common/tabs';
+import { getAdminTabInfo, openNewTab, discardOtherTabs } from '~/entrypoints/common/tabs';
 import { getMenus, strategyHandler } from '~/entrypoints/common/contextMenus';
 import { settingsUtils } from '~/entrypoints/common/storage';
-import { TAB_EVENTS } from '~/entrypoints/common/constants';
+import { TAB_EVENTS, ENUM_ACTION_NAME } from '~/entrypoints/common/constants';
 import type { PopupModuleNames } from '~/entrypoints/types';
 import {
   GITHUB_URL,
@@ -31,9 +31,11 @@ import {
 import { StyledContainer, StyledList, StyledFavIcon } from './App.styled';
 
 interface ActionBtnItem {
-  action?: string;
-  label?: string;
+  key: string;
+  label: string;
+  type?: 'group';
   disabled?: boolean;
+  children?: ActionBtnItem[];
   onClick?: () => void;
 }
 
@@ -73,22 +75,36 @@ export default function App() {
     },
   ];
   // 操作按钮
-  const getActionBtns = async () => {
-    const menus = await getMenus();
+  const getActionBtns = async (): Promise<ActionBtnItem[]> => {
+    let menus = await getMenus();
+    menus = menus.filter((menu) => menu.id !== ENUM_ACTION_NAME.OPEN_ADMIN_TAB);
+
     return [
-      ...menus.map((menu) => ({
-        action: menu.id,
-        label: menu.title,
-        disabled: menu.enabled === false,
-        onClick: async () => {
-          await strategyHandler(String(menu.id));
-          setTimeout(() => {
-            init();
-          }, 500);
-        },
-      })),
       {
-        action: 'reload',
+        type: 'group',
+        key: 'group-sendTabs',
+        label: $fmt('common.sendTabs'),
+        children: menus.map((menu) => ({
+          key: menu.id!,
+          label: menu.title!,
+          disabled: menu.enabled === false,
+          onClick: async () => {
+            await strategyHandler(String(menu.id));
+            setTimeout(() => {
+              init();
+            }, 500);
+          },
+        })),
+      },
+      {
+        key: 'discardTabs',
+        label: $fmt('common.discardTabs'),
+        onClick: () => {
+          discardOtherTabs();
+        },
+      },
+      {
+        key: 'reload',
         label: $fmt('common.reload'),
         onClick: () => {
           browser.runtime.reload();
@@ -106,6 +122,20 @@ export default function App() {
   const handleTabItemClick = useCallback((tab: Tabs.Tab) => {
     browser.tabs.highlight({ tabs: [tab.index] });
   }, []);
+
+  const handleDiscard = useCallback(
+    async (event: React.MouseEvent<HTMLElement, MouseEvent>, tab: Tabs.Tab) => {
+      event.stopPropagation();
+      if (tab.active || tab.discarded) return;
+
+      tab.id && (await browser.tabs.discard(tab.id));
+      browser.tabs.query({ currentWindow: true }).then(async (allTabs) => {
+        const { tab: adminTab } = await getAdminTabInfo();
+        setTabs(allTabs?.filter((t) => t.id !== adminTab?.id && !t.pinned));
+      });
+    },
+    [tabs]
+  );
 
   const handleDelete = useCallback(
     async (event: React.MouseEvent<HTMLElement, MouseEvent>, tab: Tabs.Tab) => {
@@ -154,6 +184,7 @@ export default function App() {
       <StyledContainer className="popup-container select-none">
         <GlobalStyle />
         <div className="fixed-top">
+          {/* 该模块不会渲染，目前未配置模块时，单击扩展图标会直接发送所有标签页，不会打开popup面板 */}
           {!modules.length && (
             <div className="block quick-actions">
               <span
@@ -164,14 +195,14 @@ export default function App() {
               </span>
             </div>
           )}
-
+          {/* 模块-扩展信息 */}
           {modules.includes('extensionInfo') && (
             <div className="block version">
               <span className="block-title">{$fmt('common.version')}：</span>
               {version}
             </div>
           )}
-
+          {/* 模块-前往 */}
           {modules.includes('goto') && (
             <div className="block quick-actions">
               <span className="block-title">{$fmt('common.goto')}：</span>
@@ -184,23 +215,47 @@ export default function App() {
               </div>
             </div>
           )}
+          {/* 模块-操作 */}
           {modules.includes('actions') && (
             <div className="block quick-actions">
               <span className="block-title">{$fmt('common.actions')}：</span>
               <div className="block-content">
-                {actionBtns.map((item) => (
-                  <Button
-                    key={item.action}
-                    size="small"
-                    disabled={item.disabled}
-                    onClick={item.onClick}
-                  >
-                    {item.label}
-                  </Button>
-                ))}
+                {actionBtns.map((item) => {
+                  if (item.type === 'group' && item.children?.length) {
+                    return (
+                      <Dropdown
+                        key={item.key}
+                        className="actions-dropdown-menus"
+                        menu={{
+                          items: item.children as MenuProps['items'],
+                          onClick: item.onClick,
+                        }}
+                        placement="bottomLeft"
+                      >
+                        <Button size="small">
+                          <Space>
+                            {item.label}
+                            <DownOutlined />
+                          </Space>
+                        </Button>
+                      </Dropdown>
+                    );
+                  } else {
+                    return (
+                      <Button
+                        size="small"
+                        disabled={item.disabled}
+                        onClick={item.onClick}
+                      >
+                        {item.label}
+                      </Button>
+                    );
+                  }
+                })}
               </div>
             </div>
           )}
+          {/* 模块-主题切换 */}
           {modules.includes('theme') && (
             <div className="block theme-colors">
               <span className="block-title">{$fmt('common.theme')}：</span>
@@ -212,12 +267,17 @@ export default function App() {
           )}
         </div>
 
+        {/* 模块-已打开标签页列表 */}
         {modules.includes('openedTabs') && (
           <StyledList className="tab-list">
             {tabs.map((tab) => (
               <li
                 key={tab.id}
-                className={classNames('tab-item', tab.active && 'active')}
+                className={classNames(
+                  'tab-item',
+                  tab.active && 'active',
+                  tab.discarded && 'discarded'
+                )}
                 title={tab.title}
                 onClick={() => handleTabItemClick(tab)}
               >
@@ -226,9 +286,24 @@ export default function App() {
                   $icon={tab.favIconUrl || getFaviconURL(tab.url!)}
                 />
                 <span className="tab-item-title">{tab.title}</span>
+
+                { !tab.active && (
+                  <StyledActionIconBtn
+                      className={classNames("action-icon-btn", tab.discarded && "btn-discarded")}
+                      $size={16}
+                      $hoverColor={tab.discarded ? '' : 'red' }
+                      title={$fmt(tab.discarded ? 'common.discarded' : 'common.discard')}
+                      onClick={(event) => handleDiscard(event, tab)}
+                    >
+                    <CoffeeOutlined />
+                  </StyledActionIconBtn>
+                ) }
+
                 <StyledActionIconBtn
                   className="action-icon-btn"
+                  $size={16}
                   $hoverColor="red"
+                  title={$fmt('common.remove')}
                   onClick={(event) => handleDelete(event, tab)}
                 >
                   <CloseOutlined />

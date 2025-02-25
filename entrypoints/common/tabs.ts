@@ -41,11 +41,9 @@ export async function sendTabMessage(
   }: SendTabMsgEventProps,
   errorCallback?: () => void
 ) {
-  const { tab: adminTab } = await getAdminTabInfo();
   if (onlyCurrentTab) {
     const currentTabs = await browser.tabs.query({ active: true, currentWindow: true });
     const currentTab = currentTabs?.[0];
-    if (currentTab.id === adminTab?.id) return;
 
     if (currentTab?.id) {
       try {
@@ -445,6 +443,17 @@ export async function openNewGroup(groupName: string, urls: Array<string | undef
       });
       browser.tabGroups?.update(bsGroupId, { title: groupName });
     });
+  }
+}
+
+// 冻结当前标签页以外的标签页
+export async function discardOtherTabs() {
+  const { tab: adminTab } = await getAdminTabInfo();
+  const tabs = await browser.tabs.query({ currentWindow: true });
+  for (let tab of tabs) {
+    if (tab.id && tab.id !== adminTab?.id && !tab.active) {
+      browser.tabs.discard(tab.id);
+    }
   }
 }
 

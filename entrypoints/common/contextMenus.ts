@@ -197,13 +197,14 @@ export async function handleSendTabsAction(
 
 // 右键菜单点击以及快捷命令操作
 export async function strategyHandler(actionName: string) {
-  const { tab: adminTab } = await tabUtils.getAdminTabInfo();
-  const currentTabs = await browser.tabs.query({ active: true, currentWindow: true });
-  const currentTab = currentTabs?.[0];
-  if (currentTab.id === adminTab?.id) {
-    actionHandler(actionName);
-    return;
-  };
+  // 注释掉，放开拦截限制，在管理后台页面也允许展示发送目标选择弹窗
+  // const { tab: adminTab } = await tabUtils.getAdminTabInfo();
+  // const currentTabs = await browser.tabs.query({ active: true, currentWindow: true });
+  // const currentTab = currentTabs?.[0];
+  // if (currentTab.id === adminTab?.id) {
+  //   actionHandler(actionName);
+  //   return;
+  // };
 
   if (actionName === ENUM_ACTION_NAME.OPEN_ADMIN_TAB) {
     actionHandler(actionName);

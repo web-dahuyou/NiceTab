@@ -11,6 +11,10 @@ export default class StateUtils {
   };
   state: StateProps = this.initialState;
 
+  constructor() {
+    this.getState();
+  }
+
   async setState(state: StateProps) {
     this.state = { ...this.initialState, ...state };
     return await storage.setItem<StateProps>(this.storageKey, this.state);

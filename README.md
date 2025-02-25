@@ -60,6 +60,7 @@ Based on the above reasons, I decided to develop the `NiceTab` extension. incorp
 - Option to **Show "Send To" modal when sending tabs**.
 - Option to **Retain duplicate groups when sending tabs**.
 - Option to **Retain duplicate tabs when sending tabs**.
+- Option to **Show "Send To" modal when sending tabs**. You can send tabs to a specified category or tab group.
 - Configurable **Exclude domains for sending tabs** (regex supported) so certain sites or pages are never sent to NiceTab.
 - Option to **Open tab group in a new window when opening**.
 - Option to **Remove tabs when opening tabs or tab group**.
@@ -81,6 +82,7 @@ Based on the above reasons, I decided to develop the `NiceTab` extension. incorp
 - Supports one-click copying of all links in a tab group, with a customizable link template.
 - Supports tab and URL search, and jump straight to the result.
 - Supports import/export and remote sync for both tabs (existing) and preference settings (newly supported).
+- Supports manually discard tabs from memory. Discarded tabs are still visible on the tab strip and are reloaded when activated.
 
 ## Screenshots of Features
 
