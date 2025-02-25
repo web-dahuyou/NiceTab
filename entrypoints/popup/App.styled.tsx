@@ -91,6 +91,11 @@ export const StyledList = styled.div<{theme: StyledThemeProps}>`
       flex-shrink: 0;
       margin-left: 8px;
     }
+    &.discarded {
+      .tab-item-title, .btn-discarded {
+        color: ${props => props.theme.colorTextQuaternary || 'rgba(0, 0, 0, 0.25)'};
+      }
+    }
   }
 `;
 

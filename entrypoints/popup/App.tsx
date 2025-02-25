@@ -2,7 +2,7 @@ import React, { useContext, useCallback, useEffect, useState } from 'react';
 import { browser, Tabs } from 'wxt/browser';
 import { ThemeProvider } from 'styled-components';
 import { theme, Space, Dropdown, Button, type MenuProps } from 'antd';
-import { CloseOutlined, DownOutlined } from '@ant-design/icons';
+import { CloseOutlined, DownOutlined, CoffeeOutlined } from '@ant-design/icons';
 import {
   classNames,
   sendRuntimeMessage,
@@ -12,7 +12,7 @@ import '~/assets/css/reset.css';
 import '~/assets/css/index.css';
 import './App.css';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { getAdminTabInfo, openNewTab } from '~/entrypoints/common/tabs';
+import { getAdminTabInfo, openNewTab, discardOtherTabs } from '~/entrypoints/common/tabs';
 import { getMenus, strategyHandler } from '~/entrypoints/common/contextMenus';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import { TAB_EVENTS, ENUM_ACTION_NAME } from '~/entrypoints/common/constants';
@@ -97,6 +97,13 @@ export default function App() {
         })),
       },
       {
+        key: 'discardTabs',
+        label: $fmt('common.discardTabs'),
+        onClick: () => {
+          discardOtherTabs();
+        },
+      },
+      {
         key: 'reload',
         label: $fmt('common.reload'),
         onClick: () => {
@@ -115,6 +122,20 @@ export default function App() {
   const handleTabItemClick = useCallback((tab: Tabs.Tab) => {
     browser.tabs.highlight({ tabs: [tab.index] });
   }, []);
+
+  const handleDiscard = useCallback(
+    async (event: React.MouseEvent<HTMLElement, MouseEvent>, tab: Tabs.Tab) => {
+      event.stopPropagation();
+      if (tab.active || tab.discarded) return;
+
+      tab.id && (await browser.tabs.discard(tab.id));
+      browser.tabs.query({ currentWindow: true }).then(async (allTabs) => {
+        const { tab: adminTab } = await getAdminTabInfo();
+        setTabs(allTabs?.filter((t) => t.id !== adminTab?.id && !t.pinned));
+      });
+    },
+    [tabs]
+  );
 
   const handleDelete = useCallback(
     async (event: React.MouseEvent<HTMLElement, MouseEvent>, tab: Tabs.Tab) => {
@@ -252,7 +273,11 @@ export default function App() {
             {tabs.map((tab) => (
               <li
                 key={tab.id}
-                className={classNames('tab-item', tab.active && 'active')}
+                className={classNames(
+                  'tab-item',
+                  tab.active && 'active',
+                  tab.discarded && 'discarded'
+                )}
                 title={tab.title}
                 onClick={() => handleTabItemClick(tab)}
               >
@@ -261,9 +286,24 @@ export default function App() {
                   $icon={tab.favIconUrl || getFaviconURL(tab.url!)}
                 />
                 <span className="tab-item-title">{tab.title}</span>
+
+                { !tab.active && (
+                  <StyledActionIconBtn
+                      className={classNames("action-icon-btn", tab.discarded && "btn-discarded")}
+                      $size={16}
+                      $hoverColor={tab.discarded ? '' : 'red' }
+                      title={$fmt(tab.discarded ? 'common.discarded' : 'common.discard')}
+                      onClick={(event) => handleDiscard(event, tab)}
+                    >
+                    <CoffeeOutlined />
+                  </StyledActionIconBtn>
+                ) }
+
                 <StyledActionIconBtn
                   className="action-icon-btn"
+                  $size={16}
                   $hoverColor="red"
+                  title={$fmt('common.remove')}
                   onClick={(event) => handleDelete(event, tab)}
                 >
                   <CloseOutlined />

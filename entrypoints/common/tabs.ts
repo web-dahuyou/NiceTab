@@ -446,6 +446,17 @@ export async function openNewGroup(groupName: string, urls: Array<string | undef
   }
 }
 
+// 冻结当前标签页以外的标签页
+export async function discardOtherTabs() {
+  const { tab: adminTab } = await getAdminTabInfo();
+  const tabs = await browser.tabs.query({ currentWindow: true });
+  for (let tab of tabs) {
+    if (tab.id && tab.id !== adminTab?.id && !tab.active) {
+      browser.tabs.discard(tab.id);
+    }
+  }
+}
+
 export default {
   sendTabMessage,
   executeContentScript,

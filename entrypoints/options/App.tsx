@@ -31,6 +31,7 @@ import {
   MenuOutlined,
   ReloadOutlined,
   KeyOutlined,
+  CoffeeOutlined,
 } from '@ant-design/icons';
 import styled, { ThemeProvider } from 'styled-components';
 import '~/assets/css/reset.css';
@@ -49,7 +50,7 @@ import {
   THEME_COLORS,
   defaultThemeType,
 } from '~/entrypoints/common/constants';
-import { openNewTab } from '~/entrypoints/common/tabs';
+import { openNewTab, discardOtherTabs } from '~/entrypoints/common/tabs';
 import {
   StyledActionIconBtn,
   GlobalStyle,
@@ -242,6 +243,7 @@ function AppLayout() {
   const extActionOptions: MenuProps['items'] = [
     { key: 'sendAllTabs', icon: <SendOutlined />, label: $fmt('common.sendAllTabs') },
     { key: 'bindShortcuts', icon: <KeyOutlined />, label: $fmt('common.bindShortcuts') },
+    { key: 'discardTabs', icon: <CoffeeOutlined />, label: $fmt('common.discardTabs') },
     { key: 'reload', icon: <ReloadOutlined />, label: $fmt('common.reload') },
   ];
 
@@ -255,6 +257,8 @@ function AppLayout() {
         active: true,
         openToNext: true,
       });
+    } else if (key === 'discardTabs') {
+      discardOtherTabs();
     }
   };
 
