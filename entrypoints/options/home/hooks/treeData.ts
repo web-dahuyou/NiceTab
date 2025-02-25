@@ -1,5 +1,4 @@
 import React, { createContext, useCallback, useEffect, useState, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import type { TreeProps } from 'antd';
 import type { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
 import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
@@ -27,7 +26,6 @@ export const HomeContext = createContext<HomeContextProps>({
 });
 
 export function useTreeData() {
-  const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState<boolean>(true);
   const [countInfo, setCountInfo] = useState<CountInfo>();
   const [tagList, setTagList] = useState<TagItem[]>([]);

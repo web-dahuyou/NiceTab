@@ -41,11 +41,9 @@ export async function sendTabMessage(
   }: SendTabMsgEventProps,
   errorCallback?: () => void
 ) {
-  const { tab: adminTab } = await getAdminTabInfo();
   if (onlyCurrentTab) {
     const currentTabs = await browser.tabs.query({ active: true, currentWindow: true });
     const currentTab = currentTabs?.[0];
-    if (currentTab.id === adminTab?.id) return;
 
     if (currentTab?.id) {
       try {

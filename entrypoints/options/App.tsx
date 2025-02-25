@@ -38,9 +38,10 @@ import '~/assets/css/index.css';
 import { IconTheme } from '~/entrypoints/common/components/icon/CustomIcon';
 import ColorList from '~/entrypoints/common/components/ColorList.tsx';
 import { pick, sendRuntimeMessage } from '~/entrypoints/common/utils';
-import { ENUM_ACTION_NAME } from '~/entrypoints/common/constants';
-import { actionHandler } from '~/entrypoints/common/contextMenus';
+import { ENUM_ACTION_NAME, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
+import { actionHandler } from '../common/contextMenus';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { settingsUtils } from '~/entrypoints/common/storage';
 import useUpdate from '~/entrypoints/common/hooks/update';
 import {
   GITHUB_URL,
@@ -53,12 +54,21 @@ import {
   StyledActionIconBtn,
   GlobalStyle,
 } from '~/entrypoints/common/style/Common.styled';
-import type { StyledThemeProps, PageModuleNames, PageWidthTypes } from '~/entrypoints/types';
+import type {
+  StyledThemeProps,
+  PageModuleNames,
+  PageWidthTypes,
+} from '~/entrypoints/types';
 import Home from './home/index.tsx';
 import Settings from './settings/index.tsx';
 import ImportExport from './importExport/index.tsx';
 import SyncPage from './sync/index.tsx';
 import RecycleBin from './recycleBin/index.tsx';
+import SendTargetActionHolder, {
+  type SendTargetActionHolderProps,
+} from '~/entrypoints/options/home/SendTargetActionHolder';
+
+const { SHOW_SEND_TARGET_MODAL } = ENUM_SETTINGS_PROPS;
 
 const StyledPageContainer = styled.div<{
   theme: StyledThemeProps;
@@ -179,6 +189,8 @@ function AppLayout() {
   const { updateDetail, updateReload } = useUpdate();
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const { $fmt, locale } = useIntlUtls();
+  const sendTargetActionRef = useRef<SendTargetActionHolderProps>();
+
   const { version, themeTypeConfig, pageWidthType } = NiceGlobalContext;
   const navs = useMemo(() => {
     return navsTemplate.map((item) => {
@@ -215,8 +227,15 @@ function AppLayout() {
     sendRuntimeMessage({ msgType: 'setLocale', data: { locale: option.locale } });
   }, []);
 
-  const handleSendAllTabs = useCallback(() => {
-    actionHandler(ENUM_ACTION_NAME.SEND_ALL_TABS);
+  const handleSendAllTabs = useCallback(async () => {
+    // 这里之所以没有直接使用 strategyHandler 方法，是因为在 option 页面中发送消息，本页面是不会监听到 runtimeMessage 消息的
+    const settings = await settingsUtils.getSettings();
+    if (settings[SHOW_SEND_TARGET_MODAL]) {
+      sendTargetActionRef.current?.show?.({ actionName: ENUM_ACTION_NAME.SEND_ALL_TABS });
+    } else {
+      // 该方法会直接发送，不会显示发送目标选择弹窗
+      actionHandler(ENUM_ACTION_NAME.SEND_ALL_TABS);
+    }
   }, []);
 
   // 插件操作选项
@@ -227,7 +246,6 @@ function AppLayout() {
   ];
 
   const handleExtActionClick: MenuProps['onClick'] = ({ key }) => {
-    console.log('handleExtActionClick-key', key);
     if (key === 'sendAllTabs') {
       handleSendAllTabs();
     } else if (key === 'reload') {
@@ -247,6 +265,8 @@ function AppLayout() {
 
   return (
     <ThemeProvider theme={{ ...themeTypeConfig, ...token }}>
+      <SendTargetActionHolder ref={sendTargetActionRef}></SendTargetActionHolder>
+
       <StyledPageContainer $widthType={pageWidthType} className="page-container">
         <GlobalStyle />
         <div className="header-navbar select-none">
