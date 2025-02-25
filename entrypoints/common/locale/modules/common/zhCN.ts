@@ -5,6 +5,7 @@ export default {
   'common.sync': '同步',
   'common.recycleBin': '回收站',
   'common.home': '首页',
+  'common.sendTabs': '发送标签页',
   'common.sendAllTabs': '发送所有标签页',
   'common.sendCurrentTab': '发送当前标签页',
   'common.sendOtherTabs': '发送其他标签页',

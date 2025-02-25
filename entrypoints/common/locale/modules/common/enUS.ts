@@ -5,6 +5,7 @@ export default {
   'common.sync': 'Sync',
   'common.recycleBin': 'Recycle Bin',
   'common.home': 'Home',
+  'common.sendTabs': 'Send Tabs',
   'common.sendAllTabs': 'Send All Tabs',
   'common.sendCurrentTab': 'Send Current Tab',
   'common.sendOtherTabs': 'Send Other Tabs',

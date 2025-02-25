@@ -3,9 +3,9 @@ import type { StyledThemeProps } from '~/entrypoints/types';
 import { StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
 
 export const StyledContainer = styled.div<{theme: StyledThemeProps}>`
-  min-width: 420px;
-  max-width: 520px;
-  min-height: 300px;
+  min-width: 460px;
+  max-width: 600px;
+  min-height: 420px;
   max-height: 590px; // 浏览器popup高度最大为600px, 超过这个高度会出现body滚动条
   display: flex;
   flex-direction: column;
