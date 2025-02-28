@@ -34,6 +34,7 @@ export default {
   'settings.deleteAfterRestore.yes': 'Remove (pinned tabs remain)',
   'settings.deleteAfterRestore.no': 'All remain (recommended)',
   'settings.unnamedGroupRestoreAsGroup': 'Restore the unnamed group as a browser tab group?',
+  'settings.namedGroupRestoreAsGroup': 'Restore the named group as a browser tab group?',
   'settings.silentOpenTabModifierKey': 'Modifier key for opening a tab silently (in background):',
   'settings.openTabModifierKey': 'Modifier key for opening a tab in foreground：',
   'settings.openTabModifierKey.tooltip': 'Foreground opening takes precedence over background opening. When both modifier keys are identical, the foreground opening behavior will be triggered.',

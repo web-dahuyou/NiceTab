@@ -34,6 +34,7 @@ export default {
   'settings.deleteAfterRestore.yes': '从NiceTab列表中删除（仍保留固定标签页）',
   'settings.deleteAfterRestore.no': '保留在NiceTab列表中（推荐）',
   'settings.unnamedGroupRestoreAsGroup': '恢复未命名标签组时-是否以标签组形式打开到浏览器：',
+  'settings.namedGroupRestoreAsGroup': '恢复已命名标签组时-是否以标签组形式打开到浏览器：',
   'settings.silentOpenTabModifierKey': '静默（后台）打开标签页使用的修饰键：',
   'settings.openTabModifierKey': '前台打开标签页使用的修饰键：',
   'settings.openTabModifierKey.tooltip': '前台打开方式优先级高于后台打开方式，意味着如果后台打开和前台打开的修饰键相同，则触发前台打开',

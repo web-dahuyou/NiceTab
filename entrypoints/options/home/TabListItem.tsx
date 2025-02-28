@@ -164,7 +164,7 @@ export default memo(function TabListItem({
       // 兜底使用前台打开方式 (正常不会走到这一步)
       handleTabOpen(true);
     }
-  }, []);
+  }, [handleTabOpen]);
 
   const draggingListener = (value: boolean) => {
     setIsDragging(value);

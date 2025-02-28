@@ -47,6 +47,7 @@ const {
   SILENT_OPEN_TAB_MODIFIER_KEY,
   OPEN_TAB_MODIFIER_KEY,
   UNNAMED_GROUP_RESTORE_AS_GROUP,
+  NAMED_GROUP_RESTORE_AS_GROUP,
   DELETE_UNLOCKED_EMPTY_GROUP,
   CONFIRM_BEFORE_DELETING_TABS,
   ALLOW_DUPLICATE_TABS,
@@ -418,6 +419,16 @@ export default function Settings() {
           <Form.Item<SettingsProps>
             label={$fmt(`${module}.${UNNAMED_GROUP_RESTORE_AS_GROUP}`)}
             name={UNNAMED_GROUP_RESTORE_AS_GROUP}
+          >
+            <Radio.Group>
+              <Radio value={true}>{$fmt('common.yes')}</Radio>
+              <Radio value={false}>{$fmt('common.no')}</Radio>
+            </Radio.Group>
+          </Form.Item>
+          {/* 是否以标签组形式恢复已命名标签组 */}
+          <Form.Item<SettingsProps>
+            label={$fmt(`${module}.${NAMED_GROUP_RESTORE_AS_GROUP}`)}
+            name={NAMED_GROUP_RESTORE_AS_GROUP}
           >
             <Radio.Group>
               <Radio value={true}>{$fmt('common.yes')}</Radio>
