@@ -128,6 +128,7 @@ export type SettingsProps = {
   deleteAfterRestore?: boolean; // 恢复标签页/标签组时是否从列表中删除
   unnamedGroupRestoreAsGroup?: boolean; // 是否以标签组形式恢复未命名标签组
   silentOpenTabModifierKey?: string; // 静默打开标签页的修饰键
+  openTabModifierKey?: string; // 前台打开标签页的修饰键
   deleteUnlockedEmptyGroup?: boolean; // 是否删除未锁定的空标签组
   confirmBeforeDeletingTabs?: boolean; // 删除标签页前是否确认
   allowDuplicateTabs?: boolean; // 同一个标签组中是否允许重复的标签页

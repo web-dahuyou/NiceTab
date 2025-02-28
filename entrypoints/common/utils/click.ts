@@ -1,4 +1,4 @@
-type ModifierKeys = 'alt' | 'ctrl' | 'meta' | 'shift';
+export type ModifierKeys = 'alt' | 'ctrl' | 'meta' | 'shift';
 
 interface ClickOptions {
   stop?: boolean;
