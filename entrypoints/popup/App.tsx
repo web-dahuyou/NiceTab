@@ -97,8 +97,8 @@ export default function App() {
         })),
       },
       {
-        key: 'discardTabs',
-        label: $fmt('common.discardTabs'),
+        key: 'hibernateTabs',
+        label: $fmt('common.hibernateTabs'),
         onClick: () => {
           discardOtherTabs();
         },
@@ -243,6 +243,7 @@ export default function App() {
                   } else {
                     return (
                       <Button
+                        key={item.key}
                         size="small"
                         disabled={item.disabled}
                         onClick={item.onClick}
@@ -291,8 +292,7 @@ export default function App() {
                   <StyledActionIconBtn
                       className={classNames("action-icon-btn", tab.discarded && "btn-discarded")}
                       $size={16}
-                      $hoverColor={tab.discarded ? '' : 'red' }
-                      title={$fmt(tab.discarded ? 'common.discarded' : 'common.discard')}
+                      title={$fmt(tab.discarded ? 'common.hibernated' : 'common.hibernate')}
                       onClick={(event) => handleDiscard(event, tab)}
                     >
                     <CoffeeOutlined />

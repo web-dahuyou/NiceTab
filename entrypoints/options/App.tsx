@@ -243,7 +243,7 @@ function AppLayout() {
   const extActionOptions: MenuProps['items'] = [
     { key: 'sendAllTabs', icon: <SendOutlined />, label: $fmt('common.sendAllTabs') },
     { key: 'bindShortcuts', icon: <KeyOutlined />, label: $fmt('common.bindShortcuts') },
-    { key: 'discardTabs', icon: <CoffeeOutlined />, label: $fmt('common.discardTabs') },
+    { key: 'hibernateTabs', icon: <CoffeeOutlined />, label: $fmt('common.hibernateTabs') },
     { key: 'reload', icon: <ReloadOutlined />, label: $fmt('common.reload') },
   ];
 
@@ -257,7 +257,7 @@ function AppLayout() {
         active: true,
         openToNext: true,
       });
-    } else if (key === 'discardTabs') {
+    } else if (key === 'hibernateTabs') {
       discardOtherTabs();
     }
   };

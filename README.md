@@ -82,7 +82,7 @@ Based on the above reasons, I decided to develop the `NiceTab` extension. incorp
 - Supports one-click copying of all links in a tab group, with a customizable link template.
 - Supports tab and URL search, and jump straight to the result.
 - Supports import/export and remote sync for both tabs (existing) and preference settings (newly supported).
-- Supports manually discard tabs from memory. Discarded tabs are still visible on the tab strip and are reloaded when activated.
+- Supports manually hibernate inactive tabs from memory. Hibernated tabs are still visible on the tab strip and will automatically reload when activated.
 
 ## Screenshots of Features
 
