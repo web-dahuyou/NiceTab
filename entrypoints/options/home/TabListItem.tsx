@@ -1,9 +1,9 @@
-import { useCallback, useState, memo, useRef } from 'react';
+import React, { useCallback, useState, memo, useRef } from 'react';
 import { theme, Checkbox, Typography, Tooltip, Popover, Modal, QRCode } from 'antd';
 import { CloseOutlined, EditOutlined, QrcodeOutlined } from '@ant-design/icons';
 import { GroupItem, TabItem } from '~/entrypoints/types';
 import { getFaviconURL } from '~/entrypoints/common/utils';
-import clickDecorator from '~/entrypoints/common/utils/click';
+import type { ModifierKeys } from '~/entrypoints/common/utils/click';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
@@ -29,6 +29,7 @@ const {
   DELETE_AFTER_RESTORE,
   CONFIRM_BEFORE_DELETING_TABS,
   SILENT_OPEN_TAB_MODIFIER_KEY,
+  OPEN_TAB_MODIFIER_KEY,
 } = ENUM_SETTINGS_PROPS;
 const osInfo = getOSInfo();
 
@@ -122,28 +123,48 @@ export default memo(function TabListItem({
     }
   }, [$fmt, tab, onRemove]);
 
-  // 点击打开标签页
-  const onTabOpen = useMemo(() => {
+  // 执行打开标签页
+  const handleTabOpen = useCallback((active: boolean) => {
     const settings = settingsUtils.settings;
-    let modifierKey = settings[SILENT_OPEN_TAB_MODIFIER_KEY] || 'alt';
-    if (modifierKey === 'cmdOrCtrl') {
-      modifierKey = osInfo.isMac ? 'meta' : 'ctrl';
+    // 如果直接单击未按下alt键，则打开新标签页并激活(active: true)，如果按下了alt键，则后台静默打开新标签页(active: false)
+    openNewTab(tab.url, { active });
+    setTimeout(() => {
+      if (settings[DELETE_AFTER_RESTORE] && !group?.isLocked) {
+        onRemove?.([tab]);
+      }
+      setTooltipVisible(false);
+    }, 500);
+  }, [tab, group.isLocked, onRemove]);
+
+  // 鼠标点击标签页
+  const onTabOpen = useCallback((event: React.MouseEvent) => {
+    const settings = settingsUtils.settings;
+    let silentModifierKey = settings[SILENT_OPEN_TAB_MODIFIER_KEY] || '';
+    let defaultModifierKey = settings[OPEN_TAB_MODIFIER_KEY] || '';
+    if (silentModifierKey === 'cmdOrCtrl') {
+      silentModifierKey = osInfo.isMac ? 'meta' : 'ctrl';
+    }
+    if (defaultModifierKey === 'cmdOrCtrl') {
+      defaultModifierKey = osInfo.isMac ? 'meta' : 'ctrl';
     }
 
-    return clickDecorator(
-      ({ isMatched }) => {
-        // 如果直接单击未按下alt键，则打开新标签页并激活(active: true)，如果按下了alt键，则后台静默打开新标签页(active: false)
-        openNewTab(tab.url, { active: !isMatched });
-        setTimeout(() => {
-          if (settings[DELETE_AFTER_RESTORE] && !group?.isLocked) {
-            onRemove?.([tab]);
-          }
-          setTooltipVisible(false);
-        }, 500);
-      },
-      { allowMissMatch: true, [modifierKey]: true }
-    );
-  }, [tab, group.isLocked, onRemove]);
+    const defaultFlag = event?.[`${defaultModifierKey as ModifierKeys}Key`];
+    const silentFlag = event?.[`${silentModifierKey as ModifierKeys}Key`];
+
+    // 前台打开方式优先级高于静默打开方式
+    if (defaultModifierKey && defaultFlag) {
+      handleTabOpen(true);
+    } else if (silentModifierKey && silentFlag) {
+      handleTabOpen(false);
+    } else if (!defaultModifierKey) {
+      handleTabOpen(true);
+    } else if (!silentModifierKey) {
+      handleTabOpen(false);
+    } else {
+      // 兜底使用前台打开方式 (正常不会走到这一步)
+      handleTabOpen(true);
+    }
+  }, [handleTabOpen]);
 
   const draggingListener = (value: boolean) => {
     setIsDragging(value);

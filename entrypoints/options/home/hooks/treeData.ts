@@ -15,7 +15,12 @@ import {
 } from '../types';
 import { getTreeData } from '../utils';
 
-const { DELETE_AFTER_RESTORE, UNNAMED_GROUP_RESTORE_AS_GROUP, AUTO_EXPAND_HOME_TREE } = ENUM_SETTINGS_PROPS;
+const {
+  DELETE_AFTER_RESTORE,
+  UNNAMED_GROUP_RESTORE_AS_GROUP,
+  NAMED_GROUP_RESTORE_AS_GROUP,
+  AUTO_EXPAND_HOME_TREE,
+} = ENUM_SETTINGS_PROPS;
 
 export type TreeDataHookProps = ReturnType<typeof useTreeData>;
 interface HomeContextProps {
@@ -130,7 +135,10 @@ export function useTreeData() {
   );
 
   const selectedKeyChange = useCallback(
-    ({ type, key, parentKey, tabId }: Partial<TreeDataNodeUnion & { tabId: string }>, callback?: () => void) => {
+    (
+      { type, key, parentKey, tabId }: Partial<TreeDataNodeUnion & { tabId: string }>,
+      callback?: () => void
+    ) => {
       if (!key) return;
       handleSelect(treeData, [key], {
         node: { type, key, parentKey } as TreeDataNodeUnion,
@@ -281,20 +289,24 @@ export function useTreeData() {
       const tagKey = tabGroup.parentKey;
       const tag = treeData.find((tag) => tag.key === tagKey) as TreeDataNodeTag;
       const settings = await settingsUtils.getSettings();
+      const { groupName, tabList = [], isLocked } = tabGroup?.originData || {};
       // 未命名的标签组，不以原生标签组形式打开
-      if (tabGroup?.originData?.groupName === UNNAMED_GROUP && !settings?.[UNNAMED_GROUP_RESTORE_AS_GROUP]) {
+      if (
+        (groupName === UNNAMED_GROUP && !settings?.[UNNAMED_GROUP_RESTORE_AS_GROUP]) ||
+        (groupName !== UNNAMED_GROUP && !settings?.[NAMED_GROUP_RESTORE_AS_GROUP])
+      ) {
         // 打开标签组 (标签页单独打开)
-        tabGroup?.originData?.tabList.forEach((tab) => {
+        tabList.forEach((tab) => {
           openNewTab(tab.url);
         });
       } else {
         // 打开标签组 (保持标签组形式)
         openNewGroup(
-          tabGroup.originData.groupName,
-          tabGroup.originData.tabList.map((tab) => tab.url)
+          groupName,
+          tabList.map((tab) => tab.url)
         );
       }
-      if (settings?.[DELETE_AFTER_RESTORE] && !tabGroup.originData?.isLocked) {
+      if (settings?.[DELETE_AFTER_RESTORE] && !isLocked) {
         await tabListUtils.removeTabGroup(tag.key, tabGroup.key);
         refreshTreeData((treeData) => handleSelect(treeData, [tag.key], { node: tag }));
       }
@@ -516,14 +528,15 @@ export function useTreeData() {
     init();
   }, []);
 
-
   // 多窗口数据同步（通过监听randomId变化）
   async function multiWindowDataSync() {
     const tagList = await tabListUtils.getTagList();
     setTagList(tagList);
     refreshTreeData((treeData) => {
-      const tag = treeData.find(t => t.key === selectedTagKey) as TreeDataNodeTag;
-      const tabGroup = (tag || treeData?.[0])?.children?.find(g => g.key === selectedTabGroupKey) as TreeDataNodeTabGroup;
+      const tag = treeData.find((t) => t.key === selectedTagKey) as TreeDataNodeTag;
+      const tabGroup = (tag || treeData?.[0])?.children?.find(
+        (g) => g.key === selectedTabGroupKey
+      ) as TreeDataNodeTabGroup;
 
       if (tabGroup) {
         handleSelect(treeData, [tabGroup.key], { node: tabGroup });

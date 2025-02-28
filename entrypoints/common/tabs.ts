@@ -451,7 +451,7 @@ export async function discardOtherTabs() {
   const { tab: adminTab } = await getAdminTabInfo();
   const tabs = await browser.tabs.query({ currentWindow: true });
   for (let tab of tabs) {
-    if (tab.id && tab.id !== adminTab?.id && !tab.active) {
+    if (tab.id && tab.id !== adminTab?.id && !tab.active && !tab.discarded) {
       browser.tabs.discard(tab.id);
     }
   }

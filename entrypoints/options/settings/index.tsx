@@ -45,7 +45,9 @@ const {
   RESTORE_IN_NEW_WINDOW,
   DELETE_AFTER_RESTORE,
   SILENT_OPEN_TAB_MODIFIER_KEY,
+  OPEN_TAB_MODIFIER_KEY,
   UNNAMED_GROUP_RESTORE_AS_GROUP,
+  NAMED_GROUP_RESTORE_AS_GROUP,
   DELETE_UNLOCKED_EMPTY_GROUP,
   CONFIRM_BEFORE_DELETING_TABS,
   ALLOW_DUPLICATE_TABS,
@@ -390,12 +392,43 @@ export default function Settings() {
               <Radio value="alt">{modifierKeyLabels.alt.symbol}</Radio>
               <Radio value="cmdOrCtrl">{modifierKeyLabels.cmd.symbol}</Radio>
               <Radio value="shift">{modifierKeyLabels.shift.symbol}</Radio>
+              <Radio value="">{$fmt('common.none')}</Radio>
+            </Radio.Group>
+          </Form.Item>
+          {/* 激活打开标签页修饰键 */}
+          <Form.Item<SettingsProps>
+            label={$fmt(`${module}.${OPEN_TAB_MODIFIER_KEY}`)}
+            name={OPEN_TAB_MODIFIER_KEY}
+            tooltip={{
+              color: token.colorBgElevated,
+              title: (
+                <Typography.Text>
+                  {$fmt(`${module}.${OPEN_TAB_MODIFIER_KEY}.tooltip`)}
+                </Typography.Text>
+              ),
+            }}
+          >
+            <Radio.Group>
+              <Radio value="alt">{modifierKeyLabels.alt.symbol}</Radio>
+              <Radio value="cmdOrCtrl">{modifierKeyLabels.cmd.symbol}</Radio>
+              <Radio value="shift">{modifierKeyLabels.shift.symbol}</Radio>
+              <Radio value="">{$fmt('common.none')}</Radio>
             </Radio.Group>
           </Form.Item>
           {/* 是否以标签组形式恢复未命名标签组 */}
           <Form.Item<SettingsProps>
             label={$fmt(`${module}.${UNNAMED_GROUP_RESTORE_AS_GROUP}`)}
             name={UNNAMED_GROUP_RESTORE_AS_GROUP}
+          >
+            <Radio.Group>
+              <Radio value={true}>{$fmt('common.yes')}</Radio>
+              <Radio value={false}>{$fmt('common.no')}</Radio>
+            </Radio.Group>
+          </Form.Item>
+          {/* 是否以标签组形式恢复已命名标签组 */}
+          <Form.Item<SettingsProps>
+            label={$fmt(`${module}.${NAMED_GROUP_RESTORE_AS_GROUP}`)}
+            name={NAMED_GROUP_RESTORE_AS_GROUP}
           >
             <Radio.Group>
               <Radio value={true}>{$fmt('common.yes')}</Radio>

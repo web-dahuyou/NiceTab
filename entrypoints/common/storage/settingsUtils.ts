@@ -23,7 +23,9 @@ const {
   RESTORE_IN_NEW_WINDOW,
   DELETE_AFTER_RESTORE,
   UNNAMED_GROUP_RESTORE_AS_GROUP,
+  NAMED_GROUP_RESTORE_AS_GROUP,
   SILENT_OPEN_TAB_MODIFIER_KEY,
+  OPEN_TAB_MODIFIER_KEY,
   DELETE_UNLOCKED_EMPTY_GROUP,
   CONFIRM_BEFORE_DELETING_TABS,
   ALLOW_DUPLICATE_TABS,
@@ -56,7 +58,9 @@ export default class SettingsUtils {
     [RESTORE_IN_NEW_WINDOW]: false, // 是否在新窗口打开标签组
     [DELETE_AFTER_RESTORE]: false, // 恢复标签页/标签组时是否从列表中删除
     [UNNAMED_GROUP_RESTORE_AS_GROUP]: true, // 是否以标签组形式恢复未命名标签组
+    [NAMED_GROUP_RESTORE_AS_GROUP]: true, // 是否以标签组形式恢复已命名标签组
     [SILENT_OPEN_TAB_MODIFIER_KEY]: 'alt', // 静默打开标签页的修饰键
+    [OPEN_TAB_MODIFIER_KEY]: '', // 前台打开标签页的修饰键
     [DELETE_UNLOCKED_EMPTY_GROUP]: true, // 是否删除未锁定的空标签组
     [CONFIRM_BEFORE_DELETING_TABS]: false, // 删除标签页前是否需要确认
     [ALLOW_DUPLICATE_TABS]: true, // 同一个标签组中是否允许重复的标签页
