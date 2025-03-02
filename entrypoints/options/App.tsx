@@ -118,7 +118,7 @@ const StyledPageContainer = styled.div<{
   }
   @media screen and (min-width: 1200px) {
     .main-content {
-      width: ${(props) => (props.$widthType === 'fixed' ? '1120px' : '100%')};
+      width: ${(props) => (props.$widthType === 'fixed' ? '1200px' : '100%')};
     }
   }
 `;

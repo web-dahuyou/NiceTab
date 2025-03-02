@@ -39,19 +39,16 @@ export default function BaseCardItem<T extends { label: string } = RemoteOptionP
   }, [$fmt]);
 
   // 操作确认
-  const handleConfirm = useCallback(
-    async (actionType: SyncType) => {
-      if (!validator?.(option)) return;
+  const handleConfirm = async (actionType: SyncType) => {
+    if (!validator?.(option)) return;
 
-      const modalConfig = {
-        title: $fmt('sync.actionTip'),
-        content: actionConfirmTextMap[actionType],
-      };
-      const confirmed = await modal.confirm(modalConfig);
-      if (confirmed) onAction?.(option, actionType);
-    },
-    [option, onAction]
-  );
+    const modalConfig = {
+      title: $fmt('sync.actionTip'),
+      content: actionConfirmTextMap[actionType],
+    };
+    const confirmed = await modal.confirm(modalConfig);
+    if (confirmed) onAction?.(option, actionType);
+  };
   // 合并推送
   const handlePushMerge = useCallback(() => {
     if (!validator?.(option)) return;

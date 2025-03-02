@@ -23,22 +23,20 @@ export const StyledGroupHeader = styled.div<{ theme: StyledThemeProps }>`
     .group-info {
       display: flex;
       align-items: center;
+      font-size: 14px;
     }
     .tab-count {
       margin-right: 8px;
-      font-size: 14px;
     }
     .group-create-time {
-      font-size: 12px;
       color: ${(props) => props.theme.colorTextTertiary || '#999'};
     }
     .group-action-btns {
       margin-top: 4px;
-      font-size: 12px;
+      font-size: 14px;
       .action-btn {
         display: flex;
         align-items: center;
-        font-size: 12px;
         color: ${(props) => props.theme.colorTextSecondary || '#333'};
         cursor: pointer;
         &:hover {
