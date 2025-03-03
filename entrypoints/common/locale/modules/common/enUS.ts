@@ -1,4 +1,6 @@
-export default {
+import { LocaleKey } from './zhCN';
+
+const enUS: Record<LocaleKey, string> = {
   'common.list': 'List',
   'common.settings': 'Settings',
   'common.importExport': 'Import & Export',
@@ -86,3 +88,5 @@ export default {
   'common.search': 'Search',
   'common.reload': 'Reload',
 };
+
+export default enUS;

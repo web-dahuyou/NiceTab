@@ -1,4 +1,4 @@
-export default {
+const zhCN = {
   'home.tag': '分类',
   'home.tabGroup': '标签组',
   'home.tab': '标签页',
@@ -84,3 +84,7 @@ export default {
 
   'recycleBin.tip.autoClear': '注意：回收站的数据每天会自动清空一次！',
 }
+
+export type LocaleKey = keyof typeof zhCN;
+
+export default zhCN;

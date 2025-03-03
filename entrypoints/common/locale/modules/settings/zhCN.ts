@@ -1,4 +1,4 @@
-export default {
+const zhCN = {
   'settings.block.sendTabs': '发送标签页相关配置',
   'settings.block.openTabs': '打开标签页相关配置',
   'settings.block.otherActions': '其他操作配置',
@@ -77,3 +77,7 @@ export default {
   'settings.syncType.manualPushMerge': '手动同步-合并推送（推荐）',
   'settings.syncType.manualPushForce': '手动同步-覆盖推送',
 }
+
+export type LocaleKey = keyof typeof zhCN;
+
+export default zhCN;

@@ -1,4 +1,6 @@
-export default {
+import { LocaleKey } from './zhCN';
+
+const enUS: Record<LocaleKey, string> = {
   'sync.settings': 'Sync Settings',
   'sync.autoSync': 'Auto Sync',
   'sync.syncing': 'Syncing',
@@ -54,3 +56,5 @@ export default {
   'sync.addConfig': 'Add New Config',
   'sync.tip.connectionName': 'Used to distinguish different WebDAV configs',
 }
+
+export default enUS;
