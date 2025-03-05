@@ -1,4 +1,4 @@
-export default {
+const zhCN = {
   'sync.settings': '同步设置',
   'sync.autoSync': '是否自动同步',
   'sync.syncing': '正在同步',
@@ -54,3 +54,7 @@ export default {
   'sync.addConfig': '新增配置',
   'sync.tip.connectionName': '用于区分多个 webDAV 的配置名称',
 }
+
+export type LocaleKey = keyof typeof zhCN;
+
+export default zhCN;

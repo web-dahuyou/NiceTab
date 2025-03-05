@@ -49,7 +49,7 @@ export default function MoveToModal({
   const [autoMerge, setAutoMerge] = useState<boolean>(false); // 是否自动合并
 
   // 校验级联数据
-  const validInfo = useMemo(() => {
+  const validInfo: { valid: boolean; type: 'tag' | 'tabGroup' } = useMemo(() => {
     if (!moveData) return { valid: false, type: 'tag' };
     const { tagId, groupId, tabs } = moveData || {};
     if (!targetOptions?.length) {
@@ -66,6 +66,16 @@ export default function MoveToModal({
 
     return { valid: targetOptions?.length > 1, type: 'tabGroup' };
   }, [moveData, targetOptions]);
+
+  const targetText = useMemo(() => {
+    switch (validInfo.type) {
+      case 'tabGroup':
+        return $fmt('home.tabGroup');
+      case 'tag':
+      default:
+        return $fmt('home.tag');
+    }
+  }, [validInfo, $fmt]);
 
   const onCheckboxChange: CheckboxProps['onChange'] = (e) => {
     // console.log('checked = ', e.target.checked);
@@ -169,7 +179,7 @@ export default function MoveToModal({
               <Typography.Text type="danger">
                 {$fmt({
                   id: 'home.moveTo.missingTip',
-                  values: { type: $fmt(`home.${validInfo?.type || 'tag'}`) },
+                  values: { type: targetText },
                 })}
               </Typography.Text>
             </div>

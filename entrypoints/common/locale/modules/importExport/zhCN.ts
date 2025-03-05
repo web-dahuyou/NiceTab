@@ -1,4 +1,4 @@
-export default {
+const zhCN = {
   'importExport.import': '导入',
   'importExport.export': '导出',
   'importExport.moduleTitle': `标签{action, select,
@@ -34,3 +34,7 @@ export default {
   'importExport.CopySuccess': '复制成功',
   'importExport.CopyFailed': '复制失败',
 }
+
+export type LocaleKey = keyof typeof zhCN;
+
+export default zhCN;

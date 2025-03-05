@@ -1,4 +1,6 @@
-export default {
+import { LocaleKey } from './zhCN';
+
+const enUS: Record<LocaleKey, string> = {
   'importExport.import': 'Import',
   'importExport.export': 'Export',
   'importExport.moduleTitle': `{action, select,
@@ -29,3 +31,5 @@ export default {
   'importExport.CopyFailed': 'Copy Failed',
   'importExport.settingsModuleTitle': `Import/Export Settings`,
 }
+
+export default enUS;

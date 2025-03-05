@@ -1,4 +1,6 @@
-export default {
+import { LocaleKey } from './zhCN';
+
+const enUS: Record<LocaleKey, string> = {
   'home.tag': 'Tag',
   'home.tabGroup': 'Tab Group',
   'home.tab': 'Tab',
@@ -92,3 +94,5 @@ export default {
 
   'recycleBin.tip.autoClear': 'Note: The recycle bin will be automatically cleared once a day!',
 }
+
+export default enUS;

@@ -1,4 +1,4 @@
-export default {
+const zhCN = {
   'common.list': '列表',
   'common.settings': '设置',
   'common.importExport': '导入/导出',
@@ -86,3 +86,7 @@ export default {
   'common.search': '搜索',
   'common.reload': '重新加载',
 };
+
+export type LocaleKey = keyof typeof zhCN;
+
+export default zhCN;

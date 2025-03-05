@@ -6,6 +6,8 @@ import antd_enUS from 'antd/locale/en_US';
 import { type LanguageTypes } from '~/entrypoints/types';
 import modules, { type LocaleModules } from './modules';
 
+export type LocaleKeys = keyof LocaleModules;
+
 export type LocaleAntd = ConfigProviderProps['locale'];
 export const antdMap: Record<LanguageTypes, LocaleAntd> = {
   'zh-CN': antd_zhCN,

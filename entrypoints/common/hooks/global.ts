@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import mitt from 'mitt';
-import { antdMap, customMap } from '~/entrypoints/common/locale';
+import { antdMap, customMap, type LocaleKeys } from '~/entrypoints/common/locale';
 import type {
   EventsEmitterProps,
   GlobalContextProps,
@@ -110,7 +110,7 @@ export function useThemeTypeConfig() {
 export function useIntlUtls() {
   const intl = useIntl();
   const $fmt = (
-    idOrFormatMsg: string | IntlForamtMessageParams,
+    idOrFormatMsg: LocaleKeys | IntlForamtMessageParams,
     options?: Record<string, any>
   ) => {
     const {
