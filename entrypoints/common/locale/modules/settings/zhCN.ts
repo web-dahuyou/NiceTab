@@ -69,7 +69,7 @@ export default {
   'settings.autoSync': '是否开启自动同步：',
   'settings.autoSyncInterval': '自动同步间隔时间（分钟）：',
   'settings.autoSyncType': '自动同步方式：',
-  'settings.autoSyncType.tooltip': '合并推送不进行diff对比删除操作，而是合并远程和本地，然后推送到远程，所以标签页是会增多的，想要同步删除操作，请删除标签页后手动覆盖推送到远程。',
+  'settings.autoSyncType.tooltip': '合并推送不进行diff对比删除操作，而是合并远程和本地，然后推送到远程，想要同步删除操作，请删除标签页后手动覆盖推送到远程。',
   'settings.syncType.autoPullMerge': '自动拉取-合并到本地',
   'settings.syncType.autoPullForce': '自动拉取-覆盖本地数据',
   'settings.syncType.autoPushMerge': '自动同步-合并推送（推荐）',

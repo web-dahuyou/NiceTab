@@ -15,9 +15,10 @@ import type {
   ThemeProps,
   LanguageTypes,
   ThemeTypes,
+  SettingsProps,
   PageWidthTypes,
 } from '~/entrypoints/types';
-import { themeUtils } from '~/entrypoints/common/storage';
+import { themeUtils, settingsUtils } from '~/entrypoints/common/storage';
 import { updateAdminPageUrlDebounced } from '~/entrypoints/common/tabs';
 
 export default function Root({
@@ -38,11 +39,13 @@ export default function Root({
   const { themeTypeConfig, changeThemeType } = useThemeTypeConfig();
   const [hasReady, setHasReady] = useState(false);
   const [primaryColor, setPrimaryColor] = useState(PRIMARY_COLOR);
-  const [pageWidthType, setPageWidthType] = useState<PageWidthTypes>('fixed');
+  const [pageWidthType, setPageWidthType] = useState<PageWidthTypes>(
+    settingsUtils.settings?.pageWidthType || 'fixed'
+  );
 
-  const handleLocaleChange = async (languange?: LanguageTypes) => {
-    changeLocaleAntd(languange);
-    changeLocaleCustom(languange);
+  const handleLocaleChange = async (language?: LanguageTypes) => {
+    changeLocaleAntd(language);
+    changeLocaleCustom(language);
   };
   const handleThemeTypeChange = async (themeType: ThemeTypes) => {
     changeThemeType(themeType);
@@ -54,8 +57,17 @@ export default function Root({
   const handlePageWidthTypeChange = async (type: PageWidthTypes) => {
     setPageWidthType(type);
   };
+  const handleSettingsChange = async (settings: Partial<SettingsProps>) => {
+    await settingsUtils.setSettings(settings);
+    const { language, pageWidthType = settingsUtils.initialSettings.pageWidthType } =
+      settingsUtils.settings || {};
+    handleLocaleChange(language);
+    handlePageWidthTypeChange(pageWidthType);
+  };
 
-  const initThemeData = async () => {
+  const initData = async () => {
+    const settings = await settingsUtils.getSettings();
+    handleSettingsChange(settings);
     const theme = await themeUtils.getThemeData();
     setPrimaryColor(theme.colorPrimary);
     setHasReady(true);
@@ -94,7 +106,7 @@ export default function Root({
   }, [localeCustom]);
 
   useEffect(() => {
-    initThemeData();
+    initData();
     getManifest();
     browser.runtime.onMessage.addListener(messageListener);
   }, []);
@@ -129,6 +141,7 @@ export default function Root({
             $message,
             setThemeType: handleThemeTypeChange,
             setThemeData: handleThemeChange,
+            setSettings: handleSettingsChange,
             setLocale: handleLocaleChange,
             setPageWidthType: handlePageWidthTypeChange,
           }}

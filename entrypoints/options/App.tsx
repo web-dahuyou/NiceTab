@@ -46,7 +46,7 @@ import { settingsUtils } from '~/entrypoints/common/storage';
 import useUpdate from '~/entrypoints/common/hooks/update';
 import {
   GITHUB_URL,
-  LANGUANGE_OPTIONS,
+  LANGUAGE_OPTIONS,
   THEME_COLORS,
   defaultThemeType,
 } from '~/entrypoints/common/constants';
@@ -221,7 +221,7 @@ function AppLayout() {
   };
   // 切换语言
   const handleLocaleChange = useCallback(({ key }: { key: string }) => {
-    const option = LANGUANGE_OPTIONS.find((item) => item.key === key) || {
+    const option = LANGUAGE_OPTIONS.find((item) => item.key === key) || {
       locale: 'zh-CN',
     };
     NiceGlobalContext.setLocale(option.locale);
@@ -331,10 +331,10 @@ function AppLayout() {
             >
               {themeTypeConfig.type === 'light' ? <SunOutlined /> : <MoonOutlined />}
             </StyledActionIconBtn>
-            {/* languange */}
+            {/* language */}
             <Dropdown
               menu={{
-                items: LANGUANGE_OPTIONS,
+                items: LANGUAGE_OPTIONS,
                 selectedKeys: [locale],
                 onClick: handleLocaleChange,
               }}

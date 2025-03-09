@@ -128,10 +128,9 @@ export default function Settings() {
     const newSettings = { ...settingsUtils.initialSettings, ...values };
 
     await settingsUtils.setSettings(newSettings);
-    NiceGlobalContext.setLocale(newSettings.language);
+    NiceGlobalContext.setSettings(newSettings);
     sendRuntimeMessage({ msgType: 'setLocale', data: { locale: newSettings.language } });
     reloadOtherAdminPage();
-    NiceGlobalContext.setPageWidthType(newSettings.pageWidthType || 'fixed');
 
     const customMessages = getCustomLocaleMessages(
       newSettings.language || defaultLanguage
@@ -152,6 +151,7 @@ export default function Settings() {
     settingsUtils.getSettings().then((settings) => {
       setInitialFormValues(settings);
       form?.setFieldsValue(settings);
+      NiceGlobalContext.setSettings(settings);
     });
   }, [urlParams]);
   useEffect(() => {

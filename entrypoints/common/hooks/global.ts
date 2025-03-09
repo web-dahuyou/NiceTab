@@ -29,6 +29,9 @@ export const GlobalContext = createContext<GlobalContextProps>({
   setThemeData: (themeData) => {
     themeUtils.setThemeData(themeData);
   },
+  setSettings: async (settings) => {
+    settingsUtils.setSettings({ ...settingsUtils.settings, ...settings });
+  },
   setLocale: async (language = defaultLanguage, callback) => {
     settingsUtils.setSettings({ ...settingsUtils.settings, language });
     callback?.();
