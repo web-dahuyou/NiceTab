@@ -43,7 +43,7 @@ export default function useListHotkeys ({ onAction }: { onAction?: (params: { ac
         label: getHotkeyLabelByAction(item.action),
       }
     })
-  }, []);
+  }, [getHotkeyLabelByAction]);
 
   const hotkeyRegister = useCallback(() => {
     // console.log('hotkeyList', hotkeyList);
