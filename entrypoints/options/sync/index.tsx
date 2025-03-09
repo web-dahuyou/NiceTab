@@ -73,8 +73,7 @@ export default function SyncPage() {
       getWebDavConfig();
     }
 
-    const { language } = settingsUtils.settings;
-    NiceGlobalContext.setLocale(language);
+    NiceGlobalContext.setSettings(settingsUtils.settings);
   }, []);
 
   const clearSyncResult = async () => {

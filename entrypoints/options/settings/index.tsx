@@ -10,11 +10,14 @@ import {
   Radio,
   Typography,
   Slider,
+  Modal,
   theme,
   message,
 } from 'antd';
 import type { FormProps } from 'antd';
 import styled from 'styled-components';
+import { isEqual } from 'lodash-es';
+import { useBlocker } from 'react-router-dom';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import type { SettingsProps } from '~/entrypoints/types';
 import { settingsUtils } from '~/entrypoints/common/storage';
@@ -82,10 +85,23 @@ export default function Settings() {
   const NiceGlobalContext = useContext(GlobalContext);
   const { token } = theme.useToken();
   const { $fmt, locale } = useIntlUtls();
-  const [messageApi, contextHolder] = message.useMessage();
+  const [messageApi, msgContextHolder] = message.useMessage();
 
   const [form] = Form.useForm();
   const { autoSyncTypeOptions } = useSyncType();
+
+  const [initialFormValues, setInitialFormValues] = useState<SettingsProps>();
+  // 使用 useBlocker 拦截路由离开
+  const blocker = useBlocker(() => {
+    const fieldsValues: SettingsProps = form.getFieldsValue();
+    for (let [key, value] of Object.entries(fieldsValues)) {
+      const _isEqual = isEqual(value, initialFormValues?.[key as keyof SettingsProps]);
+
+      if (!_isEqual) return true;
+    }
+
+    return false;
+  });
 
   // 发送标签页自动关闭标签页的操作选项
   const actionAutoCloseFlagOptions = useMemo(() => {
@@ -112,15 +128,18 @@ export default function Settings() {
     const newSettings = { ...settingsUtils.initialSettings, ...values };
 
     await settingsUtils.setSettings(newSettings);
-    NiceGlobalContext.setLocale(newSettings.language);
+    NiceGlobalContext.setSettings(newSettings);
     sendRuntimeMessage({ msgType: 'setLocale', data: { locale: newSettings.language } });
     reloadOtherAdminPage();
-    NiceGlobalContext.setPageWidthType(newSettings.pageWidthType || 'fixed');
 
     const customMessages = getCustomLocaleMessages(
       newSettings.language || defaultLanguage
     );
     messageApi.success(customMessages['common.saveSuccess']);
+    setInitialFormValues((values) => ({
+      ...values,
+      ...newSettings,
+    }));
   };
 
   useEffect(() => {
@@ -130,25 +149,36 @@ export default function Settings() {
   const { urlParams } = useUrlParams();
   useEffect(() => {
     settingsUtils.getSettings().then((settings) => {
+      setInitialFormValues(settings);
       form?.setFieldsValue(settings);
+      NiceGlobalContext.setSettings(settings);
     });
   }, [urlParams]);
   useEffect(() => {
     settingsUtils.getSettings().then((settings) => {
+      setInitialFormValues(settings);
       form?.setFieldsValue(settings);
     });
   }, []);
 
   return (
     <>
-      {contextHolder}
+      {msgContextHolder}
+      <Modal
+        title={$fmt('common.confirmReminder')}
+        open={blocker.state === 'blocked'}
+        onOk={() => blocker.proceed?.()}
+        onCancel={() => blocker.reset?.()}
+      >
+        {$fmt('settings.confirmTipContent')}
+      </Modal>
       <div className="settings-wrapper">
         <Form
           form={form}
           name="settings"
           layout="vertical"
-          onFinish={onFinish}
           autoComplete="off"
+          onFinish={onFinish}
         >
           <StickyBox topGap={60} fullWidth bgColor={token.colorBgContainer}>
             <StyledHeaderActionWrapper>
@@ -212,6 +242,7 @@ export default function Settings() {
                   {$fmt(`${module}.${SHOW_SEND_TARGET_MODAL}.tooltip`)}
                 </Typography.Text>
               ),
+              styles: { root: { maxWidth: '320px', width: '320px' } },
             }}
           >
             <Radio.Group>
@@ -250,6 +281,7 @@ export default function Settings() {
                   {$fmt(`${module}.${EXCLUDE_DOMAINS_FOR_SENDING}.tooltip`)}
                 </Typography.Text>
               ),
+              styles: { root: { maxWidth: '320px', width: '320px' } },
             }}
           >
             <Input.TextArea
@@ -316,6 +348,7 @@ export default function Settings() {
                         {$fmt(`${module}.${ACTION_AUTO_CLOSE_FLAGS}.tooltip`)}
                       </Typography.Text>
                     ),
+                    styles: { root: { maxWidth: '320px', width: '320px' } },
                   }}
                 >
                   <Checkbox.Group options={actionAutoCloseFlagOptions}></Checkbox.Group>
@@ -406,6 +439,7 @@ export default function Settings() {
                   {$fmt(`${module}.${OPEN_TAB_MODIFIER_KEY}.tooltip`)}
                 </Typography.Text>
               ),
+              styles: { root: { maxWidth: '320px', width: '320px' } },
             }}
           >
             <Radio.Group>
@@ -483,6 +517,7 @@ export default function Settings() {
                   {$fmt(`${module}.${TAB_COUNT_THRESHOLD}.tooltip`)}
                 </Typography.Text>
               ),
+              styles: { root: { maxWidth: '320px', width: '320px' } },
             }}
           >
             <InputNumber
@@ -505,6 +540,7 @@ export default function Settings() {
                   {$fmt(`${module}.${LINK_TEMPLATE}.tooltip`)}
                 </Typography.Text>
               ),
+              styles: { root: { maxWidth: '320px', width: '320px' } },
             }}
           >
             <Space wrap>
@@ -560,6 +596,7 @@ export default function Settings() {
                   {$fmt(`${module}.${POPUP_MODULE_DISPLAYS}.tooltip`)}
                 </Typography.Text>
               ),
+              styles: { root: { maxWidth: '320px', width: '320px' } },
             }}
           >
             <Checkbox.Group options={popupModuleDisplayOptions}></Checkbox.Group>
@@ -619,6 +656,15 @@ export default function Settings() {
           <Form.Item<SettingsProps>
             label={$fmt(`${module}.${AUTO_SYNC_TYPE}`)}
             name={AUTO_SYNC_TYPE}
+            tooltip={{
+              color: token.colorBgElevated,
+              title: (
+                <Typography.Text>
+                  {$fmt(`${module}.${AUTO_SYNC_TYPE}.tooltip`)}
+                </Typography.Text>
+              ),
+              styles: { root: { maxWidth: '320px', width: '320px' } },
+            }}
           >
             <Radio.Group>
               <Space direction="vertical">

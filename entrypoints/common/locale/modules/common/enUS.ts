@@ -87,6 +87,7 @@ const enUS: Record<LocaleKey, string> = {
   'common.sendTo': 'Send To',
   'common.search': 'Search',
   'common.reload': 'Reload',
+  'common.confirmReminder': 'Comfirm Reminder',
 };
 
 export default enUS;

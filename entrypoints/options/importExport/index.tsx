@@ -120,7 +120,7 @@ export default function ImportExport() {
       try {
         const settings = JSON.parse(content);
         await settingsUtils.setSettings(settings);
-        NiceGlobalContext.setLocale(settings.language);
+        NiceGlobalContext.setSettings(settings);
         sendRuntimeMessage({ msgType: 'setLocale', data: { locale: settings.language } });
         reloadOtherAdminPage();
         messageApi.success(

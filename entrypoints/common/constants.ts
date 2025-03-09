@@ -152,7 +152,7 @@ export const TAB_EVENTS: Array<keyof Pick<Tabs.Static, TabEvents>> = [
 ];
 
 // 语言选项
-export const LANGUANGE_OPTIONS: Array<{
+export const LANGUAGE_OPTIONS: Array<{
   key: LanguageTypes;
   locale: LanguageTypes;
   label: string;
@@ -208,7 +208,7 @@ export default {
   ENUM_ACTION_NAME,
   ENUM_SETTINGS_PROPS,
   TAB_EVENTS,
-  LANGUANGE_OPTIONS,
+  LANGUAGE_OPTIONS,
   defaultLanguage,
   defaultAutoSyncType,
   UNNAMED_TAG,

@@ -31,6 +31,7 @@ export interface GlobalContextProps {
   $message: MessageInstance;
   setThemeType: (themeType: ThemeTypes) => void;
   setThemeData: (themeData: Partial<ThemeProps>) => void;
+  setSettings: (settings: Partial<SettingsProps>) => void;
   setLocale: (language?: LanguageTypes, callback?: () => void) => Promise<void>;
   setPageWidthType: (pageWidthType: PageWidthTypes) => void;
 }
