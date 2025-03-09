@@ -14,7 +14,7 @@ export default function FooterFloatButton() {
         placement="left"
         shape="circle"
         style={{ right: 30, bottom: 30 }}
-        icon={<span title={$fmt('common.search')}><SearchOutlined /></span>}
+        icon={<span title={$fmt('home.searchTabAndUrl')}><SearchOutlined /></span>}
         onClick={() => {
           setTimeout(() => {
             searchSelectRef.current?.focus();
