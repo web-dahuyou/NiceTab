@@ -1,12 +1,14 @@
-export default {
+import { LocaleKey } from './zhCN';
+
+const enUS: Record<LocaleKey, string> = {
   'settings.block.sendTabs': 'Settings: Sending Tabs',
   'settings.block.openTabs': 'Settings: Opening Tabs',
   'settings.block.otherActions': 'Settings: Other Actions',
   'settings.block.display': 'Settings: Displays',
   'settings.block.autoSync': 'Settings: Auto Sync',
   'settings.language': 'Language{mark}',
-  'settings.language.ChineseSimplified': 'Chinese Simplified',
-  'settings.language.English': 'English',
+  // 'settings.language.ChineseSimplified': 'Chinese Simplified',
+  // 'settings.language.English': 'English',
   'settings.openAdminTabAfterBrowserLaunch': 'Open NiceTab Admin Page after launching the browser?',
   'settings.openAdminTabAfterBrowserLaunch.yes': 'Automatically open (recommended)',
   'settings.openAdminTabAfterBrowserLaunch.no': 'Do not',
@@ -77,3 +79,5 @@ export default {
   'settings.syncType.manualPushMerge': 'Manual Push (Merge): Merge to local data and then push to remote (recommended).',
   'settings.syncType.manualPushForce': 'Manual Push (Force): Force to overwrite remote data.',
 }
+
+export default enUS;

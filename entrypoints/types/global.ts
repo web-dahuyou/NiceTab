@@ -6,6 +6,7 @@ import type {
   SyncStartEventProps,
   AutoSyncType,
 } from './sync';
+import { LocaleKeys } from '../common/locale';
 
 // 扩展版本信息
 export type VersionInfo = { updateAvailable: boolean; version?: string };
@@ -38,6 +39,7 @@ export interface GlobalContextProps {
 export type LanguageTypes = 'zh-CN' | 'en-US';
 // react-intl formatMessage 参数
 export type IntlForamtMessageParams = MessageDescriptor & {
+  id?: LocaleKeys;
   values?: Record<string, any>;
   opts?: Record<string, any>;
 };

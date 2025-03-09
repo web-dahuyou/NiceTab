@@ -68,6 +68,7 @@ import RecycleBin from './recycleBin/index.tsx';
 import SendTargetActionHolder, {
   type SendTargetActionHolderProps,
 } from '~/entrypoints/options/home/SendTargetActionHolder';
+import { type LocaleKeys } from '~/entrypoints/common/locale';
 
 const { SHOW_SEND_TARGET_MODAL } = ENUM_SETTINGS_PROPS;
 
@@ -125,7 +126,7 @@ const StyledPageContainer = styled.div<{
 
 interface NavProps {
   key: PageModuleNames;
-  label: string;
+  label: LocaleKeys;
   path: string;
   icon?: JSX.Element;
   element: JSX.Element;

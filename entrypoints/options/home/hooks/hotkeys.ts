@@ -10,7 +10,9 @@ const keyMap = getKeysByOS();
 const hotkeyOptions = [
   { macKey: 'shift+option+up', winKey: 'shift+alt+up', action: 'moveUp' },
   { macKey: 'shift+option+down', winKey: 'shift+alt+down', action: 'moveDown' },
-];
+] as const;
+
+type HotkeyAction = typeof hotkeyOptions[number]['action'];
 
 const getSymbols = (option: HotkeyOption, splitKey: string = '+') => {
   const key = osInfo.isMac ? option.macKey : option.winKey;
@@ -20,16 +22,28 @@ const getSymbols = (option: HotkeyOption, splitKey: string = '+') => {
 
 export default function useListHotkeys ({ onAction }: { onAction?: (params: { action: string }) => void }) {
   const { $fmt } = useIntlUtls();
+
+  const getHotkeyLabelByAction = (action: HotkeyAction) => {
+    switch (action) {
+      case 'moveUp':
+        return $fmt('common.moveUp');
+      case 'moveDown':
+        return $fmt('common.moveDown');
+      default:
+        return '';
+    }
+  }
+
   const hotkeyList = useMemo(() => {
     return hotkeyOptions.map((item) => {
       return {
         ...item,
         key: osInfo.isMac ? item.macKey : item.winKey,
         combo: getSymbols(item),
-        label: $fmt(`common.${item.action}`),
+        label: getHotkeyLabelByAction(item.action),
       }
     })
-  }, []);
+  }, [getHotkeyLabelByAction]);
 
   const hotkeyRegister = useCallback(() => {
     // console.log('hotkeyList', hotkeyList);
