@@ -85,4 +85,5 @@ export default {
   'common.sendTo': 'Send To',
   'common.search': 'Search',
   'common.reload': 'Reload',
+  'common.confirmReminder': 'Comfirm Reminder',
 };
