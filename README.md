@@ -65,8 +65,8 @@ Based on the above reasons, I decided to develop the `NiceTab` extension. incorp
 - Option to **Open tab group in a new window when opening**.
 - Option to **Remove tabs when opening tabs or tab group**.
 - Option to **Restore the unnamed group as a browser tab group**.
-- Option to **Modifier key for opening a tab silently (in background)**.
-- Option to **Modifier key for opening a tab in foreground**.
+- Configurable **Modifier key for opening a tab silently (in background)**.
+- Configurable **Modifier key for opening a tab in foreground**.
 - Option to **Remove empty groups when clearing tabs**.
 - Option to **Confirm before removing tabs**.
 - Configurable **Copy links format template for tab groups**.
