@@ -49,22 +49,41 @@ export function objectToUrlParams(params: Record<string, any>): string {
   return searchParams.toString();
 }
 
-// 获取网站 favicon
-export function getFaviconURL(pageUrl: string, size: number = 16) {
-  let pageOrigin = pageUrl;
+// 获取origin
+export function getOrigin(url: string): string {
+  let pageOrigin = url;
   try {
-    pageOrigin = new URL(pageUrl)?.origin || pageUrl;
+    pageOrigin = new URL(url)?.origin || url;
   } catch {
-    pageOrigin = pageUrl;
-  }
-  // 通过 favicon api 获取网站图标 (官方文档: https://developer.chrome.com/docs/extensions/how-to/ui/favicons?hl=en)
-  if (pageOrigin.includes('extension://')) {
-    const apiUrl = browser.runtime.getURL('/_favicon/');
-    return handleUrlWidthParams(apiUrl, { pageUrl: pageOrigin, size });
+    pageOrigin = url;
   }
 
-  // 通过 t3.gstatic.com/faviconV2 获取网站图标
-  return `https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${pageOrigin}&size=${size}`;
+  return pageOrigin;
+}
+// 获取domain
+export function getBaseDomain(url: string): string {
+  if (!url) return 'undefined';
+
+  // 补全协议
+  if (url.startsWith('//')) {
+    url = 'http:' + url;
+  }
+  if (!url.includes('://')) {
+    url = 'http://' + url;
+  }
+
+  // 提取域名部分
+  let domain = url.split('://')[1].split('/')[0];
+
+  // 移除端口号、查询参数和片段标识符
+  domain = domain.split(':')[0].split('?')[0].split('#')[0];
+
+  // 移除 `www.` 前缀
+  // if (domain.toLowerCase().startsWith('www.')) {
+  //   domain = domain.substring('www.'.length);
+  // }
+
+  return domain.toLowerCase();
 }
 
 /**
@@ -99,4 +118,6 @@ export default {
   handleUrlWidthParams,
   getUrlParams,
   objectToUrlParams,
+  getOrigin,
+  getBaseDomain
 };

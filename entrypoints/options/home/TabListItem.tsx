@@ -2,7 +2,6 @@ import React, { useCallback, useState, memo, useRef } from 'react';
 import { theme, Checkbox, Tooltip, Popover, Modal, QRCode } from 'antd';
 import { CloseOutlined, EditOutlined, QrcodeOutlined } from '@ant-design/icons';
 import { GroupItem, TabItem } from '~/entrypoints/types';
-import { getFaviconURL } from '~/entrypoints/common/utils';
 import type { ModifierKeys } from '~/entrypoints/common/utils/click';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import { settingsUtils } from '~/entrypoints/common/storage';
@@ -13,9 +12,9 @@ import { getOSInfo } from '~/entrypoints/common/utils';
 import {
   StyledTabItemWrapper,
   StyledTabTitle,
-  StyledTabItemFavicon,
   StyledTabItemTooltip,
 } from './TabListItem.styled';
+import Favicon from '~/entrypoints/common/components/Favicon';
 import TabItemEditModal from './TabItemEditModal';
 
 type TabItemProps = TabItem & {
@@ -250,10 +249,7 @@ export default memo(function TabListItem({
           </StyledActionIconBtn>
         )}
         {/* icon tab favicon */}
-        <StyledTabItemFavicon
-          className="tab-item-favicon"
-          $bgUrl={tab.favIconUrl || getFaviconURL(tab.url!)}
-        />
+        <Favicon pageUrl={tab.url!} favIconUrl={tab.favIconUrl}></Favicon>
         {/* tab title */}
         <StyledTabTitle className="tab-item-title">
           {tooltipSwitch ? (

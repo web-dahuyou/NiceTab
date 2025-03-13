@@ -3,11 +3,7 @@ import { browser, Tabs } from 'wxt/browser';
 import { ThemeProvider } from 'styled-components';
 import { theme, Space, Dropdown, Button, type MenuProps } from 'antd';
 import { CloseOutlined, DownOutlined, CoffeeOutlined } from '@ant-design/icons';
-import {
-  classNames,
-  sendRuntimeMessage,
-  getFaviconURL,
-} from '~/entrypoints/common/utils';
+import { classNames, sendRuntimeMessage } from '~/entrypoints/common/utils';
 import '~/assets/css/reset.css';
 import '~/assets/css/index.css';
 import './App.css';
@@ -24,11 +20,15 @@ import {
   POPUP_MODULE_NAMES,
 } from '~/entrypoints/common/constants';
 import ColorList from '~/entrypoints/common/components/ColorList.tsx';
+import Favicon from '~/entrypoints/common/components/Favicon';
 import {
   StyledActionIconBtn,
   GlobalStyle,
 } from '~/entrypoints/common/style/Common.styled';
-import { StyledContainer, StyledList, StyledFavIcon } from './App.styled';
+import { StyledContainer, StyledList } from './App.styled';
+
+import { initFaviconApiData } from '~/entrypoints/common/utils/favicon';
+initFaviconApiData();
 
 interface ActionBtnItem {
   key: string;
@@ -282,22 +282,22 @@ export default function App() {
                 title={tab.title}
                 onClick={() => handleTabItemClick(tab)}
               >
-                <StyledFavIcon
-                  className="tab-item-icon"
-                  $icon={tab.favIconUrl || getFaviconURL(tab.url!)}
-                />
+                <Favicon pageUrl={tab.url!} favIconUrl={tab.favIconUrl}></Favicon>
                 <span className="tab-item-title">{tab.title}</span>
 
-                { !tab.active && (
+                {!tab.active && (
                   <StyledActionIconBtn
-                      className={classNames("action-icon-btn", tab.discarded && "btn-discarded")}
-                      $size={16}
-                      title={$fmt(tab.discarded ? 'common.hibernated' : 'common.hibernate')}
-                      onClick={(event) => handleDiscard(event, tab)}
-                    >
+                    className={classNames(
+                      'action-icon-btn',
+                      tab.discarded && 'btn-discarded'
+                    )}
+                    $size={16}
+                    title={$fmt(tab.discarded ? 'common.hibernated' : 'common.hibernate')}
+                    onClick={(event) => handleDiscard(event, tab)}
+                  >
                     <CoffeeOutlined />
                   </StyledActionIconBtn>
-                ) }
+                )}
 
                 <StyledActionIconBtn
                   className="action-icon-btn"

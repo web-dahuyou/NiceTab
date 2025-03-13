@@ -70,6 +70,9 @@ import SendTargetActionHolder, {
 } from '~/entrypoints/options/home/SendTargetActionHolder';
 import { type LocaleKeys } from '~/entrypoints/common/locale';
 
+import { initFaviconApiData } from '~/entrypoints/common/utils/favicon';
+initFaviconApiData();
+
 const { SHOW_SEND_TARGET_MODAL } = ENUM_SETTINGS_PROPS;
 
 const StyledPageContainer = styled.div<{
