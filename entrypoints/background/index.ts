@@ -103,7 +103,11 @@ export default defineBackground(() => {
 
   browser.runtime.onMessage.addListener(async (msg: unknown, msgSender, sendResponse) => {
     // console.log('browser.runtime.onMessage--background--msg', msg);
-    const { msgType, data, targetPageContext = 'background' } = (msg || {}) as RuntimeMessageEventProps;
+    const {
+      msgType,
+      data,
+      targetPageContext = 'background',
+    } = (msg || {}) as RuntimeMessageEventProps;
 
     if (msgType === 'setPrimaryColor') {
       const colorPrimary = data?.colorPrimary || PRIMARY_COLOR;

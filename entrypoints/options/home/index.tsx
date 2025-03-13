@@ -35,6 +35,7 @@ import {
   StyledHelpInfoBox,
 } from './Home.styled';
 import ToggleSidebarBtn from '../components/ToggleSidebarBtn';
+import SearchTabsBtn from './SearchTabsBtn';
 import SortingBtns from './SortingBtns';
 import HotkeyList from '../components/HotkeyList';
 // import StickyFooter from '~/entrypoints/common/components/StickyFooter';
@@ -161,6 +162,7 @@ export default function Home() {
                 collapsed={sidebarCollapsed}
                 onCollapseChange={onCollapseChange}
               ></ToggleSidebarBtn>
+              <SearchTabsBtn></SearchTabsBtn>
               {selectedTagKey ? <SortingBtns onSort={onNameSort}></SortingBtns> : null}
               {selectedTagKey ? (
                 <SortingBtns sortBy="createTime" onSort={onCreateTimeSort}></SortingBtns>
@@ -263,7 +265,8 @@ export default function Home() {
                 <strong>"{$fmt('common.sendCurrentTab')}"</strong>
               </Space>
               {$fmt('home.help.hotkey.2')}
-              <Typography.Link
+              <a
+                className="link"
                 onClick={() =>
                   openNewTab('chrome://extensions/shortcuts', {
                     active: true,
@@ -272,7 +275,7 @@ export default function Home() {
                 }
               >
                 {$fmt('home.help.hotkey.modify')}
-              </Typography.Link>
+              </a>
               <Tooltip
                 color={token.colorBgContainer}
                 title={

@@ -181,7 +181,18 @@ webdav 方式远程同步截图暂未更新。
 
 ## 插件开发
 
+### 项目启动
 - 依赖安装：`pnpm install`
 - 启动插件服务：`pnpm run dev`
-- 
+  
 **注意**：每个js文件都必须有 `export default` 默认导出，否则本地启动服务时会报错。
+
+### 指定浏览器可执行文件路径
+
+默认情况下，`wxt` 会自动识别 `Chrome/Firefox` 的安装路径，并启动对应的浏览器。如果启动项目报错找不到浏览器安装路径
+```
+ERROR  No Chrome installations found.  
+```
+
+或者想自定义浏览器可执行文件，可以参考 [官方文档-Set Browser Binaries](https://wxt.dev/guide/essentials/config/browser-startup.html#set-browser-binaries)，手动配置浏览器可执行文件的路径即可。
+

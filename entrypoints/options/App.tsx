@@ -70,6 +70,9 @@ import SendTargetActionHolder, {
 } from '~/entrypoints/options/home/SendTargetActionHolder';
 import { type LocaleKeys } from '~/entrypoints/common/locale';
 
+import { initFaviconApiData } from '~/entrypoints/common/utils/favicon';
+initFaviconApiData();
+
 const { SHOW_SEND_TARGET_MODAL } = ENUM_SETTINGS_PROPS;
 
 const StyledPageContainer = styled.div<{
@@ -244,7 +247,11 @@ function AppLayout() {
   const extActionOptions: MenuProps['items'] = [
     { key: 'sendAllTabs', icon: <SendOutlined />, label: $fmt('common.sendAllTabs') },
     { key: 'bindShortcuts', icon: <KeyOutlined />, label: $fmt('common.bindShortcuts') },
-    { key: 'hibernateTabs', icon: <CoffeeOutlined />, label: $fmt('common.hibernateTabs') },
+    {
+      key: 'hibernateTabs',
+      icon: <CoffeeOutlined />,
+      label: $fmt('common.hibernateTabs'),
+    },
     { key: 'reload', icon: <ReloadOutlined />, label: $fmt('common.reload') },
   ];
 
@@ -295,9 +302,9 @@ function AppLayout() {
                 })}
                 :
               </Typography.Text>
-              <Typography.Link href="javascript:void(0);" onClick={updateReload}>
+              <a className="link" onClick={updateReload}>
                 {$fmt('common.update.upgradeNow')}
-              </Typography.Link>
+              </a>
             </Space>
           )}
 

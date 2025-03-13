@@ -15,11 +15,11 @@ import type { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
 import type { TreeDataNodeUnion } from '../types';
 import { HomeContext } from '../hooks/treeData';
 
-type SearchListItemProps = Pick<TagItem, 'tagId' | 'tagName' | 'static'> &
+export type SearchListItemProps = Pick<TagItem, 'tagId' | 'tagName' | 'static'> &
   Pick<GroupItem, 'groupId' | 'groupName'> &
   Pick<TabItem, 'tabId' | 'title' | 'url'>;
 
-type ActionCallbackFn = (
+export type ActionCallbackFn = (
   type: 'tag' | 'tabGroup' | 'tab',
   option?: SearchListItemProps
 ) => void;
@@ -28,7 +28,7 @@ const StyledSearchList = styled.div`
   position: relative;
 `;
 
-const StyledListItem = styled.div`
+export const StyledListItem = styled.div`
   .item-content {
     display: flex;
     align-items: center;
@@ -68,7 +68,7 @@ const StyledListItem = styled.div`
   }
 `;
 
-function SearchListItem({
+export function SearchListItem({
   option,
   onAction,
 }: {
@@ -221,8 +221,8 @@ export default forwardRef((_, ref) => {
   useImperativeHandle(ref, () => ({
     focus: () => {
       selectRef.current?.focus();
-    }
-  }))
+    },
+  }));
 
   return (
     <StyledSearchList ref={searchListRef}>

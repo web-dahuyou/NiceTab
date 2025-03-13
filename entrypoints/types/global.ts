@@ -138,12 +138,13 @@ export type SettingsProps = {
   allowDuplicateTabs?: boolean; // 同一个标签组中是否允许重复的标签页
   allowDuplicateGroups?: boolean; // 同一个分类中是否允许重复的标签组
   linkTemplate?: string; // 链接模板
-  tabCountThreshold?: number; // 分类中标签页超过该数量时，则右侧面板只展示单个分组
+  tabCountThreshold?: number; // 分类中标签页超过该数量时，则右侧面板开启虚拟滚动
   showOpenedTabCount?: boolean; // 扩展图标上是否显示打开的标签页数量
   showPageContextMenus?: boolean; // 网页中是否显示NiceTab右键菜单
   popupModuleDisplays?: PopupModuleNames[]; // popup面板中需要展示的模块
   autoExpandHomeTree?: boolean; // 进入列表页时，是否自动展开全部节点
   pageWidthType?: PageWidthTypes; // 主内容区宽度设置
+  showTabTitleTooltip?: boolean; // 是否显示标签页标题的tooltip
   autoSync?: boolean; // 是否开启自动同步
   autoSyncInterval?: number; // 自动同步间隔时间
   autoSyncType?: AutoSyncType; // 自动同步方式

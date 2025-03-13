@@ -67,6 +67,7 @@ const enUS: Record<LocaleKey, string> = {
   'settings.pageWidthType': 'Width of the page content area:',
   'settings.pageWidthType.fixed': 'Fixed',
   'settings.pageWidthType.responsive': 'Responsive',
+  'settings.showTabTitleTooltip': 'Display tooltip when hovering over a tab?',
 
   'settings.autoSync': 'Enable Auto Sync?',
   'settings.autoSyncInterval': 'Auto Sync Interval (in minutes)',

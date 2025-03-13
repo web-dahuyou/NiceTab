@@ -67,20 +67,33 @@ export const StyledColorItem = styled.div`
 export const GlobalStyle = createGlobalStyle`
   :root {
     --bg-color: ${(props) => props.theme.colorBgContainer || '#fff'};
+    --link-color: ${(props) =>
+      props.theme.type === 'light' ? props.theme.colorLink : '#8AB4F8'};
+    --link-color-hover: ${(props) =>
+      props.theme.type === 'light' ? props.theme.colorLinkHover : '#8AB4F8b6'};
   }
   html, body {
     --bg-color: ${(props) => props.theme.colorBgContainer || '#fff'};
     --text-color: ${(props) => props.theme.colorText || 'rgba(0, 0, 0, 0.88)'};
     color: ${(props) => props.theme.colorText || 'rgba(0, 0, 0, 0.88)'};
-	}
+  }
 
   .ellipsis {
     ${StyledEllipsis}
   }
 
-  ::-webkit-scrollbar, .nicetab-tree-list-scrollbar {
+  a.link {
+    color: var(--link-color);
+    cursor: pointer;
+    &:hover {
+      color: var(--link-color-hover);
+    }
+  }
+
+  ::-webkit-scrollbar,
+  .nicetab-tree-list-scrollbar-vertical,
+  .rc-virtual-list-scrollbar-vertical {
     width: 8px !important;
-    height: 8px !important;
   }
 
   ::-webkit-scrollbar-track {
@@ -88,13 +101,19 @@ export const GlobalStyle = createGlobalStyle`
     background: var(--bg-color, #fff) !important;
   }
 
-  ::-webkit-scrollbar-thumb, .nicetab-tree-list-scrollbar-thumb {
+  ::-webkit-scrollbar-thumb,
+  .nicetab-tree-list-scrollbar-thumb,
+  .rc-virtual-list-scrollbar-thumb {
     border-radius: 4px;
-    background: ${(props) => `${props.theme.type === 'light' ? '#d9d9d9' : '#555'} !important`};
+    background: ${(props) =>
+      `${props.theme.type === 'light' ? '#d9d9d9' : '#555'} !important`};
     box-shadow:inset 0 0 4px rgba(0, 0, 0, .3);
   }
 
-  ::-webkit-scrollbar-thumb:hover, .nicetab-tree-list-scrollbar-thumb:hover {
-    background: ${(props) => `${props.theme.type === 'light' ? '#bfbfbf' : '#888'} !important`};
+  ::-webkit-scrollbar-thumb:hover,
+  .nicetab-tree-list-scrollbar-thumb:hover,
+  .rc-virtual-list-scrollbar-thumb:hover {
+    background: ${(props) =>
+      `${props.theme.type === 'light' ? '#bfbfbf' : '#888'} !important`};
   }
 `;

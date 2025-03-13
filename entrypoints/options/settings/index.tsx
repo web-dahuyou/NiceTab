@@ -18,7 +18,7 @@ import type { FormProps } from 'antd';
 import styled from 'styled-components';
 import { isEqual } from 'lodash-es';
 import { useBlocker } from 'react-router-dom';
-import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
+import { getCustomLocaleMessages, type LocaleKeys } from '~/entrypoints/common/locale';
 import type { SettingsProps } from '~/entrypoints/types';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import {
@@ -62,6 +62,7 @@ const {
   POPUP_MODULE_DISPLAYS,
   AUTO_EXPAND_HOME_TREE,
   MAIN_CONTENT_WIDTH_TYPE,
+  SHOW_TAB_TITLE_TOOLTIP,
   AUTO_SYNC,
   AUTO_SYNC_INTERVAL,
   AUTO_SYNC_TYPE,
@@ -107,7 +108,7 @@ export default function Settings() {
   const actionAutoCloseFlagOptions = useMemo(() => {
     return SEND_TAB_ACTION_NAMES.map((actionName) => {
       return {
-        label: $fmt({ id: `common.${actionName}` }),
+        label: $fmt({ id: `common.${actionName}` as LocaleKeys }),
         value: actionName,
       };
     });
@@ -329,15 +330,9 @@ export default function Settings() {
             </Radio.Group>
           </Form.Item>
           {/* 发送标签页各种操作单独控制, 当 `发送标签页后是否关闭标签页` 设置为保留标签页时生效 */}
-          <Form.Item
-            noStyle
-            shouldUpdate={(prevValues, currentValues) =>
-              prevValues[CLOSE_TABS_AFTER_SEND_TABS] !==
-              currentValues[CLOSE_TABS_AFTER_SEND_TABS]
-            }
-          >
+          <Form.Item noStyle dependencies={[CLOSE_TABS_AFTER_SEND_TABS]}>
             {({ getFieldValue }) => {
-              return !getFieldValue(CLOSE_TABS_AFTER_SEND_TABS) ? (
+              return (
                 <Form.Item
                   label={$fmt(`${module}.${ACTION_AUTO_CLOSE_FLAGS}`)}
                   name={ACTION_AUTO_CLOSE_FLAGS}
@@ -351,9 +346,12 @@ export default function Settings() {
                     styles: { root: { maxWidth: '320px', width: '320px' } },
                   }}
                 >
-                  <Checkbox.Group options={actionAutoCloseFlagOptions}></Checkbox.Group>
+                  <Checkbox.Group
+                    options={actionAutoCloseFlagOptions}
+                    disabled={getFieldValue(CLOSE_TABS_AFTER_SEND_TABS)}
+                  ></Checkbox.Group>
                 </Form.Item>
-              ) : null;
+              );
             }}
           </Form.Item>
           {/* 发送标签页时-是否允许重复的标签组 */}
@@ -628,6 +626,17 @@ export default function Settings() {
             </Radio.Group>
           </Form.Item>
 
+          {/* 是否显示标签页标题的tooltip */}
+          <Form.Item<SettingsProps>
+            label={$fmt(`${module}.${SHOW_TAB_TITLE_TOOLTIP}`)}
+            name={SHOW_TAB_TITLE_TOOLTIP}
+          >
+            <Radio.Group>
+              <Radio value={true}>{$fmt('common.yes')}</Radio>
+              <Radio value={false}>{$fmt('common.no')}</Radio>
+            </Radio.Group>
+          </Form.Item>
+
           {/* ******************* 远程同步相关设置 ******************* */}
           <Divider>{$fmt('settings.block.autoSync')}</Divider>
           {/* 是否开启自动同步 */}
@@ -640,41 +649,56 @@ export default function Settings() {
               <Radio value={false}>{$fmt('common.no')}</Radio>
             </Radio.Group>
           </Form.Item>
-          {/* 自动同步间隔时间 */}
-          <Form.Item<SettingsProps> label={$fmt(`${module}.${AUTO_SYNC_INTERVAL}`)}>
-            {/* 嵌套一下没有别的意思，只是为了给slider的tooltip留出点空间 */}
-            <Form.Item<SettingsProps> name={AUTO_SYNC_INTERVAL}>
-              <Slider
-                min={5}
-                max={100}
-                step={5}
-                tooltip={{ open: true, placement: 'bottom', autoAdjustOverflow: false }}
-              />
-            </Form.Item>
-          </Form.Item>
-          {/* 自动同步方式 */}
-          <Form.Item<SettingsProps>
-            label={$fmt(`${module}.${AUTO_SYNC_TYPE}`)}
-            name={AUTO_SYNC_TYPE}
-            tooltip={{
-              color: token.colorBgElevated,
-              title: (
-                <Typography.Text>
-                  {$fmt(`${module}.${AUTO_SYNC_TYPE}.tooltip`)}
-                </Typography.Text>
-              ),
-              styles: { root: { maxWidth: '320px', width: '320px' } },
+          <Form.Item noStyle dependencies={[AUTO_SYNC]}>
+            {({ getFieldValue }) => {
+              return (
+                <>
+                  {/* 自动同步间隔时间 */}
+                  <Form.Item<SettingsProps>
+                    label={$fmt(`${module}.${AUTO_SYNC_INTERVAL}`)}
+                  >
+                    {/* 嵌套一下没有别的意思，只是为了给slider的tooltip留出点空间 */}
+                    <Form.Item<SettingsProps> name={AUTO_SYNC_INTERVAL}>
+                      <Slider
+                        min={5}
+                        max={100}
+                        step={5}
+                        tooltip={{
+                          open: true,
+                          placement: 'bottom',
+                          autoAdjustOverflow: false,
+                        }}
+                        disabled={!getFieldValue(AUTO_SYNC)}
+                      />
+                    </Form.Item>
+                  </Form.Item>
+                  {/* 自动同步方式 */}
+                  <Form.Item<SettingsProps>
+                    label={$fmt(`${module}.${AUTO_SYNC_TYPE}`)}
+                    name={AUTO_SYNC_TYPE}
+                    tooltip={{
+                      color: token.colorBgElevated,
+                      title: (
+                        <Typography.Text>
+                          {$fmt(`${module}.${AUTO_SYNC_TYPE}.tooltip`)}
+                        </Typography.Text>
+                      ),
+                      styles: { root: { maxWidth: '320px', width: '320px' } },
+                    }}
+                  >
+                    <Radio.Group disabled={!getFieldValue(AUTO_SYNC)}>
+                      <Space direction="vertical">
+                        {autoSyncTypeOptions.map((item) => (
+                          <Radio key={item.type} value={item.type}>
+                            {item.label}
+                          </Radio>
+                        ))}
+                      </Space>
+                    </Radio.Group>
+                  </Form.Item>
+                </>
+              );
             }}
-          >
-            <Radio.Group>
-              <Space direction="vertical">
-                {autoSyncTypeOptions.map((item) => (
-                  <Radio key={item.type} value={item.type}>
-                    {item.label}
-                  </Radio>
-                ))}
-              </Space>
-            </Radio.Group>
           </Form.Item>
 
           {/* ******************* 保存 ******************* */}

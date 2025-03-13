@@ -37,6 +37,7 @@ const {
   POPUP_MODULE_DISPLAYS,
   AUTO_EXPAND_HOME_TREE,
   MAIN_CONTENT_WIDTH_TYPE,
+  SHOW_TAB_TITLE_TOOLTIP,
   AUTO_SYNC,
   AUTO_SYNC_INTERVAL,
   AUTO_SYNC_TYPE,
@@ -73,6 +74,7 @@ export default class SettingsUtils {
     [POPUP_MODULE_DISPLAYS]: POPUP_MODULE_NAMES, // popup面板中需要展示的模块
     [AUTO_EXPAND_HOME_TREE]: false, // 进入列表页时，是否自动展开全部节点
     [MAIN_CONTENT_WIDTH_TYPE]: 'fixed' as PageWidthTypes, // 主内容区域宽度类型
+    [SHOW_TAB_TITLE_TOOLTIP]: false, // 是否显示标签页标题的tooltip
 
     [AUTO_SYNC]: false, // 是否开启自动同步
     [AUTO_SYNC_INTERVAL]: 30, // 自动同步间隔时间
