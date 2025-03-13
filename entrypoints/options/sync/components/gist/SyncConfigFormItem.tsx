@@ -50,9 +50,9 @@ export default function SyncConfigFormItem({ form, type }: SyncConfigFormItemPro
           {itemMap?.[type]?.title} {$fmt('common.config')}
         </Divider>
         <StyledLink>
-          <Typography.Link href={tokenSettingsPageUrls[type]} target="_blank">
+          <a className="link" href={tokenSettingsPageUrls[type]} target="_blank">
             <LinkOutlined /> {$fmt('sync.getYourToken')}
-          </Typography.Link>
+          </a>
         </StyledLink>
         <Form.Item<SyncConfigProps>
           label="Access Token"

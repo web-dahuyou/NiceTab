@@ -65,6 +65,7 @@ const zhCN = {
   'settings.pageWidthType': '页面内容区宽度设置：',
   'settings.pageWidthType.fixed': '固定宽度',
   'settings.pageWidthType.responsive': '自适应宽度',
+  'settings.showTabTitleTooltip': '标签页hover时是否展示tooltip：',
 
   'settings.autoSync': '是否开启自动同步：',
   'settings.autoSyncInterval': '自动同步间隔时间（分钟）：',

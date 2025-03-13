@@ -265,7 +265,8 @@ export default function Home() {
                 <strong>"{$fmt('common.sendCurrentTab')}"</strong>
               </Space>
               {$fmt('home.help.hotkey.2')}
-              <Typography.Link
+              <a
+                className="link"
                 onClick={() =>
                   openNewTab('chrome://extensions/shortcuts', {
                     active: true,
@@ -274,7 +275,7 @@ export default function Home() {
                 }
               >
                 {$fmt('home.help.hotkey.modify')}
-              </Typography.Link>
+              </a>
               <Tooltip
                 color={token.colorBgContainer}
                 title={

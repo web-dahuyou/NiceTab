@@ -1,7 +1,9 @@
 import styled from 'styled-components';
 import { blue } from '@ant-design/colors';
-import { StyledThemeProps, StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
-import { PRIMARY_COLOR } from '~/entrypoints/common/constants';
+import {
+  StyledThemeProps,
+  StyledEllipsis,
+} from '~/entrypoints/common/style/Common.styled';
 
 export const StyledTabItemWrapper = styled.div<{ $bgColor?: string }>`
   position: relative;
@@ -27,18 +29,12 @@ export const StyledTabItemFavicon = styled.i<{ $bgUrl?: string }>`
   background: url(${(props) => props.$bgUrl}) no-repeat center / 100% 100%;
 `;
 
-export const StyledTabTitle = styled.span<{ $color?: string; $colorHover?: string }>`
+export const StyledTabTitle = styled.span`
   flex: 1;
   width: 0;
   ${StyledEllipsis}
   .tab-item-title-text {
     font-size: 14px;
-    color: ${(props) => props.$color || blue.primary};
-    // text-decoration: underline;
-    cursor: pointer;
-    &:hover {
-      color: ${(props) => props.$colorHover || PRIMARY_COLOR};
-    }
   }
 `;
 

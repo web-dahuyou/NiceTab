@@ -1,5 +1,5 @@
 import React, { useCallback, useState, memo, useRef } from 'react';
-import { theme, Checkbox, Typography, Tooltip, Popover, Modal, QRCode } from 'antd';
+import { theme, Checkbox, Tooltip, Popover, Modal, QRCode } from 'antd';
 import { CloseOutlined, EditOutlined, QrcodeOutlined } from '@ant-design/icons';
 import { GroupItem, TabItem } from '~/entrypoints/types';
 import { getFaviconURL } from '~/entrypoints/common/utils';
@@ -30,6 +30,7 @@ const {
   CONFIRM_BEFORE_DELETING_TABS,
   SILENT_OPEN_TAB_MODIFIER_KEY,
   OPEN_TAB_MODIFIER_KEY,
+  SHOW_TAB_TITLE_TOOLTIP,
 } = ENUM_SETTINGS_PROPS;
 const osInfo = getOSInfo();
 
@@ -50,12 +51,9 @@ const TabItemTooltipMarkup = memo(function TabItemTooltipMarkup({
       </div>
       <div className="tooltip-item tooltip-url">
         <span className="label">{$fmt('common.url')}:</span>
-        {/* <span className="link" title={tab.url}>
+        <a className="link" href={tab.url} target="_blank" title={tab.url}>
           {tab.url}
-        </span> */}
-        <Typography.Link className="link" href={tab.url} target="_blank" title={tab.url}>
-          {tab.url}
-        </Typography.Link>
+        </a>
       </div>
     </StyledTabItemTooltip>
   );
@@ -74,6 +72,7 @@ export default memo(function TabListItem({
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const [removeModal, removeContextHolder] = Modal.useModal();
+  const [tooltipSwitch, setTooltipSwitch] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -141,6 +140,7 @@ export default memo(function TabListItem({
   // 鼠标点击标签页
   const onTabOpen = useCallback(
     (event: React.MouseEvent) => {
+      event.preventDefault();
       const settings = settingsUtils.settings;
       let silentModifierKey = settings[SILENT_OPEN_TAB_MODIFIER_KEY] || '';
       let defaultModifierKey = settings[OPEN_TAB_MODIFIER_KEY] || '';
@@ -188,7 +188,11 @@ export default memo(function TabListItem({
   }, []);
 
   useEffect(() => {
-    eventEmitter.on('home:is-dragging', draggingListener);
+    const _toolTipswitch = !!settingsUtils?.settings?.[SHOW_TAB_TITLE_TOOLTIP];
+    setTooltipSwitch(_toolTipswitch);
+    if (_toolTipswitch) {
+      eventEmitter.on('home:is-dragging', draggingListener);
+    }
     return () => {
       eventEmitter.off('home:is-dragging', draggingListener);
     };
@@ -251,26 +255,34 @@ export default memo(function TabListItem({
           $bgUrl={tab.favIconUrl || getFaviconURL(tab.url!)}
         />
         {/* tab title */}
-        <StyledTabTitle
-          className="tab-item-title"
-          $color={token.colorLink}
-          $colorHover={token.colorLinkHover}
-        >
-          <Tooltip
-            open={!isDragging && tooltipVisible}
-            placement="topLeft"
-            styles={{ root: { maxWidth: '360px', width: '360px' } }}
-            title={<TabItemTooltipMarkup tab={tab} />}
-            color={token.colorBgElevated}
-            destroyTooltipOnHide
-            mouseEnterDelay={0.4}
-            mouseLeaveDelay={0.3}
-            onOpenChange={setTooltipVisible}
-          >
-            <span className="tab-item-title-text" onClick={onTabOpen}>
+        <StyledTabTitle className="tab-item-title">
+          {tooltipSwitch ? (
+            <Tooltip
+              open={!isDragging && tooltipVisible}
+              placement="topLeft"
+              styles={{ root: { maxWidth: '360px', width: '360px' } }}
+              title={<TabItemTooltipMarkup tab={tab} />}
+              color={token.colorBgElevated}
+              destroyTooltipOnHide
+              mouseEnterDelay={0.4}
+              mouseLeaveDelay={0.3}
+              onOpenChange={setTooltipVisible}
+            >
+              <a className="link" href={tab.url} draggable={false} onClick={onTabOpen}>
+                {tab.title}
+              </a>
+            </Tooltip>
+          ) : (
+            <a
+              className="link"
+              href={tab.url}
+              title={tab.title}
+              draggable={false}
+              onClick={onTabOpen}
+            >
               {tab.title}
-            </span>
-          </Tooltip>
+            </a>
+          )}
         </StyledTabTitle>
       </StyledTabItemWrapper>
 

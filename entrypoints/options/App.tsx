@@ -244,7 +244,11 @@ function AppLayout() {
   const extActionOptions: MenuProps['items'] = [
     { key: 'sendAllTabs', icon: <SendOutlined />, label: $fmt('common.sendAllTabs') },
     { key: 'bindShortcuts', icon: <KeyOutlined />, label: $fmt('common.bindShortcuts') },
-    { key: 'hibernateTabs', icon: <CoffeeOutlined />, label: $fmt('common.hibernateTabs') },
+    {
+      key: 'hibernateTabs',
+      icon: <CoffeeOutlined />,
+      label: $fmt('common.hibernateTabs'),
+    },
     { key: 'reload', icon: <ReloadOutlined />, label: $fmt('common.reload') },
   ];
 
@@ -295,9 +299,9 @@ function AppLayout() {
                 })}
                 :
               </Typography.Text>
-              <Typography.Link href="javascript:void(0);" onClick={updateReload}>
+              <a className="link" onClick={updateReload}>
                 {$fmt('common.update.upgradeNow')}
-              </Typography.Link>
+              </a>
             </Space>
           )}
 

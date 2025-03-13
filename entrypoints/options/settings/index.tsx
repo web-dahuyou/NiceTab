@@ -62,6 +62,7 @@ const {
   POPUP_MODULE_DISPLAYS,
   AUTO_EXPAND_HOME_TREE,
   MAIN_CONTENT_WIDTH_TYPE,
+  SHOW_TAB_TITLE_TOOLTIP,
   AUTO_SYNC,
   AUTO_SYNC_INTERVAL,
   AUTO_SYNC_TYPE,
@@ -622,6 +623,17 @@ export default function Settings() {
               <Radio value="responsive">
                 {$fmt(`settings.${MAIN_CONTENT_WIDTH_TYPE}.responsive`)}
               </Radio>
+            </Radio.Group>
+          </Form.Item>
+
+          {/* 是否显示标签页标题的tooltip */}
+          <Form.Item<SettingsProps>
+            label={$fmt(`${module}.${SHOW_TAB_TITLE_TOOLTIP}`)}
+            name={SHOW_TAB_TITLE_TOOLTIP}
+          >
+            <Radio.Group>
+              <Radio value={true}>{$fmt('common.yes')}</Radio>
+              <Radio value={false}>{$fmt('common.no')}</Radio>
             </Radio.Group>
           </Form.Item>
 

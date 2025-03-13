@@ -67,15 +67,27 @@ export const StyledColorItem = styled.div`
 export const GlobalStyle = createGlobalStyle`
   :root {
     --bg-color: ${(props) => props.theme.colorBgContainer || '#fff'};
+    --link-color: ${(props) =>
+      props.theme.type === 'light' ? props.theme.colorLink : '#8AB4F8'};
+    --link-color-hover: ${(props) =>
+      props.theme.type === 'light' ? props.theme.colorLinkHover : '#8AB4F8b6'};
   }
   html, body {
     --bg-color: ${(props) => props.theme.colorBgContainer || '#fff'};
     --text-color: ${(props) => props.theme.colorText || 'rgba(0, 0, 0, 0.88)'};
     color: ${(props) => props.theme.colorText || 'rgba(0, 0, 0, 0.88)'};
-	}
+  }
 
   .ellipsis {
     ${StyledEllipsis}
+  }
+
+  a.link {
+    color: var(--link-color);
+    cursor: pointer;
+    &:hover {
+      color: var(--link-color-hover);
+    }
   }
 
   ::-webkit-scrollbar,
@@ -93,13 +105,15 @@ export const GlobalStyle = createGlobalStyle`
   .nicetab-tree-list-scrollbar-thumb,
   .rc-virtual-list-scrollbar-thumb {
     border-radius: 4px;
-    background: ${(props) => `${props.theme.type === 'light' ? '#d9d9d9' : '#555'} !important`};
+    background: ${(props) =>
+      `${props.theme.type === 'light' ? '#d9d9d9' : '#555'} !important`};
     box-shadow:inset 0 0 4px rgba(0, 0, 0, .3);
   }
 
   ::-webkit-scrollbar-thumb:hover,
   .nicetab-tree-list-scrollbar-thumb:hover,
   .rc-virtual-list-scrollbar-thumb:hover {
-    background: ${(props) => `${props.theme.type === 'light' ? '#bfbfbf' : '#888'} !important`};
+    background: ${(props) =>
+      `${props.theme.type === 'light' ? '#bfbfbf' : '#888'} !important`};
   }
 `;
