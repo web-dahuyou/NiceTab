@@ -45,6 +45,6 @@
     "@types/react-dom": "^18.3.0",
     "@wxt-dev/module-react": "^1.1.0",
     "typescript": "^5.5.4",
-    "wxt": "^0.19.26"
+    "wxt": "^0.19.29"
   }
 }
