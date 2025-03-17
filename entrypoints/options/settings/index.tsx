@@ -126,7 +126,8 @@ export default function Settings() {
 
   const onFinish: FormProps<SettingsProps>['onFinish'] = async (values) => {
     console.log('Save Success:', values);
-    const newSettings = { ...settingsUtils.initialSettings, ...values };
+    const settings = await settingsUtils.getSettings();
+    const newSettings = { ...settingsUtils.initialSettings, ...settings, ...values };
 
     await settingsUtils.setSettings(newSettings);
     NiceGlobalContext.setSettings(newSettings);
