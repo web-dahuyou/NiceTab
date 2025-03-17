@@ -39,7 +39,11 @@ import '~/assets/css/index.css';
 import { IconTheme } from '~/entrypoints/common/components/icon/CustomIcon';
 import ColorList from '~/entrypoints/common/components/ColorList.tsx';
 import { pick, sendRuntimeMessage } from '~/entrypoints/common/utils';
-import { ENUM_ACTION_NAME, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
+import {
+  ENUM_ACTION_NAME,
+  ENUM_SETTINGS_PROPS,
+  SHORTCUTS_PAGE_URL,
+} from '~/entrypoints/common/constants';
 import { actionHandler } from '../common/contextMenus';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { settingsUtils } from '~/entrypoints/common/storage';
@@ -246,7 +250,12 @@ function AppLayout() {
   // 插件操作选项
   const extActionOptions: MenuProps['items'] = [
     { key: 'sendAllTabs', icon: <SendOutlined />, label: $fmt('common.sendAllTabs') },
-    { key: 'bindShortcuts', icon: <KeyOutlined />, label: $fmt('common.bindShortcuts') },
+    {
+      key: 'bindShortcuts',
+      icon: <KeyOutlined />,
+      label: $fmt('common.bindShortcuts'),
+      disabled: import.meta.env.FIREFOX,
+    },
     {
       key: 'hibernateTabs',
       icon: <CoffeeOutlined />,
@@ -261,7 +270,7 @@ function AppLayout() {
     } else if (key === 'reload') {
       browser.runtime.reload();
     } else if (key === 'bindShortcuts') {
-      openNewTab('chrome://extensions/shortcuts', {
+      openNewTab(SHORTCUTS_PAGE_URL, {
         active: true,
         openToNext: true,
       });

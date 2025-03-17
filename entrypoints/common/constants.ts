@@ -23,6 +23,7 @@ import type {
   PopupModuleNames,
   PageContextType,
 } from '~/entrypoints/types';
+export * from './envVars';
 
 export const GITHUB_URL = 'https://github.com/web-dahuyou/NiceTab';
 

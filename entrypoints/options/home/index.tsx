@@ -21,7 +21,12 @@ import {
   recycleUtils,
   initTabListStorageListener,
 } from '~/entrypoints/common/storage';
-import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
+import {
+  ENUM_SETTINGS_PROPS,
+  SHORTCUTS_PAGE_URL,
+  shortcutsPageUrlMap,
+  type BrowserType,
+} from '~/entrypoints/common/constants';
 import {
   openNewTab,
   reloadOtherAdminPage,
@@ -265,27 +270,31 @@ export default function Home() {
                 <strong>"{$fmt('common.sendCurrentTab')}"</strong>
               </Space>
               {$fmt('home.help.hotkey.2')}
-              <a
-                className="link"
-                onClick={() =>
-                  openNewTab('chrome://extensions/shortcuts', {
-                    active: true,
-                    openToNext: true,
-                  })
-                }
-              >
-                {$fmt('home.help.hotkey.modify')}
-              </a>
+              {import.meta.env.FIREFOX ? (
+                <span>{$fmt('home.help.hotkey.modify')}</span>
+              ) : (
+                <a
+                  className="link"
+                  onClick={() =>
+                    openNewTab(SHORTCUTS_PAGE_URL, {
+                      active: true,
+                      openToNext: true,
+                    })
+                  }
+                >
+                  {$fmt('home.help.hotkey.modify')}
+                </a>
+              )}
               <Tooltip
                 color={token.colorBgContainer}
                 title={
                   <Flex vertical>
-                    <Typography.Text>
-                      <strong>Chrome</strong>: chrome://extensions/shortcuts
-                    </Typography.Text>
-                    <Typography.Text>
-                      <strong>Edge</strong>: edge://extensions/shortcuts
-                    </Typography.Text>
+                    {['chrome', 'edge', 'firefox'].map((type) => (
+                      <Typography.Text key={type}>
+                        <strong>{type}: </strong>
+                        {shortcutsPageUrlMap[type as BrowserType]}
+                      </Typography.Text>
+                    ))}
                     <Typography.Text>
                       {$fmt('home.help.hotkey.modifyTip')}
                     </Typography.Text>
