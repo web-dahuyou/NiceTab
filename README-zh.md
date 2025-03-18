@@ -11,6 +11,16 @@
 - 微软 Edge 商店：[Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/ompjiaelpibiggcnanhbdblkhfdmkgnl) （（由于审核周期比较长，版本发布会比Chrome版本慢））
 - Firefox 暂未发布。
 
+### 注意事项
+出于安全原因，在 Firefox 中，可能不允许使用特权 URL，例如：
+- chrome: URL
+- javascript: URL
+- data: URL
+- file: URL
+- Firefox 的特权 about: URL（例如，`about:config`、`about:addons`、`about:debugging`）。非特权 URL（例如 `about:blank`）是允许的。
+
+如果页面链接符合上述场景，点击链接可能无法打开页面，请手动复制链接进行访问。
+
 ## 基础介绍
 - 本项目是一个方便快捷管理浏览器标签页的浏览器插件。
 - 取名 `NiceTab` 是希望它是一个用起来很 nice 的 tab 标签页管理工具（不过本人的UI和交互设计太差，只能凑合凑合了）。 

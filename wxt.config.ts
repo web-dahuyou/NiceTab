@@ -4,6 +4,8 @@ import yargsParser from 'yargs-parser';
 
 const args = yargsParser(process.argv.slice(2));
 
+const isFirefox = args.b === 'firefox';
+
 export default defineConfig({
   // entrypointLoader: 'jiti',
   // extensionApi: 'chrome',
@@ -19,7 +21,7 @@ export default defineConfig({
       'contextMenus',
       'unlimitedStorage',
       'alarms',
-      ...(args.b === 'firefox' ? [] : ['tabGroups', 'commands', 'favicon']),
+      ...(isFirefox ? [] : ['tabGroups', 'commands', 'favicon']),
     ],
     homepage_url: 'https://github.com/web-dahuyou/NiceTab',
     host_permissions: ['<all_urls>'],

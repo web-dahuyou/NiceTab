@@ -13,6 +13,16 @@
   (Note that due to longer review times, the Edge store release may lag behind the Chrome version.)
 - Firefox: Not yet available.
 
+### Notes
+For security reasons, Firefox may not allow privileged URLs such as:
+- chrome: URLs
+- javascript: URLs  
+- data: URLs
+- file: URLs
+- Firefox's privileged about: URLs (e.g., `about:config`, `about:addons`, `about:debugging`). Non-privileged URLs (e.g., `about:blank`) are allowed.
+
+If a page URL matches any of the above cases, opening tab may not work. Please manually copy the URL to open it.
+
 ## Overview
 
 - NiceTab is a browser extension that makes managing your browser tabs quick and convenient.

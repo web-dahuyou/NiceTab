@@ -9,6 +9,7 @@ import {
   Space,
   Typography,
   Tooltip,
+  Divider,
   type MenuProps,
 } from 'antd';
 import { QuestionCircleOutlined, MoreOutlined, ClearOutlined } from '@ant-design/icons';
@@ -254,6 +255,19 @@ export default function Home() {
         width={600}
       >
         <StyledHelpInfoBox>
+          {import.meta.env.FIREFOX && (
+            <>
+              <p style={{ marginBottom: '4px' }}>
+                <strong>{$fmt('common.note')}</strong>: {$fmt('home.help.reminder.start')}
+              </p>
+              <ul
+                dangerouslySetInnerHTML={{ __html: $fmt('home.help.reminder.list') }}
+              ></ul>
+              <p style={{ marginBottom: '8px' }}>{$fmt('home.help.reminder.end')}</p>
+              <Divider></Divider>
+            </>
+          )}
+
           <ul dangerouslySetInnerHTML={{ __html: $fmt('home.help.content') }}></ul>
 
           <p style={{ marginBottom: '8px' }}>

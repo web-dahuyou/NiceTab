@@ -86,6 +86,7 @@ export const StyledTreeNodeItem = styled.div`
 
 export const StyledHelpInfoBox = styled.div`
   ul {
+    padding-left: 16px;
     list-style-type: disc;
     li {
       margin-bottom: 8px;
