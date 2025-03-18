@@ -198,32 +198,4 @@ Feel free to join our QQ group: 924270240
 
 ## Extension Development
 
-### Project Setup
-- Install dependencies:  
-  `pnpm install`
-- Start the dev server:  
-  `pnpm run dev`
-
-Important: Each `.js .ts .tsx` file must have an `export default` statement. Otherwise, you'll encounter errors when running the local service.
-
-### Set Browser Binaries 
-
-By default, `WXT` will try to automatically discover where `Chrome/Firefox` are installed. If you encounter an error:
-
-```
-ERROR  No Chrome installations found.  
-```
-
-Or you want to specify a browser executable binary.
-
-You can refer to the [docs - Set Browser Binaries](https://wxt.dev/guide/essentials/config/browser-startup.html#set-browser-binaries) to manually configure the browser binary paths.
-
-```js
-export default defineRunnerConfig({
-  binaries: {
-    chrome: '/path/to/chrome-beta', // Use Chrome Beta instead of regular Chrome
-    firefox: 'firefoxdeveloperedition', // Use Firefox Developer Edition instead of regular Firefox
-    edge: '/path/to/edge', // Open MS Edge when running "wxt -b edge"
-  },
-});
-```
+See [NiceTab Contributing Guide](./CONTRIBUTING.md)
