@@ -26,12 +26,13 @@ export default defineConfig({
     homepage_url: 'https://github.com/web-dahuyou/NiceTab',
     host_permissions: ['<all_urls>'],
     default_locale: 'zh_CN',
-    content_security_policy: {
-      extension_pages:
-        "script-src 'self' 'wasm-unsafe-eval' http://localhost:8097; object-src 'self';",
-      sandbox:
-        "sandbox allow-scripts; script-src 'self' https://api.github.com https://gitee.com; object-src 'self'",
-    },
+    content_security_policy: isFirefox
+      ? "script-src 'self'; object-src 'self';"
+      : {
+          extension_pages: "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';",
+          sandbox:
+            "sandbox allow-scripts; script-src 'self' https://api.github.com https://gitee.com; object-src 'self'",
+        },
     commands: {
       'action:openAdminTab': {
         suggested_key: {
