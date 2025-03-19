@@ -11,7 +11,7 @@
 - Google Chrome Web Store: [Chrome Web Store](https://chromewebstore.google.com/detail/fonflmjnjbkigocpoommgmhljdpljain)
 - Microsoft Edge Add-ons: [Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/ompjiaelpibiggcnanhbdblkhfdmkgnl)  
   (Note that due to longer review times, the Edge store release may lag behind the Chrome version.)
-- Firefox: Not yet available.
+- Firefox Browser Add-ons: [Firefox Browser Addons](https://addons.mozilla.org/zh-CN/firefox/addon/nice-tab-manager-%E6%A0%87%E7%AD%BE%E9%A1%B5%E7%AE%A1%E7%90%86%E5%99%A8/) 
 
 ### Notes
 For security reasons, Firefox may not allow privileged URLs such as:
