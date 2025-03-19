@@ -86,6 +86,7 @@ const zhCN = {
   'common.search': '搜索',
   'common.reload': '重新加载',
   'common.confirmReminder': '确认提醒',
+  'common.note': '注意',
 };
 
 export type LocaleKey = keyof typeof zhCN;

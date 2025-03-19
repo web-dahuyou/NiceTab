@@ -9,7 +9,17 @@
 ## 扩展安装
 - 谷歌 Chrome 应用商店：[Chrome Web Store](https://chromewebstore.google.com/detail/fonflmjnjbkigocpoommgmhljdpljain)
 - 微软 Edge 商店：[Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/ompjiaelpibiggcnanhbdblkhfdmkgnl) （（由于审核周期比较长，版本发布会比Chrome版本慢））
-- Firefox 暂未发布。
+- Firefox 附加组件: [Firefox Browser Addons](https://addons.mozilla.org/zh-CN/firefox/addon/nice-tab-manager-%E6%A0%87%E7%AD%BE%E9%A1%B5%E7%AE%A1%E7%90%86%E5%99%A8/) 
+
+### 注意事项
+出于安全原因，在 Firefox 中，可能不允许使用特权 URL，例如：
+- chrome: URL
+- javascript: URL
+- data: URL
+- file: URL
+- Firefox 的特权 about: URL（例如，`about:config`、`about:addons`、`about:debugging`）。非特权 URL（例如 `about:blank`）是允许的。
+
+如果页面链接符合上述场景，点击链接可能无法打开页面，请手动复制链接进行访问。
 
 ## 基础介绍
 - 本项目是一个方便快捷管理浏览器标签页的浏览器插件。

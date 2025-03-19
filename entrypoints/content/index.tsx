@@ -6,7 +6,7 @@ import App from './App';
 
 export default defineContentScript({
   // "matches": ['<all_urls>'],
-  matches: ["*://*/*"],
+  matches: ['*://*/*'],
   cssInjectionMode: "ui",
   // cssInjectionMode: 'manual',
 
@@ -39,15 +39,20 @@ export default defineContentScript({
 
     // createIntegratedUi 方式
     // const ui = await createIntegratedUi(ctx, {
-    //   position: "inline",
-    //   anchor: "body",
-    //   append: "first",
+    //   position: 'modal',
+    //   anchor: 'body',
+    //   // append: "first",
     //   onMount: (container) => {
-    //     const wrapper = document.createElement("div");
+    //     const wrapper = document.createElement('div');
     //     container.append(wrapper);
 
     //     const root = ReactDOM.createRoot(wrapper);
-    //     root.render(<App />);
+    //     // root.render(<App />);
+    //     root.render(
+    //       <Root pageContext="contentScriptPage">
+    //         <App />
+    //       </Root>
+    //     );
     //     return { root, wrapper };
     //   },
     //   onRemove: (elements) => {

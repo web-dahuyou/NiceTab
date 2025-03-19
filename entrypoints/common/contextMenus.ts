@@ -190,7 +190,7 @@ export async function handleSendTabsAction(
     await actionHandler(actionName, targetData);
     tabUtils.executeContentScript(actionName);
   } catch (error) {
-    console.error(error);
+    console.log(error);
     tabUtils.executeContentScript(actionName, 'error');
   }
 }

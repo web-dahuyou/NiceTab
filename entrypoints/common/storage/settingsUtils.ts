@@ -58,8 +58,8 @@ export default class SettingsUtils {
     [ACTION_AUTO_CLOSE_FLAGS]: [], // 各种操作的自动关闭标签页标志
     [RESTORE_IN_NEW_WINDOW]: false, // 是否在新窗口打开标签组
     [DELETE_AFTER_RESTORE]: false, // 恢复标签页/标签组时是否从列表中删除
-    [UNNAMED_GROUP_RESTORE_AS_GROUP]: true, // 是否以标签组形式恢复未命名标签组
-    [NAMED_GROUP_RESTORE_AS_GROUP]: true, // 是否以标签组形式恢复已命名标签组
+    [UNNAMED_GROUP_RESTORE_AS_GROUP]: import.meta.env.FIREFOX ? false : true, // 是否以标签组形式恢复未命名标签组
+    [NAMED_GROUP_RESTORE_AS_GROUP]: import.meta.env.FIREFOX ? false : true, // 是否以标签组形式恢复已命名标签组
     [SILENT_OPEN_TAB_MODIFIER_KEY]: 'alt', // 静默打开标签页的修饰键
     [OPEN_TAB_MODIFIER_KEY]: '', // 前台打开标签页的修饰键
     [DELETE_UNLOCKED_EMPTY_GROUP]: true, // 是否删除未锁定的空标签组

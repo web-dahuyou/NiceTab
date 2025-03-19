@@ -11,7 +11,11 @@ import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { getAdminTabInfo, openNewTab, discardOtherTabs } from '~/entrypoints/common/tabs';
 import { getMenus, strategyHandler } from '~/entrypoints/common/contextMenus';
 import { settingsUtils } from '~/entrypoints/common/storage';
-import { TAB_EVENTS, ENUM_ACTION_NAME } from '~/entrypoints/common/constants';
+import {
+  TAB_EVENTS,
+  ENUM_ACTION_NAME,
+  SHORTCUTS_PAGE_URL,
+} from '~/entrypoints/common/constants';
 import type { PopupModuleNames } from '~/entrypoints/types';
 import {
   GITHUB_URL,
@@ -66,8 +70,9 @@ export default function App() {
     {
       path: '/shortcuts',
       label: $fmt('common.bindShortcuts'),
+      disabled: import.meta.env.FIREFOX,
       onClick: () => {
-        openNewTab('chrome://extensions/shortcuts', {
+        openNewTab(SHORTCUTS_PAGE_URL, {
           active: true,
           openToNext: true,
         });
@@ -208,7 +213,12 @@ export default function App() {
               <span className="block-title">{$fmt('common.goto')}：</span>
               <div className="block-content">
                 {quickJumpBtns.map((item) => (
-                  <Button size="small" key={item.path} onClick={item.onClick}>
+                  <Button
+                    size="small"
+                    key={item.path}
+                    disabled={item.disabled}
+                    onClick={item.onClick}
+                  >
                     {item.label}
                   </Button>
                 ))}
