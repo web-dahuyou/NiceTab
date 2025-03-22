@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { theme, Collapse, Space, Button, Modal, Empty, Alert } from 'antd';
+import { isEmpty } from 'lodash-es';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import useUrlParams from '~/entrypoints/common/hooks/urlParams';
 import { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
@@ -17,6 +18,8 @@ export default function RecycleBin() {
   const [activeKey, setActiveKey] = useState<string | string[]>([]);
   const [recoverModalVisible, setRecoverModalVisible] = useState<boolean>(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState<boolean>(false);
+
+  const isEmptyRecycleBin = isEmpty(tagList);
 
   // 获取回收站数据
   const getRecycleBinData = useCallback(async () => {
@@ -117,10 +120,18 @@ export default function RecycleBin() {
             {$fmt('home.collapseAll')}
           </Button>
           */}
-          <Button type="primary" onClick={() => setRecoverModalVisible(true)}>
+          <Button
+            disabled={isEmptyRecycleBin}
+            type="primary"
+            onClick={() => setRecoverModalVisible(true)}
+          >
             {$fmt('home.recoverAll')}
           </Button>
-          <Button type="primary" onClick={() => setConfirmModalVisible(true)}>
+          <Button
+            disabled={isEmptyRecycleBin}
+            type="primary"
+            onClick={() => setConfirmModalVisible(true)}
+          >
             {$fmt('home.clearAll')}
           </Button>
           <Alert
@@ -132,7 +143,7 @@ export default function RecycleBin() {
         </Space>
       </StickyBox>
 
-      {tagList?.length > 0 ? (
+      {!isEmptyRecycleBin ? (
         <Collapse
           bordered={false}
           size="large"
