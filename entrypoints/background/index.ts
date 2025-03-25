@@ -8,7 +8,7 @@ import initSettingsStorageListener, {
   themeUtils,
   settingsUtils,
 } from '~/entrypoints/common/storage';
-import { autoSyncAlarm } from '~/entrypoints/common/alarms';
+import { autoSyncAlarm, autoSaveOpenedTabsAlarm } from '~/entrypoints/common/alarms';
 import {
   PRIMARY_COLOR,
   // TAB_EVENTS,
@@ -84,6 +84,8 @@ export default defineBackground(() => {
 
   // 创建自动同步闹钟
   autoSyncAlarm.create();
+  // 创建自动保存已打开标签页的闹钟
+  autoSaveOpenedTabsAlarm.create();
 
   // 左键点击图标 (如果有 popup 是不会触发的，可以执行 browser[BROWSER_ACTION_API_NAME].setPopup({ popup: '' }) 来监听事件)
   // Fired when an action icon is clicked. This event will not fire if the action has a popup.

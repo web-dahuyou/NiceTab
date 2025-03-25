@@ -7,7 +7,10 @@ export default class StateUtils {
   initialState: StateProps = {
     home: {
       'sidebarCollapsed': false,
-    }
+    },
+    global: {
+      openedTabs: [],
+    },
   };
   state: StateProps = this.initialState;
 

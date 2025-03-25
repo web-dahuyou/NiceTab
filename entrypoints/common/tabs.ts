@@ -201,7 +201,7 @@ export async function openAdminTab(
   await openAdminRoutePage({ path: '/home', query: params }, openAdminTabAfterSendTabs);
 }
 // 获取过滤后的标签页
-async function getFilteredTabs(
+export async function getFilteredTabs(
   tabs: Tabs.Tab[],
   settings: SettingsProps,
   validator?: (tab: Tabs.Tab) => boolean
