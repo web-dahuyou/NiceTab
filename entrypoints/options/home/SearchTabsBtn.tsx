@@ -39,7 +39,6 @@ export default function SearchTabsBtn() {
   const { $fmt } = useIntlUtls();
   const { treeDataHook } = useContext(HomeContext);
   const { tagList, selectedKeyChange } = treeDataHook;
-  const [searchValue, setSearchValue] = useState<string>('');
   const [filterList, setFilterList] = useState<SearchListItemProps[]>([]);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [listHeight, setListHeight] = useState<number>(500);
