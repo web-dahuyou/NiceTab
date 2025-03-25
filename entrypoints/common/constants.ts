@@ -179,6 +179,7 @@ export const DEFAULT_EXCLUDE_DOMAINS = [
   'about:blank',
   'chrome://newtab/',
   'edge://newtab/',
+  import.meta.env.FIREFOX ? '^about:.+$' : 'about:newtab',
 ];
 
 // 同步方式枚举
