@@ -110,6 +110,7 @@ export enum ENUM_SETTINGS_PROPS {
   LANGUAGE = 'language', // 语言
   THEME_TYPE = 'themeType', // 主题类型
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH = 'openAdminTabAfterBrowserLaunch', // 启动浏览器时是否自动打开管理后台
+  OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED = 'openAdminTabAfterWindowCreated', // 新开window窗口时是否自动打开管理后台
   SHOW_SEND_TARGET_MODAL = 'showSendTargetModal', // 发送标签页时是否显示目标选择弹窗
   AUTO_PIN_ADMIN_TAB = 'autoPinAdminTab', // 是否固定管理后台
   OPEN_ADMIN_TAB_AFTER_SEND_TABS = 'openAdminTabAfterSendTabs', // 发送标签页后是否打开管理后台
