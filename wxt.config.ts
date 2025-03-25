@@ -27,7 +27,9 @@ export default defineConfig({
     host_permissions: ['<all_urls>'],
     default_locale: 'zh_CN',
     content_security_policy: isFirefox
-      ? "script-src 'self'; object-src 'self';"
+      ? {
+          extension_pages: "script-src 'self'; object-src 'self';",
+        }
       : {
           extension_pages: "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';",
           sandbox:

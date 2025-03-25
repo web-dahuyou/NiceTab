@@ -13,6 +13,7 @@ const {
   LANGUAGE,
   THEME_TYPE,
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
+  OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED,
   SHOW_SEND_TARGET_MODAL,
   OPEN_ADMIN_TAB_AFTER_SEND_TABS,
   ALLOW_SEND_PINNED_TABS,
@@ -49,6 +50,7 @@ export default class SettingsUtils {
     [LANGUAGE]: defaultLanguage,
     [THEME_TYPE]: defaultThemeType,
     [OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH]: true, // 启动浏览器时是否自动打开管理后台
+    [OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED]: false, // 新开window窗口时是否自动打开管理后台
     [AUTO_PIN_ADMIN_TAB]: true, // 是否固定管理后台
     [SHOW_SEND_TARGET_MODAL]: false, // 发送标签页时是否显示目标选择弹窗
     [OPEN_ADMIN_TAB_AFTER_SEND_TABS]: true, // 发送标签页后默认打开管理后台
