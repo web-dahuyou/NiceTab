@@ -74,7 +74,7 @@ export default function TagNode({
 
   return (
     <StyledTagNode>
-      <TagOutlined />
+      <TagOutlined style={{ fontSize: '16px' }} />
       <div className="tag-name">{ tag.static ? $fmt('home.stagingArea') : tag.tagName }</div>
       <Flex align="center">
         <span className="count" style={{ color: ENUM_COLORS.volcano }}>
