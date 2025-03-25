@@ -21,6 +21,7 @@ import type { RuntimeMessageEventProps } from '~/entrypoints/types';
 
 const {
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
+  OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED,
   SHOW_OPENED_TAB_COUNT,
   POPUP_MODULE_DISPLAYS,
 } = ENUM_SETTINGS_PROPS;
@@ -94,10 +95,24 @@ export default defineBackground(() => {
     }
   });
 
-  browser.runtime.onInstalled.addListener(async () => {
-    console.log('browser.runtime.onInstalled');
+  async function startup() {
     const settings = await settingsUtils.getSettings();
     if (settings[OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH]) {
+      tabUtils.openAdminRoutePage({ path: '/home' });
+    }
+  }
+  browser.runtime.onInstalled.addListener(() => {
+    console.log('browser.runtime.onInstalled');
+    startup();
+  });
+  browser.runtime.onStartup.addListener(() => {
+    console.log('browser.runtime.onStartup');
+    startup();
+  });
+  browser.windows.onCreated.addListener(async () => {
+    console.log('browser.windows.onCreated');
+    const settings = await settingsUtils.getSettings();
+    if (settings[OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED]) {
       tabUtils.openAdminRoutePage({ path: '/home' });
     }
   });

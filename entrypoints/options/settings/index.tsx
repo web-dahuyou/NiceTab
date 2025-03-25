@@ -38,6 +38,7 @@ import { useSyncType } from '../sync/hooks/syncType';
 const {
   LANGUAGE,
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
+  OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED,
   OPEN_ADMIN_TAB_AFTER_SEND_TABS,
   CLOSE_TABS_AFTER_SEND_TABS,
   ACTION_AUTO_CLOSE_FLAGS,
@@ -202,10 +203,7 @@ export default function Settings() {
           </Form.Item>
           {/* 启动浏览器时是否自动打开NiceTab管理后台 */}
           <Form.Item<SettingsProps>
-            label={$fmt({
-              id: `${module}.${OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH}`,
-              values: { mark: '：' },
-            })}
+            label={$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH}`)}
             name={OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH}
           >
             <Radio.Group>
@@ -214,6 +212,20 @@ export default function Settings() {
               </Radio>
               <Radio value={false}>
                 {$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH}.no`)}
+              </Radio>
+            </Radio.Group>
+          </Form.Item>
+          {/* 新开窗口时是否自动打开NiceTab管理后台 */}
+          <Form.Item<SettingsProps>
+            label={$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED}`)}
+            name={OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED}
+          >
+            <Radio.Group>
+              <Radio value={true}>
+                {$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED}.yes`)}
+              </Radio>
+              <Radio value={false}>
+                {$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED}.no`)}
               </Radio>
             </Radio.Group>
           </Form.Item>
