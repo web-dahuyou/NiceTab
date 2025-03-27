@@ -1,5 +1,5 @@
 import { Alarms } from 'wxt/browser';
-import { stateUtils } from '../storage';
+import { stateUtils, tabListUtils } from '../storage';
 import { getAdminTabInfo } from '../tabs';
 import CommonAlarm from './utils';
 
@@ -31,9 +31,8 @@ export const onAutoSaveOpenedTabsAlarm = async (alarm: Alarms.Alarm) => {
     return true;
   });
 
-  stateUtils.setStateByModule('global', {
-    openedTabs: filteredTabs,
-  });
+  const openedTabs = await tabListUtils.createOpenedTabsSnapshot(filteredTabs);
+  stateUtils.setStateByModule('global', { openedTabs });
 };
 
 export default {

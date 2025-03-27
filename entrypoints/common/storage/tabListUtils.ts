@@ -677,9 +677,13 @@ export default class TabListUtils {
     const doSortList = unstarredIndex > -1 ? tag?.groupList?.slice(unstarredIndex) : [];
 
     if (sortType === 'ascending') {
-      doSortList?.sort((a, b) => dayjs(a.createTime).valueOf() - dayjs(b.createTime).valueOf());
+      doSortList?.sort(
+        (a, b) => dayjs(a.createTime).valueOf() - dayjs(b.createTime).valueOf()
+      );
     } else {
-      doSortList?.sort((a, b) => dayjs(b.createTime).valueOf() - dayjs(a.createTime).valueOf());
+      doSortList?.sort(
+        (a, b) => dayjs(b.createTime).valueOf() - dayjs(a.createTime).valueOf()
+      );
     }
 
     tag.groupList = tag.groupList?.slice(0, unstarredIndex).concat(doSortList);
@@ -716,7 +720,6 @@ export default class TabListUtils {
     const groupsMap = new Map<number, GroupItem>(),
       independentTabs = [];
     for (let tab of tabs) {
-      // 目前 webextension-polyfill 中没有 group 相关的类型定义, 但是新版浏览器有相关的属性
       if (tab.groupId && tab.groupId != -1) {
         const group: GroupItem = groupsMap.get(tab.groupId) || {
           ...this.getInitialTabGroup(),
@@ -730,7 +733,6 @@ export default class TabListUtils {
       }
     }
 
-    // 目前 webextension-polyfill 中没有 group 相关的类型定义, 但是新版浏览器有相关的 API
     if (isGroupSupported() && browser.tabGroups?.get) {
       for (const [bsGroupId, group] of groupsMap.entries()) {
         const tabGroup = await browser.tabGroups.get(bsGroupId);
@@ -843,6 +845,44 @@ export default class TabListUtils {
     tag.groupList = [newtabGroup];
     this.tagList.push(tag);
     return { tagId: tag.tagId, groupId: newtabGroup.groupId };
+  }
+  // 给已打开的标签页生成快照
+  async createOpenedTabsSnapshot(tabs: Tabs.Tab[]) {
+    type ListItemGroup = GroupItem & { type: 'group'; bsGroupId: number };
+    type ListItemTab = TabItem & { type: 'tab' };
+
+    const _isGroupSupported = isGroupSupported() && browser.tabGroups?.get;
+    const result: Array<ListItemGroup | ListItemTab> = [];
+
+    for (let index = 0; index < tabs.length; index++) {
+      const tab = tabs[index] || {};
+      if (tab.groupId && tab.groupId != -1) {
+        const savedGroupIdx = result.findIndex(
+          (item) => item.type === 'group' && item.bsGroupId === tab.groupId
+        );
+
+        if (~savedGroupIdx) {
+          const group = result[savedGroupIdx] as ListItemGroup;
+          group.tabList.push(this.transformTabItem(tab));
+        } else {
+          const group: ListItemGroup = {
+            ...this.getInitialTabGroup(),
+            type: 'group',
+            bsGroupId: tab.groupId,
+            tabList: [this.transformTabItem(tab)],
+          };
+          if (_isGroupSupported) {
+            const bsGroup = await browser.tabGroups!.get(group.bsGroupId);
+            group.groupName = bsGroup?.title || group.groupName;
+          }
+          result.push(group);
+        }
+      } else {
+        result.push({ type: 'tab', ...this.transformTabItem(tab) });
+      }
+    }
+
+    return result;
   }
   // 删除标签页: filterFlag 是否过滤空分类、标签组 (列表页保留空分类、标签组；回收站中不保留)
   async removeTabs(groupId: Key, tabs: TabItem[], filterFlag = false) {
