@@ -17,7 +17,7 @@ export default class CommonAlarm {
   }
 
   async createAlarm(createInfo?: Alarms.CreateAlarmInfoType) {
-    this.setCreateInfo(createInfo);
+    createInfo && this.setCreateInfo(createInfo);
     const alarm = await browser.alarms.get(this.name);
     if (!alarm) {
       await browser.alarms.create(this.name, this.createInfo);

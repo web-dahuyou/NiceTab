@@ -64,6 +64,10 @@ const enUS: Record<LocaleKey, string> = {
     other {these # tabs}
   }?`,
 
+  'home.createSnapshot': 'Create Snapshot',
+  'home.createSnapshot.tip': 'Save currently opened tabs as a snapshot',
+  'home.restoreSnapshot': 'Restore Snapshot',
+
   'home.help.reminder.start': 'For security reasons, Firefox may not allow privileged URLs such as:',
   'home.help.reminder.list': `
     <li>chrome: URLs</li>

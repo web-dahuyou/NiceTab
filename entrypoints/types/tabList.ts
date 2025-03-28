@@ -90,4 +90,9 @@ export interface SendTargetProps {
   targetGroupId?: string;
 }
 
+// 已打开标签页快照列表元素
+export type SnapshotGroupItem = GroupItem & { type: 'group'; bsGroupId: number };
+export type SnapshotTabItem = TabItem & { type: 'tab' };
+export type SnapshotItem = SnapshotGroupItem | SnapshotTabItem;
+
 export default { name: 'tabList-types' };
