@@ -163,7 +163,7 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
           useWindowScroll
           initialTopMostItemIndex={initialConfig}
           overscan={12}
-          increaseViewportBy={{ top: 400, bottom: 200 }}
+          increaseViewportBy={{ top: 1200, bottom: 1200 }}
           data={selectedTag?.children || []}
           itemContent={(index, tabGroup) => <ListItem tabGroup={tabGroup}></ListItem>}
         />

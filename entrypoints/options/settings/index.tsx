@@ -38,6 +38,7 @@ import { useSyncType } from '../sync/hooks/syncType';
 const {
   LANGUAGE,
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
+  OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED,
   OPEN_ADMIN_TAB_AFTER_SEND_TABS,
   CLOSE_TABS_AFTER_SEND_TABS,
   ACTION_AUTO_CLOSE_FLAGS,
@@ -125,8 +126,9 @@ export default function Settings() {
   }, [$fmt]);
 
   const onFinish: FormProps<SettingsProps>['onFinish'] = async (values) => {
-    console.log('Save Success:', values);
-    const newSettings = { ...settingsUtils.initialSettings, ...values };
+    const settings = await settingsUtils.getSettings();
+    const newSettings = { ...settingsUtils.initialSettings, ...settings, ...values };
+    console.log('Save Success: newSettings', newSettings);
 
     await settingsUtils.setSettings(newSettings);
     NiceGlobalContext.setSettings(newSettings);
@@ -201,10 +203,7 @@ export default function Settings() {
           </Form.Item>
           {/* 启动浏览器时是否自动打开NiceTab管理后台 */}
           <Form.Item<SettingsProps>
-            label={$fmt({
-              id: `${module}.${OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH}`,
-              values: { mark: '：' },
-            })}
+            label={$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH}`)}
             name={OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH}
           >
             <Radio.Group>
@@ -213,6 +212,20 @@ export default function Settings() {
               </Radio>
               <Radio value={false}>
                 {$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH}.no`)}
+              </Radio>
+            </Radio.Group>
+          </Form.Item>
+          {/* 新开窗口时是否自动打开NiceTab管理后台 */}
+          <Form.Item<SettingsProps>
+            label={$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED}`)}
+            name={OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED}
+          >
+            <Radio.Group>
+              <Radio value={true}>
+                {$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED}.yes`)}
+              </Radio>
+              <Radio value={false}>
+                {$fmt(`${module}.${OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED}.no`)}
               </Radio>
             </Radio.Group>
           </Form.Item>
@@ -447,26 +460,30 @@ export default function Settings() {
               <Radio value="">{$fmt('common.none')}</Radio>
             </Radio.Group>
           </Form.Item>
-          {/* 是否以标签组形式恢复未命名标签组 */}
-          <Form.Item<SettingsProps>
-            label={$fmt(`${module}.${UNNAMED_GROUP_RESTORE_AS_GROUP}`)}
-            name={UNNAMED_GROUP_RESTORE_AS_GROUP}
-          >
-            <Radio.Group>
-              <Radio value={true}>{$fmt('common.yes')}</Radio>
-              <Radio value={false}>{$fmt('common.no')}</Radio>
-            </Radio.Group>
-          </Form.Item>
-          {/* 是否以标签组形式恢复已命名标签组 */}
-          <Form.Item<SettingsProps>
-            label={$fmt(`${module}.${NAMED_GROUP_RESTORE_AS_GROUP}`)}
-            name={NAMED_GROUP_RESTORE_AS_GROUP}
-          >
-            <Radio.Group>
-              <Radio value={true}>{$fmt('common.yes')}</Radio>
-              <Radio value={false}>{$fmt('common.no')}</Radio>
-            </Radio.Group>
-          </Form.Item>
+          {!import.meta.env.FIREFOX && (
+            <>
+              {/* 是否以标签组形式恢复未命名标签组 */}
+              <Form.Item<SettingsProps>
+                label={$fmt(`${module}.${UNNAMED_GROUP_RESTORE_AS_GROUP}`)}
+                name={UNNAMED_GROUP_RESTORE_AS_GROUP}
+              >
+                <Radio.Group>
+                  <Radio value={true}>{$fmt('common.yes')}</Radio>
+                  <Radio value={false}>{$fmt('common.no')}</Radio>
+                </Radio.Group>
+              </Form.Item>
+              {/* 是否以标签组形式恢复已命名标签组 */}
+              <Form.Item<SettingsProps>
+                label={$fmt(`${module}.${NAMED_GROUP_RESTORE_AS_GROUP}`)}
+                name={NAMED_GROUP_RESTORE_AS_GROUP}
+              >
+                <Radio.Group>
+                  <Radio value={true}>{$fmt('common.yes')}</Radio>
+                  <Radio value={false}>{$fmt('common.no')}</Radio>
+                </Radio.Group>
+              </Form.Item>
+            </>
+          )}
 
           {/* ******************* 其他操作相关设置 ******************* */}
           <Divider>{$fmt('settings.block.otherActions')}</Divider>

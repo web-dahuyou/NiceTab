@@ -23,6 +23,9 @@ importers:
       '@atlaskit/pragmatic-drag-and-drop-react-drop-indicator':
         specifier: ^1.1.1
         version: 1.2.0(@types/react@18.3.18)(react@18.3.1)
+      '@types/yargs-parser':
+        specifier: ^21.0.3
+        version: 21.0.3
       antd:
         specifier: ^5.16.4
         version: 5.23.4(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -74,6 +77,9 @@ importers:
       webdav:
         specifier: ^5.7.1
         version: 5.7.1
+      yargs-parser:
+        specifier: ^21.1.1
+        version: 21.1.1
     devDependencies:
       '@types/file-saver':
         specifier: ^2.0.7
@@ -1156,6 +1162,9 @@ packages:
 
   '@types/webextension-polyfill@0.12.1':
     resolution: {integrity: sha512-xPTFWwQ8BxPevPF2IKsf4hpZNss4LxaOLZXypQH4E63BDLmcwX/RMGdI4tB4VO4Nb6xDBH3F/p4gz4wvof1o9w==}
+
+  '@types/yargs-parser@21.0.3':
+    resolution: {integrity: sha512-I4q9QU9MQv4oEOz4tAHJtNz1cwuLxn2F3xcc2iV5WdqLPpUnj30aUuxt1mAxYTG+oe8CZMV/+6rU4S4gRDzqtQ==}
 
   '@types/yauzl@2.10.3':
     resolution: {integrity: sha512-oJoftv0LSuaDZE3Le4DbKX+KS9G36NzOeSap90UIK0yMA/NhKJhqlSGtNDORNRaIbQfzjXDrQa0ytJ6mNRGz/Q==}
@@ -4479,6 +4488,8 @@ snapshots:
   '@types/stylis@4.2.5': {}
 
   '@types/webextension-polyfill@0.12.1': {}
+
+  '@types/yargs-parser@21.0.3': {}
 
   '@types/yauzl@2.10.3':
     dependencies:

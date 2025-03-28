@@ -8,18 +8,20 @@ import initSettingsStorageListener, {
   themeUtils,
   settingsUtils,
 } from '~/entrypoints/common/storage';
-import { autoSyncAlarm } from '~/entrypoints/common/alarms';
+import { autoSyncAlarm, autoSaveOpenedTabsAlarm } from '~/entrypoints/common/alarms';
 import {
   PRIMARY_COLOR,
   // TAB_EVENTS,
   ENUM_SETTINGS_PROPS,
   POPUP_MODULE_NAMES,
   ENUM_ACTION_NAME,
+  BROWSER_ACTION_API_NAME,
 } from '~/entrypoints/common/constants';
 import type { RuntimeMessageEventProps } from '~/entrypoints/types';
 
 const {
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
+  OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED,
   SHOW_OPENED_TAB_COUNT,
   POPUP_MODULE_DISPLAYS,
 } = ENUM_SETTINGS_PROPS;
@@ -30,12 +32,12 @@ async function setBadge() {
   const themeData = await themeUtils.getThemeData();
   const tabs = await tabUtils.getAllTabs();
   if (!settings[SHOW_OPENED_TAB_COUNT]) {
-    browser.action.setBadgeText({ text: '' });
+    browser[BROWSER_ACTION_API_NAME].setBadgeText?.({ text: '' });
   } else {
-    browser.action.setBadgeText({ text: String(tabs.length || 0) });
+    browser[BROWSER_ACTION_API_NAME].setBadgeText({ text: String(tabs.length || 0) });
   }
-  browser.action.setBadgeTextColor({ color: '#fff' });
-  browser.action.setBadgeBackgroundColor({
+  browser[BROWSER_ACTION_API_NAME].setBadgeTextColor({ color: '#fff' });
+  browser[BROWSER_ACTION_API_NAME].setBadgeBackgroundColor({
     color: themeData?.colorPrimary || PRIMARY_COLOR,
   });
 
@@ -56,10 +58,10 @@ async function initPopup() {
   const modules = settings[POPUP_MODULE_DISPLAYS] || POPUP_MODULE_NAMES;
   if (modules.length > 0) {
     console.log('配置了popup模块, 点击图标显示popup面板');
-    browser.action.setPopup({ popup: 'popup.html' });
+    browser[BROWSER_ACTION_API_NAME].setPopup({ popup: 'popup.html' });
   } else {
     console.log('没有配置popup模块, 点击图标不显示popup面板， 直接发送所有标签页');
-    browser.action.setPopup({ popup: '' });
+    browser[BROWSER_ACTION_API_NAME].setPopup({ popup: '' });
   }
 }
 
@@ -82,10 +84,12 @@ export default defineBackground(() => {
 
   // 创建自动同步闹钟
   autoSyncAlarm.create();
+  // 创建自动保存已打开标签页的闹钟
+  autoSaveOpenedTabsAlarm.create();
 
-  // 左键点击图标 (如果有 popup 是不会触发的，可以执行 browser.action.setPopup({ popup: '' }) 来监听事件)
+  // 左键点击图标 (如果有 popup 是不会触发的，可以执行 browser[BROWSER_ACTION_API_NAME].setPopup({ popup: '' }) 来监听事件)
   // Fired when an action icon is clicked. This event will not fire if the action has a popup.
-  browser.action.onClicked.addListener(async (tab) => {
+  browser[BROWSER_ACTION_API_NAME].onClicked.addListener(async (tab) => {
     const settings = await settingsUtils.getSettings();
     const modules = settings[POPUP_MODULE_DISPLAYS] || POPUP_MODULE_NAMES;
     if (!modules.length) {
@@ -93,10 +97,24 @@ export default defineBackground(() => {
     }
   });
 
-  browser.runtime.onInstalled.addListener(async () => {
-    console.log('browser.runtime.onInstalled');
+  async function startup() {
     const settings = await settingsUtils.getSettings();
     if (settings[OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH]) {
+      tabUtils.openAdminRoutePage({ path: '/home' });
+    }
+  }
+  browser.runtime.onInstalled.addListener(() => {
+    console.log('browser.runtime.onInstalled');
+    startup();
+  });
+  browser.runtime.onStartup.addListener(() => {
+    console.log('browser.runtime.onStartup');
+    startup();
+  });
+  browser.windows.onCreated.addListener(async () => {
+    console.log('browser.windows.onCreated');
+    const settings = await settingsUtils.getSettings();
+    if (settings[OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED]) {
       tabUtils.openAdminRoutePage({ path: '/home' });
     }
   });

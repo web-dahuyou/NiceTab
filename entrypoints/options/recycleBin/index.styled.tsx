@@ -24,7 +24,7 @@ export const StyledTagNode = styled.div<{ theme: StyledThemeProps }>`
   gap: 12px;
   .tag-name {
     flex-shrink: 0;
-    font-size: 14px;
+    font-size: 20px;
     color: ${(props) => props.theme.colorText || '#333'};
   }
   .count {
@@ -32,7 +32,7 @@ export const StyledTagNode = styled.div<{ theme: StyledThemeProps }>`
     font-size: 14px;
   }
   .tag-create-time {
-    font-size: 12px;
+    font-size: 14px;
     color: ${(props) => props.theme.colorTextTertiary || '#999'};
   }
   .action-btns {
@@ -42,7 +42,7 @@ export const StyledTagNode = styled.div<{ theme: StyledThemeProps }>`
     .action-btn {
       display: flex;
       align-items: center;
-      font-size: 12px;
+      font-size: 14px;
       color: ${(props) => props.theme.colorTextSecondary || '#333'};
       cursor: pointer;
       &:hover {

@@ -53,8 +53,6 @@ class AutoSyncAlarm extends CommonAlarm {
 
 export const autoSyncAlarm = new AutoSyncAlarm();
 
-const scheduledTimeSet = new Set();
-
 export const onAutoSyncAlarm = async (alarm: Alarms.Alarm) => {
   const settings = await settingsUtils.getSettings();
   const autoSync = settings[AUTO_SYNC];

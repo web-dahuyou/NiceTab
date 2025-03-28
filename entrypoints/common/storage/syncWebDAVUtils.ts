@@ -264,8 +264,9 @@ export default class syncWebDAVUtils {
         ) {
           const localSettings = await Store.settingsUtils.getSettings();
           settings = {
-            ...settings,
             ...localSettings,
+            ...settings,
+            autoSync: localSettings.autoSync // 自动同步开关，本地优先级高于远程（防止其他设备的设置覆盖本地的开关）
           };
           await client.putFileContents(settingsFilepath, JSON.stringify(settings));
         }

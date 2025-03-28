@@ -54,6 +54,20 @@ const zhCN = {
     other {这#个标签页}
   }吗？`,
 
+  'home.createSnapshot': '创建快照',
+  'home.createSnapshot.tip': '将当前打开的标签页保存为快照',
+  'home.restoreSnapshot': '恢复快照',
+
+  'home.help.reminder.start': '出于安全原因，在 Firefox 中，可能不允许使用特权 URL，例如：',
+  'home.help.reminder.list': `
+    <li>chrome: URL</li>
+    <li>javascript: URL</li>
+    <li>data: URL</li>
+    <li>file: URL</li>
+    <li>Firefox 的特权 about: URL（例如，about:config、about:addons、about:debugging）。非特权 URL（例如 about:blank）是允许的</li>
+  `,
+  'home.help.reminder.end': '如果页面链接符合上述场景，点击链接可能无法打开页面，请手动复制链接进行访问。',
+
   'home.help.content': `
     <li>左侧列表一级菜单表示分类，二级菜单表示标签组，左侧列表支持分类和标签组的搜索；右侧面板展示的是当前选中分类中的所有标签组以及标签组中的标签页。</li>
     <li>右侧面板中的标签页支持拖拽排序以及跨组移动，您还可以将右侧面板中的标签页拖拽到左侧列表的标签组中，以实现跨分类移动；另外可点击“移动到”按钮进行标签组和标签页的移动操作。</li>

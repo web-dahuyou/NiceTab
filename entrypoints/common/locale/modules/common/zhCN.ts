@@ -82,10 +82,12 @@ const zhCN = {
   'common.adminPage': '管理后台',
   'common.shortcuts': '快捷键',
   'common.bindShortcuts': '绑定快捷键',
+  'common.bindShortcuts.tip': 'firefox 浏览器请前往 about:addons 页面，切换到“扩展”选项卡，点击右上角的“设置（用于所有附加组件的工具）”按钮打开下拉菜单，然后选择“管理扩展快捷键”按钮进行修改',
   'common.sendTo': '发送到',
   'common.search': '搜索',
   'common.reload': '重新加载',
   'common.confirmReminder': '确认提醒',
+  'common.note': '注意',
 };
 
 export type LocaleKey = keyof typeof zhCN;

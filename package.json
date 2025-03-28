@@ -2,11 +2,11 @@
   "name": "nice-tab",
   "description": "开源的标签页管理器，OneTab、Toby、N-Tab、KepTab 等扩展的升级替代品，功能丰富易用 | A nice, convenient, powerful tab manager (open source)",
   "private": true,
-  "version": "2.6.4",
+  "version": "2.7.0",
   "type": "module",
   "scripts": {
     "dev": "wxt",
-    "dev:firefox": "wxt -b firefox",
+    "dev:firefox": "wxt --mode production -b firefox",
     "build": "wxt build",
     "build:firefox": "wxt build -b firefox",
     "zip": "wxt zip",
@@ -43,8 +43,10 @@
     "@types/lodash-es": "^4.17.12",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "@types/yargs-parser": "^21.0.3",
     "@wxt-dev/module-react": "^1.1.0",
     "typescript": "^5.5.4",
-    "wxt": "^0.19.29"
+    "wxt": "^0.19.29",
+    "yargs-parser": "^21.1.1"
   }
 }

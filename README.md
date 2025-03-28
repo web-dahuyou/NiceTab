@@ -11,7 +11,17 @@
 - Google Chrome Web Store: [Chrome Web Store](https://chromewebstore.google.com/detail/fonflmjnjbkigocpoommgmhljdpljain)
 - Microsoft Edge Add-ons: [Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/ompjiaelpibiggcnanhbdblkhfdmkgnl)  
   (Note that due to longer review times, the Edge store release may lag behind the Chrome version.)
-- Firefox: Not yet available.
+- Firefox Browser Add-ons: [Firefox Browser Addons](https://addons.mozilla.org/zh-CN/firefox/addon/nice-tab-manager-%E6%A0%87%E7%AD%BE%E9%A1%B5%E7%AE%A1%E7%90%86%E5%99%A8/) 
+
+### Notes
+For security reasons, Firefox may not allow privileged URLs such as:
+- chrome: URLs
+- javascript: URLs  
+- data: URLs
+- file: URLs
+- Firefox's privileged about: URLs (e.g., `about:config`, `about:addons`, `about:debugging`). Non-privileged URLs (e.g., `about:blank`) are allowed.
+
+If a page URL matches any of the above cases, opening tab may not work. Please manually copy the URL to open it.
 
 ## Overview
 
@@ -198,32 +208,4 @@ Feel free to join our QQ group: 924270240
 
 ## Extension Development
 
-### Project Setup
-- Install dependencies:  
-  `pnpm install`
-- Start the dev server:  
-  `pnpm run dev`
-
-Important: Each `.js .ts .tsx` file must have an `export default` statement. Otherwise, you'll encounter errors when running the local service.
-
-### Set Browser Binaries 
-
-By default, `WXT` will try to automatically discover where `Chrome/Firefox` are installed. If you encounter an error:
-
-```
-ERROR  No Chrome installations found.  
-```
-
-Or you want to specify a browser executable binary.
-
-You can refer to the [docs - Set Browser Binaries](https://wxt.dev/guide/essentials/config/browser-startup.html#set-browser-binaries) to manually configure the browser binary paths.
-
-```js
-export default defineRunnerConfig({
-  binaries: {
-    chrome: '/path/to/chrome-beta', // Use Chrome Beta instead of regular Chrome
-    firefox: 'firefoxdeveloperedition', // Use Firefox Developer Edition instead of regular Firefox
-    edge: '/path/to/edge', // Open MS Edge when running "wxt -b edge"
-  },
-});
-```
+See [NiceTab Contributing Guide](./CONTRIBUTING.md)

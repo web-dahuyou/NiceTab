@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import { theme, Collapse, Space, Button, Modal, Empty, Alert } from 'antd';
+import { useState, useEffect, useCallback, memo } from 'react';
+import { theme, Space, Button, Modal, Empty, Alert } from 'antd';
+import { Virtuoso } from 'react-virtuoso';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import useUrlParams from '~/entrypoints/common/hooks/urlParams';
 import { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
@@ -14,7 +15,6 @@ export default function RecycleBin() {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const [tagList, setTagList] = useState<TagItem[]>([]);
-  const [activeKey, setActiveKey] = useState<string | string[]>([]);
   const [recoverModalVisible, setRecoverModalVisible] = useState<boolean>(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState<boolean>(false);
 
@@ -22,7 +22,6 @@ export default function RecycleBin() {
   const getRecycleBinData = useCallback(async () => {
     const recycleList = await recycleUtils.getTagList();
     setTagList(recycleList || []);
-    // setActiveKey(recycleList.map((tag) => tag.tagId) || []); // 默认全部展开
   }, []);
 
   // 删除标签组
@@ -64,18 +63,6 @@ export default function RecycleBin() {
     [getRecycleBinData]
   );
 
-  /* 顶部按钮事件 */
-  // 展开全部、收起全部
-  // const toggleExpand = useCallback(
-  //   (bool: boolean) => {
-  //     if (bool) {
-  //       setActiveKey(tagList.map((tag) => tag.tagId) || []);
-  //     } else {
-  //       setActiveKey([]);
-  //     }
-  //   },
-  //   [tagList]
-  // );
   // 还原所有
   const handleRecoverConfirm = useCallback(async () => {
     await recycleUtils.recoverAll();
@@ -105,22 +92,65 @@ export default function RecycleBin() {
     });
   }, []);
 
+  const [totalGroupList, setTotalGroupList] = useState<GroupItem[]>([]);
+  const [index2Tag, setIndex2Tag] = useState<TagItem[]>([]);
+
+  useEffect(() => {
+    const _totalGroupList: GroupItem[] = [];
+    const _index2Tag: TagItem[] = [];
+    for (let tag of tagList) {
+      for (let group of tag?.groupList || []) {
+        _totalGroupList.push(group || {});
+        _index2Tag.push(tag || {});
+      }
+    }
+    setTotalGroupList(_totalGroupList);
+    setIndex2Tag(_index2Tag);
+  }, [tagList]);
+
+  const ListItemMarkup = memo(({ index }: { index: number }) => {
+    const tag = index2Tag[index] || {};
+    const group = totalGroupList[index] || {};
+
+    return (
+      <>
+        <TagNodeMarkup
+          tag={tag}
+          onRemove={getRecycleBinData}
+          onRecover={getRecycleBinData}
+        />
+        <TabGroup
+          key={group.groupId}
+          {...group}
+          canDrag={false}
+          canDrop={false}
+          allowGroupActions={['remove', 'recover']}
+          allowTabActions={['remove', 'recover']}
+          onRemove={() => handleTabGroupRemove(tag, group)}
+          onRecover={() => handleTabGroupRecover(tag, group)}
+          onTabChange={(tabItem: TabItem) => handleTabItemChange(tag, group, tabItem)}
+          onTabRemove={handleTabItemRemove}
+        />
+      </>
+    );
+  });
+
   return (
     <StyledRecycleBinWrapper className="recycle-bin-wrapper">
       <StickyBox topGap={60} fullWidth bgColor={token.colorBgContainer}>
         <Space className="header-action-btns">
-          {/*
-          <Button type="primary" size="small" onClick={() => toggleExpand(true)}>
-            {$fmt('home.expandAll')}
-          </Button>
-          <Button type="primary" size="small" onClick={() => toggleExpand(false)}>
-            {$fmt('home.collapseAll')}
-          </Button>
-          */}
-          <Button type="primary" onClick={() => setRecoverModalVisible(true)}>
+          <Button
+            type="primary"
+            disabled={!totalGroupList?.length}
+            onClick={() => setRecoverModalVisible(true)}
+          >
             {$fmt('home.recoverAll')}
           </Button>
-          <Button type="primary" onClick={() => setConfirmModalVisible(true)}>
+          <Button
+            type="primary"
+            disabled={!totalGroupList?.length}
+            onClick={() => setConfirmModalVisible(true)}
+          >
             {$fmt('home.clearAll')}
           </Button>
           <Alert
@@ -132,51 +162,13 @@ export default function RecycleBin() {
         </Space>
       </StickyBox>
 
-      {tagList?.length > 0 ? (
-        <Collapse
-          bordered={false}
-          size="large"
-          ghost
-          activeKey={activeKey}
-          onChange={setActiveKey}
-          items={tagList.map((tag) => {
-            return {
-              key: tag.tagId,
-              label: (
-                <TagNodeMarkup
-                  tag={tag}
-                  onRemove={getRecycleBinData}
-                  onRecover={getRecycleBinData}
-                />
-              ),
-              style: {
-                marginBottom: 16,
-                background: token.colorFillContent,
-                borderRadius: token.borderRadiusLG,
-                border: 'none',
-              },
-              children: (
-                <div className="tab-group-list">
-                  {tag.groupList.map((group) => (
-                    <TabGroup
-                      key={group.groupId}
-                      {...group}
-                      canDrag={false}
-                      canDrop={false}
-                      allowGroupActions={['remove', 'recover']}
-                      allowTabActions={['remove', 'recover']}
-                      onRemove={() => handleTabGroupRemove(tag, group)}
-                      onRecover={() => handleTabGroupRecover(tag, group)}
-                      onTabChange={(tabItem: TabItem) =>
-                        handleTabItemChange(tag, group, tabItem)
-                      }
-                      onTabRemove={handleTabItemRemove}
-                    ></TabGroup>
-                  ))}
-                </div>
-              ),
-            };
-          })}
+      {totalGroupList?.length > 0 ? (
+        <Virtuoso
+          useWindowScroll
+          overscan={12}
+          increaseViewportBy={{ top: 1000, bottom: 1000 }}
+          data={totalGroupList}
+          itemContent={(index) => <ListItemMarkup index={index} />}
         />
       ) : (
         <StyledEmptyBox className="no-data">
