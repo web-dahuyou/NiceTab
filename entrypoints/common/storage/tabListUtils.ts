@@ -7,6 +7,9 @@ import type {
   GroupItem,
   TabItem,
   CountInfo,
+  SnapshotGroupItem,
+  SnapshotTabItem,
+  SnapshotItem,
 } from '~/entrypoints/types';
 import dayjs from 'dayjs';
 import { ENUM_SETTINGS_PROPS, UNNAMED_TAG, UNNAMED_GROUP } from '../constants';
@@ -19,6 +22,7 @@ import {
   getUniqueList,
   getMergedList,
 } from '../utils';
+import { openNewGroup, openNewTab } from '../tabs';
 import Store from './instanceStore';
 
 const {
@@ -848,11 +852,8 @@ export default class TabListUtils {
   }
   // 给已打开的标签页生成快照
   async createOpenedTabsSnapshot(tabs: Tabs.Tab[]) {
-    type ListItemGroup = GroupItem & { type: 'group'; bsGroupId: number };
-    type ListItemTab = TabItem & { type: 'tab' };
-
     const _isGroupSupported = isGroupSupported() && browser.tabGroups?.get;
-    const result: Array<ListItemGroup | ListItemTab> = [];
+    const result: Array<SnapshotGroupItem | SnapshotTabItem> = [];
 
     for (let index = 0; index < tabs.length; index++) {
       const tab = tabs[index] || {};
@@ -862,10 +863,10 @@ export default class TabListUtils {
         );
 
         if (~savedGroupIdx) {
-          const group = result[savedGroupIdx] as ListItemGroup;
+          const group = result[savedGroupIdx] as SnapshotGroupItem;
           group.tabList.push(this.transformTabItem(tab));
         } else {
-          const group: ListItemGroup = {
+          const group: SnapshotGroupItem = {
             ...this.getInitialTabGroup(),
             type: 'group',
             bsGroupId: tab.groupId,
@@ -883,6 +884,33 @@ export default class TabListUtils {
     }
 
     return result;
+  }
+  // 还原快照
+  async restoreTabsSnapshot(list: SnapshotItem[]) {
+    const _isGroupSupported = isGroupSupported();
+    for (let item of list) {
+      if (item.type === 'group') {
+        if (!_isGroupSupported) {
+          for (let tab of item.tabList) {
+            openNewTab(tab.url);
+          }
+          return;
+        }
+
+        Promise.all(
+          item.tabList?.map((tab) => {
+            return browser.tabs.create({ url: tab.url, active: false });
+          })
+        ).then(async (tabs) => {
+          const bsGroupId = await browser.tabs.group!({
+            tabIds: tabs.map((tab) => tab.id!),
+          });
+          browser.tabGroups?.update(bsGroupId, { title: item.groupName });
+        });
+      } else {
+        openNewTab(item.url);
+      }
+    }
   }
   // 删除标签页: filterFlag 是否过滤空分类、标签组 (列表页保留空分类、标签组；回收站中不保留)
   async removeTabs(groupId: Key, tabs: TabItem[], filterFlag = false) {

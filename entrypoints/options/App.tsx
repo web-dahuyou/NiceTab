@@ -32,6 +32,8 @@ import {
   ReloadOutlined,
   KeyOutlined,
   CoffeeOutlined,
+  CameraOutlined,
+  RollbackOutlined,
 } from '@ant-design/icons';
 import styled, { ThemeProvider } from 'styled-components';
 import '~/assets/css/reset.css';
@@ -46,6 +48,7 @@ import {
 } from '~/entrypoints/common/constants';
 import { actionHandler } from '../common/contextMenus';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
+import useMenus from '@/entrypoints/common/hooks/menu';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import useUpdate from '~/entrypoints/common/hooks/update';
 import {
@@ -54,7 +57,12 @@ import {
   THEME_COLORS,
   defaultThemeType,
 } from '~/entrypoints/common/constants';
-import { openNewTab, discardOtherTabs } from '~/entrypoints/common/tabs';
+import {
+  openNewTab,
+  discardOtherTabs,
+  saveOpenedTabsAsSnapshot,
+  restoreOpenedTabsSnapshot,
+} from '~/entrypoints/common/tabs';
 import {
   StyledActionIconBtn,
   GlobalStyle,
@@ -200,7 +208,7 @@ function AppLayout() {
   const { $fmt, locale } = useIntlUtls();
   const sendTargetActionRef = useRef<SendTargetActionHolderProps>();
 
-  const { version, themeTypeConfig, pageWidthType } = NiceGlobalContext;
+  const { version, themeTypeConfig, pageWidthType, $message } = NiceGlobalContext;
   const navs = useMemo(() => {
     return navsTemplate.map((item) => {
       return { ...item, label: $fmt(item.label) };
@@ -247,24 +255,41 @@ function AppLayout() {
     }
   }, []);
 
+  const { createMenus } = useMenus();
   // 插件操作选项
-  const extActionOptions: MenuProps['items'] = [
-    { key: 'sendAllTabs', icon: <SendOutlined />, label: $fmt('common.sendAllTabs') },
-    {
-      key: 'bindShortcuts',
-      icon: <KeyOutlined />,
-      label: $fmt('common.bindShortcuts'),
-      disabled: import.meta.env.FIREFOX,
-    },
-    {
-      key: 'hibernateTabs',
-      icon: <CoffeeOutlined />,
-      label: $fmt('common.hibernateTabs'),
-    },
-    { key: 'reload', icon: <ReloadOutlined />, label: $fmt('common.reload') },
-  ];
+  const extActionOptions = useMemo(
+    () =>
+      createMenus([
+        { key: 'sendAllTabs', icon: <SendOutlined />, label: $fmt('common.sendAllTabs') },
+        {
+          key: 'createSnapshot',
+          icon: <CameraOutlined />,
+          label: $fmt('home.createSnapshot'),
+          tip: $fmt('home.createSnapshot.tip'),
+        },
+        {
+          key: 'restoreSnapshot',
+          icon: <RollbackOutlined />,
+          label: $fmt('home.restoreSnapshot'),
+        },
+        {
+          key: 'bindShortcuts',
+          icon: <KeyOutlined />,
+          label: $fmt('common.bindShortcuts'),
+          tip: import.meta.env.FIREFOX ? $fmt('common.bindShortcuts.tip') : '',
+          disabled: import.meta.env.FIREFOX,
+        },
+        {
+          key: 'hibernateTabs',
+          icon: <CoffeeOutlined />,
+          label: $fmt('common.hibernateTabs'),
+        },
+        { key: 'reload', icon: <ReloadOutlined />, label: $fmt('common.reload') },
+      ]),
+    [$fmt]
+  );
 
-  const handleExtActionClick: MenuProps['onClick'] = ({ key }) => {
+  const handleExtActionClick: MenuProps['onClick'] = async ({ key }) => {
     if (key === 'sendAllTabs') {
       handleSendAllTabs();
     } else if (key === 'reload') {
@@ -276,6 +301,11 @@ function AppLayout() {
       });
     } else if (key === 'hibernateTabs') {
       discardOtherTabs();
+    } else if (key === 'createSnapshot') {
+      await saveOpenedTabsAsSnapshot('manualSave');
+      $message.success($fmt('common.saveSuccess'));
+    } else if (key === 'restoreSnapshot') {
+      await restoreOpenedTabsSnapshot('manualSave');
     }
   };
 

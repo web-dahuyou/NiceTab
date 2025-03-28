@@ -1,6 +1,6 @@
 import { Tabs } from 'wxt/browser';
 import { debounce } from 'lodash-es';
-import { settingsUtils, tabListUtils } from './storage';
+import { settingsUtils, tabListUtils, stateUtils } from './storage';
 import type {
   SettingsProps,
   ActionNames,
@@ -457,6 +457,40 @@ export async function discardOtherTabs() {
   }
 }
 
+// 将已打开的标签页生保存为快照
+export const saveOpenedTabsAsSnapshot = async (
+  type: 'autoSave' | 'manualSave' = 'autoSave'
+) => {
+  const tabs = await browser.tabs.query({ currentWindow: true });
+  const { tab: adminTab } = await getAdminTabInfo();
+  const filteredTabs = tabs.filter((tab) => {
+    if (!tab?.id) return false;
+    if (adminTab && adminTab.id === tab.id) return false;
+    if (tab.pinned) return false;
+    return true;
+  });
+
+  if (!filteredTabs.length) return;
+
+  const openedTabs = await tabListUtils.createOpenedTabsSnapshot(filteredTabs);
+  if (type === 'autoSave') {
+    await stateUtils.setStateByModule('global', { openedTabsAutoSave: openedTabs });
+  } else if (type === 'manualSave') {
+    await stateUtils.setStateByModule('global', { openedTabsManualSave: openedTabs });
+  }
+};
+// 恢复快照
+export const restoreOpenedTabsSnapshot = async (
+  type: 'autoSave' | 'manualSave' = 'autoSave'
+) => {
+  const globalState = await stateUtils.getState('global');
+  if (type === 'autoSave') {
+    await tabListUtils.restoreTabsSnapshot(globalState.openedTabsAutoSave || []);
+  } else if (type === 'manualSave') {
+    await tabListUtils.restoreTabsSnapshot(globalState.openedTabsManualSave || []);
+  }
+};
+
 export default {
   sendTabMessage,
   executeContentScript,
@@ -474,4 +508,6 @@ export default {
   sendLeftTabs,
   sendRightTabs,
   openNewTab,
+  saveOpenedTabsAsSnapshot,
+  restoreOpenedTabsSnapshot,
 };

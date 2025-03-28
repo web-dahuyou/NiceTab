@@ -1,9 +1,9 @@
-import { Tabs } from 'wxt/browser';
-import type { PageModuleNames } from './global';
+import type { SnapshotItem } from './tabList';
 
 // 全局状态
 export interface GlobalStateProps {
-  openedTabs: Tabs.Tab[];
+  openedTabsManualSave?: SnapshotItem[];
+  openedTabsAutoSave?: SnapshotItem[];
 }
 
 // 首页状态
@@ -11,10 +11,11 @@ export interface HomeStateProps {
   sidebarCollapsed?: boolean;
 }
 
-// 状态相关
-export interface StateProps extends Partial<Record<PageModuleNames, any>> {
+export interface StateProps {
   global: GlobalStateProps;
   home: HomeStateProps;
 }
+
+export type StateModuleProps<K extends keyof StateProps = 'global'> = StateProps[K];
 
 export default { name: 'state-types' };

@@ -103,7 +103,7 @@ export type ActionNames =
   | 'sendRightTabs';
 
 // 页面模块名称
-export type PageModuleNames = 'global' | 'home' | 'settings' | 'import-export' | 'sync' | 'recycle-bin';
+export type PageModuleNames = 'home' | 'settings' | 'import-export' | 'sync' | 'recycle-bin';
 
 // popup 弹窗中的模块名称
 export type PopupModuleNames =
