@@ -19,6 +19,7 @@ export type RuntimeMsgType =
   | 'reloadAdminPage'
   | 'sync:sync-status-change--gist'
   | 'sync:sync-status-change--webdav'
+  | 'sendTabsActionStart'
   | 'sendTabsActionConfirm';
 
 export interface RuntimeMsgSetPrimaryColor {
@@ -59,6 +60,10 @@ export interface RuntimeMsgSyncStatusChangeWebdav {
   msgType: 'sync:sync-status-change--webdav';
   data: { key: string; status: SyncStatus };
 }
+export interface RuntimeMsgSendTabsActionStart {
+  msgType: 'sendTabsActionStart';
+  data: { actionName: string; };
+}
 export interface RuntimeMsgSendTabsActionConfirm {
   msgType: 'sendTabsActionConfirm';
   data: { actionName: string; targetData: SendTargetProps; currWindowId?: number };
@@ -73,6 +78,7 @@ export type RuntimeMsgBaseProps =
   | RuntimeMsgReloadAdminPage
   | RuntimeMsgSyncStatusChangeGist
   | RuntimeMsgSyncStatusChangeWebdav
+  | RuntimeMsgSendTabsActionStart
   | RuntimeMsgSendTabsActionConfirm;
 
 // runtime message event props
@@ -98,6 +104,8 @@ export type SendRuntimeMessageBaseProps<T extends RuntimeMsgType> =
     ? RuntimeMsgSyncStatusChangeGist
     : T extends 'sync:sync-status-change--webdav'
     ? RuntimeMsgSyncStatusChangeWebdav
+    : T extends 'sendTabsActionStart'
+    ? RuntimeMsgSendTabsActionStart
     : T extends 'sendTabsActionConfirm'
     ? RuntimeMsgSendTabsActionConfirm
     : never;

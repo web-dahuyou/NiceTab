@@ -94,7 +94,11 @@ export default function App() {
           label: menu.title!,
           disabled: menu.enabled === false,
           onClick: async () => {
-            await strategyHandler(String(menu.id));
+            sendRuntimeMessage({
+              msgType: 'sendTabsActionStart',
+              data: { actionName: String(menu.id) },
+              targetPageContexts: ['background'],
+            });
             setTimeout(() => {
               init();
             }, 500);
