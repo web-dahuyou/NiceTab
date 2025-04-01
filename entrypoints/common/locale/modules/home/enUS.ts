@@ -109,7 +109,7 @@ const enUS: Record<LocaleKey, string> = {
   'home.tip.tooManyTabs':
     'The number of tabs exceeds the set value, enabling virtual scrolling.',
   'home.tip.addScope':
-    'The next version will introduce new features that require additional authorization. Once the new version is released, this option will be automatically disabled. If you want to continue using this option, please manually enable it.',
+    'The next version will add new features that require additional authorization. Once the new version is released, the NiceTab extension will be automatically disabled. If you want to continue using it, please manually enable it.',
 
   'recycleBin.tip.autoClear':
     'Note: The recycle bin will be automatically cleared once a day!',
