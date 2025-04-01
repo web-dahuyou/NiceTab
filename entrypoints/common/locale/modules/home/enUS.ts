@@ -65,7 +65,7 @@ const enUS: Record<LocaleKey, string> = {
   }?`,
 
   'home.createSnapshot': 'Create Snapshot',
-  'home.createSnapshot.tip': 'Save currently opened tabs as a snapshot',
+  'home.createSnapshot.tip': 'Save the currently opened tabs as a snapshot',
   'home.restoreSnapshot': 'Restore Snapshot',
 
   'home.help.reminder.start': 'For security reasons, Firefox may not allow privileged URLs such as:',
@@ -74,9 +74,9 @@ const enUS: Record<LocaleKey, string> = {
     <li>javascript: URLs</li>
     <li>data: URLs</li>
     <li>file: URLs</li>
-    <li>Firefox's privileged about: URLs (e.g., about:config、about:addons、about:debugging). Non-privileged URLs (e.g., about:blank) are allowed.</li>
+    <li>Firefox's privileged about: URLs (e.g. about:config, about:addons, about:debugging). Non-privileged URLs (e.g. about:blank) are allowed.</li>
   `,
-  'home.help.reminder.end': 'If a page URL matches any of the above cases, opening tab may not work. Please manually copy the URL to open it.',
+  'home.help.reminder.end': 'If the URL of a page matches any of the above cases, opening the tab may not work. Please manually copy the URL to open it.',
 
   'home.help.content': `
     <li>The left-side list displays the tags, and the secondary menus represent the tab groups. The list supports searching for both tags and tab groups. The right-side panel displays all the tab groups and the tabs within each tab group.</li>
@@ -98,18 +98,18 @@ const enUS: Record<LocaleKey, string> = {
   'home.help.hotkey.2': `); You can also go to the extension page by yourself and `,
   'home.help.hotkey.modify': `modify the shortcuts`,
   'home.help.hotkey.modifyTip':
-    'After modifying the shortcuts, they will take effect immediately. The shortcut key names in the ContextMenu will automatically update after switching browser tabs.',
+    'After modifying the shortcuts, they will take effect immediately. The names of the shortcut keys in the ContextMenu will automatically update after switching browser tabs.',
 
   'home.moveTo.missingTip': 'Please select a {type}',
   'home.moveTo.mergeLabel': 'Merge Duplicate Items?',
   'home.moveTo.mergeTip.1':
-    '1. If checked, when moving tabs, the tabs will be de-duplicated with the same URL in the target group.',
+    '1. If this option is checked, when moving tabs, tabs with the same URL in the target group will be de-duplicated.',
   'home.moveTo.mergeTip.2':
-    '2. If checked, when moving a tab group, it will be merged to the group of the same name in the target category (tag).',
+    '2. If this option is checked, when moving a tab group, it will be merged into the group with the same name in the target category (tag).',
   'home.tip.tooManyTabs':
     'The number of tabs exceeds the set value, enabling virtual scrolling.',
   'home.tip.addScope':
-    'The next version will add new features, which require additional authorization. After the new version is released, it will be automatically disabled. If you wish to continue using it, please manually enable it.',
+    'The next version will add new features that require additional authorization. Once the new version is released, the NiceTab extension will be automatically disabled. If you want to continue using it, please manually enable it.',
 
   'recycleBin.tip.autoClear':
     'Note: The recycle bin will be automatically cleared once a day!',
