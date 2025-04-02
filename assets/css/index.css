@@ -3,7 +3,8 @@
 }
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+	--system-font: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; /* https://css-tricks.com/snippets/css/system-font-stack */
+  font-family: var(--system-font);
   line-height: 1.5;
 
   /* color-scheme: light dark; */

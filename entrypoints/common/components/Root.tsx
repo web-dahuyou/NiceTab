@@ -102,8 +102,10 @@ export default function Root({
   };
 
   useEffect(() => {
-    document.documentElement.lang = localeCustom || defaultLanguage;
-  }, [localeCustom]);
+    if (pageContext !== 'contentScriptPage') {
+      document.documentElement.lang = localeCustom || defaultLanguage;
+    }
+  }, [pageContext, localeCustom]);
 
   useEffect(() => {
     initData();
@@ -117,8 +119,9 @@ export default function Root({
         prefixCls="nicetab"
         locale={localeAntd}
         theme={{
-          cssVar: true,
+          cssVar: { key: 'css-var-token-nicetab' },
           hashed: false,
+
           algorithm: theme[themeTypeConfig.algorithm],
           token: {
             colorPrimary: primaryColor || PRIMARY_COLOR,
