@@ -69,12 +69,7 @@ export function useTreeData() {
         },
         tabGroup: {
           create: () => handleTabGroupCreate(node.key),
-          remove: () =>
-            handleTabGroupRemove(
-              node as TreeDataNodeTabGroup,
-              selectedTagKey,
-              selectedTabGroupKey
-            ),
+          remove: () => handleTabGroupRemove(node as TreeDataNodeTabGroup),
           rename: () =>
             handleTabGroupChange(
               node as TreeDataNodeTabGroup,
@@ -194,41 +189,12 @@ export function useTreeData() {
 
   // 删除标签组
   const handleTabGroupRemove = useCallback(
-    async (
-      tabGroup: TreeDataNodeTabGroup,
-      currSelectedTagKey?: React.Key,
-      currSelectedGroupKey?: React.Key
-    ) => {
+    async (tabGroup: TreeDataNodeTabGroup) => {
       const tagKey = tabGroup.parentKey;
       if (!tabGroup.key || !tagKey) return;
       const tag = treeData.find((tag) => tag.key === tagKey) as TreeDataNodeTag;
       await tabListUtils.removeTabGroup(tagKey, tabGroup.key);
-      refreshTreeData((treeData) => {
-        if (!currSelectedTagKey) {
-          const tag = treeData?.[0];
-          handleSelect(treeData, [tag?.key], { node: tag });
-          return;
-        }
-        if (!currSelectedGroupKey) {
-          const tag = treeData.find(
-            (tag) => tag.key === currSelectedTagKey
-          ) as TreeDataNodeTag;
-          handleSelect(treeData, [currSelectedTagKey], { node: tag });
-          return;
-        }
-
-        if (tabGroup.key === currSelectedGroupKey) {
-          handleSelect(treeData, [tagKey], { node: tag });
-        } else {
-          const tag = treeData.find(
-            (tag) => tag.key === currSelectedTagKey
-          ) as TreeDataNodeTag;
-          const selectedTabGroup = tag?.children?.find(
-            (g) => g.key === currSelectedGroupKey
-          ) as TreeDataNodeTabGroup;
-          handleSelect(treeData, [currSelectedTagKey], { node: selectedTabGroup });
-        }
-      });
+      refreshTreeData();
     },
     [treeData]
   );
@@ -308,7 +274,7 @@ export function useTreeData() {
       }
       if (settings?.[DELETE_AFTER_RESTORE] && !isLocked) {
         await tabListUtils.removeTabGroup(tag.key, tabGroup.key);
-        refreshTreeData((treeData) => handleSelect(treeData, [tag.key], { node: tag }));
+        refreshTreeData();
       }
     },
     [treeData]

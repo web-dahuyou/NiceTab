@@ -1,6 +1,10 @@
 import { memo, useMemo, useContext } from 'react';
 import { Typography } from 'antd';
-import { Virtuoso, VirtuosoHandle, type FlatIndexLocationWithAlign } from 'react-virtuoso';
+import {
+  Virtuoso,
+  VirtuosoHandle,
+  type FlatIndexLocationWithAlign,
+} from 'react-virtuoso';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import type { TreeDataNodeTag, TreeDataNodeTabGroup, MoveToCallbackProps } from './types';
 import { StyledGroupList } from './Home.styled';
@@ -67,9 +71,7 @@ const ListItem = memo(
         // }
         {...tabGroup.originData}
         onChange={(data) => handleTabGroupChange(tabGroup, data)}
-        onRemove={() =>
-          handleTabGroupRemove(tabGroup, selectedTagKey, selectedTabGroupKey)
-        }
+        onRemove={() => handleTabGroupRemove(tabGroup)}
         onRestore={() => handleTabGroupRestore(tabGroup)}
         onStarredChange={(isStarred) => handleTabGroupStarredChange(tabGroup, isStarred)}
         onDedup={() => handleTabGroupDedup(tabGroup)}
@@ -91,9 +93,8 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
   }, [selectedTag.originData]);
 
   const initialConfig = useMemo(() => {
-    const index = selectedTag?.children?.findIndex(
-      (group) => group.key === selectedTabGroupKey
-    ) || 0;
+    const index =
+      selectedTag?.children?.findIndex((group) => group.key === selectedTabGroupKey) || 0;
     return {
       index: index > -1 ? index : 0,
       align: 'start',
@@ -104,9 +105,9 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
   const [prevSelectedTagKey, setPrevSelectedTagKey] = useState(selectedTagKey);
   const scrollHandler = useCallback(() => {
     if (virtual && virtuosoRef.current) {
-      const index = selectedTag?.children?.findIndex(
-        (group) => group.key === selectedTabGroupKey
-      ) || 0;
+      const index =
+        selectedTag?.children?.findIndex((group) => group.key === selectedTabGroupKey) ||
+        0;
       virtuosoRef.current?.scrollToIndex({
         index: index > -1 ? index : 0,
         align: 'start',
