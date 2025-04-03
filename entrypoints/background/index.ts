@@ -7,6 +7,7 @@ import tabUtils from '~/entrypoints/common/tabs';
 import initSettingsStorageListener, {
   themeUtils,
   settingsUtils,
+  stateUtils,
 } from '~/entrypoints/common/storage';
 import { autoSyncAlarm, autoSaveOpenedTabsAlarm } from '~/entrypoints/common/alarms';
 import {
@@ -119,6 +120,11 @@ export default defineBackground(() => {
     }
   });
 
+  browser.windows.onRemoved.addListener(async (windowId) => {
+    console.log('browser.windows.onRemoved--windowId', windowId);
+    stateUtils.clearSelectedKeysOfInvalidWindows();
+  });
+
   browser.runtime.onMessage.addListener(async (msg: unknown, msgSender, sendResponse) => {
     // console.log('browser.runtime.onMessage--background--msg', msg);
     const {
@@ -151,6 +157,8 @@ export default defineBackground(() => {
       setBadge();
     } else if (msgType === 'openAdminRoutePage') {
       tabUtils.openAdminRoutePage(data || {});
+    } else if (msgType === 'sendTabsActionStart') {
+      strategyHandler(data.actionName);
     } else if (msgType === 'sendTabsActionConfirm') {
       handleSendTabsAction(data.actionName, data.targetData);
     }

@@ -1,14 +1,20 @@
 import type { SnapshotItem } from './tabList';
 
-// 全局状态
+/* 全局状态 */
 export interface GlobalStateProps {
   openedTabsManualSave?: SnapshotItem[];
   openedTabsAutoSave?: SnapshotItem[];
 }
 
-// 首页状态
+/* 首页状态 */
+export interface SelectedKeysStoreItem {
+  windowId?: number;
+  selectedTagKey?: string;
+  selectedTabGroupKey?: string;
+}
 export interface HomeStateProps {
   sidebarCollapsed?: boolean;
+  selectedKeysStore?: SelectedKeysStoreItem[];
 }
 
 export interface StateProps {
