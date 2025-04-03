@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
-import { Modal, Cascader, Typography, Flex } from 'antd';
+import { useState, useEffect, useContext } from 'react';
+import { Modal, Cascader, Typography } from 'antd';
 import styled from 'styled-components';
+import { ContentGlobalContext } from '~/entrypoints/content/context';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { tabListUtils } from '~/entrypoints/common/storage';
 import type { SendTargetProps } from '~/entrypoints/types';
@@ -32,12 +33,14 @@ const StyledCascaderWrapper = styled.div`
 
     &::-webkit-scrollbar-thumb {
       border-radius: 4px;
-      background: ${(props) => `${props.theme.type === 'light' ? '#d9d9d9' : '#555'} !important`};
-      box-shadow:inset 0 0 4px rgba(0, 0, 0, .3);
+      background: ${(props) =>
+        `${props.theme.type === 'light' ? '#d9d9d9' : '#555'} !important`};
+      box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.3);
     }
 
     &::-webkit-scrollbar-thumb:hover {
-      background: ${(props) => `${props.theme.type === 'light' ? '#bfbfbf' : '#888'} !important`};
+      background: ${(props) =>
+        `${props.theme.type === 'light' ? '#bfbfbf' : '#888'} !important`};
     }
   }
   .cascader-label-custom {
@@ -58,6 +61,7 @@ export default function SendTargetModal({
   onCancel,
 }: SendTargetModalProps) {
   const { $fmt } = useIntlUtls();
+  const contentContext = useContext(ContentGlobalContext);
   const [options, setOptions] = useState<CascaderOption[]>([]); // 级联数据
   const [targetValue, setTargetValue] = useState<string[]>([]); // 选中的目标值
   const [targetOptions, setTargetOptions] = useState<CascaderOption[]>([]); // 选中的目标选项
@@ -94,6 +98,7 @@ export default function SendTargetModal({
     <Modal
       title={$fmt('common.sendTo')}
       width={600}
+      getContainer={() => contentContext.rootWrapper}
       open={visible}
       onOk={handleSending}
       onCancel={onCancel}

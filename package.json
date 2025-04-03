@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@ant-design/colors": "^7.0.2",
+    "@ant-design/cssinjs": "^1.23.0",
     "@ant-design/icons": "^5.3.6",
     "@atlaskit/pragmatic-drag-and-drop": "^1.1.7",
     "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.0.3",
