@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useEffect, useState, useMemo } from 'react';
 import type { TreeProps } from 'antd';
 import type { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
-import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
+import { settingsUtils, stateUtils, tabListUtils } from '~/entrypoints/common/storage';
 import { openNewTab, openNewGroup } from '~/entrypoints/common/tabs';
 import { ENUM_SETTINGS_PROPS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { getRandomId } from '~/entrypoints/common/utils';
@@ -41,6 +41,8 @@ export function useTreeData() {
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [refreshKey, setRefreshKey] = useState<string>(getRandomId());
   const [highlightTabId, setHighlightTabId] = useState<string | undefined>();
+
+  const { urlParams, setSearchParams } = useUrlParams();
 
   const selectedTag: TreeDataNodeTag = useMemo(() => {
     const tag =
@@ -101,26 +103,39 @@ export function useTreeData() {
       selectedKeys: React.Key[],
       { node }: { node: TreeDataNodeUnion }
     ) => {
+      let tagKey: React.Key = '',
+        tabGroupKey: React.Key = '';
       if (node.type === 'tag') {
-        setSelectedTagKey(node.key);
-        // setSelectedTabGroupKey(node?.children?.[0]?.key || '');
-        setSelectedTabGroupKey('');
+        tagKey = node.key;
+        tabGroupKey = '';
         setExpandedKeys((keys) => {
           return [...new Set([...keys, node.key])];
         });
       } else if (node.type === 'tabGroup') {
         const tag = treeData.find((tag) => tag.key === node.parentKey);
-        setSelectedTagKey(tag?.key);
-        setSelectedTabGroupKey(node.key);
+        tagKey = tag?.key || '';
+        tabGroupKey = node.key;
         setExpandedKeys((keys) => {
           return [...new Set([...keys, node.parentKey])];
         });
       }
+      setSelectedTagKey(tagKey);
+      setSelectedTabGroupKey(tabGroupKey);
       setSelectedKeys([node.key]);
       setRefreshKey(getRandomId());
       setHighlightTabId(undefined);
+      stateUtils.saveHomeSelectedKeys(
+        {
+          selectedTagKey: tagKey as string,
+          selectedTabGroupKey: tabGroupKey as string,
+        },
+        () => {
+          // 清除urlParams上的tagId和groupId
+          setSearchParams({});
+        }
+      );
     },
-    []
+    [urlParams.randomId, setSearchParams]
   );
   const onSelect = useCallback(
     (selectedKeys: React.Key[], { node }: { node: TreeDataNodeUnion }) => {
@@ -390,8 +405,6 @@ export function useTreeData() {
     callback?.(treeData);
   };
 
-  const { urlParams } = useUrlParams();
-
   // 初始化
   const init = async () => {
     const tagList = await tabListUtils.getTagList();
@@ -409,11 +422,16 @@ export function useTreeData() {
       setExpandedKeys(treeData.map((tag) => tag.key));
     }
 
-    const tag =
-      treeData?.find((tag) => tag.type === 'tag' && tag.key === urlParams.tagId) ||
-      treeData?.[0];
-    const tabGroup =
-      tag?.children?.find((g) => g.key === urlParams.groupId) || tag?.children?.[0];
+    let tagId = urlParams.tagId;
+    let groupId = urlParams.groupId;
+    if (!tagId) {
+      const selectedKeys = await stateUtils.getHomeSelectedKeys();
+      tagId = selectedKeys.selectedTagKey || '';
+      groupId = selectedKeys.selectedTabGroupKey || '';
+    }
+    let tag =
+      treeData?.find((tag) => tag.type === 'tag' && tag.key === tagId) || treeData?.[0];
+    let tabGroup = tag?.children?.find((g) => g.key === groupId) || tag?.children?.[0];
 
     if (!tag) return;
     handleSelect(treeData, [tabGroup ? tabGroup.key : tag.key], {
@@ -486,6 +504,7 @@ export function useTreeData() {
   );
 
   useEffect(() => {
+    if (!urlParams.tagId) return;
     init();
   }, [urlParams.tagId, urlParams.groupId]);
 
@@ -498,10 +517,16 @@ export function useTreeData() {
   async function multiWindowDataSync() {
     const tagList = await tabListUtils.getTagList();
     setTagList(tagList);
+    const selectedKeys = await stateUtils.getHomeSelectedKeys();
+    const _tagId = selectedKeys.selectedTagKey || '';
+    const _groupId = selectedKeys.selectedTabGroupKey || '';
     refreshTreeData((treeData) => {
-      const tag = treeData.find((t) => t.key === selectedTagKey) as TreeDataNodeTag;
+      const tag = treeData.find(
+        (t) => t.key === (_tagId || selectedTagKey)
+      ) as TreeDataNodeTag;
+
       const tabGroup = (tag || treeData?.[0])?.children?.find(
-        (g) => g.key === selectedTabGroupKey
+        (g) => g.key === (_groupId || selectedTabGroupKey)
       ) as TreeDataNodeTabGroup;
 
       if (tabGroup) {
@@ -512,7 +537,9 @@ export function useTreeData() {
     });
   }
   useEffect(() => {
-    multiWindowDataSync();
+    if (urlParams.randomId && !urlParams.tagId) {
+      multiWindowDataSync();
+    }
   }, [urlParams.randomId]);
 
   return {

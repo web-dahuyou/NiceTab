@@ -7,6 +7,7 @@ import tabUtils from '~/entrypoints/common/tabs';
 import initSettingsStorageListener, {
   themeUtils,
   settingsUtils,
+  stateUtils,
 } from '~/entrypoints/common/storage';
 import { autoSyncAlarm, autoSaveOpenedTabsAlarm } from '~/entrypoints/common/alarms';
 import {
@@ -117,6 +118,11 @@ export default defineBackground(() => {
     if (settings[OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED]) {
       tabUtils.openAdminRoutePage({ path: '/home' });
     }
+  });
+
+  browser.windows.onRemoved.addListener(async (windowId) => {
+    console.log('browser.windows.onRemoved--windowId', windowId);
+    stateUtils.clearSelectedKeysOfInvalidWindows();
   });
 
   browser.runtime.onMessage.addListener(async (msg: unknown, msgSender, sendResponse) => {
