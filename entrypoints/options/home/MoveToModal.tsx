@@ -5,6 +5,7 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { tabListUtils } from '~/entrypoints/common/storage';
+import { StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
 import type { TagItem } from '~/entrypoints/types';
 import type { MoveDataProps, MoveTargetProps, CascaderOption } from './types';
 import { HomeContext } from './hooks/treeData';
@@ -12,17 +13,35 @@ import { getCascaderData } from './utils';
 
 const StyledCascaderWrapper = styled.div`
   .nicetab-cascader-panel {
+    width: 100%;
+    position: relative;
     overflow-x: visible;
   }
+  .nicetab-cascader-menus {
+    position: relative;
+    box-shadow: none;
+    width: 100%;
+  }
   .nicetab-cascader-menu {
+    position: relative;
+    flex: 1;
     min-height: 180px;
     max-height: 360px;
     overflow: auto;
+    &:first-of-type {
+      max-width: 35%;
+    }
   }
+
   .cascader-label-custom {
     display: flex;
     align-items: center;
     gap: 4px;
+    .label-name {
+      flex: 1;
+      width: 0;
+      ${StyledEllipsis}
+    }
   }
 `;
 
