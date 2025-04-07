@@ -116,7 +116,6 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
             <span className="tree-node-title">
               <EditInput
                 value={node.title || unnamedNodeName}
-                maxLength={20}
                 fontSize={14}
                 iconSize={14}
                 onValueChange={handleRenameChange}

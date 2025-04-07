@@ -4,23 +4,32 @@ import styled from 'styled-components';
 import { ContentGlobalContext } from '~/entrypoints/content/context';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { tabListUtils } from '~/entrypoints/common/storage';
+import { StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
 import type { SendTargetProps } from '~/entrypoints/types';
 import type { CascaderOption } from './types';
 import { getTotalCascaderData } from './utils';
 
 const StyledCascaderWrapper = styled.div`
   .nicetab-cascader-panel {
+    width: 100%;
     position: relative;
     overflow-x: visible;
   }
-  // .nicetab-cascader-menus {
-  //   position: relative;
-  //   box-shadow: none;
-  // }
+  .nicetab-cascader-menus {
+    position: relative;
+    box-shadow: none;
+    width: 100%;
+  }
   .nicetab-cascader-menu {
+    position: relative;
+    flex: 1;
     min-height: 180px;
     max-height: 360px;
     overflow: auto;
+    &:first-of-type {
+      max-width: 35%;
+    }
+
     &::-webkit-scrollbar {
       width: 8px !important;
       height: 8px !important;
@@ -47,6 +56,11 @@ const StyledCascaderWrapper = styled.div`
     display: flex;
     align-items: center;
     gap: 4px;
+    .label-name {
+      flex: 1;
+      width: 0;
+      ${StyledEllipsis}
+    }
   }
 `;
 

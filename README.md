@@ -27,7 +27,7 @@ If a page URL matches any of the above cases, opening tab may not work. Please m
 
 - NiceTab is a browser extension that makes managing your browser tabs quick and convenient.
 - Named `NiceTab` with the hope that it would be a "nice" tab management tool.
-- Similar to other tab management extensions like `OneTab`, `Toby`, `N-Tab`, and `KepTab`. it supports browsers such as Chrome, Firefox, Microsoft Edge, and any Chromium based browser.
+- Similar to other tab management extensions like `OneTab`, `Toby`, `SessionBuddy`, `N-Tab` and `KepTab`. it supports browsers such as Chrome, Firefox, Microsoft Edge, and any Chromium based browser.
 - Developed using `React` and based on the [`wxt framework`](https://wxt.dev/), which provides built-in templates for `Vanilla`, `Vue`, `React`, `Svelte`, and `Solid`.
 - The UI is powered by the popular [`Ant Design`](https://ant-design.antgroup.com/) library.
 
@@ -52,7 +52,7 @@ Based on the above reasons, I decided to develop the `NiceTab` extension. incorp
 
 - Manage categories, tab groups, and tabs. Includes easy saving, restoring, starring (favorites), locking, adding, deleting, editing, searching, and drag-and-drop reordering, etc.
 - Categories support expand/collapse, creation of categories and tab groups, making it easy to move other tab groups/tabs to new categories/groups.
-- Offers **import/export** in multiple formats, with local file saving supported. Currently supports cross-import/export for `NiceTab`, `Toby`, `OneTab`, and `KepTab`. (e.g., import OneTab format then export to NiceTab format, or export from NiceTab to OneTab format.) More formats can be added later as needed.
+- Offers **import** in multiple formats, with local file saving supported. Currently supports for `NiceTab`, `OneTab`, `Toby`, `SessionBuddy` and `KepTab`. More formats can be added later as needed.
 - Supports **remote syncing** (note that merging push do not perform a diff-comparison delete; it merges remote and local, then pushes to remote. To sync deletions, remove them locally and then manually overwrite the remote):
   - Gists Sync: You can sync your data to GitHub or Gitee by configuring your personal access token (note, token permissions only check `gists` scope). Potentially more platforms may be supported in the future.
   - WebDAV Sync: You can sync your data to a WebDAV service by configuring the WebDAV URL, username, and password (supports multiple WebDAV accounts).
@@ -131,11 +131,11 @@ Screenshots of other actions are not yet updated.
 
 ### Import/Export
 
-- Currently supports cross-import/export for `NiceTab`, `Toby`, `OneTab`, and `KepTab` formats.
-- You can import `OneTab`, `Toby` or `KepTab` data, and parsed into `NiceTab` format.
-- You can export `NiceTab` data to `NiceTab`, `OneTab`, `Toby` or `KepTab` format.
+- Currently supports import for `NiceTab`, `OneTab`, `Toby`, `SessionBuddy` and `KepTab` formats.
+- You can import `OneTab`, `Toby` `SessionBuddy` or `KepTab` data, and parsed into `NiceTab` format.
+- You can export `NiceTab` data to local file.
 
-Screenshots of KepTab and Toby format imports/exports are not yet updated.
+Screenshots are not yet updated.
 
 ![NiceTab-import-export](https://github.com/user-attachments/assets/e2ea4b00-3531-4819-b67a-e45f09b4e948)
 
@@ -185,7 +185,7 @@ Switch between Chinese and English in the management dashboard.
 - In the Dashboard (Admin Page), you can switch languages and themes, or toggle light/dark mode.
 - In `Dashboard > List` page, view all sent tabs organized by category and group.
 - In `Dashboard > Settings` page, manage the extension's preferences.
-- In `Dashboard > Import & Export` page, import or export tabs in NiceTab, OneTab, Toby or KepTab formats.
+- In `Dashboard > Import & Export` page, import or export tabs in NiceTab, OneTab, SessionBuddy, Toby or KepTab formats.
 - In `Dashboard > Sync` page, sync tabs to your Github and Gitee accounts as needed, just configure your access token (note, token permissions only check `gists` scope).
 - In `Dashboard > Recycle Bin` page, view and manage any deleted categories, tab groups, or tabs. You can restore or permanently delete them.
 

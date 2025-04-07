@@ -7,6 +7,7 @@ import type {
   TobyItem,
   TobyGroup,
   TobyData,
+  SessionBuddyData,
 } from '~/entrypoints/types';
 import { tabListUtils } from '~/entrypoints/common/storage';
 import type {
@@ -30,6 +31,8 @@ export const extContentFormatCheck = (content: string): ExtContentParserFuncName
     } else {
       if (Array.isArray(contentValue?.lists)) {
         return 'toby';
+      } else if (Array.isArray(contentValue?.collections)) {
+        return 'sessionBuddy';
       }
     }
 
@@ -152,6 +155,33 @@ export const extContentImporter: ExtContentImporterProps = {
     newTag.groupList = groupList || [];
     return [newTag];
   },
+  sessionBuddy(content: string): TagItem[] {
+    const sessionBuddyData = JSON.parse(content || '{}') as SessionBuddyData;
+    const tagList = sessionBuddyData.collections || [];
+    const createTime = newCreateTime();
+    return tagList.map((tag) => {
+      return {
+        tagId: getRandomId(),
+        tagName: tag.title ? `SessionBuddy-${tag.title}` : 'SessionBuddy',
+        createTime: tag.created ? newCreateTime(tag.created) : createTime,
+        groupList: tag.folders?.map((group) => {
+          return {
+            groupId: getRandomId(),
+            groupName: group.title || `sessionBuddy-${getRandomId()}`,
+            createTime: createTime,
+            tabList: group.links?.map((tab) => {
+              return {
+                tabId: getRandomId(),
+                title: tab.title,
+                url: tab.url,
+                favIconUrl: tab.favIconUrl || '',
+              };
+            }),
+          };
+        }),
+      };
+    });
+  },
 };
 
 // 将内容导出为 NiceTab、OneTab 等格式
@@ -246,6 +276,9 @@ export const extContentExporter: ExtContentExporterProps = {
     } catch {
       return JSON.stringify([]);
     }
+  },
+  sessionBuddy(): string {
+    return '暂不适配';
   },
 };
 

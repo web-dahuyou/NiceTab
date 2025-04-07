@@ -36,6 +36,13 @@ export const formatTypeOptions: FormatTypeOptionItem[] = [
     extname: 'json',
     fileType: 'application/json',
   },
+  {
+    type: 5,
+    label: 'Session Buddy',
+    funcName: 'sessionBuddy',
+    extname: 'json',
+    fileType: 'application/json',
+  },
 ];
 // 导入模式选项
 export const importModeOptions: BaseOptionItem[] = [
