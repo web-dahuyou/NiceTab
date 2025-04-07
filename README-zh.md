@@ -24,7 +24,7 @@
 ## 基础介绍
 - 本项目是一个方便快捷管理浏览器标签页的浏览器插件。
 - 取名 `NiceTab` 是希望它是一个用起来很 nice 的 tab 标签页管理工具（不过本人的UI和交互设计太差，只能凑合凑合了）。 
-- 类似于 `OneTab`、`Toby`、`N-Tab`、`KepTab` 等标签页管理插件，支持**谷歌Chrome**、**Firefox**、**微软Edge**等浏览器。
+- 类似于 `OneTab`、`Toby`、`SessionBuddy`、`N-Tab`、`KepTab` 等标签页管理插件，支持**谷歌Chrome**、**Firefox**、**微软Edge**等浏览器。
 - 采用 `react` 语言，基于[wxt框架](https://wxt.dev/)开发（wxt框架内置 `vanilla | vue | react | svelte | solid` 语言的初始化模板）。
 - UI直接使用了 `Ant Design` 这个常用的 UI 框架。
 
@@ -47,7 +47,7 @@
 ## 功能介绍
 - 支持分类、标签组、标签页管理，包括一键收集保存、恢复、星标、锁定、增删改查、拖拽排序等功能。
 - 分类支持展开/收起，支持创建分类和标签组，方便移动其他标签组/标签页到新分类/新标签组。
-- 支持多种插件格式的 **导入/导出** 功能，支持导出到本地。目前支持 `NiceTab`、`OneTab`、`Toby`、`KepTab` 格式的交叉导入导出（比如：可选择导入OneTab格式并导出为NiceTab格式；或者将NiceTab格式导出为OneTab格式），后续可根据需求增加其他插件格式的导入导出功能。
+- 支持多种插件的数据导入，支持导出到本地。目前支持 `NiceTab`、`OneTab`、`Toby`、`SessionBuddy`、`KepTab` 格式的导入，后续可根据需求增加其他插件格式的适配导入（）。
 - 支持**远程同步功能**（注意，合并推送不进行diff对比删除操作，而是合并远程和本地，然后推送到远程，所以标签页是会增多的，想要同步删除操作，请删除标签页后手动覆盖推送到远程）：
   - gists同步: 您可根据需求将标签页同步到自己的 github 和 gitee 账号，只需要配置自己的 access token 即可（注意 token 权限只勾选 gists 操作），后期看看能否扩展配置其他平台方案。
   - webDAV同步: 您可根据需求将标签页同步到自己的 webDAV 网盘，只需要配置 webDAV 的 url，username，password即可（支持配置多个 webDAV 账号）。
@@ -119,11 +119,11 @@
 ![NiceTab-偏好设置页](https://github.com/user-attachments/assets/90e19998-206b-42de-9329-410e553955a4)
 
 ### 扩展管理后台-导入导出
-导入导出功能目前支持 `NiceTab` 和 `OneTab`、`Toby`、`KepTab` 格式的交叉导入导出。
-- 支持导入 `OneTab`、`Toby`、`KepTab` 格式的列表并解析为 `NiceTab` 格式。
-- 支持将 `NiceTab`格式的列表导出为 `NiceTab`、`OneTab`、`Toby`、`KepTab` 格式。
+目前支持 `NiceTab` 和 `OneTab`、`Toby`、`SessionBuddy`、`KepTab` 格式的数据导入。
+- 支持导入 `OneTab`、`Toby`、`SessionBuddy`、`KepTab` 格式的列表并解析为 `NiceTab` 格式。
+- 支持将列表导出到本地。
 
-`Toby` 和 `KepTab` 格式导入导出的截图暂未更新。
+截图未更新。
 ![NiceTab-导入导出](https://github.com/user-attachments/assets/e2ea4b00-3531-4819-b67a-e45f09b4e948)
 
 ### 远程同步功能
@@ -167,7 +167,7 @@ webdav 方式远程同步截图暂未更新。
 - 打开**管理后台**，可进行亮色/暗黑主题切换。
 - 打开**管理后台 > 标签列表**页，查看已发送的标签页列表，支持分类和标签组管理。
 - 打开**管理后台 > 设置**页，可保存扩展的偏好设置。
-- 打开**管理后台 > 导入导出**页，可进行 NiceTab、OneTab、Toby、KepTab 格式的标签页导入导出操作。
+- 打开**管理后台 > 导入导出**页，可进行 NiceTab、OneTab、Toby、SessionBuddy、KepTab 格式的标签页导入导出操作。
 - 打开**管理后台 > 同步**页，可根据需求将标签页同步到自己的 github 和 gitee 账号，只需要配置自己的 access token 即可（注意 token 权限只勾选 gists 操作）。
 - 打开**管理后台 > 回收站**页，可查看和管理从标签列表页中删除的分类、标签组、标签页，并进行还原和删除操作。
 
