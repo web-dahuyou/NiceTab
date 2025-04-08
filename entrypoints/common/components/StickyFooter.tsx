@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState, useRef } from 'react';
+import { ReactNode, useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 
 const StyledStickyInner = styled.div<{
