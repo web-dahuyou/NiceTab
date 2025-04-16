@@ -304,7 +304,8 @@ export default class SyncUtils {
           );
           return;
         }
-        fileContent = ((await fetchApi(fileInfo?.raw_url)) as string) || '';
+        fileContent =
+          ((await fetchApi(fileInfo?.raw_url, {}, {}, 'text')) as string) || '';
       } else {
         fileContent = fileInfo?.content || '';
       }
