@@ -216,12 +216,15 @@ function AppLayout() {
   }, [$fmt]);
 
   // 导航菜单
-  const onSelect = useCallback(({ key }: { key: string }) => {
-    const nav = navs.find((item) => item.key === key);
-    if (nav) {
-      nav && navigate(nav.path);
-    }
-  }, []);
+  const onSelect = useCallback(
+    ({ key }: { key: string }) => {
+      const nav = navs.find((item) => item.key === key);
+      if (nav) {
+        nav && navigate(nav.path);
+      }
+    },
+    [navs, navigate]
+  );
   // 切换主题类型
   const handleThemeTypeChange = () => {
     const currThemeType = themeTypeConfig.type || defaultThemeType;

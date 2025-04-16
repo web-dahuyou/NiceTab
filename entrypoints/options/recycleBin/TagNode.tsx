@@ -104,6 +104,7 @@ export default function TagNode({
         <Modal
           title={$fmt('home.removeTitle')}
           width={400}
+          centered
           open={removeModalVisible}
           onOk={handleRemoveConfirm}
           onCancel={handleRemoveCancel}
@@ -115,6 +116,7 @@ export default function TagNode({
         <Modal
           title={$fmt('home.recoverTitle')}
           width={400}
+          centered
           open={recoverModalVisible}
           onOk={handleRecoverConfirm}
           onCancel={handleRecoverCancel}

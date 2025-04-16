@@ -156,7 +156,8 @@ export default defineBackground(() => {
       }
       setBadge();
     } else if (msgType === 'openAdminRoutePage') {
-      tabUtils.openAdminRoutePage(data || {});
+      await tabUtils.openAdminRoutePage(data || {});
+      tabUtils.cancelHighlightTabs();
     } else if (msgType === 'sendTabsActionStart') {
       strategyHandler(data.actionName);
     } else if (msgType === 'sendTabsActionConfirm') {

@@ -16,5 +16,8 @@
 	},
 	"action_sendRightTabs": {
 		"message": "发送右侧标签页"
+	},
+	"action_globalSearch": {
+		"message": "全局搜索"
 	}
 }

@@ -240,6 +240,7 @@ export default function Home() {
       <Modal
         title={$fmt('home.removeTitle')}
         width={400}
+        centered
         open={confirmModalVisible}
         onOk={handleClearConfirm}
         onCancel={() => setConfirmModalVisible(false)}

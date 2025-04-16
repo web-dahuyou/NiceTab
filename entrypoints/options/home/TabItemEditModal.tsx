@@ -56,6 +56,7 @@ export default function TabItemEditModal({
     <Modal
       title={`${$fmt('common.edit')} - ${$fmt('home.tab')}`}
       width={600}
+      centered
       open={visible}
       onOk={handleModalConfirm}
       onCancel={handleModalCancel}

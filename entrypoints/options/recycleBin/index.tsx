@@ -180,6 +180,7 @@ export default function RecycleBin() {
       <Modal
         title={$fmt('home.recoverTitle')}
         width={400}
+        centered
         open={recoverModalVisible}
         onOk={handleRecoverConfirm}
         onCancel={() => setRecoverModalVisible(false)}
@@ -190,6 +191,7 @@ export default function RecycleBin() {
       <Modal
         title={$fmt('home.clearTitle')}
         width={400}
+        centered
         open={confirmModalVisible}
         onOk={handleClearConfirm}
         onCancel={() => setConfirmModalVisible(false)}

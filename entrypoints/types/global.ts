@@ -6,6 +6,7 @@ import type {
   SyncStartEventProps,
   AutoSyncType,
 } from './sync';
+import { PageContextType } from './runtimeMsg';
 import { LocaleKeys } from '../common/locale';
 
 // 扩展版本信息
@@ -14,7 +15,7 @@ export type VersionInfo = { updateAvailable: boolean; version?: string };
 // 订阅事件类型
 export type EventsEmitterProps = {
   'home:is-dragging': boolean;
-  'home:set-tree-searchValue': string;
+  'home:set-tree-searchValue': { value: string, callback?: () => void };
   'home:set-editing-status': boolean;
   'sync:push-to-all-remotes': undefined;
   'sync:sync-status-change--gist': SyncStatusChangeEventProps<'gist'>;
@@ -28,6 +29,7 @@ export interface GlobalContextProps {
   colorPrimary: string;
   themeTypeConfig: ThemeTypeConfig;
   pageWidthType: PageWidthTypes;
+  pageContext: PageContextType,
   $message: MessageInstance;
   setThemeType: (themeType: ThemeTypes) => void;
   setThemeData: (themeData: Partial<ThemeProps>) => void;

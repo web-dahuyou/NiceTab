@@ -62,7 +62,7 @@ export interface RuntimeMsgSyncStatusChangeWebdav {
 }
 export interface RuntimeMsgSendTabsActionStart {
   msgType: 'sendTabsActionStart';
-  data: { actionName: string; };
+  data: { actionName: string };
 }
 export interface RuntimeMsgSendTabsActionConfirm {
   msgType: 'sendTabsActionConfirm';
@@ -134,10 +134,18 @@ export interface SendTabMsgCallbackMessage {
   };
 }
 
+export interface SendTabMsgOpenGlobalSearchModal {
+  msgType: 'action:open-global-search-modal';
+  data: {
+    currWindowId?: number;
+  };
+}
+
 export type SendTabMsgBaseProps =
   | RuntimeMsgBaseProps
   | SendTabMsgOpenSendTargetModal
-  | SendTabMsgCallbackMessage;
+  | SendTabMsgCallbackMessage
+  | SendTabMsgOpenGlobalSearchModal;
 
 // sendTabMessage event props
 export type SendTabMsgEventProps = SendTabMsgBaseProps & {

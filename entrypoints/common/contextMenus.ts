@@ -85,8 +85,8 @@ export const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> =>
     enabled:
       !!currTab?.id &&
       currTab?.id != adminTab?.id &&
-      !(currTab?.pinned && !settings[ALLOW_SEND_PINNED_TABS])
-      && isCurrTabMatched,
+      !(currTab?.pinned && !settings[ALLOW_SEND_PINNED_TABS]) &&
+      isCurrTabMatched,
   };
 
   const _sendOtherTabs: Menus.CreateCreatePropertiesType = {
@@ -100,7 +100,10 @@ export const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> =>
 
   async function hasFilteredLeftTabs() {
     if (!currTab?.id || currTab?.index <= 0) return false;
-    const filteredRightTabs = await tabUtils.getFilteredTabs(tabs.slice(0, (currTab?.index || 0)), settings);
+    const filteredRightTabs = await tabUtils.getFilteredTabs(
+      tabs.slice(0, currTab?.index || 0),
+      settings
+    );
     return filteredRightTabs?.length > 0;
   }
   const _hasFilteredLeftTabs = await hasFilteredLeftTabs();
@@ -115,7 +118,10 @@ export const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> =>
 
   async function hasFilteredRightTabs() {
     if (!currTab?.id || currTab?.index >= tabs.length - 1) return false;
-    const filteredRightTabs = await tabUtils.getFilteredTabs(tabs.slice((currTab?.index || 0) + 1), settings);
+    const filteredRightTabs = await tabUtils.getFilteredTabs(
+      tabs.slice((currTab?.index || 0) + 1),
+      settings
+    );
     return filteredRightTabs?.length > 0;
   }
   const _hasFilteredRightTabs = await hasFilteredRightTabs();
@@ -211,18 +217,30 @@ export async function strategyHandler(actionName: string) {
     return;
   }
 
+  if (actionName === ENUM_ACTION_NAME.GLOBAL_SEARCH) {
+    tabUtils.sendTabMessage({
+      msgType: 'action:open-global-search-modal',
+      data: {},
+      onlyCurrentTab: true,
+    });
+    return;
+  }
+
   const settings = await settingsUtils.getSettings();
   if (!settings[SHOW_SEND_TARGET_MODAL]) {
     handleSendTabsAction(actionName);
   } else {
     const currWindow = await browser.windows.getCurrent();
-    tabUtils.sendTabMessage({
-      msgType: 'action:open-send-target-modal',
-      data: { actionName, currWindowId: currWindow.id },
-      onlyCurrentTab: true,
-    }, () => {
-      actionHandler(actionName);
-    });
+    tabUtils.sendTabMessage(
+      {
+        msgType: 'action:open-send-target-modal',
+        data: { actionName, currWindowId: currWindow.id },
+        onlyCurrentTab: true,
+      },
+      () => {
+        actionHandler(actionName);
+      }
+    );
   }
 }
 

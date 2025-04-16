@@ -37,7 +37,7 @@ export default forwardRef((_, ref) => {
       });
       handleClose();
     },
-    [actionName]
+    [actionName, handleClose]
   );
 
   const messageListener = async (msg: unknown) => {

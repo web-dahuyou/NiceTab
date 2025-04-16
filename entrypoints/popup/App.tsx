@@ -79,6 +79,25 @@ export default function App() {
       },
     },
   ];
+
+  const handleAction = async (actionType: string, actionName: string) => {
+    if (actionType === 'sendTabs') {
+      sendRuntimeMessage({
+        msgType: 'sendTabsActionStart',
+        data: { actionName },
+        targetPageContexts: ['background'],
+      });
+      setTimeout(() => {
+        init();
+      }, 500);
+    } else if (actionType === 'globalSearch') {
+      sendRuntimeMessage({
+        msgType: 'sendTabsActionStart',
+        data: { actionName },
+        targetPageContexts: ['background'],
+      });
+    }
+  };
   // 操作按钮
   const getActionBtns = async (): Promise<ActionBtnItem[]> => {
     let menus = await getMenus();
@@ -93,17 +112,17 @@ export default function App() {
           key: menu.id!,
           label: menu.title!,
           disabled: menu.enabled === false,
-          onClick: async () => {
-            sendRuntimeMessage({
-              msgType: 'sendTabsActionStart',
-              data: { actionName: String(menu.id) },
-              targetPageContexts: ['background'],
-            });
-            setTimeout(() => {
-              init();
-            }, 500);
+          onClick: () => {
+            handleAction('sendTabs', menu.id!);
           },
         })),
+      },
+      {
+        key: 'globalSearch',
+        label: $fmt('common.globalSearch'),
+        onClick: () => {
+          handleAction('globalSearch', 'action:globalSearch');
+        },
       },
       {
         key: 'hibernateTabs',
@@ -143,7 +162,7 @@ export default function App() {
         setTabs(allTabs?.filter((t) => t.id !== adminTab?.id && !t.pinned));
       });
     },
-    [tabs]
+    []
   );
 
   const handleDelete = useCallback(

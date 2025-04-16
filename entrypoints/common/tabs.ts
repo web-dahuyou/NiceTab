@@ -152,7 +152,7 @@ export async function openAdminRoutePage(
   if (!needOpen) {
     if (!tab?.id) return;
     // 如果存在打开的nicetab管理后台页，则刷新管理后台页
-    browser.tabs.update(tab.id, { url: urlWithParams });
+    await browser.tabs.update(tab.id, { url: urlWithParams });
     return;
   }
 
@@ -229,7 +229,7 @@ export async function getFilteredTabs(
   });
 }
 // 取消标签页高亮
-async function cancelHighlightTabs(tabs?: Tabs.Tab[]) {
+export async function cancelHighlightTabs(tabs?: Tabs.Tab[]) {
   await new Promise((res) => setTimeout(res, 50));
   if (tabs) {
     tabs.forEach((tab) => {
@@ -300,7 +300,7 @@ async function sendCurrentTab(targetData: SendTargetProps = {}) {
   filteredTabs = filteredTabs.map((tab) => ({ ...tab, groupId: -1 }));
   if (!filteredTabs?.length) return;
   const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs, targetData);
-  openAdminTab(settings, { tagId, groupId });
+  await openAdminTab(settings, { tagId, groupId });
   const actionAutoCloseFlags = settings[ACTION_AUTO_CLOSE_FLAGS];
   if (
     settings[CLOSE_TABS_AFTER_SEND_TABS] ||
@@ -501,6 +501,7 @@ export default {
   updateAdminPageUrl,
   updateAdminPageUrlDebounced,
   getFilteredTabs,
+  cancelHighlightTabs,
   getAllTabs,
   sendAllTabs,
   sendCurrentTab,

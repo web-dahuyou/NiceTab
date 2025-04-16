@@ -1,8 +1,7 @@
 import { useContext, useState, useEffect, useMemo } from 'react';
-import { Space, Menu, Form, Button, Modal, theme, message } from 'antd';
+import { Menu, Form, Button, Modal, message } from 'antd';
 import type { MenuProps, FormProps } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
-import styled from 'styled-components';
 import { isEqual } from 'lodash-es';
 import { useBlocker } from 'react-router-dom';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
@@ -33,7 +32,6 @@ type MenuItem = Required<MenuProps>['items'][number];
 
 export default function Settings() {
   const NiceGlobalContext = useContext(GlobalContext);
-  const { token } = theme.useToken();
   const { $fmt, locale } = useIntlUtls();
   const [messageApi, msgContextHolder] = message.useMessage();
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
@@ -137,6 +135,7 @@ export default function Settings() {
       {msgContextHolder}
       <Modal
         title={$fmt('common.confirmReminder')}
+        centered
         open={blocker.state === 'blocked'}
         onOk={() => blocker.proceed?.()}
         onCancel={() => blocker.reset?.()}

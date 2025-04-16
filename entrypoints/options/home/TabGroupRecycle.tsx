@@ -278,6 +278,7 @@ function TabGroup({
         <Modal
           title={$fmt('home.removeTitle')}
           width={400}
+          centered
           open={modalVisible}
           onOk={handleTabGroupRemove}
           onCancel={() => setModalVisible(false)}
@@ -292,6 +293,7 @@ function TabGroup({
         <Modal
           title={$fmt('home.recoverTitle')}
           width={400}
+          centered
           open={recoverModalVisible}
           onOk={handleTabGroupRecover}
           onCancel={() => setRecoverModalVisible(false)}

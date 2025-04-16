@@ -165,6 +165,7 @@ export default function MoveToModal({
     <Modal
       title={$fmt('common.moveTo')}
       width={600}
+      centered
       open={visible}
       onOk={handleMoveTo}
       onCancel={onCancel}

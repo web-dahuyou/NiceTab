@@ -58,33 +58,6 @@ export function useTreeData() {
     }
   };
 
-  // treeNode 节点操作
-  const onTreeNodeAction = useCallback(
-    ({ actionType, node, actionName, data }: RenderTreeNodeActionProps) => {
-      const handlerMap = {
-        tag: {
-          create: () => handleTagCreate(),
-          remove: () => handleTagRemove(node.key, selectedTagKey),
-          rename: () =>
-            handleTagChange(node as TreeDataNodeTag, (data as Partial<TagItem>) || {}),
-          moveTo: () => {}, // 在index.tsx中实现
-        },
-        tabGroup: {
-          create: () => handleTabGroupCreate(node.key),
-          remove: () => handleTabGroupRemove(node as TreeDataNodeTabGroup),
-          rename: () =>
-            handleTabGroupChange(
-              node as TreeDataNodeTabGroup,
-              (data as Partial<GroupItem>) || {}
-            ),
-          moveTo: () => {}, // 在index.tsx中实现
-        },
-      };
-      const handler = handlerMap[actionType][actionName];
-      handler?.();
-    },
-    [selectedTagKey, selectedTabGroupKey]
-  );
   // 展开、折叠全部
   const toggleExpand = useCallback(
     (bool: boolean) => {
@@ -103,6 +76,7 @@ export function useTreeData() {
       selectedKeys: React.Key[],
       { node }: { node: TreeDataNodeUnion }
     ) => {
+      console.log('handleSelect', node);
       let tagKey: React.Key = '',
         tabGroupKey: React.Key = '';
       if (node.type === 'tag') {
@@ -135,13 +109,13 @@ export function useTreeData() {
         }
       );
     },
-    [urlParams.randomId, setSearchParams]
+    [setSearchParams]
   );
   const onSelect = useCallback(
     (selectedKeys: React.Key[], { node }: { node: TreeDataNodeUnion }) => {
       handleSelect(treeData, selectedKeys, { node });
     },
-    [treeData]
+    [treeData, handleSelect]
   );
 
   const selectedKeyChange = useCallback(
@@ -159,7 +133,7 @@ export function useTreeData() {
         callback?.();
       }, 300);
     },
-    [treeData]
+    [treeData, handleSelect]
   );
 
   // 删除分类
@@ -178,7 +152,7 @@ export function useTreeData() {
         }
       });
     },
-    []
+    [handleSelect]
   );
   // 创建分类
   const handleTagCreate = useCallback(async () => {
@@ -192,7 +166,7 @@ export function useTreeData() {
         }
       }, 0);
     });
-  }, []);
+  }, [handleSelect]);
   // 修改分类
   const handleTagChange = useCallback(
     async (tag: TreeDataNodeTag, data: Partial<TagItem>) => {
@@ -214,19 +188,22 @@ export function useTreeData() {
     [treeData]
   );
   // 创建标签组
-  const handleTabGroupCreate = useCallback(async (tagKey: React.Key) => {
-    const { tagId, tabGroup } = await tabListUtils.createTabGroup(tagKey);
-    refreshTreeData((treeData) => {
-      const tag = treeData.find((tag) => tag.key === tagId) as TreeDataNodeTag;
-      const group = tag.children?.find(
-        (g) => g.key === tabGroup?.groupId
-      ) as TreeDataNodeTabGroup;
-      // 优先渲染新的tree节点，再选中，防止渲染卡顿（创建时，选中新创建的节点）
-      setTimeout(() => {
-        handleSelect(treeData, [tabGroup.groupId], { node: group });
-      }, 0);
-    });
-  }, []);
+  const handleTabGroupCreate = useCallback(
+    async (tagKey: React.Key) => {
+      const { tagId, tabGroup } = await tabListUtils.createTabGroup(tagKey);
+      refreshTreeData((treeData) => {
+        const tag = treeData.find((tag) => tag.key === tagId) as TreeDataNodeTag;
+        const group = tag.children?.find(
+          (g) => g.key === tabGroup?.groupId
+        ) as TreeDataNodeTabGroup;
+        // 优先渲染新的tree节点，再选中，防止渲染卡顿（创建时，选中新创建的节点）
+        setTimeout(() => {
+          handleSelect(treeData, [tabGroup.groupId], { node: group });
+        }, 0);
+      });
+    },
+    [handleSelect]
+  );
   // 修改标签组
   const handleTabGroupChange = useCallback(
     async (tabGroup: TreeDataNodeTabGroup, data: Partial<GroupItem>) => {
@@ -254,16 +231,13 @@ export function useTreeData() {
         handleSelect(treeData, [tabGroup.key], { node: tabGroup })
       );
     },
-    [treeData]
+    [handleSelect]
   );
   // 标签组去重
-  const handleTabGroupDedup = useCallback(
-    async (tabGroup: TreeDataNodeTabGroup) => {
-      await tabListUtils.tabGroupDedup(tabGroup.parentKey, tabGroup.key);
-      refreshTreeData();
-    },
-    [treeData]
-  );
+  const handleTabGroupDedup = useCallback(async (tabGroup: TreeDataNodeTabGroup) => {
+    await tabListUtils.tabGroupDedup(tabGroup.parentKey, tabGroup.key);
+    refreshTreeData();
+  }, []);
   // 打开标签组
   const handleTabGroupRestore = useCallback(
     async (tabGroup: TreeDataNodeTabGroup) => {
@@ -295,13 +269,10 @@ export function useTreeData() {
     [treeData]
   );
   // 删除标签页
-  const handleTabItemRemove = useCallback(
-    async (groupId: React.Key, tabs: TabItem[]) => {
-      await tabListUtils.removeTabs(groupId, tabs);
-      refreshTreeData();
-    },
-    [treeData]
-  );
+  const handleTabItemRemove = useCallback(async (groupId: React.Key, tabs: TabItem[]) => {
+    await tabListUtils.removeTabs(groupId, tabs);
+    refreshTreeData();
+  }, []);
   // 修改标签页
   const handleTabItemChange = useCallback(
     async (tabGroup: { parentKey?: React.Key; key: React.Key }, tabData: TabItem) => {
@@ -373,6 +344,42 @@ export function useTreeData() {
     });
   };
 
+  // treeNode 节点操作
+  const onTreeNodeAction = useCallback(
+    ({ actionType, node, actionName, data }: RenderTreeNodeActionProps) => {
+      const handlerMap = {
+        tag: {
+          create: () => handleTagCreate(),
+          remove: () => handleTagRemove(node.key, selectedTagKey),
+          rename: () =>
+            handleTagChange(node as TreeDataNodeTag, (data as Partial<TagItem>) || {}),
+          moveTo: () => {}, // 在index.tsx中实现
+        },
+        tabGroup: {
+          create: () => handleTabGroupCreate(node.key),
+          remove: () => handleTabGroupRemove(node as TreeDataNodeTabGroup),
+          rename: () =>
+            handleTabGroupChange(
+              node as TreeDataNodeTabGroup,
+              (data as Partial<GroupItem>) || {}
+            ),
+          moveTo: () => {}, // 在index.tsx中实现
+        },
+      };
+      const handler = handlerMap[actionType][actionName];
+      handler?.();
+    },
+    [
+      selectedTagKey,
+      handleTagCreate,
+      handleTagRemove,
+      handleTagChange,
+      handleTabGroupCreate,
+      handleTabGroupRemove,
+      handleTabGroupChange,
+    ]
+  );
+
   // 拖拽标签页逻辑
   const handleTabItemDrop: DndTabItemOnDropCallback = async ({
     sourceData,
@@ -424,6 +431,7 @@ export function useTreeData() {
 
     let tagId = urlParams.tagId;
     let groupId = urlParams.groupId;
+    let tabId = urlParams.tabId;
     if (!tagId) {
       const selectedKeys = await stateUtils.getHomeSelectedKeys();
       tagId = selectedKeys.selectedTagKey || '';
@@ -437,6 +445,14 @@ export function useTreeData() {
     handleSelect(treeData, [tabGroup ? tabGroup.key : tag.key], {
       node: tabGroup ? (tabGroup as TreeDataNodeTabGroup) : tag,
     });
+
+    if (tabId) {
+      setHighlightTabId(tabId);
+
+      // setTimeout(() => {
+      //   setHighlightTabId(tabId);
+      // }, 200);
+    }
   };
 
   // 快捷键操作
@@ -500,13 +516,13 @@ export function useTreeData() {
         );
       }
     },
-    [treeData, selectedTagKey, selectedTabGroupKey]
+    [treeData, selectedTagKey, selectedTabGroupKey, handleSelect]
   );
 
   useEffect(() => {
     if (!urlParams.tagId) return;
     init();
-  }, [urlParams.tagId, urlParams.groupId]);
+  }, [urlParams.tagId, urlParams.groupId, urlParams.tabId]);
 
   useEffect(() => {
     setLoading(true);
@@ -536,11 +552,12 @@ export function useTreeData() {
       }
     });
   }
+
   useEffect(() => {
     if (urlParams.randomId && !urlParams.tagId) {
       multiWindowDataSync();
     }
-  }, [urlParams.randomId]);
+  }, [urlParams.randomId, urlParams.tagId]);
 
   return {
     urlParams,

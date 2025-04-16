@@ -5,7 +5,7 @@ import type { StyledThemeProps } from '~/entrypoints/types';
 export const StyledGroupWrapper = styled.div<{ $bgColor?: string }>`
   position: relative;
   width: 100%;
-  padding: 8px 8px 24px;
+  padding: 16px 8px;
   border-radius: 8px;
   background: ${props => props.$bgColor || '#fff'};
 `;
