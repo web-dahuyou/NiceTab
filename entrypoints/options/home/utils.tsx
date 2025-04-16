@@ -89,7 +89,9 @@ export const getCascaderData = async (
     label: (
       <div className="cascader-label-custom cascader-label-tag">
         <TagOutlined />
-        <span>{tag.static ? localeMessage?.['home.stagingArea'] : tag.tagName}</span>
+        <span className="label-name">
+          {tag.static ? localeMessage?.['home.stagingArea'] : tag.tagName}
+        </span>
       </div>
     ),
     disabled: tagDisabled(tag),
@@ -102,7 +104,7 @@ export const getCascaderData = async (
         label: (
           <div className="cascader-label-custom cascader-label-group">
             <ProductOutlined />
-            <span>{group.groupName}</span>
+            <span className="label-name">{group.groupName}</span>
           </div>
         ),
         disabled: moveType !== 'tab' || group.groupId === groupId,
@@ -116,7 +118,7 @@ export const getCascaderData = async (
 
 // 生成全量的Cascader级联数据，发送标签页时选择指定分类或者标签组
 export const getTotalCascaderData = async (
-  tagList: TagItem[],
+  tagList: TagItem[]
 ): Promise<CascaderOption[]> => {
   const localeMessage = await getLocaleMessages();
 
@@ -126,7 +128,9 @@ export const getTotalCascaderData = async (
     label: (
       <div className="cascader-label-custom cascader-label-tag">
         <TagOutlined />
-        <span>{tag.static ? localeMessage?.['home.stagingArea'] : tag.tagName}</span>
+        <span className="label-name">
+          {tag.static ? localeMessage?.['home.stagingArea'] : tag.tagName}
+        </span>
       </div>
     ),
     // isLeaf: false,
@@ -138,7 +142,7 @@ export const getTotalCascaderData = async (
         label: (
           <div className="cascader-label-custom cascader-label-group">
             <ProductOutlined />
-            <span>{group.groupName}</span>
+            <span className="label-name">{group.groupName}</span>
           </div>
         ),
         parentKey: tag.tagId,

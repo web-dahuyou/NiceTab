@@ -79,8 +79,8 @@ export const groupBySize = (list: any[], size: number = 3) => {
 };
 
 // 生成创建时间
-export const newCreateTime = () => {
-  return dayjs().format('YYYY-MM-DD HH:mm');
+export const newCreateTime = (stamp: number = Date.now()) => {
+  return dayjs(stamp).format('YYYY-MM-DD HH:mm');
 };
 
 /**
@@ -132,7 +132,8 @@ export function getMergedList<T, K extends keyof T>(
 export const fetchApi = (
   url: string,
   params: Record<string, any> = {},
-  options?: RequestInit
+  options?: RequestInit,
+  responseType: XMLHttpRequestResponseType = 'json'
 ) => {
   const _options = {
     method: 'GET',
@@ -155,7 +156,11 @@ export const fetchApi = (
     fetch(_url, _options)
       .then(async (res) => {
         if (res.ok) {
-          resolve(res.json());
+          if (responseType === 'json') {
+            resolve(await res.json());
+          } else if (responseType === 'text') {
+            resolve(await res.text());
+          }
         }
         reject(await res.json());
       })

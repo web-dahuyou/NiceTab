@@ -1,6 +1,7 @@
 import { LocaleKey } from './zhCN';
 
 const enUS: Record<LocaleKey, string> = {
+  'settings.block.common': 'Settings: Common',
   'settings.block.sendTabs': 'Settings: Sending Tabs',
   'settings.block.openTabs': 'Settings: Opening Tabs',
   'settings.block.otherActions': 'Settings: Other Actions',

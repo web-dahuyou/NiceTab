@@ -36,7 +36,7 @@ export default function EditInput({
   type = 'text',
   value,
   disabled,
-  maxLength,
+  maxLength = 40,
   maxWidth,
   fontSize = 14,
   iconSize = 16,

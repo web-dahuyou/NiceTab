@@ -290,7 +290,6 @@ function TabGroup({
             <EditInput
               value={groupName || UNNAMED_GROUP}
               disabled={!allowGroupActions.includes('rename')}
-              maxLength={20}
               maxWidth={240}
               fontSize={20}
               iconSize={16}

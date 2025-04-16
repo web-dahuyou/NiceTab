@@ -220,7 +220,7 @@ export default function ImportExport() {
           {$fmt({ id: 'importExport.moduleTitle', values: { action: 'export' } })}
         </Divider>
         <Form name="exports" layout="vertical" autoComplete="off">
-          <Form.Item
+          {/* <Form.Item
             label={$fmt({ id: 'importExport.formatType', values: { action: 'export' } })}
           >
             <Radio.Group value={exportFormatType} onChange={onExportFormatTypeChange}>
@@ -230,7 +230,7 @@ export default function ImportExport() {
                 </Radio>
               ))}
             </Radio.Group>
-          </Form.Item>
+          </Form.Item> */}
           <Form.Item>
             <Space size={12} align="center">
               <Button type="primary" loading={downloadLoading} onClick={handleDownload}>

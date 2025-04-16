@@ -1,6 +1,7 @@
 const zhCN = {
-  'settings.block.sendTabs': '发送标签页相关配置',
-  'settings.block.openTabs': '打开标签页相关配置',
+  'settings.block.common': '通用配置',
+  'settings.block.sendTabs': '发送标签页配置',
+  'settings.block.openTabs': '打开标签页配置',
   'settings.block.otherActions': '其他操作配置',
   'settings.block.display': '展示配置',
   'settings.block.autoSync': '自动同步配置',

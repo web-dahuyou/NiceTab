@@ -48,7 +48,6 @@ export interface KepTabGroup {
 
 export type KepTabData = KepTabGroup[];
 
-
 /* toby 格式相关  */
 export interface TobyItem {
   url: string;
@@ -66,13 +65,49 @@ export interface TobyGroup {
 export interface TobyData {
   version: number;
   lists: TobyGroup[];
-};
+}
+
+/* Session Buddy 格式相关  */
+export interface SessionBuddyItem {
+  id: string;
+  url: string;
+  title: string;
+  favIconUrl: string;
+  pinned: boolean;
+}
+export interface SessionBuddyGroup {
+  links: SessionBuddyItem[];
+  id: string;
+  title?: string;
+}
+export interface SessionBuddyCollections {
+  id: string;
+  title?: string;
+  created: number;
+  pinned: number;
+  updated: number;
+  touched: number;
+  folders: SessionBuddyGroup[];
+}
+export interface SessionBuddyData {
+  format: string;
+  exportId: string;
+  scope: string;
+  collections: SessionBuddyCollections[];
+}
 
 /* 导入导出相关 */
-export type ExtContentParserFuncName = 'niceTab' | 'oneTab' | 'kepTab' | 'toby';
+export type ExtContentParserFuncName =
+  | 'niceTab'
+  | 'oneTab'
+  | 'kepTab'
+  | 'toby'
+  | 'sessionBuddy';
+
 export type ExtContentImporterProps = {
   [key in ExtContentParserFuncName]: (content: string) => TagItem[];
 };
+
 export type ExtContentExporterProps = {
   [key in ExtContentParserFuncName]: (content: Partial<TagItem>[]) => string;
 };
