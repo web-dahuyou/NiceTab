@@ -76,7 +76,6 @@ export function useTreeData() {
       selectedKeys: React.Key[],
       { node }: { node: TreeDataNodeUnion }
     ) => {
-      console.log('handleSelect', node);
       let tagKey: React.Key = '',
         tabGroupKey: React.Key = '';
       if (node.type === 'tag') {
