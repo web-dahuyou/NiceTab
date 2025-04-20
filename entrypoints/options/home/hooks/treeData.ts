@@ -414,6 +414,7 @@ export function useTreeData() {
 
   // 初始化
   const init = async () => {
+    if (urlParams.action === 'globalSearch') return;
     const tagList = await tabListUtils.getTagList();
     setTagList(tagList);
     const treeData = getTreeData(tagList);
@@ -448,10 +449,6 @@ export function useTreeData() {
 
     if (tabId) {
       setHighlightTabId(tabId);
-
-      // setTimeout(() => {
-      //   setHighlightTabId(tabId);
-      // }, 200);
     }
   };
 

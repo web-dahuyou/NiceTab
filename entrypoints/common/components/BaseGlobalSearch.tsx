@@ -13,8 +13,7 @@ import VirtualList from 'rc-virtual-list';
 import { TagOutlined, ProductOutlined, ExportOutlined } from '@ant-design/icons';
 import { debounce } from 'lodash-es';
 import { pick, sendRuntimeMessage } from '~/entrypoints/common/utils';
-import { openAdminRoutePage, openNewTab } from '~/entrypoints/common/tabs';
-import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { useIntlUtls, eventEmitter } from '~/entrypoints/common/hooks/global';
 import { ContentGlobalContext } from '~/entrypoints/content/context';
 import {
   StyledEllipsis,
@@ -339,7 +338,7 @@ const StyledSearchList = styled.div`
   position: relative;
   width: 100%;
 `;
-const GlobalSearchBox = forwardRef(
+export const GlobalSearchBox = forwardRef(
   (
     {
       tagList,
@@ -409,120 +408,146 @@ const GlobalSearchBox = forwardRef(
   }
 );
 
-export default GlobalSearchBox;
-
 /* 全局搜索面板 */
-
 const StyledGlobalSearchBox = styled.div<{ height: number }>`
   position: relative;
   width: 100%;
   height: ${(props) => props.height}px;
 `;
 
-export const GlobalSearchPanel = () => {
-  const { $fmt } = useIntlUtls();
-  const contentContext = useContext(ContentGlobalContext);
-  const [visible, setVisible] = useState<boolean>(false);
-  const searchBoxRef = useRef<HTMLDivElement>(null);
-  const [listHeight, setListHeight] = useState<number>(window.innerHeight * 0.5);
-
-  const modalStyles = {
-    header: {
-      // height: 0,
-      // display: 'none'
-    },
-    body: {},
-    mask: {},
-    footer: {},
-    content: {
-      padding: 12,
-    },
-  };
-
-  const onAction: ActionCallbackFn = useCallback((type, option) => {
-    console.log('onAction', type, option);
-    const { tagId, groupId, tabId } = option || {};
-    setVisible(false);
-
-    if (type === 'open') return;
-
-    setTimeout(() => {
-      sendRuntimeMessage({
-        msgType: 'openAdminRoutePage',
-        data: {
-          path: `/home`,
-          query: {
-            tagId: tagId!,
-            groupId: groupId!,
-            tabId: tabId!,
-          },
-        },
-        targetPageContexts: ['background'],
-      });
-    }, 200);
-  }, []);
-
-  const handleClose = useCallback(() => {
-    setVisible(false);
-  }, []);
-
-  const debounceResize = useMemo(
-    () =>
-      debounce(() => {
-        setListHeight(window.innerHeight * 0.6);
-      }, 300),
-    []
-  );
-
-  const handleResize = useCallback(() => {
-    debounceResize();
-  }, [debounceResize]);
-
-  const messageListener = async (msg: unknown) => {
-    console.log('browser.runtime.onMessage--globalSearch', msg);
-    const { msgType } = (msg || {}) as SendTabMsgEventProps;
-
-    if (msgType === 'action:open-global-search-modal') {
-      setVisible(true);
-    }
-  };
-  console.log('listHeight', listHeight);
-
-  useEffect(() => {
-    window.addEventListener('resize', handleResize);
-    browser.runtime.onMessage.addListener(messageListener);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      browser.runtime.onMessage.removeListener(messageListener);
-    };
-  }, []);
-
-  return (
-    <Modal
-      title={$fmt('common.globalSearch')}
-      className="global-search-modal"
-      width="70%"
-      destroyOnClose
-      maskClosable
-      centered
-      getContainer={() => contentContext.rootWrapper}
-      closeIcon={null}
-      footer={null}
-      open={visible}
-      style={{ maxWidth: '1000px' }}
-      styles={modalStyles}
-      onCancel={handleClose}
-    >
-      <StyledGlobalSearchBox className="global-search-panel" height={listHeight + 50}>
-        <GlobalSearchBox
-          ref={searchBoxRef}
-          inputWidth="100%"
-          listWidth={true}
-          listHeight={listHeight || 450}
-          open
-          onAction={onAction}
-        ></GlobalSearchBox>
-      </StyledGlobalSearchBox>
-    </Modal>
-  );
+const modalStyles = {
+  header: {},
+  body: {},
+  mask: {},
+  footer: {},
+  content: {
+    padding: 12,
+  },
 };
+
+export const GlobalSearchPanel = forwardRef(
+  (
+    {
+      tagList,
+      onAction,
+    }: {
+      tagList?: TagItem[];
+      onAction?: ActionCallbackFn;
+    },
+    ref
+  ) => {
+    const { $fmt } = useIntlUtls();
+    const contentContext = useContext(ContentGlobalContext);
+    const [visible, setVisible] = useState<boolean>(false);
+    const searchBoxRef = useRef<HTMLDivElement>(null);
+    const [listHeight, setListHeight] = useState<number>(window.innerHeight * 0.5);
+
+    const handleAction: ActionCallbackFn = useCallback(
+      (type, option) => {
+        setVisible(false);
+        if (onAction) {
+          onAction(type, option);
+          return;
+        }
+
+        const { tagId, groupId, tabId } = option || {};
+
+        if (type === 'open') return;
+
+        setTimeout(() => {
+          sendRuntimeMessage({
+            msgType: 'openAdminRoutePage',
+            data: {
+              path: `/home`,
+              query: {
+                tagId: tagId!,
+                groupId: groupId!,
+                tabId: tabId!,
+              },
+            },
+            targetPageContexts: ['background'],
+          });
+        }, 200);
+      },
+      [onAction]
+    );
+
+    const handleClose = useCallback(() => {
+      setVisible(false);
+    }, []);
+
+    const debounceResize = useMemo(
+      () =>
+        debounce(() => {
+          setListHeight(window.innerHeight * 0.6);
+        }, 300),
+      []
+    );
+
+    const handleResize = useCallback(() => {
+      debounceResize();
+    }, [debounceResize]);
+
+    const messageListener = async (msg: unknown) => {
+      console.log('browser.runtime.onMessage--globalSearch', msg);
+      const { msgType } = (msg || {}) as SendTabMsgEventProps;
+
+      if (msgType === 'action:open-global-search-modal') {
+        setVisible(true);
+      }
+    };
+
+    const eventEmitterListener = useCallback(async () => {
+      setVisible(true);
+    }, []);
+
+    useEffect(() => {
+      window.addEventListener('resize', handleResize);
+      browser.runtime.onMessage.addListener(messageListener);
+      eventEmitter.on('global:open-global-search-modal', eventEmitterListener);
+      return () => {
+        window.removeEventListener('resize', handleResize);
+        browser.runtime.onMessage.removeListener(messageListener);
+        eventEmitter.off('global:open-global-search-modal', eventEmitterListener);
+      };
+    }, []);
+
+    useImperativeHandle(ref, () => ({
+      open: () => {
+        setVisible(true);
+      },
+    }));
+
+    return (
+      <Modal
+        title={$fmt('common.globalSearch')}
+        className="global-search-modal"
+        width="70%"
+        destroyOnClose
+        maskClosable
+        centered
+        getContainer={() => contentContext.rootWrapper}
+        closeIcon={null}
+        footer={null}
+        open={visible}
+        style={{ maxWidth: '1000px' }}
+        styles={modalStyles}
+        onCancel={handleClose}
+      >
+        <StyledGlobalSearchBox className="global-search-panel" height={listHeight + 50}>
+          <GlobalSearchBox
+            ref={searchBoxRef}
+            tagList={tagList}
+            inputWidth="100%"
+            listWidth={true}
+            listHeight={listHeight || 450}
+            open
+            onAction={handleAction}
+          ></GlobalSearchBox>
+        </StyledGlobalSearchBox>
+      </Modal>
+    );
+  }
+);
+
+export default GlobalSearchPanel;

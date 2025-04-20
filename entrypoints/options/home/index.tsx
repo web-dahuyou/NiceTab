@@ -52,7 +52,7 @@ import useHotkeys from './hooks/hotkeys';
 import { getSelectedCounts } from './utils';
 import TreeBox from './TreeBox';
 import TabGroupList from './TabGroupList';
-import FooterFloatButton from './FooterFloatButton';
+// import FooterFloatButton from './FooterFloatButton';
 
 const { TAB_COUNT_THRESHOLD } = ENUM_SETTINGS_PROPS;
 
@@ -234,7 +234,7 @@ export default function Home() {
         <Footer></Footer>
       </StickyFooter> */}
 
-      <FooterFloatButton></FooterFloatButton>
+      {/* <FooterFloatButton></FooterFloatButton> */}
 
       {/* 清空全部提示 */}
       <Modal

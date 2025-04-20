@@ -14,6 +14,7 @@ export type VersionInfo = { updateAvailable: boolean; version?: string };
 
 // 订阅事件类型
 export type EventsEmitterProps = {
+  'global:open-global-search-modal': void;
   'home:is-dragging': boolean;
   'home:set-tree-searchValue': { value: string, callback?: () => void };
   'home:set-editing-status': boolean;

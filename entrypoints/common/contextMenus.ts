@@ -10,7 +10,7 @@ import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import type { SendTargetProps } from '~/entrypoints/types';
 import initSettingsStorageListener, { settingsUtils } from './storage';
 import { getCommandsHotkeys } from './commands';
-import { pick, isUrlMatched } from './utils';
+import { pick, omit, isUrlMatched, sendRuntimeMessage } from './utils';
 
 const {
   LANGUAGE,
@@ -21,6 +21,10 @@ const {
 } = ENUM_SETTINGS_PROPS;
 
 export type ContextMenuHotKeys = Record<string, string>;
+type CreateMenuPropertiesType = Menus.CreateCreatePropertiesType & {
+  // 用来给popup等地方复用menus时进行过滤使用，browser.contextMenus.create 时需要去掉这个属性
+  tag: 'common' | 'sendTabs' | 'menuGroup';
+};
 
 export const getMenuHotkeys = async () => {
   const commandsHotkeysMap = await getCommandsHotkeys();
@@ -31,6 +35,7 @@ export const getMenuHotkeys = async () => {
 
   return [
     ENUM_ACTION_NAME.OPEN_ADMIN_TAB,
+    ENUM_ACTION_NAME.GLOBAL_SEARCH,
     ENUM_ACTION_NAME.SEND_ALL_TABS,
     ENUM_ACTION_NAME.SEND_CURRENT_TAB,
     ENUM_ACTION_NAME.SEND_OTHER_TABS,
@@ -42,7 +47,7 @@ export const getMenuHotkeys = async () => {
   }, {});
 };
 
-export const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> => {
+export const getMenus = async (): Promise<CreateMenuPropertiesType[]> => {
   const settings = await settingsUtils.getSettings();
   const language = settings[LANGUAGE] || defaultLanguage;
   const customMessages = getCustomLocaleMessages(language);
@@ -59,7 +64,8 @@ export const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> =>
     ? ['all']
     : ['action'];
 
-  const _openAdminTab: Menus.CreateCreatePropertiesType = {
+  const _openAdminTab: CreateMenuPropertiesType = {
+    tag: 'common',
     id: ENUM_ACTION_NAME.OPEN_ADMIN_TAB,
     title:
       customMessages['common.openAdminTab'] +
@@ -67,7 +73,17 @@ export const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> =>
     contexts,
   };
 
-  const _sendAllTabs: Menus.CreateCreatePropertiesType = {
+  const _openGlobalSearch: CreateMenuPropertiesType = {
+    tag: 'common',
+    id: ENUM_ACTION_NAME.GLOBAL_SEARCH,
+    title:
+      customMessages['common.globalSearch'] +
+      ` (${hotkeysMap?.[ENUM_ACTION_NAME.GLOBAL_SEARCH]})`,
+    contexts,
+  };
+
+  const _sendAllTabs: CreateMenuPropertiesType = {
+    tag: 'sendTabs',
     id: ENUM_ACTION_NAME.SEND_ALL_TABS,
     title:
       customMessages['common.sendAllTabs'] +
@@ -76,7 +92,8 @@ export const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> =>
     enabled: filteredTabs?.length > 0,
   };
 
-  const _sendCurrentTab: Menus.CreateCreatePropertiesType = {
+  const _sendCurrentTab: CreateMenuPropertiesType = {
+    tag: 'sendTabs',
     id: ENUM_ACTION_NAME.SEND_CURRENT_TAB,
     title:
       customMessages['common.sendCurrentTab'] +
@@ -89,13 +106,23 @@ export const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> =>
       isCurrTabMatched,
   };
 
-  const _sendOtherTabs: Menus.CreateCreatePropertiesType = {
+  const _sendOtherTabs: CreateMenuPropertiesType = {
+    tag: 'sendTabs',
     id: ENUM_ACTION_NAME.SEND_OTHER_TABS,
     title:
       customMessages['common.sendOtherTabs'] +
       ` (${hotkeysMap?.[ENUM_ACTION_NAME.SEND_OTHER_TABS]})`,
     contexts,
     enabled: !!currTab?.id && filteredTabs?.length > 1,
+  };
+
+  // 后面的menu全都折叠收到 menuGroup:more
+  const _moreMenus: CreateMenuPropertiesType = {
+    tag: 'menuGroup',
+    id: 'menuGroup:more',
+    title: customMessages['common.more'],
+    contexts,
+    enabled: true,
   };
 
   async function hasFilteredLeftTabs() {
@@ -107,8 +134,10 @@ export const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> =>
     return filteredRightTabs?.length > 0;
   }
   const _hasFilteredLeftTabs = await hasFilteredLeftTabs();
-  const _sendLeftTabs: Menus.CreateCreatePropertiesType = {
+  const _sendLeftTabs: CreateMenuPropertiesType = {
+    tag: 'sendTabs',
     id: ENUM_ACTION_NAME.SEND_LEFT_TABS,
+    parentId: 'menuGroup:more',
     title:
       customMessages['common.sendLeftTabs'] +
       ` (${hotkeysMap?.[ENUM_ACTION_NAME.SEND_LEFT_TABS]})`,
@@ -125,8 +154,10 @@ export const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> =>
     return filteredRightTabs?.length > 0;
   }
   const _hasFilteredRightTabs = await hasFilteredRightTabs();
-  const _sendRightTabs: Menus.CreateCreatePropertiesType = {
+  const _sendRightTabs: CreateMenuPropertiesType = {
+    tag: 'sendTabs',
     id: ENUM_ACTION_NAME.SEND_RIGHT_TABS,
+    parentId: 'menuGroup:more',
     title:
       customMessages['common.sendRightTabs'] +
       ` (${hotkeysMap?.[ENUM_ACTION_NAME.SEND_RIGHT_TABS]})`,
@@ -136,9 +167,11 @@ export const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> =>
 
   return [
     _openAdminTab,
+    _openGlobalSearch,
     _sendAllTabs,
     _sendCurrentTab,
     _sendOtherTabs,
+    _moreMenus,
     _sendLeftTabs,
     _sendRightTabs,
   ];
@@ -148,7 +181,7 @@ export const getMenus = async (): Promise<Menus.CreateCreatePropertiesType[]> =>
 async function createContextMenus(callback?: () => void) {
   const menus = await getMenus();
   for (let menu of menus) {
-    await browser.contextMenus.create(menu);
+    await browser.contextMenus.create(omit(menu, ['tag']));
   }
   callback?.();
 }
@@ -181,6 +214,13 @@ export async function actionHandler(actionName: string, targetData?: SendTargetP
       break;
     case ENUM_ACTION_NAME.OPEN_ADMIN_TAB:
       await tabUtils.openAdminRoutePage({ path: '/home' });
+      break;
+    case ENUM_ACTION_NAME.GLOBAL_SEARCH:
+      sendRuntimeMessage({
+        msgType: 'sendTabsActionStart',
+        data: { actionName },
+        targetPageContexts: ['background'],
+      });
       break;
     default:
       break;
@@ -218,11 +258,16 @@ export async function strategyHandler(actionName: string) {
   }
 
   if (actionName === ENUM_ACTION_NAME.GLOBAL_SEARCH) {
-    tabUtils.sendTabMessage({
-      msgType: 'action:open-global-search-modal',
-      data: {},
-      onlyCurrentTab: true,
-    });
+    tabUtils.sendTabMessage(
+      {
+        msgType: 'action:open-global-search-modal',
+        data: {},
+        onlyCurrentTab: true,
+      },
+      () => {
+        tabUtils.openAdminRoutePage({ path: '/home', query: { action: 'globalSearch' } });
+      }
+    );
     return;
   }
 

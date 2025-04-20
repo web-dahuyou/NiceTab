@@ -139,9 +139,7 @@ export async function openAdminRoutePage(
   route: { path: string; query?: Record<string, string> },
   needOpen = true
 ) {
-  const paramsStr = objectToUrlParams(
-    Object.assign(route?.query || {}, { randomId: getRandomId(6) })
-  );
+  const paramsStr = objectToUrlParams(route?.query || {});
   const settings = await settingsUtils.getSettings();
   const { tab, adminTabUrl } = await getAdminTabInfo();
   const urlWithParams = `${adminTabUrl}#${route.path || '/home'}${
@@ -171,6 +169,8 @@ export async function openAdminRoutePage(
       pinned: !!settings[AUTO_PIN_ADMIN_TAB],
     });
   }
+
+  cancelHighlightTabs();
 }
 // 多窗口时，刷新其他窗口的管理后台页面
 export async function reloadOtherAdminPage() {
