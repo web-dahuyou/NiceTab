@@ -12,6 +12,7 @@ import type {
   SnapshotItem,
 } from '~/entrypoints/types';
 import dayjs from 'dayjs';
+import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import { ENUM_SETTINGS_PROPS, UNNAMED_TAG, UNNAMED_GROUP } from '../constants';
 import {
   isGroupSupported,
@@ -22,7 +23,7 @@ import {
   getUniqueList,
   getMergedList,
 } from '../utils';
-import { openNewGroup, openNewTab } from '../tabs';
+import { openNewTab } from '../tabs';
 import Store from './instanceStore';
 
 const {
@@ -30,6 +31,7 @@ const {
   ALLOW_DUPLICATE_TABS,
   ALLOW_DUPLICATE_GROUPS,
   LINK_TEMPLATE,
+  LANGUAGE,
 } = ENUM_SETTINGS_PROPS;
 
 /**
@@ -1268,5 +1270,26 @@ export default class TabListUtils {
           .replace(/\{\{\s*url\s*\}\}/g, tab.url || '');
       })
       .join('\n');
+  }
+  // 复制标签组
+  async copyGroup(groupId: string) {
+    const settings = await Store.settingsUtils.getSettings();
+    const language = settings[LANGUAGE];
+    const customMessages = getCustomLocaleMessages(language);
+    const tagList = await this.getTagList();
+    for (let t of tagList) {
+      const groupIdx = t.groupList?.findIndex?.((g) => g.groupId === groupId);
+      if (~groupIdx) {
+        const group = t.groupList[groupIdx];
+        t.groupList.splice(groupIdx + 1, 0, {
+          ...group,
+          groupId: getRandomId(),
+          groupName: `${group.groupName}_${customMessages['common.copy']}`,
+        });
+        break;
+      }
+    }
+
+    await this.setTagList(tagList);
   }
 }

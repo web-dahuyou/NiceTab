@@ -237,6 +237,11 @@ export function useTreeData() {
     await tabListUtils.tabGroupDedup(tabGroup.parentKey, tabGroup.key);
     refreshTreeData();
   }, []);
+  // 复制标签组
+  const handleTabGroupCopy = useCallback(async (groupId: string) => {
+    await tabListUtils.copyGroup(groupId);
+    refreshTreeData();
+  }, []);
   // 打开标签组
   const handleTabGroupRestore = useCallback(
     async (tabGroup: TreeDataNodeTabGroup) => {
@@ -584,6 +589,7 @@ export function useTreeData() {
     handleTabGroupChange,
     handleTabGroupStarredChange,
     handleTabGroupDedup,
+    handleTabGroupCopy,
     handleTabGroupRestore,
     handleTreeNodeDrop,
     handleTabItemDrop,

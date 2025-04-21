@@ -48,6 +48,7 @@ type TabGroupProps = GroupItem & {
   onRestore?: () => void;
   onStarredChange?: (isStarred: boolean) => void;
   onDedup?: () => void;
+  onCopy?: (groupId: string) => void;
   onRecover?: () => void;
   // onTabChange?: (data: TabItem) => void;
   // onTabRemove?: (groupId: string, tabs: TabItem[]) => void;
@@ -63,6 +64,7 @@ const defaultGroupActions = [
   'dedup',
   'moveTo',
   'copyLinks',
+  'copyGroup',
 ];
 const defaultTabActions = ['remove', 'moveTo'];
 
@@ -85,6 +87,7 @@ function TabGroup({
   onRestore,
   onStarredChange,
   onDedup,
+  onCopy,
   onRecover,
   onMoveTo,
 }: TabGroupProps) {
@@ -157,6 +160,10 @@ function TabGroup({
     setRecoverModalVisible(false);
     onRecover?.();
   };
+
+  const handleGroupCopy = useCallback(() => {
+    onCopy?.(groupId);
+  }, [groupId]);
 
   const handleCopy = useCallback(() => {
     const tabLinks = tabListUtils.copyLinks(tabList);
@@ -273,18 +280,20 @@ function TabGroup({
             </StyledActionIconBtn>
           )}
 
-          <div className="group-status-wrapper">
-            {isLocked && (
-              <LockOutlined
-                style={{ fontSize: '22px', color: token.colorPrimaryHover }}
-              />
-            )}
-            {isStarred && (
-              <StarOutlined
-                style={{ fontSize: '22px', color: token.colorPrimaryHover }}
-              />
-            )}
-          </div>
+          {(isLocked || isStarred) && (
+            <div className="group-status-wrapper">
+              {isLocked && (
+                <LockOutlined
+                  style={{ fontSize: '22px', color: token.colorPrimaryHover }}
+                />
+              )}
+              {isStarred && (
+                <StarOutlined
+                  style={{ fontSize: '22px', color: token.colorPrimaryHover }}
+                />
+              )}
+            </div>
+          )}
 
           <div className="group-name-wrapper">
             <EditInput
@@ -345,6 +354,11 @@ function TabGroup({
                   onClick={() => openMoveToModal?.({ groupId })}
                 >
                   {$fmt('common.moveTo')}
+                </span>
+              )}
+              {allowGroupActions.includes('copyGroup') && (
+                <span className="action-btn" onClick={handleGroupCopy}>
+                  {$fmt('home.copyGroup')}
                 </span>
               )}
               {allowGroupActions.includes('copyLinks') && (
