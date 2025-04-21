@@ -289,6 +289,14 @@ export function useTreeData() {
     },
     []
   );
+  // 复制标签页
+  const handleTabItemCopy = useCallback(
+    async ({ groupId, tabs }: { groupId: React.Key; tabs: TabItem[] }) => {
+      await tabListUtils.copyTabs(groupId as string, tabs);
+      refreshTreeData();
+    },
+    []
+  );
 
   // 拖拽
   const handleTreeNodeDrop: TreeProps<TreeDataNodeUnion>['onDrop'] = async ({
@@ -594,6 +602,7 @@ export function useTreeData() {
     handleTreeNodeDrop,
     handleTabItemDrop,
     handleTabItemChange,
+    handleTabItemCopy,
     handleTabItemRemove,
     handleHotkeyAction,
     selectedKeyChange,

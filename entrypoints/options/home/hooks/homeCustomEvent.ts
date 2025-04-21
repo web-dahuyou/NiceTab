@@ -56,6 +56,9 @@ export type HomeCustomEventParamsProps = {
   action: 'handleTabItemChange',
   params: Parameters<TreeDataHookProps['handleTabItemChange']>
 } | {
+  action: 'handleTabItemCopy',
+  params: Parameters<TreeDataHookProps['handleTabItemCopy']>
+} | {
   action: 'handleTabItemRemove',
   params: Parameters<TreeDataHookProps['handleTabItemRemove']>
 } | {

@@ -66,7 +66,7 @@ const defaultGroupActions = [
   'copyLinks',
   'copyGroup',
 ];
-const defaultTabActions = ['remove', 'moveTo'];
+const defaultTabActions = ['remove', 'copy', 'moveTo'];
 
 const blockSize = 50;
 
@@ -181,6 +181,17 @@ function TabGroup({
       params: [{ key: group.groupId }, newData],
     });
   }, []);
+
+  const handleTabCopy = useCallback((tabs: TabItem[]) => {
+    eventEmitter.emit('home:treeDataHook', {
+      action: 'handleTabItemCopy',
+      params: [{ groupId: group.groupId, tabs }],
+    });
+  }, []);
+
+  const handleSelectedTabsCopy = useCallback(() => {
+    handleTabCopy(selectedTabs);
+  }, [selectedTabs]);
 
   const handleTabRemove = useCallback((tabs: TabItem[]) => {
     eventEmitter.emit('home:treeDataHook', {
@@ -409,6 +420,11 @@ function TabGroup({
                     {$fmt('common.remove')}
                   </span>
                 )}
+                {allowTabActions.includes('copy') && (
+                  <span className="action-btn" onClick={handleSelectedTabsCopy}>
+                    {$fmt('common.copy')}
+                  </span>
+                )}
                 {allowTabActions.includes('moveTo') && (
                   <span
                     className="action-btn"
@@ -463,6 +479,7 @@ function TabGroup({
                         }
                         onRemove={handleTabRemove}
                         onChange={handleTabChange}
+                        onCopy={handleTabCopy}
                       />
                     </DndComponent>
                   ))}

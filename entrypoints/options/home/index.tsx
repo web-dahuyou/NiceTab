@@ -213,7 +213,7 @@ export default function Home() {
                   menu={{ items: moreItems, onClick: onMoreItemClick }}
                   placement="bottomLeft"
                 >
-                  <StyledActionIconBtn className="btn-more" $size="20" title="更多">
+                  <StyledActionIconBtn className="btn-more" $size="20" title={$fmt('common.more')}>
                     <MoreOutlined />
                   </StyledActionIconBtn>
                 </Dropdown>

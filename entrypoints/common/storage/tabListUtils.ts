@@ -363,6 +363,27 @@ export default class TabListUtils {
     }
     await this.setTagList(tagList);
   }
+  // 复制标签组
+  async copyGroup(groupId: string) {
+    const settings = await Store.settingsUtils.getSettings();
+    const language = settings[LANGUAGE];
+    const customMessages = getCustomLocaleMessages(language);
+    const tagList = await this.getTagList();
+    for (let t of tagList) {
+      const groupIdx = t.groupList?.findIndex?.((g) => g.groupId === groupId);
+      if (groupIdx != undefined && ~groupIdx) {
+        const group = t.groupList[groupIdx];
+        t.groupList.splice(groupIdx + 1, 0, {
+          ...group,
+          groupId: getRandomId(),
+          groupName: `${group.groupName}_${customMessages['common.copy']}`,
+        });
+        break;
+      }
+    }
+
+    await this.setTagList(tagList);
+  }
   // 切换标签组星标状态
   async toggleTabGroupStarred(tagId: Key, groupId: Key, isStarred: boolean) {
     const tagList = await this.getTagList();
@@ -982,6 +1003,28 @@ export default class TabListUtils {
     }
     await this.setTagList(tagList);
   }
+  // 复制标签页
+  async copyTabs(groupId: string, tabs: TabItem[]) {
+    const tagList = await this.getTagList();
+    for (let t of tagList) {
+      const groupIdx = t.groupList?.findIndex?.((g) => g.groupId === groupId);
+      if (groupIdx != undefined && ~groupIdx) {
+        const group = t.groupList[groupIdx];
+        const lastTab = tabs[tabs.length - 1];
+        const tabIdx = group.tabList?.findLastIndex?.((item) => item.tabId === lastTab.tabId);
+        if (tabIdx != undefined && ~tabIdx) {
+          const newTabs = tabs.map((item) => ({
+            ...item,
+            tabId: getRandomId(),
+          }));
+          group.tabList.splice(tabIdx + 1, 0, ...newTabs);
+        }
+        break;
+      }
+    }
+
+    await this.setTagList(tagList);
+  }
   // tab标签页拖拽
   async onTabDrop(
     sourceGroupId: Key,
@@ -1270,26 +1313,5 @@ export default class TabListUtils {
           .replace(/\{\{\s*url\s*\}\}/g, tab.url || '');
       })
       .join('\n');
-  }
-  // 复制标签组
-  async copyGroup(groupId: string) {
-    const settings = await Store.settingsUtils.getSettings();
-    const language = settings[LANGUAGE];
-    const customMessages = getCustomLocaleMessages(language);
-    const tagList = await this.getTagList();
-    for (let t of tagList) {
-      const groupIdx = t.groupList?.findIndex?.((g) => g.groupId === groupId);
-      if (~groupIdx) {
-        const group = t.groupList[groupIdx];
-        t.groupList.splice(groupIdx + 1, 0, {
-          ...group,
-          groupId: getRandomId(),
-          groupName: `${group.groupName}_${customMessages['common.copy']}`,
-        });
-        break;
-      }
-    }
-
-    await this.setTagList(tagList);
   }
 }
