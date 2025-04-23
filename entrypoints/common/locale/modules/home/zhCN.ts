@@ -91,6 +91,8 @@ const zhCN = {
   'home.help.hotkey.modifyTip': '快捷键修改完后，会立即生效，但右键菜单中的快捷键按键名需在切换浏览器tab后自动更新。',
 
   'home.moveTo.missingTip': '请选择{type}',
+  'home.moveTo.copyLabel': '复制所选项',
+  'home.moveTo.copyTip': '勾选后，则将所选项复制到目标分类/分组中。',
   'home.moveTo.mergeLabel': '是否合并重复项',
   'home.moveTo.mergeTip.1': '1、勾选后，如果移动标签页，则与目标分组中相同 url 的标签页合并（去重）。',
   'home.moveTo.mergeTip.2': '2、勾选后，如果移动标签组，则与目标分类中同名的标签组合并，标签页去重。',

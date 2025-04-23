@@ -147,6 +147,17 @@ export function mergeGroupsAndTabs({
   return [...mergedList, ..._tExceptList, ..._iExceptList];
 }
 
+export function getCopyGroup(group: GroupItem) {
+  return {
+    ...group,
+    groupId: getRandomId(),
+    tabList: group.tabList?.map((tab) => ({
+      ...tab,
+      tabId: getRandomId(),
+    })),
+  };
+}
+
 // tab列表工具类 (tag: 分类， tabGroup: 标签组， tab: 标签页)
 export default class TabListUtils {
   tagList: TagItem[] = [];
@@ -374,8 +385,7 @@ export default class TabListUtils {
       if (groupIdx != undefined && ~groupIdx) {
         const group = t.groupList[groupIdx];
         t.groupList.splice(groupIdx + 1, 0, {
-          ...group,
-          groupId: getRandomId(),
+          ...getCopyGroup(group),
           groupName: `${group.groupName}_${customMessages['common.copy']}`,
         });
         break;
@@ -544,10 +554,12 @@ export default class TabListUtils {
   async tabGroupMoveThrough({
     sourceGroupId,
     targetTagId,
+    isCopy = false,
     autoMerge = false,
   }: {
     sourceGroupId: Key;
     targetTagId: Key;
+    isCopy?: boolean;
     autoMerge?: boolean;
   }) {
     const tagList = await this.getTagList();
@@ -579,7 +591,9 @@ export default class TabListUtils {
 
     if (isSourceFound && isTargetFound && sourceGroup) {
       const sourceTag = tagList?.[sourceTagIndex];
-      sourceTag?.groupList?.splice(sourceGroupIndex, 1);
+      if (!isCopy) {
+        sourceTag?.groupList?.splice(sourceGroupIndex, 1);
+      }
 
       const targetTag = tagList?.[targetTagIndex];
       const sameNameGroupIndex = targetTag?.groupList?.findIndex(
@@ -588,21 +602,27 @@ export default class TabListUtils {
       // 如果开启自动合并，则同名标签组会自动合并
       if (autoMerge && ~sameNameGroupIndex) {
         const targetSameNameGroup = targetTag?.groupList[sameNameGroupIndex];
+        const moveTabList = isCopy
+          ? sourceGroup?.tabList?.map((tab) => ({ ...tab, tabId: getRandomId() }))
+          : sourceGroup?.tabList;
         targetTag?.groupList?.splice(sameNameGroupIndex, 1, {
           ...targetSameNameGroup,
           tabList: getUniqueList(
-            [...targetSameNameGroup?.tabList, ...sourceGroup?.tabList],
+            [...targetSameNameGroup?.tabList].concat(moveTabList || []),
             'url'
           ),
         });
         await this.setTagList(tagList);
         return { targetGroupId: targetSameNameGroup.groupId };
       } else {
-        // 穿越操作改为往队尾插入
-        targetTag?.groupList.push(sourceGroup);
+        const targetGroup = isCopy ? getCopyGroup(sourceGroup) : { ...sourceGroup };
+        targetTag.groupList = this.groupListSortbyStarred([
+          ...targetTag?.groupList,
+          targetGroup,
+        ]);
 
         await this.setTagList(tagList);
-        return { targetGroupId: sourceGroup.groupId };
+        return { targetGroupId: targetGroup.groupId };
       }
     }
 
@@ -613,10 +633,12 @@ export default class TabListUtils {
   async allTabGroupsMoveThrough({
     sourceTagId,
     targetTagId,
+    isCopy = false,
     autoMerge = false,
   }: {
     sourceTagId: Key;
     targetTagId: Key;
+    isCopy?: boolean;
     autoMerge?: boolean;
   }) {
     const tagList = await this.getTagList();
@@ -640,8 +662,12 @@ export default class TabListUtils {
 
     if (isSourceFound && isTargetFound) {
       const sourceTag = tagList?.[sourceTagIndex];
-      const allSourceGroups = sourceTag?.groupList?.splice(0);
-
+      let allSourceGroups: GroupItem[] = [];
+      if (isCopy) {
+        allSourceGroups = sourceTag.groupList?.map((group) => getCopyGroup(group));
+      } else {
+        allSourceGroups = sourceTag.groupList?.splice(0);
+      }
       const targetTag = tagList?.[targetTagIndex];
 
       // 如果开启自动合并，则同名标签组会自动合并
@@ -654,8 +680,10 @@ export default class TabListUtils {
 
         await this.setTagList(tagList);
       } else {
-        // 穿越操作改为往队尾插入
-        targetTag.groupList = [...targetTag?.groupList, ...allSourceGroups];
+        targetTag.groupList = this.groupListSortbyStarred([
+          ...targetTag?.groupList,
+          ...allSourceGroups,
+        ]);
         await this.setTagList(tagList);
       }
 
@@ -715,6 +743,20 @@ export default class TabListUtils {
 
     tag.groupList = tag.groupList?.slice(0, unstarredIndex).concat(doSortList);
     await this.setTagList(tagList);
+  }
+
+  // 标签组按星标状态排序
+  groupListSortbyStarred(list: GroupItem[]) {
+    return list
+      .map((g, idx) => ({ ...g, idx }))
+      .sort((a, b) => {
+        if (!!a.isStarred === !!b.isStarred) {
+          return a.idx - b.idx;
+        } else {
+          return b.isStarred ? 1 : -1;
+        }
+      })
+      .map((g) => omit(g, ['idx']));
   }
 
   /* 标签相关方法 */
@@ -1011,7 +1053,9 @@ export default class TabListUtils {
       if (groupIdx != undefined && ~groupIdx) {
         const group = t.groupList[groupIdx];
         const lastTab = tabs[tabs.length - 1];
-        const tabIdx = group.tabList?.findLastIndex?.((item) => item.tabId === lastTab.tabId);
+        const tabIdx = group.tabList?.findLastIndex?.(
+          (item) => item.tabId === lastTab.tabId
+        );
         if (tabIdx != undefined && ~tabIdx) {
           const newTabs = tabs.map((item) => ({
             ...item,
@@ -1115,12 +1159,14 @@ export default class TabListUtils {
     targetTagId,
     targetGroupId,
     tabs,
+    isCopy,
     autoMerge = false,
   }: {
     sourceGroupId: Key;
     targetTagId: Key;
     targetGroupId: Key;
     tabs: TabItem[];
+    isCopy?: boolean;
     autoMerge?: boolean;
   }) {
     const tagList = await this.getTagList();
@@ -1143,7 +1189,9 @@ export default class TabListUtils {
           isSourceFound = true;
           sourceTagIndex = tIndex;
           sourceGroupIndex = gIndex;
-          group.tabList = group.tabList?.filter((tab) => !tabIds.includes(tab.tabId));
+          if (!isCopy) {
+            group.tabList = group.tabList?.filter((tab) => !tabIds.includes(tab.tabId));
+          }
         } else if (group.groupId === targetGroupId) {
           isTargetFound = true;
           targetGroupIndex = gIndex;
@@ -1157,7 +1205,10 @@ export default class TabListUtils {
       const tag = tagList[targetTagIndex];
       const group = tag.groupList[targetGroupIndex];
       if (group) {
-        let newTabList = [...group.tabList, ...tabs];
+        const moveTabList = isCopy
+          ? tabs.map((tab) => ({ ...tab, tabId: getRandomId() }))
+          : tabs;
+        let newTabList = [...group.tabList].concat(moveTabList);
         // 如果开启自动合并，则标签页去重
         if (autoMerge) {
           newTabList = getUniqueList(newTabList, 'url');

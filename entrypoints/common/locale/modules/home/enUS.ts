@@ -102,6 +102,8 @@ const enUS: Record<LocaleKey, string> = {
     'After modifying the shortcuts, they will take effect immediately. The names of the shortcut keys in the ContextMenu will automatically update after switching browser tabs.',
 
   'home.moveTo.missingTip': 'Please select a {type}',
+  'home.moveTo.copyLabel': 'Copy Selected Items?',
+  'home.moveTo.copyTip': 'If this option is checked, the selected items will be copied to the target category/group.',
   'home.moveTo.mergeLabel': 'Merge Duplicate Items?',
   'home.moveTo.mergeTip.1':
     '1. If this option is checked, when moving tabs, tabs with the same URL in the target group will be de-duplicated.',
