@@ -22,6 +22,7 @@ export const GlobalContext = createContext<GlobalContextProps>({
   colorPrimary: PRIMARY_COLOR,
   themeTypeConfig: THEME_TYPE_CONFIG[defaultThemeType],
   pageWidthType: 'fixed',
+  pageContext: 'optionsPage',
   $message: (() => {}) as any,
   setThemeType: async (themeType = defaultThemeType) => {
     settingsUtils.setSettings({ ...settingsUtils.settings, themeType });

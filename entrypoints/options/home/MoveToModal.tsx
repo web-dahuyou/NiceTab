@@ -65,6 +65,7 @@ export default function MoveToModal({
   const [options, setOptions] = useState<CascaderOption[]>([]); // 级联数据
   const [targetValue, setTargetValue] = useState<string[]>([]); // 选中的目标值
   const [targetOptions, setTargetOptions] = useState<CascaderOption[]>([]); // 选中的目标选项
+  const [isCopy, setIsCopy] = useState<boolean>(false); // 是否拷贝
   const [autoMerge, setAutoMerge] = useState<boolean>(false); // 是否自动合并
 
   // 校验级联数据
@@ -100,6 +101,10 @@ export default function MoveToModal({
     // console.log('checked = ', e.target.checked);
     setAutoMerge(e.target.checked);
   };
+  const onCopyCheckboxChange: CheckboxProps['onChange'] = (e) => {
+    // console.log('checked = ', e.target.checked);
+    setIsCopy(e.target.checked);
+  };
 
   const onCascaderChange = async (value: string[], selectedOptions: CascaderOption[]) => {
     setTargetValue(value);
@@ -118,6 +123,7 @@ export default function MoveToModal({
       await tabListUtils.allTabGroupsMoveThrough({
         sourceTagId: tagId,
         targetTagId: targetOptions[0].value,
+        isCopy,
         autoMerge,
       });
 
@@ -126,6 +132,7 @@ export default function MoveToModal({
       const { targetGroupId } = await tabListUtils.tabGroupMoveThrough({
         sourceGroupId: groupId,
         targetTagId: targetOptions[0].value,
+        isCopy,
         autoMerge,
       });
 
@@ -138,6 +145,7 @@ export default function MoveToModal({
         targetTagId,
         targetGroupId,
         tabs,
+        isCopy,
         autoMerge,
       });
 
@@ -149,7 +157,8 @@ export default function MoveToModal({
   };
 
   const initData = async () => {
-    const tagList = treeDataHook?.tagList || listData || (await tabListUtils.getTagList());
+    const tagList =
+      treeDataHook?.tagList || listData || (await tabListUtils.getTagList());
     const cascaderData = await getCascaderData(tagList, moveData);
     setOptions(cascaderData);
   };
@@ -165,12 +174,22 @@ export default function MoveToModal({
     <Modal
       title={$fmt('common.moveTo')}
       width={600}
+      centered
       open={visible}
       onOk={handleMoveTo}
       onCancel={onCancel}
     >
       <Flex vertical gap="middle">
         <Space>
+          <Checkbox checked={isCopy} onChange={onCopyCheckboxChange}>
+            {$fmt('home.moveTo.copyLabel')}
+          </Checkbox>
+          <Tooltip
+            color={token.colorBgContainer}
+            title={<Typography.Text>{$fmt('home.moveTo.copyTip')}</Typography.Text>}
+          >
+            <QuestionCircleOutlined />
+          </Tooltip>
           <Checkbox checked={autoMerge} onChange={onCheckboxChange}>
             {$fmt('home.moveTo.mergeLabel')}
           </Checkbox>

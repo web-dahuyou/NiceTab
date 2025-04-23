@@ -90,6 +90,7 @@ export function RemoveActionModal({
     <Modal
       title={$fmt('home.removeTitle')}
       width={400}
+      centered
       open={modalVisible}
       onOk={handleOk}
       onCancel={handleCancel}

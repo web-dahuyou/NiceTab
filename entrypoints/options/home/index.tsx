@@ -52,7 +52,7 @@ import useHotkeys from './hooks/hotkeys';
 import { getSelectedCounts } from './utils';
 import TreeBox from './TreeBox';
 import TabGroupList from './TabGroupList';
-import FooterFloatButton from './FooterFloatButton';
+// import FooterFloatButton from './FooterFloatButton';
 
 const { TAB_COUNT_THRESHOLD } = ENUM_SETTINGS_PROPS;
 
@@ -213,7 +213,7 @@ export default function Home() {
                   menu={{ items: moreItems, onClick: onMoreItemClick }}
                   placement="bottomLeft"
                 >
-                  <StyledActionIconBtn className="btn-more" $size="20" title="更多">
+                  <StyledActionIconBtn className="btn-more" $size="20" title={$fmt('common.more')}>
                     <MoreOutlined />
                   </StyledActionIconBtn>
                 </Dropdown>
@@ -234,12 +234,13 @@ export default function Home() {
         <Footer></Footer>
       </StickyFooter> */}
 
-      <FooterFloatButton></FooterFloatButton>
+      {/* <FooterFloatButton></FooterFloatButton> */}
 
       {/* 清空全部提示 */}
       <Modal
         title={$fmt('home.removeTitle')}
         width={400}
+        centered
         open={confirmModalVisible}
         onOk={handleClearConfirm}
         onCancel={() => setConfirmModalVisible(false)}

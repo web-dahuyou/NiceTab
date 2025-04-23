@@ -24,6 +24,7 @@ const ListItem = memo(
       handleTabGroupChange,
       handleTabGroupStarredChange,
       handleTabGroupDedup,
+      handleTabGroupCopy,
       handleTabGroupRestore,
     } = treeDataHook;
 
@@ -75,6 +76,7 @@ const ListItem = memo(
         onRestore={() => handleTabGroupRestore(tabGroup)}
         onStarredChange={(isStarred) => handleTabGroupStarredChange(tabGroup, isStarred)}
         onDedup={() => handleTabGroupDedup(tabGroup)}
+        onCopy={handleTabGroupCopy}
         onMoveTo={handleTabGroupMoveTo}
       ></TabGroup>
     );

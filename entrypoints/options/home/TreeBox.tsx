@@ -47,6 +47,7 @@ function TreeBox() {
   const listRef = useRef<HTMLDivElement>(null);
   const treeRef = useRef<any>(null);
 
+  const [searchText, setSearchText] = useState<string>('');
   const [searchValue, setSearchValue] = useState<string>('');
   const [isEditing, setIsediting] = useState<boolean>(false);
   const [treeBoxHeight, setTreeBoxHeight] = useState<number>(400);
@@ -57,19 +58,32 @@ function TreeBox() {
     }, 100);
   }, [refreshKey, selectedKeys]);
 
-  const onSearch: SearchProps['onSearch'] = (value) => {
-    const text = value?.trim().toLowerCase();
-    setSearchValue(text);
-    setTimeout(() => {
-      toggleExpand(!!text);
-    }, 30);
-  };
-  const onSearchTextChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const text = e.target?.value?.trim().toLowerCase();
-    if (!text) {
-      onSearch?.(text);
-    }
+  const setSearchTextValue = useCallback((value: string) => {
+    setSearchText(value);
+    setSearchValue(value);
   }, []);
+
+  const onSearch = useCallback(
+    (value: string) => {
+      const text = value?.trim().toLowerCase();
+      setSearchTextValue(text);
+      setTimeout(() => {
+        if (text) toggleExpand(true);
+      }, 30);
+    },
+    [setSearchTextValue, toggleExpand]
+  );
+
+  const onSearchTextChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const text = e.target?.value?.trim().toLowerCase();
+      setSearchText(text);
+      if (!text) {
+        onSearch?.(text);
+      }
+    },
+    [onSearch]
+  );
 
   // 搜索过滤后的 treeData
   const searchTreeData = useMemo(() => {
@@ -95,7 +109,7 @@ function TreeBox() {
         }
       }, []) || [];
     return getTreeData(searchTagList);
-  }, [tagList, searchValue]);
+  }, [tagList, treeData, searchValue]);
 
   // 判断节点是否可拖拽
   const isNodeDraggable = useCallback(
@@ -113,12 +127,12 @@ function TreeBox() {
     return { icon: false, nodeDraggable: isNodeDraggable };
   }, [isNodeDraggable]);
 
-  const titleRender = useCallback((node: TreeDataNodeUnion) => (
-    <RenderTreeNode
-      node={node}
-      onAction={handleTreeNodeAction}
-    ></RenderTreeNode>
-  ), []);
+  const titleRender = useCallback(
+    (node: TreeDataNodeUnion) => (
+      <RenderTreeNode node={node} onAction={handleTreeNodeAction} />
+    ),
+    [handleTreeNodeAction]
+  );
 
   // 移动所有标签组
   const handleAllTabGroupsMoveTo = async ({ targetData }: MoveToCallbackProps) => {
@@ -155,19 +169,37 @@ function TreeBox() {
     []
   );
 
-  const handleResize = debounce(() => {
-    const listHeight = listRef.current?.offsetHeight || 400;
-    setTreeBoxHeight(listHeight);
-  }, 300);
+  const debounceResize = useMemo(
+    () =>
+      debounce(() => {
+        const listHeight = listRef.current?.offsetHeight || 400;
+        setTreeBoxHeight(listHeight);
+      }, 300),
+    []
+  );
+
+  const handleResize = useCallback(() => {
+    debounceResize();
+  }, [debounceResize]);
+
+  const setTreeSearchValue = useCallback(
+    ({ value, callback }: { value: string; callback?: () => void }) => {
+      setSearchTextValue(value);
+      setTimeout(() => {
+        callback?.();
+      }, 100);
+    },
+    [setSearchTextValue]
+  );
 
   useEffect(() => {
     const listHeight = listRef.current?.offsetHeight || 400;
     setTreeBoxHeight(listHeight);
-    eventEmitter.on('home:set-tree-searchValue', setSearchValue);
+    eventEmitter.on('home:set-tree-searchValue', setTreeSearchValue);
     eventEmitter.on('home:set-editing-status', setIsediting);
     window.addEventListener('resize', handleResize);
     return () => {
-      eventEmitter.off('home:set-tree-searchValue', setSearchValue);
+      eventEmitter.off('home:set-tree-searchValue', setTreeSearchValue);
       eventEmitter.off('home:set-editing-status', setIsediting);
       window.removeEventListener('resize', handleResize);
     };
@@ -177,6 +209,7 @@ function TreeBox() {
     <>
       {/* 列表搜索框 */}
       <Input.Search
+        value={searchText}
         style={{ marginBottom: 8 }}
         placeholder={$fmt('home.searchTagAndGroup')}
         allowClear

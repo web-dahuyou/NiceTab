@@ -1,3 +1,4 @@
+import { Tabs } from 'wxt/browser';
 import contextMenusRegister, {
   strategyHandler,
   handleSendTabsAction,
@@ -66,8 +67,36 @@ async function initPopup() {
   }
 }
 
+// 初始化监听 tabs 更新
+async function initTabsUpdateListener() {
+  // 限制最多可固定一个NiceTab管理页面
+  async function adminPageLimitControl(
+    tabId: number,
+    changeInfo: Tabs.OnUpdatedChangeInfoType,
+    tab: Tabs.Tab
+  ) {
+
+    const adminTabUrl = browser.runtime.getURL('/options.html');
+    const tabs = await browser.tabs.query({
+      url: `${adminTabUrl}*`,
+      currentWindow: true,
+    });
+    let pinnedAdminPageCount = 0;
+    for (let tab of tabs) {
+      if (tab.pinned) {
+        pinnedAdminPageCount++;
+      }
+      if (pinnedAdminPageCount > 1) {
+        browser.tabs.remove(tabId);
+      }
+    }
+  }
+  browser.tabs.onUpdated.addListener(adminPageLimitControl);
+}
+
 export default defineBackground(() => {
   // console.log('Hello background!', { id: browser.runtime.id });
+  initTabsUpdateListener();
   // 设置插件图标徽标
   setBadge();
   // 初始化 popup 交互
@@ -156,7 +185,8 @@ export default defineBackground(() => {
       }
       setBadge();
     } else if (msgType === 'openAdminRoutePage') {
-      tabUtils.openAdminRoutePage(data || {});
+      await tabUtils.openAdminRoutePage(data || {});
+      tabUtils.cancelHighlightTabs();
     } else if (msgType === 'sendTabsActionStart') {
       strategyHandler(data.actionName);
     } else if (msgType === 'sendTabsActionConfirm') {

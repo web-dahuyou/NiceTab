@@ -90,6 +90,7 @@ const enUS: Record<LocaleKey, string> = {
   'common.reload': 'Reload',
   'common.confirmReminder': 'Comfirm Reminder',
   'common.note': 'Note',
+  'common.globalSearch': 'Global Search',
 };
 
 export default enUS;

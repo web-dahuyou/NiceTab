@@ -141,6 +141,7 @@ export default function Root({
             colorPrimary: primaryColor,
             themeTypeConfig,
             pageWidthType,
+            pageContext,
             $message,
             setThemeType: handleThemeTypeChange,
             setThemeData: handleThemeChange,
