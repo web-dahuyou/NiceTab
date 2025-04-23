@@ -197,7 +197,6 @@ export function useSearchAction({
   const debounceSearch = useMemo(
     () =>
       debounce((value: string) => {
-        console.log('debounceSearch', value);
         const text = value?.trim()?.toLowerCase() || '';
         const filterList = getFilterList(text);
         setFilterList(filterList || []);
@@ -207,7 +206,6 @@ export function useSearchAction({
 
   const handleSearch = useCallback(
     (value: string) => {
-      console.log('handleSearch', value);
       debounceSearch(value);
     },
     [debounceSearch]
@@ -215,7 +213,6 @@ export function useSearchAction({
 
   const onChange = useCallback(
     (value: string, option?: SearchListItemProps | SearchListItemProps[]) => {
-      console.log('onChange', value);
       onAction?.('tab', Array.isArray(option) ? option[0] : option);
       setValue(value || '');
       // setSearchValue(value);
@@ -232,7 +229,6 @@ export function useSearchAction({
 
   const onSearchTextChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      console.log('onSearchTextChange', e.target?.value);
       setSearchValue(e.target?.value);
       handleSearch?.(e.target?.value);
     },
