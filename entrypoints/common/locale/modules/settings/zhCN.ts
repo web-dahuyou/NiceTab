@@ -64,6 +64,8 @@ const zhCN = {
   'settings.linkTemplate.tooltip': '复制链接所用的模板格式, 采用 Mustache 格式',
   'settings.tabCountThreshold': '当前分类中标签页数量阈值设置：',
   'settings.tabCountThreshold.tooltip': '为了保证交互性能，当前分类中标签页数量超过设定值时，右侧面板将开启虚拟滚动，根据滚动位置展示部分标签组。',
+  'settings.tabInsertPosition': '移动或插入标签页到目标标签组中的位置：',
+  'settings.tabInsertPosition.tooltip': '设置为“顶部”时，标签页将插入到标签组的顶部；设置为“底部”时，新标签页将插入到标签组的底部。',
 
   /* 展示配置 */
   'settings.showOpenedTabCount': '是否在扩展图标上显示打开的标签页数量：',

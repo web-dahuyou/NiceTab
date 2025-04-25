@@ -20,6 +20,7 @@ const {
   UNNAMED_GROUP_RESTORE_AS_GROUP,
   NAMED_GROUP_RESTORE_AS_GROUP,
   AUTO_EXPAND_HOME_TREE,
+  TAB_INSERT_POSITION,
 } = ENUM_SETTINGS_PROPS;
 
 export type TreeDataHookProps = ReturnType<typeof useTreeData>;
@@ -398,12 +399,19 @@ export function useTreeData() {
     targetData,
     sourceIndex,
     targetIndex,
+    actionType = 'tab2tab',
+    targetTabListLength = 0,
   }) => {
+    let _targetIndex = targetIndex;
+    if (actionType === 'tab2group') {
+      const settings = await settingsUtils.getSettings();
+      _targetIndex = settings[TAB_INSERT_POSITION] === 'bottom' ? targetTabListLength : 0;
+    }
     await tabListUtils.onTabDrop(
       sourceData.groupId,
       targetData.groupId,
       sourceIndex,
-      targetIndex
+      _targetIndex
     );
     refreshTreeData();
   };

@@ -66,6 +66,8 @@ const enUS: Record<LocaleKey, string> = {
   'settings.linkTemplate.tooltip': 'Format for copy links, using the Mustache format',
   'settings.tabCountThreshold': 'Threshold setting for current category:',
   'settings.tabCountThreshold.tooltip': 'To ensure performance, when the number of tabs in the category exceeds a certain threshold, the right panel will enable virtual scrolling, displaying partial tab groups based on the scrolling position.',
+  'settings.tabInsertPosition': 'Insert position for moving or inserting tabs to the target tab group:',
+  'settings.tabInsertPosition.tooltip': 'If set to "Top", the tabs will be inserted at the top of the target tab group. If set to "Bottom", the tabs will be inserted at the bottom.',
 
   /* 展示配置 */
   'settings.showOpenedTabCount': 'Display the number of open tabs on the extension icon?',

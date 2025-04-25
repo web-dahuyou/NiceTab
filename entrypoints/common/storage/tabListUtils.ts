@@ -32,6 +32,7 @@ const {
   ALLOW_DUPLICATE_GROUPS,
   LINK_TEMPLATE,
   LANGUAGE,
+  TAB_INSERT_POSITION,
 } = ENUM_SETTINGS_PROPS;
 
 /**
@@ -1205,10 +1206,15 @@ export default class TabListUtils {
       const tag = tagList[targetTagIndex];
       const group = tag.groupList[targetGroupIndex];
       if (group) {
+        const settings = await Store.settingsUtils.getSettings();
+        const insertPosition = settings?.[TAB_INSERT_POSITION] || 'bottom';
         const moveTabList = isCopy
           ? tabs.map((tab) => ({ ...tab, tabId: getRandomId() }))
           : tabs;
-        let newTabList = [...group.tabList].concat(moveTabList);
+        let newTabList =
+          insertPosition === 'bottom'
+            ? [...group.tabList].concat(moveTabList)
+            : [...moveTabList].concat(group.tabList);
         // 如果开启自动合并，则标签页去重
         if (autoMerge) {
           newTabList = getUniqueList(newTabList, 'url');

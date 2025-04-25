@@ -1,4 +1,5 @@
 import { Space, Form, Input, InputNumber, Radio, Typography, theme } from 'antd';
+import type { FormItemProps } from 'antd';
 import type { SettingsProps } from '~/entrypoints/types';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -9,18 +10,19 @@ const {
   CONFIRM_BEFORE_DELETING_TABS,
   LINK_TEMPLATE,
   TAB_COUNT_THRESHOLD,
+  TAB_INSERT_POSITION,
 } = ENUM_SETTINGS_PROPS;
 
 const defaultTemplate = String.raw`{{url}} | {{title}}`;
 
-export default function FormModule() {
+export default function FormModule(formItemProps: FormItemProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
 
   const [form] = Form.useForm();
 
   return (
-    <>
+    <Form.Item noStyle {...formItemProps}>
       {/* 是否删除未锁定的空标签组 */}
       <Form.Item<SettingsProps>
         label={$fmt({
@@ -28,6 +30,7 @@ export default function FormModule() {
           values: { mark: '：' },
         })}
         name={DELETE_UNLOCKED_EMPTY_GROUP}
+        {...formItemProps}
       >
         <Radio.Group>
           <Radio value={true}>
@@ -107,6 +110,26 @@ export default function FormModule() {
           ></QuickActions>
         </Space>
       </Form.Item>
-    </>
+
+      {/* 插入位置 */}
+      <Form.Item<SettingsProps>
+        label={$fmt(`settings.${TAB_INSERT_POSITION}`)}
+        name={TAB_INSERT_POSITION}
+        tooltip={{
+          color: token.colorBgElevated,
+          title: (
+            <Typography.Text>
+              {$fmt(`settings.${TAB_INSERT_POSITION}.tooltip`)}
+            </Typography.Text>
+          ),
+          styles: { root: { maxWidth: '320px', width: '320px' } },
+        }}
+      >
+        <Radio.Group>
+          <Radio value="top">{$fmt('common.top')}</Radio>
+          <Radio value="bottom">{$fmt('common.bottom')}</Radio>
+        </Radio.Group>
+      </Form.Item>
+    </Form.Item>
   );
 }

@@ -1,12 +1,6 @@
 import { useMemo } from 'react';
-import {
-  Form,
-  Input,
-  Checkbox,
-  Radio,
-  Typography,
-  theme,
-} from 'antd';
+import { Form, Input, Checkbox, Radio, Typography, theme } from 'antd';
+import type { FormItemProps } from 'antd';
 import { type LocaleKeys } from '~/entrypoints/common/locale';
 import type { SettingsProps } from '~/entrypoints/types';
 import {
@@ -26,8 +20,7 @@ const {
   ALLOW_DUPLICATE_GROUPS,
 } = ENUM_SETTINGS_PROPS;
 
-
-export default function FormModuleSend() {
+export default function FormModuleSend(formItemProps: FormItemProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
 
@@ -42,7 +35,7 @@ export default function FormModuleSend() {
   }, [$fmt]);
 
   return (
-    <>
+    <Form.Item noStyle {...formItemProps}>
       {/* 是否展示目录选择弹窗 */}
       <Form.Item<SettingsProps>
         label={$fmt(`settings.${SHOW_SEND_TARGET_MODAL}`)}
@@ -56,6 +49,7 @@ export default function FormModuleSend() {
           ),
           styles: { root: { maxWidth: '320px', width: '320px' } },
         }}
+        {...formItemProps}
       >
         <Radio.Group>
           <Radio value={true}>{$fmt('common.yes')}</Radio>
@@ -184,6 +178,6 @@ export default function FormModuleSend() {
           <Radio value={false}>{$fmt(`settings.${ALLOW_DUPLICATE_TABS}.no`)}</Radio>
         </Radio.Group>
       </Form.Item>
-    </>
+    </Form.Item>
   );
 }
