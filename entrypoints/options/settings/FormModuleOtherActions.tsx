@@ -1,4 +1,5 @@
 import { Space, Form, Input, InputNumber, Radio, Typography, theme } from 'antd';
+import type { FormItemProps } from 'antd';
 import type { SettingsProps } from '~/entrypoints/types';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -13,14 +14,14 @@ const {
 
 const defaultTemplate = String.raw`{{url}} | {{title}}`;
 
-export default function FormModule() {
+export default function FormModule(formItemProps: FormItemProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
 
   const [form] = Form.useForm();
 
   return (
-    <>
+    <Form.Item noStyle {...formItemProps}>
       {/* 是否删除未锁定的空标签组 */}
       <Form.Item<SettingsProps>
         label={$fmt({
@@ -28,6 +29,7 @@ export default function FormModule() {
           values: { mark: '：' },
         })}
         name={DELETE_UNLOCKED_EMPTY_GROUP}
+        {...formItemProps}
       >
         <Radio.Group>
           <Radio value={true}>
@@ -107,6 +109,6 @@ export default function FormModule() {
           ></QuickActions>
         </Space>
       </Form.Item>
-    </>
+    </Form.Item>
   );
 }

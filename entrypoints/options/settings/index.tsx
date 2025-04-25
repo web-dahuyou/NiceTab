@@ -183,22 +183,22 @@ export default function Settings() {
             onFinish={onFinish}
           >
             {/* ******************* 通用设置 ******************* */}
-            {currModule === 'common' && <FormModuleCommon />}
+            <FormModuleCommon hidden={currModule !== 'common'} />
 
             {/* ******************* 发送标签页相关设置 ******************* */}
-            {currModule === 'sendTabs' && <FormModuleSend />}
+            <FormModuleSend hidden={currModule !== 'sendTabs'} />
 
             {/* ******************* 打开标签页相关设置 ******************* */}
-            {currModule === 'openTabs' && <FormModuleOpen />}
+            <FormModuleOpen hidden={currModule !== 'openTabs'} />
 
             {/* ******************* 其他操作相关设置 ******************* */}
-            {currModule === 'otherActions' && <FormModuleOtherActions />}
+            <FormModuleOtherActions hidden={currModule !== 'otherActions'} />
 
             {/* ******************* 展示相关设置 ******************* */}
-            {currModule === 'display' && <FormModuleDisplay />}
+            <FormModuleDisplay hidden={currModule !== 'display'} />
 
             {/* ******************* 远程同步相关设置 ******************* */}
-            {currModule === 'autoSync' && <FormModuleSync />}
+            <FormModuleSync hidden={currModule !== 'autoSync'} />
 
           </Form>
         </div>

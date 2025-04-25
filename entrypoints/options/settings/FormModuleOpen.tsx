@@ -1,4 +1,5 @@
 import { Form, Radio, Typography, theme } from 'antd';
+import type { FormItemProps } from 'antd';
 import type { SettingsProps } from '~/entrypoints/types';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -15,12 +16,12 @@ const {
 
 const modifierKeyLabels = getKeysByOS();
 
-export default function FormModule() {
+export default function FormModule(formItemProps: FormItemProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
 
   return (
-    <>
+    <Form.Item noStyle {...formItemProps}>
       {/* 是否在新窗口打开标签组 */}
       <Form.Item<SettingsProps>
         label={$fmt({
@@ -28,6 +29,7 @@ export default function FormModule() {
           values: { mark: '：' },
         })}
         name={RESTORE_IN_NEW_WINDOW}
+        {...formItemProps}
       >
         <Radio.Group>
           <Radio value={true}>{$fmt('common.yes')}</Radio>
@@ -104,6 +106,6 @@ export default function FormModule() {
           </Form.Item>
         </>
       )}
-    </>
+    </Form.Item>
   );
 }

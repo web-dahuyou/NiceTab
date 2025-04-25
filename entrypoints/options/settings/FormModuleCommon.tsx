@@ -1,4 +1,5 @@
 import { Form, Radio } from 'antd';
+import type { FormItemProps } from 'antd';
 import type { SettingsProps } from '~/entrypoints/types';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -10,11 +11,11 @@ const {
   AUTO_PIN_ADMIN_TAB,
 } = ENUM_SETTINGS_PROPS;
 
-export default function FormModuleCommon() {
+export default function FormModuleCommon(formItemProps: FormItemProps) {
   const { $fmt } = useIntlUtls();
 
   return (
-    <>
+    <Form.Item noStyle {...formItemProps}>
       <Form.Item<SettingsProps>
         label={$fmt({ id: `settings.${LANGUAGE}`, values: { mark: '：' } })}
         name={LANGUAGE}
@@ -65,6 +66,6 @@ export default function FormModuleCommon() {
           <Radio value={false}>{$fmt(`settings.${AUTO_PIN_ADMIN_TAB}.no`)}</Radio>
         </Radio.Group>
       </Form.Item>
-    </>
+    </Form.Item>
   );
 }

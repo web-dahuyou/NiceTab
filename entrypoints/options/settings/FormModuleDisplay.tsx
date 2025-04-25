@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Form, Checkbox, Radio, Typography, theme } from 'antd';
+import type { FormItemProps } from 'antd';
 import type { SettingsProps } from '~/entrypoints/types';
 import { POPUP_MODULE_NAMES, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -13,7 +14,7 @@ const {
   SHOW_TAB_TITLE_TOOLTIP,
 } = ENUM_SETTINGS_PROPS;
 
-export default function FormModuleDisplay() {
+export default function FormModuleDisplay(formItemProps: FormItemProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
 
@@ -28,11 +29,12 @@ export default function FormModuleDisplay() {
   }, [$fmt]);
 
   return (
-    <>
+    <Form.Item noStyle {...formItemProps}>
       {/* 扩展图标上是否展示当前打开的标签页数 */}
       <Form.Item<SettingsProps>
         label={$fmt(`settings.${SHOW_OPENED_TAB_COUNT}`)}
         name={SHOW_OPENED_TAB_COUNT}
+        {...formItemProps}
       >
         <Radio.Group>
           <Radio value={true}>{$fmt('common.yes')}</Radio>
@@ -102,6 +104,6 @@ export default function FormModuleDisplay() {
           <Radio value={false}>{$fmt('common.no')}</Radio>
         </Radio.Group>
       </Form.Item>
-    </>
+    </Form.Item>
   );
 }
