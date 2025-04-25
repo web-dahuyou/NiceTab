@@ -111,6 +111,10 @@ export default function Settings() {
     }));
   };
 
+  const handleSave = () => {
+    form?.submit();
+  };
+
   useEffect(() => {
     form?.setFieldValue(LANGUAGE, locale);
   }, [locale]);
@@ -162,6 +166,12 @@ export default function Settings() {
                 onClick={onModuleChange}
               ></Menu>
             </div>
+            <div className="sidebar-inner-footer">
+              {/* ******************* 保存 ******************* */}
+              <Button type="primary" onClick={handleSave}>
+                {$fmt('common.save')}
+              </Button>
+            </div>
           </div>
         </StyledSidebarWrapper>
         <div className="main-content-wrapper settings-wrapper">
@@ -190,14 +200,6 @@ export default function Settings() {
             {/* ******************* 远程同步相关设置 ******************* */}
             {currModule === 'autoSync' && <FormModuleSync />}
 
-            {/* ******************* 保存 ******************* */}
-            <StickyFooter bottomGap={0} fullWidth>
-              <StyledFooterWrapper>
-                <Button type="primary" htmlType="submit">
-                  {$fmt('common.save')}
-                </Button>
-              </StyledFooterWrapper>
-            </StickyFooter>
           </Form>
         </div>
       </StyledMainWrapper>

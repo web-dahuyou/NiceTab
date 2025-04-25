@@ -7,10 +7,20 @@ export const StyledSidebarWrapper = styled(StyledBaseSidebarWrapper)<{
   $collapsed?: boolean;
   $sidebarWidth?: number;
 }>`
+  .sidebar-inner-box {
+    display: flex;
+    flex-direction: column;
+  }
   .sidebar-inner-content {
     padding-right: 10px;
     padding-bottom: 30px;
     overflow: auto;
+  }
+  .sidebar-inner-footer {
+    display: flex;
+    justify-content: center;
+    margin-top: auto;
+    padding: 20px 10px 0;
   }
   .nicetab-menu-vertical {
     border-inline-end: none !important;
