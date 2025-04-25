@@ -5,7 +5,7 @@ import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { ENUM_COLORS, UNNAMED_TAG, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { StyledTreeNodeItem } from './Home.styled';
-import { RenderTreeNodeProps } from './types';
+import type { RenderTreeNodeProps, TreeDataNodeTabGroup } from './types';
 import { dndKeys } from './constants';
 import EditInput from '../components/EditInput';
 import DropComponent from '~/entrypoints/common/components/DropComponent';
@@ -71,13 +71,20 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
 
   // 这个 onTabItemDrop 只是为了方便右侧面板的标签页拖拽到左侧树的标签组，左侧树中的 分类和标签组的拖拽由 antd 的 Tree 组件自带实现
   const onTabItemDrop: TreeDataHookProps['handleTabItemDrop'] = useCallback(
-    (...params) => {
+    (params) => {
+      const targetTabListLength = (node as TreeDataNodeTabGroup)?.originData?.tabList?.length || 0;
       homeEventEmitter.emit('home:treeDataHook', {
         action: 'handleTabItemDrop',
-        params,
+        params: [
+          {
+            ...params,
+            actionType: 'tab2group',
+            targetTabListLength,
+          },
+        ],
       });
     },
-    []
+    [node]
   );
 
   // 编辑状态禁止node节点拖拽

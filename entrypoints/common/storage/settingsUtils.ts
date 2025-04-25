@@ -33,6 +33,7 @@ const {
   ALLOW_DUPLICATE_GROUPS,
   LINK_TEMPLATE,
   TAB_COUNT_THRESHOLD,
+  TAB_INSERT_POSITION,
   SHOW_OPENED_TAB_COUNT,
   SHOW_PAGE_CONTEXT_MENUS,
   POPUP_MODULE_DISPLAYS,
@@ -71,6 +72,7 @@ export default class SettingsUtils {
     [LINK_TEMPLATE]: '{{url}} | {{title}}', // 复制的链接模板
 
     [TAB_COUNT_THRESHOLD]: 300, // 分类中标签页超过该数量时，则右侧面板开启虚拟滚动
+    [TAB_INSERT_POSITION]: 'bottom' as 'top' | 'bottom', // 标签页插入位置：在标签组的标签页列表顶部还是底部
     [SHOW_OPENED_TAB_COUNT]: true, // 扩展图标上是否显示打开的标签页数量
     [SHOW_PAGE_CONTEXT_MENUS]: true, // 网页中是否显示NiceTab右键菜单
     [POPUP_MODULE_DISPLAYS]: POPUP_MODULE_NAMES, // popup面板中需要展示的模块
