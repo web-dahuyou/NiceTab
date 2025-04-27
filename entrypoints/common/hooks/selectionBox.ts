@@ -8,7 +8,10 @@ const osInfo = getOSInfo();
 export const StyledSelectionBox = styled.div`
   position: absolute;
   border: 1px dashed ${(props) => props.theme.colorPrimary || '#1890ff'};
-  background-color: rgba(24, 144, 255, 0.1);
+  background-color: ${(props) =>
+    props.theme.type === 'light'
+      ? 'rgba(24, 144, 255, 0.1)'
+      : 'rgba(255, 255, 255, 0.3)'};
   z-index: 10;
   pointer-events: none;
 `;
@@ -80,7 +83,7 @@ export default function useGlobalSelectionBox({
           setIsSelecting(false);
           return;
         }
-      };
+      }
 
       // 获取列表容器的位置信息
       const startX = e.clientX;
