@@ -84,7 +84,9 @@ Based on the above reasons, I decided to develop the `NiceTab` extension. incorp
 - Option to **Display ContextMenu on your webpage**.
 - Configurable **popup panel modules**: you can configure which modules to display in the popup. If none are selected, clicking the extension icon sends all tabs to NiceTab by default.
 - Option to **Automatically expand the tree list on Home Page**.
-- Supports send all tabs, current tab, other tabs, left-side tabs, and right-side tabs in just one click.
+- Supports manual deduplication of tabs.
+- Supports multi-select tabs, move or copy tabs across tab groups.
+- Supports sending all tabs, current tabs, other tabs, left-side tabs, and right-side tabs in just one click.
 - Supports sending native browser tab groups into NiceTab, and re-open them as native tab groups in your browser.
 - Supports keyboard shortcuts for certain operations, such as reordering categories or tab groups.
 - Tabs support custom editing of title and URL.
