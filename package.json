@@ -1,8 +1,8 @@
 {
   "name": "nice-tab",
-  "description": "开源的标签页管理器，OneTab、Toby、N-Tab、KepTab 等扩展的升级替代品，功能丰富易用 | A nice, convenient, powerful tab manager (open source)",
+  "description": "开源的标签页管理器，OneTab、Toby、SessionBuddy、N-Tab、KepTab 等扩展的升级替代品，功能丰富易用 | A nice, convenient, powerful tab manager serving as an upgraded alternative to OneTab, Toby, SessionBuddy, N-Tab, KepTab (open source)",
   "private": true,
-  "version": "2.7.2",
+  "version": "2.7.3",
   "type": "module",
   "scripts": {
     "dev": "wxt",

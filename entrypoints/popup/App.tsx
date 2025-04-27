@@ -9,13 +9,9 @@ import '~/assets/css/index.css';
 import './App.css';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { getAdminTabInfo, openNewTab, discardOtherTabs } from '~/entrypoints/common/tabs';
-import { getMenus, strategyHandler } from '~/entrypoints/common/contextMenus';
+import { getMenus } from '~/entrypoints/common/contextMenus';
 import { settingsUtils } from '~/entrypoints/common/storage';
-import {
-  TAB_EVENTS,
-  ENUM_ACTION_NAME,
-  SHORTCUTS_PAGE_URL,
-} from '~/entrypoints/common/constants';
+import { TAB_EVENTS, SHORTCUTS_PAGE_URL } from '~/entrypoints/common/constants';
 import type { PopupModuleNames } from '~/entrypoints/types';
 import {
   GITHUB_URL,
@@ -79,10 +75,29 @@ export default function App() {
       },
     },
   ];
+
+  const handleAction = async (actionType: string, actionName: string) => {
+    if (actionType === 'sendTabs') {
+      sendRuntimeMessage({
+        msgType: 'sendTabsActionStart',
+        data: { actionName },
+        targetPageContexts: ['background'],
+      });
+      setTimeout(() => {
+        init();
+      }, 500);
+    } else if (actionType === 'globalSearch') {
+      sendRuntimeMessage({
+        msgType: 'sendTabsActionStart',
+        data: { actionName },
+        targetPageContexts: ['background'],
+      });
+    }
+  };
   // 操作按钮
   const getActionBtns = async (): Promise<ActionBtnItem[]> => {
     let menus = await getMenus();
-    menus = menus.filter((menu) => menu.id !== ENUM_ACTION_NAME.OPEN_ADMIN_TAB);
+    menus = menus.filter((menu) => menu.tag === 'sendTabs');
 
     return [
       {
@@ -93,17 +108,17 @@ export default function App() {
           key: menu.id!,
           label: menu.title!,
           disabled: menu.enabled === false,
-          onClick: async () => {
-            sendRuntimeMessage({
-              msgType: 'sendTabsActionStart',
-              data: { actionName: String(menu.id) },
-              targetPageContexts: ['background'],
-            });
-            setTimeout(() => {
-              init();
-            }, 500);
+          onClick: () => {
+            handleAction('sendTabs', menu.id!);
           },
         })),
+      },
+      {
+        key: 'globalSearch',
+        label: $fmt('common.globalSearch'),
+        onClick: () => {
+          handleAction('globalSearch', 'action:globalSearch');
+        },
       },
       {
         key: 'hibernateTabs',
@@ -143,7 +158,7 @@ export default function App() {
         setTabs(allTabs?.filter((t) => t.id !== adminTab?.id && !t.pinned));
       });
     },
-    [tabs]
+    []
   );
 
   const handleDelete = useCallback(

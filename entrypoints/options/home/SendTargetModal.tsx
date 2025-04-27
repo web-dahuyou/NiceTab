@@ -112,6 +112,7 @@ export default function SendTargetModal({
     <Modal
       title={$fmt('common.sendTo')}
       width={600}
+      centered
       getContainer={() => contentContext.rootWrapper}
       open={visible}
       onOk={handleSending}

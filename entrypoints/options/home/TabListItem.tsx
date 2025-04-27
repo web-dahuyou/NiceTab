@@ -1,6 +1,13 @@
 import React, { useCallback, useState, memo, useRef } from 'react';
-import { theme, Checkbox, Tooltip, Popover, Modal, QRCode } from 'antd';
-import { CloseOutlined, EditOutlined, QrcodeOutlined } from '@ant-design/icons';
+import { theme, Checkbox, Tooltip, Popover, Dropdown, Modal, QRCode } from 'antd';
+import type { MenuProps } from 'antd';
+import {
+  CloseOutlined,
+  EditOutlined,
+  QrcodeOutlined,
+  MoreOutlined,
+  CopyOutlined,
+} from '@ant-design/icons';
 import { GroupItem, TabItem } from '~/entrypoints/types';
 import type { ModifierKeys } from '~/entrypoints/common/utils/click';
 import { openNewTab } from '~/entrypoints/common/tabs';
@@ -22,6 +29,7 @@ type TabItemProps = TabItem & {
   highlight?: boolean;
   onRemove?: (tabs: TabItem[]) => void;
   onChange?: (data: TabItem) => void;
+  onCopy?: (tabs: TabItem[]) => void;
 };
 
 const {
@@ -67,6 +75,7 @@ export default memo(function TabListItem({
   highlight,
   onRemove,
   onChange,
+  onCopy,
 }: TabItemProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
@@ -170,6 +179,23 @@ export default memo(function TabListItem({
     [handleTabOpen]
   );
 
+  const moreItems: MenuProps['items'] = useMemo(
+    () => [
+      {
+        key: 'copy',
+        label: $fmt('common.copy'),
+        icon: <CopyOutlined />,
+      },
+    ],
+    [$fmt]
+  );
+
+  const onMoreItemClick = useCallback<Required<MenuProps>['onClick']>(({ key }) => {
+    if (key === 'copy') {
+      onCopy?.([tab]);
+    }
+  }, []);
+
   const draggingListener = (value: boolean) => {
     setIsDragging(value);
     if (value) setTooltipVisible(false);
@@ -202,12 +228,26 @@ export default memo(function TabListItem({
       <StyledTabItemWrapper
         className="tab-list-item"
         ref={tabRef}
+        data-id={tabId}
         $bgColor={highlight ? token.colorWarningHover : ''}
       >
         {/* checkbox */}
         {!group?.isLocked && (
           <Checkbox className="checkbox-item" value={tab.tabId}></Checkbox>
         )}
+        <Dropdown
+          menu={{ items: moreItems, onClick: onMoreItemClick }}
+          placement="bottomLeft"
+          trigger={['click']}
+        >
+          <StyledActionIconBtn
+            className="tab-item-btn btn-more"
+            $size="16"
+            title={$fmt('common.more')}
+          >
+            <MoreOutlined />
+          </StyledActionIconBtn>
+        </Dropdown>
         {/* icon tab qrcode */}
         {tab.url && (
           <Popover

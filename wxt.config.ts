@@ -54,6 +54,9 @@ export default defineConfig({
         },
         description: '__MSG_action_sendCurrentTab__',
       },
+      'action:globalSearch': {
+        description: '__MSG_action_globalSearch__',
+      },
       'action:sendOtherTabs': {
         description: '__MSG_action_sendOtherTabs__',
       },

@@ -1,8 +1,7 @@
 import { useContext, useState, useEffect, useMemo } from 'react';
-import { Space, Menu, Form, Button, Modal, theme, message } from 'antd';
+import { Menu, Form, Button, Modal, message } from 'antd';
 import type { MenuProps, FormProps } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
-import styled from 'styled-components';
 import { isEqual } from 'lodash-es';
 import { useBlocker } from 'react-router-dom';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
@@ -33,7 +32,6 @@ type MenuItem = Required<MenuProps>['items'][number];
 
 export default function Settings() {
   const NiceGlobalContext = useContext(GlobalContext);
-  const { token } = theme.useToken();
   const { $fmt, locale } = useIntlUtls();
   const [messageApi, msgContextHolder] = message.useMessage();
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
@@ -113,6 +111,10 @@ export default function Settings() {
     }));
   };
 
+  const handleSave = () => {
+    form?.submit();
+  };
+
   useEffect(() => {
     form?.setFieldValue(LANGUAGE, locale);
   }, [locale]);
@@ -137,6 +139,7 @@ export default function Settings() {
       {msgContextHolder}
       <Modal
         title={$fmt('common.confirmReminder')}
+        centered
         open={blocker.state === 'blocked'}
         onOk={() => blocker.proceed?.()}
         onCancel={() => blocker.reset?.()}
@@ -163,6 +166,12 @@ export default function Settings() {
                 onClick={onModuleChange}
               ></Menu>
             </div>
+            <div className="sidebar-inner-footer">
+              {/* ******************* 保存 ******************* */}
+              <Button type="primary" onClick={handleSave}>
+                {$fmt('common.save')}
+              </Button>
+            </div>
           </div>
         </StyledSidebarWrapper>
         <div className="main-content-wrapper settings-wrapper">
@@ -174,31 +183,23 @@ export default function Settings() {
             onFinish={onFinish}
           >
             {/* ******************* 通用设置 ******************* */}
-            {currModule === 'common' && <FormModuleCommon />}
+            <FormModuleCommon hidden={currModule !== 'common'} />
 
             {/* ******************* 发送标签页相关设置 ******************* */}
-            {currModule === 'sendTabs' && <FormModuleSend />}
+            <FormModuleSend hidden={currModule !== 'sendTabs'} />
 
             {/* ******************* 打开标签页相关设置 ******************* */}
-            {currModule === 'openTabs' && <FormModuleOpen />}
+            <FormModuleOpen hidden={currModule !== 'openTabs'} />
 
             {/* ******************* 其他操作相关设置 ******************* */}
-            {currModule === 'otherActions' && <FormModuleOtherActions />}
+            <FormModuleOtherActions hidden={currModule !== 'otherActions'} />
 
             {/* ******************* 展示相关设置 ******************* */}
-            {currModule === 'display' && <FormModuleDisplay />}
+            <FormModuleDisplay hidden={currModule !== 'display'} />
 
             {/* ******************* 远程同步相关设置 ******************* */}
-            {currModule === 'autoSync' && <FormModuleSync />}
+            <FormModuleSync hidden={currModule !== 'autoSync'} />
 
-            {/* ******************* 保存 ******************* */}
-            <StickyFooter bottomGap={0} fullWidth>
-              <StyledFooterWrapper>
-                <Button type="primary" htmlType="submit">
-                  {$fmt('common.save')}
-                </Button>
-              </StyledFooterWrapper>
-            </StickyFooter>
           </Form>
         </div>
       </StyledMainWrapper>

@@ -1,4 +1,5 @@
 import { Space, Form, Radio, Typography, Slider, theme } from 'antd';
+import type { FormItemProps } from 'antd';
 import type { SettingsProps } from '~/entrypoints/types';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -6,15 +7,18 @@ import { useSyncType } from '../sync/hooks/syncType';
 
 const { AUTO_SYNC, AUTO_SYNC_INTERVAL, AUTO_SYNC_TYPE } = ENUM_SETTINGS_PROPS;
 
-export default function FormModuleSync() {
+export default function FormModuleSync(formItemProps: FormItemProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const { autoSyncTypeOptions } = useSyncType();
 
   return (
-    <>
+    <Form.Item noStyle {...formItemProps}>
       {/* 是否开启自动同步 */}
-      <Form.Item<SettingsProps> label={$fmt(`settings.${AUTO_SYNC}`)} name={AUTO_SYNC}>
+      <Form.Item<SettingsProps>
+        label={$fmt(`settings.${AUTO_SYNC}`)}
+        name={AUTO_SYNC}
+      >
         <Radio.Group>
           <Radio value={true}>{$fmt('common.yes')}</Radio>
           <Radio value={false}>{$fmt('common.no')}</Radio>
@@ -69,6 +73,6 @@ export default function FormModuleSync() {
           );
         }}
       </Form.Item>
-    </>
+    </Form.Item>
   );
 }

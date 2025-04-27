@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo, memo } from 'react';
+import { useEffect, useRef, useState, useMemo, memo, useCallback } from 'react';
 import { theme, message, Modal, Space, Divider, Checkbox, Spin, Skeleton } from 'antd';
 import type { CheckboxProps } from 'antd';
 import { LockOutlined, StarOutlined, CloseOutlined } from '@ant-design/icons';
@@ -33,6 +33,7 @@ import type {
 import { dndKeys } from './constants';
 import MoveToModal from './MoveToModal';
 import useMoveTo from './hooks/moveTo';
+import useMultiSelection from './hooks/multiSelection';
 
 const dndKey = dndKeys.tabItem;
 const { CONFIRM_BEFORE_DELETING_TABS } = ENUM_SETTINGS_PROPS;
@@ -48,6 +49,7 @@ type TabGroupProps = GroupItem & {
   onRestore?: () => void;
   onStarredChange?: (isStarred: boolean) => void;
   onDedup?: () => void;
+  onCopy?: (groupId: string) => void;
   onRecover?: () => void;
   // onTabChange?: (data: TabItem) => void;
   // onTabRemove?: (groupId: string, tabs: TabItem[]) => void;
@@ -63,8 +65,9 @@ const defaultGroupActions = [
   'dedup',
   'moveTo',
   'copyLinks',
+  'copyGroup',
 ];
-const defaultTabActions = ['remove', 'moveTo'];
+const defaultTabActions = ['remove', 'copy', 'moveTo'];
 
 const blockSize = 50;
 
@@ -85,6 +88,7 @@ function TabGroup({
   onRestore,
   onStarredChange,
   onDedup,
+  onCopy,
   onRecover,
   onMoveTo,
 }: TabGroupProps) {
@@ -93,6 +97,7 @@ function TabGroup({
   const { $fmt } = useIntlUtls();
   const [tabsRemoveModal, tabsRemoveContextHolder] = Modal.useModal();
   const groupRef = useRef<HTMLDivElement>(null);
+  const tabListRef = useRef<HTMLDivElement>(null);
   const [selectedTabIds, setSelectedTabIds] = useState<string[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [dedupModalVisible, setDedupModalVisible] = useState(false);
@@ -111,6 +116,14 @@ function TabGroup({
     () => ({ groupId, groupName, createTime, isLocked, isStarred, selected }),
     [groupId, groupName, createTime, isLocked, isStarred, selected]
   );
+
+  // 框选相关状态
+  useMultiSelection({
+    groupData: group,
+    container: tabListRef.current!,
+    selectedTabIds,
+    setSelectedTabIds,
+  });
 
   const removeDesc = useMemo(() => {
     const typeName = $fmt(`home.tabGroup`);
@@ -158,6 +171,10 @@ function TabGroup({
     onRecover?.();
   };
 
+  const handleGroupCopy = useCallback(() => {
+    onCopy?.(groupId);
+  }, [groupId]);
+
   const handleCopy = useCallback(() => {
     const tabLinks = tabListUtils.copyLinks(tabList);
     const result = copyToClipboard(tabLinks);
@@ -174,6 +191,17 @@ function TabGroup({
       params: [{ key: group.groupId }, newData],
     });
   }, []);
+
+  const handleTabCopy = useCallback((tabs: TabItem[]) => {
+    eventEmitter.emit('home:treeDataHook', {
+      action: 'handleTabItemCopy',
+      params: [{ groupId: group.groupId, tabs }],
+    });
+  }, []);
+
+  const handleSelectedTabsCopy = useCallback(() => {
+    handleTabCopy(selectedTabs);
+  }, [selectedTabs]);
 
   const handleTabRemove = useCallback((tabs: TabItem[]) => {
     eventEmitter.emit('home:treeDataHook', {
@@ -273,18 +301,20 @@ function TabGroup({
             </StyledActionIconBtn>
           )}
 
-          <div className="group-status-wrapper">
-            {isLocked && (
-              <LockOutlined
-                style={{ fontSize: '22px', color: token.colorPrimaryHover }}
-              />
-            )}
-            {isStarred && (
-              <StarOutlined
-                style={{ fontSize: '22px', color: token.colorPrimaryHover }}
-              />
-            )}
-          </div>
+          {(isLocked || isStarred) && (
+            <div className="group-status-wrapper">
+              {isLocked && (
+                <LockOutlined
+                  style={{ fontSize: '22px', color: token.colorPrimaryHover }}
+                />
+              )}
+              {isStarred && (
+                <StarOutlined
+                  style={{ fontSize: '22px', color: token.colorPrimaryHover }}
+                />
+              )}
+            </div>
+          )}
 
           <div className="group-name-wrapper">
             <EditInput
@@ -347,6 +377,11 @@ function TabGroup({
                   {$fmt('common.moveTo')}
                 </span>
               )}
+              {allowGroupActions.includes('copyGroup') && (
+                <span className="action-btn" onClick={handleGroupCopy}>
+                  {$fmt('home.copyGroup')}
+                </span>
+              )}
               {allowGroupActions.includes('copyLinks') && (
                 <span className="action-btn" onClick={handleCopy}>
                   {$fmt('home.copyLinks')}
@@ -395,6 +430,11 @@ function TabGroup({
                     {$fmt('common.remove')}
                   </span>
                 )}
+                {allowTabActions.includes('copy') && (
+                  <span className="action-btn" onClick={handleSelectedTabsCopy}>
+                    {$fmt('common.copy')}
+                  </span>
+                )}
                 {allowTabActions.includes('moveTo') && (
                   <span
                     className="action-btn"
@@ -419,6 +459,7 @@ function TabGroup({
           onDrop={handleTabItemDrop}
         >
           <StyledTabListWrapper
+            ref={tabListRef}
             className="tab-list-wrapper"
             style={{ minHeight: `${tabListHeight}px` }}
           >
@@ -449,6 +490,7 @@ function TabGroup({
                         }
                         onRemove={handleTabRemove}
                         onChange={handleTabChange}
+                        onCopy={handleTabCopy}
                       />
                     </DndComponent>
                   ))}
@@ -467,6 +509,7 @@ function TabGroup({
         <Modal
           title={$fmt('home.removeTitle')}
           width={400}
+          centered
           open={modalVisible}
           onOk={handleTabGroupRemove}
           onCancel={() => setModalVisible(false)}
@@ -481,6 +524,7 @@ function TabGroup({
         <Modal
           title={$fmt('home.dedupTitle')}
           width={400}
+          centered
           open={dedupModalVisible}
           onOk={handleTabGroupDedup}
           onCancel={() => setDedupModalVisible(false)}
@@ -493,6 +537,7 @@ function TabGroup({
         <Modal
           title={$fmt('home.recoverTitle')}
           width={400}
+          centered
           open={recoverModalVisible}
           onOk={handleTabGroupRecover}
           onCancel={() => setRecoverModalVisible(false)}

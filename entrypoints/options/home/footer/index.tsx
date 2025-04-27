@@ -18,5 +18,5 @@ export default function Footer() {
         message={$fmt('home.tip.addScope')}
       /> */}
     </StyledFooterWrapper>
-  )
+  );
 }

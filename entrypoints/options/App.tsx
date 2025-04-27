@@ -34,6 +34,7 @@ import {
   CoffeeOutlined,
   CameraOutlined,
   RollbackOutlined,
+  SearchOutlined,
 } from '@ant-design/icons';
 import styled, { ThemeProvider } from 'styled-components';
 import '~/assets/css/reset.css';
@@ -51,6 +52,7 @@ import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import useMenus from '@/entrypoints/common/hooks/menu';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import useUpdate from '~/entrypoints/common/hooks/update';
+import useUrlParams from '~/entrypoints/common/hooks/urlParams';
 import {
   GITHUB_URL,
   LANGUAGE_OPTIONS,
@@ -80,6 +82,8 @@ import RecycleBin from './recycleBin/index.tsx';
 import SendTargetActionHolder, {
   type SendTargetActionHolderProps,
 } from '~/entrypoints/options/home/SendTargetActionHolder';
+import { GlobalSearchPanel } from '~/entrypoints/common/components/BaseGlobalSearch';
+import { useGlobalSearchPanel } from './home/hooks/globalSearch';
 import { type LocaleKeys } from '~/entrypoints/common/locale';
 
 import { initFaviconApiData } from '~/entrypoints/common/utils/favicon';
@@ -206,6 +210,7 @@ function AppLayout() {
   const { updateDetail, updateReload } = useUpdate();
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const { $fmt, locale } = useIntlUtls();
+  const { urlParams, setSearchParams } = useUrlParams();
   const sendTargetActionRef = useRef<SendTargetActionHolderProps>();
 
   const { version, themeTypeConfig, pageWidthType, $message } = NiceGlobalContext;
@@ -215,13 +220,18 @@ function AppLayout() {
     });
   }, [$fmt]);
 
+  const { globalSearchPanelRef, openGlobalSearchPanel } = useGlobalSearchPanel();
+
   // 导航菜单
-  const onSelect = useCallback(({ key }: { key: string }) => {
-    const nav = navs.find((item) => item.key === key);
-    if (nav) {
-      nav && navigate(nav.path);
-    }
-  }, []);
+  const onSelect = useCallback(
+    ({ key }: { key: string }) => {
+      const nav = navs.find((item) => item.key === key);
+      if (nav) {
+        nav && navigate(nav.path);
+      }
+    },
+    [navs, navigate]
+  );
   // 切换主题类型
   const handleThemeTypeChange = () => {
     const currThemeType = themeTypeConfig.type || defaultThemeType;
@@ -314,9 +324,18 @@ function AppLayout() {
     setSelectedKeys([nav?.key || 'home']);
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (!urlParams.action) return;
+    if (urlParams.action === 'globalSearch') {
+      openGlobalSearchPanel();
+      setSearchParams({});
+    }
+  }, [urlParams.action, setSearchParams, openGlobalSearchPanel]);
+
   return (
     <ThemeProvider theme={{ ...themeTypeConfig, ...token }}>
       <SendTargetActionHolder ref={sendTargetActionRef}></SendTargetActionHolder>
+      <GlobalSearchPanel ref={globalSearchPanelRef}></GlobalSearchPanel>
 
       <StyledPageContainer $widthType={pageWidthType} className="page-container">
         <GlobalStyle />
@@ -424,6 +443,9 @@ function AppLayout() {
           </span>
           <span title={$fmt('common.sendAllTabs')}>
             <FloatButton icon={<SendOutlined />} onClick={handleSendAllTabs} />
+          </span>
+          <span title={$fmt('home.searchTabAndUrl')}>
+            <FloatButton icon={<SearchOutlined />} onClick={openGlobalSearchPanel} />
           </span>
         </FloatButton.Group>
       </StyledPageContainer>

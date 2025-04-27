@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect, useLayoutEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   theme,
   Flex,
@@ -14,6 +14,9 @@ import {
 } from 'antd';
 import { QuestionCircleOutlined, MoreOutlined, ClearOutlined } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import useGlobalSelectionBox, {
+  StyledSelectionBox,
+} from '~/entrypoints/common/hooks/selectionBox';
 import { classNames } from '~/entrypoints/common/utils';
 import {
   tabListUtils,
@@ -52,7 +55,7 @@ import useHotkeys from './hooks/hotkeys';
 import { getSelectedCounts } from './utils';
 import TreeBox from './TreeBox';
 import TabGroupList from './TabGroupList';
-import FooterFloatButton from './FooterFloatButton';
+// import FooterFloatButton from './FooterFloatButton';
 
 const { TAB_COUNT_THRESHOLD } = ENUM_SETTINGS_PROPS;
 
@@ -75,6 +78,22 @@ export default function Home() {
   useCustomEventListener(treeDataHook);
 
   const { hotkeyList } = useHotkeys({ onAction: handleHotkeyAction });
+
+  const [isAllowed, setIsAllowed] = useState<boolean>(true);
+  const onMouseUp = useCallback(() => {
+    setIsAllowed(true);
+  }, []);
+  const { isSelecting, isSelectMoving, actionType, selectionBoxData } =
+    useGlobalSelectionBox({
+      isAllowed,
+      disabledSelectors: [
+        '.tab-list-item',
+        '.checkall-wrapper',
+        '.tab-action-btns',
+        '.group-header',
+      ],
+      onMouseUp,
+    });
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => {
     return stateUtils.state?.home?.sidebarCollapsed || false;
@@ -154,174 +173,206 @@ export default function Home() {
   }, []);
 
   return (
-    <HomeContext.Provider value={{ treeDataHook }}>
-      <StyledMainWrapper
-        className={classNames('home-wrapper', sidebarCollapsed && 'collapsed')}
-        $collapsed={sidebarCollapsed}
+    <>
+      <StyledSelectionBox
+        style={{
+          position: 'fixed',
+          display: selectionBoxData.display,
+          top: selectionBoxData.top + 'px',
+          left: selectionBoxData.left + 'px',
+          width: selectionBoxData.width + 'px',
+          height: selectionBoxData.height + 'px',
+        }}
+      ></StyledSelectionBox>
+      <HomeContext.Provider
+        value={{
+          treeDataHook,
+          selectionBoxHook: {
+            isSelecting,
+            isSelectMoving,
+            actionType,
+            selectionBoxData,
+            setIsAllowed,
+          },
+        }}
       >
-        <StyledSidebarWrapper className="sidebar" $collapsed={sidebarCollapsed}>
-          <div
-            className={classNames('sidebar-inner-box', sidebarCollapsed && 'collapsed')}
-          >
-            <div className="sidebar-action-box">
-              <ToggleSidebarBtn
-                collapsed={sidebarCollapsed}
-                onCollapseChange={onCollapseChange}
-              ></ToggleSidebarBtn>
-              <SearchTabsBtn></SearchTabsBtn>
-              {selectedTagKey ? <SortingBtns onSort={onNameSort}></SortingBtns> : null}
-              {selectedTagKey ? (
-                <SortingBtns sortBy="createTime" onSort={onCreateTimeSort}></SortingBtns>
-              ) : null}
-            </div>
-
-            <div className="sidebar-inner-content">
-              <div className="tag-list-title">
-                {$fmt('home.tabGroupList')}
-                <StyledActionIconBtn
-                  className="btn-help"
-                  title={$fmt('home.helpInfo')}
-                  onClick={() => setHelpDrawerVisible(true)}
-                >
-                  <QuestionCircleOutlined />
-                </StyledActionIconBtn>
+        <StyledMainWrapper
+          className={classNames('home-wrapper', sidebarCollapsed && 'collapsed')}
+          $collapsed={sidebarCollapsed}
+        >
+          <StyledSidebarWrapper className="sidebar" $collapsed={sidebarCollapsed}>
+            <div
+              className={classNames('sidebar-inner-box', sidebarCollapsed && 'collapsed')}
+            >
+              <div className="sidebar-action-box">
+                <ToggleSidebarBtn
+                  collapsed={sidebarCollapsed}
+                  onCollapseChange={onCollapseChange}
+                ></ToggleSidebarBtn>
+                <SearchTabsBtn></SearchTabsBtn>
+                {selectedTagKey ? <SortingBtns onSort={onNameSort}></SortingBtns> : null}
+                {selectedTagKey ? (
+                  <SortingBtns
+                    sortBy="createTime"
+                    onSort={onCreateTimeSort}
+                  ></SortingBtns>
+                ) : null}
               </div>
-              <ul className="count-info">
-                <li>
-                  {$fmt('home.tag')} ({countInfo?.tagCount})
-                </li>
-                <li>
-                  {$fmt('home.tabGroup')} ({countInfo?.groupCount})
-                </li>
-                <li>
-                  {$fmt('home.tab')} ({countInfo?.tabCount})
-                </li>
-              </ul>
-              {/* 顶部操作按钮组 */}
-              <div className="sidebar-action-btns-wrapper">
-                <Button type="primary" size="small" onClick={() => toggleExpand(true)}>
-                  {$fmt('home.expandAll')}
-                </Button>
-                <Button type="primary" size="small" onClick={() => toggleExpand(false)}>
-                  {$fmt('home.collapseAll')}
-                </Button>
-                <Button type="primary" size="small" onClick={handleTagCreate}>
-                  {$fmt('home.addTag')}
-                </Button>
 
-                <Dropdown
-                  menu={{ items: moreItems, onClick: onMoreItemClick }}
-                  placement="bottomLeft"
-                >
-                  <StyledActionIconBtn className="btn-more" $size="20" title="更多">
-                    <MoreOutlined />
+              <div className="sidebar-inner-content">
+                <div className="tag-list-title">
+                  {$fmt('home.tabGroupList')}
+                  <StyledActionIconBtn
+                    className="btn-help"
+                    title={$fmt('home.helpInfo')}
+                    onClick={() => setHelpDrawerVisible(true)}
+                  >
+                    <QuestionCircleOutlined />
                   </StyledActionIconBtn>
-                </Dropdown>
+                </div>
+                <ul className="count-info">
+                  <li>
+                    {$fmt('home.tag')} ({countInfo?.tagCount})
+                  </li>
+                  <li>
+                    {$fmt('home.tabGroup')} ({countInfo?.groupCount})
+                  </li>
+                  <li>
+                    {$fmt('home.tab')} ({countInfo?.tabCount})
+                  </li>
+                </ul>
+                {/* 顶部操作按钮组 */}
+                <div className="sidebar-action-btns-wrapper">
+                  <Button type="primary" size="small" onClick={() => toggleExpand(true)}>
+                    {$fmt('home.expandAll')}
+                  </Button>
+                  <Button type="primary" size="small" onClick={() => toggleExpand(false)}>
+                    {$fmt('home.collapseAll')}
+                  </Button>
+                  <Button type="primary" size="small" onClick={handleTagCreate}>
+                    {$fmt('home.addTag')}
+                  </Button>
+
+                  <Dropdown
+                    menu={{ items: moreItems, onClick: onMoreItemClick }}
+                    placement="bottomLeft"
+                  >
+                    <StyledActionIconBtn
+                      className="btn-more"
+                      $size="20"
+                      title={$fmt('common.more')}
+                    >
+                      <MoreOutlined />
+                    </StyledActionIconBtn>
+                  </Dropdown>
+                </div>
+
+                {/* 分类和标签组列表 */}
+                <TreeBox></TreeBox>
               </div>
-
-              {/* 分类和标签组列表 */}
-              <TreeBox></TreeBox>
             </div>
-          </div>
-        </StyledSidebarWrapper>
+          </StyledSidebarWrapper>
 
-        {/* 标签组和标签页列表 */}
-        <TabGroupList virtual={virtualMap.tabList}></TabGroupList>
-      </StyledMainWrapper>
+          {/* 标签组和标签页列表 */}
+          <TabGroupList virtual={virtualMap.tabList}></TabGroupList>
+        </StyledMainWrapper>
 
-      {/* 吸底footer */}
-      {/* <StickyFooter bottomGap={0} fullWidth>
-        <Footer></Footer>
-      </StickyFooter> */}
+        {/* 吸底footer */}
+        {/* <StickyFooter bottomGap={0} fullWidth>
+          <Footer></Footer>
+        </StickyFooter> */}
 
-      <FooterFloatButton></FooterFloatButton>
+        {/* <FooterFloatButton></FooterFloatButton> */}
 
-      {/* 清空全部提示 */}
-      <Modal
-        title={$fmt('home.removeTitle')}
-        width={400}
-        open={confirmModalVisible}
-        onOk={handleClearConfirm}
-        onCancel={() => setConfirmModalVisible(false)}
-      >
-        <div>{$fmt('home.clearDesc')}</div>
-      </Modal>
+        {/* 清空全部提示 */}
+        <Modal
+          title={$fmt('home.removeTitle')}
+          width={400}
+          centered
+          open={confirmModalVisible}
+          onOk={handleClearConfirm}
+          onCancel={() => setConfirmModalVisible(false)}
+        >
+          <div>{$fmt('home.clearDesc')}</div>
+        </Modal>
 
-      {/* 帮助信息弹层 */}
-      <Drawer
-        title={$fmt('home.helpInfo')}
-        open={helpDrawerVisible}
-        onClose={() => setHelpDrawerVisible(false)}
-        width={600}
-      >
-        <StyledHelpInfoBox>
-          {import.meta.env.FIREFOX && (
-            <>
-              <p style={{ marginBottom: '4px' }}>
-                <strong>{$fmt('common.note')}</strong>: {$fmt('home.help.reminder.start')}
-              </p>
-              <ul
-                dangerouslySetInnerHTML={{ __html: $fmt('home.help.reminder.list') }}
-              ></ul>
-              <p style={{ marginBottom: '8px' }}>{$fmt('home.help.reminder.end')}</p>
-              <Divider></Divider>
-            </>
-          )}
+        {/* 帮助信息弹层 */}
+        <Drawer
+          title={$fmt('home.helpInfo')}
+          open={helpDrawerVisible}
+          onClose={() => setHelpDrawerVisible(false)}
+          width={600}
+        >
+          <StyledHelpInfoBox>
+            {import.meta.env.FIREFOX && (
+              <>
+                <p style={{ marginBottom: '4px' }}>
+                  <strong>{$fmt('common.note')}</strong>:
+                  {$fmt('home.help.reminder.start')}
+                </p>
+                <ul
+                  dangerouslySetInnerHTML={{ __html: $fmt('home.help.reminder.list') }}
+                ></ul>
+                <p style={{ marginBottom: '8px' }}>{$fmt('home.help.reminder.end')}</p>
+                <Divider></Divider>
+              </>
+            )}
 
-          <ul dangerouslySetInnerHTML={{ __html: $fmt('home.help.content') }}></ul>
+            <ul dangerouslySetInnerHTML={{ __html: $fmt('home.help.content') }}></ul>
 
-          <p style={{ marginBottom: '8px' }}>
-            <strong>{$fmt('common.hotkeys')}</strong>
-          </p>
-          <HotkeyList list={hotkeyList}></HotkeyList>
+            <p style={{ marginBottom: '8px' }}>
+              <strong>{$fmt('common.hotkeys')}</strong>
+            </p>
+            <HotkeyList list={hotkeyList}></HotkeyList>
 
-          <ul style={{ marginTop: '8px' }}>
-            <li>
-              {$fmt('home.help.hotkey.1')}
-              <Space>
-                <strong>"{$fmt('common.openAdminTab')}",</strong>
-                <strong>"{$fmt('common.sendAllTabs')}",</strong>
-                <strong>"{$fmt('common.sendCurrentTab')}"</strong>
-              </Space>
-              {$fmt('home.help.hotkey.2')}
-              {import.meta.env.FIREFOX ? (
-                <span>{$fmt('home.help.hotkey.modify')}</span>
-              ) : (
-                <a
-                  className="link"
-                  onClick={() =>
-                    openNewTab(SHORTCUTS_PAGE_URL, {
-                      active: true,
-                      openToNext: true,
-                    })
-                  }
-                >
-                  {$fmt('home.help.hotkey.modify')}
-                </a>
-              )}
-              <Tooltip
-                color={token.colorBgContainer}
-                title={
-                  <Flex vertical>
-                    {['chrome', 'edge', 'firefox'].map((type) => (
-                      <Typography.Text key={type}>
-                        <strong>{type}: </strong>
-                        {shortcutsPageUrlMap[type as BrowserType]}
+            <ul style={{ marginTop: '8px' }}>
+              <li>
+                {$fmt('home.help.hotkey.1')}
+                <Space>
+                  <strong>"{$fmt('common.openAdminTab')}",</strong>
+                  <strong>"{$fmt('common.sendAllTabs')}",</strong>
+                  <strong>"{$fmt('common.sendCurrentTab')}"</strong>
+                </Space>
+                {$fmt('home.help.hotkey.2')}
+                {import.meta.env.FIREFOX ? (
+                  <span>{$fmt('home.help.hotkey.modify')}</span>
+                ) : (
+                  <a
+                    className="link"
+                    onClick={() =>
+                      openNewTab(SHORTCUTS_PAGE_URL, {
+                        active: true,
+                        openToNext: true,
+                      })
+                    }
+                  >
+                    {$fmt('home.help.hotkey.modify')}
+                  </a>
+                )}
+                <Tooltip
+                  color={token.colorBgContainer}
+                  title={
+                    <Flex vertical>
+                      {['chrome', 'edge', 'firefox'].map((type) => (
+                        <Typography.Text key={type}>
+                          <strong>{type}: </strong>
+                          {shortcutsPageUrlMap[type as BrowserType]}
+                        </Typography.Text>
+                      ))}
+                      <Typography.Text>
+                        {$fmt('home.help.hotkey.modifyTip')}
                       </Typography.Text>
-                    ))}
-                    <Typography.Text>
-                      {$fmt('home.help.hotkey.modifyTip')}
-                    </Typography.Text>
-                  </Flex>
-                }
-                styles={{ root: { maxWidth: '300px', width: '300px' } }}
-              >
-                <QuestionCircleOutlined style={{ marginLeft: '4px' }} />
-              </Tooltip>
-            </li>
-          </ul>
-        </StyledHelpInfoBox>
-      </Drawer>
-    </HomeContext.Provider>
+                    </Flex>
+                  }
+                  styles={{ root: { maxWidth: '300px', width: '300px' } }}
+                >
+                  <QuestionCircleOutlined style={{ marginLeft: '4px' }} />
+                </Tooltip>
+              </li>
+            </ul>
+          </StyledHelpInfoBox>
+        </Drawer>
+      </HomeContext.Provider>
+    </>
   );
 }
