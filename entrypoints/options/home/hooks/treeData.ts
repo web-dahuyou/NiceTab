@@ -7,6 +7,10 @@ import { ENUM_SETTINGS_PROPS, UNNAMED_GROUP } from '~/entrypoints/common/constan
 import { getRandomId } from '~/entrypoints/common/utils';
 import useUrlParams from '~/entrypoints/common/hooks/urlParams';
 import {
+  initialSelectionBoxData,
+  type SelectionBoxDataProps,
+} from '~/entrypoints/common/hooks/selectionBox';
+import {
   TreeDataNodeTabGroup,
   TreeDataNodeTag,
   TreeDataNodeUnion,
@@ -26,9 +30,23 @@ const {
 export type TreeDataHookProps = ReturnType<typeof useTreeData>;
 interface HomeContextProps {
   treeDataHook: TreeDataHookProps;
+  selectionBoxHook: {
+    isSelecting: boolean;
+    isSelectMoving: boolean;
+    actionType: 'meta' | 'default';
+    selectionBoxData: SelectionBoxDataProps;
+    setIsAllowed: (bool: boolean) => void;
+  };
 }
 export const HomeContext = createContext<HomeContextProps>({
   treeDataHook: {} as TreeDataHookProps,
+  selectionBoxHook: {
+    isSelecting: false,
+    isSelectMoving: false,
+    actionType: 'default',
+    selectionBoxData: { ...initialSelectionBoxData },
+    setIsAllowed: () => {},
+  },
 });
 
 export function useTreeData() {

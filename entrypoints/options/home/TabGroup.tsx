@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo, memo } from 'react';
+import { useEffect, useRef, useState, useMemo, memo, useCallback } from 'react';
 import { theme, message, Modal, Space, Divider, Checkbox, Spin, Skeleton } from 'antd';
 import type { CheckboxProps } from 'antd';
 import { LockOutlined, StarOutlined, CloseOutlined } from '@ant-design/icons';
@@ -33,6 +33,7 @@ import type {
 import { dndKeys } from './constants';
 import MoveToModal from './MoveToModal';
 import useMoveTo from './hooks/moveTo';
+import useMultiSelection from './hooks/multiSelection';
 
 const dndKey = dndKeys.tabItem;
 const { CONFIRM_BEFORE_DELETING_TABS } = ENUM_SETTINGS_PROPS;
@@ -96,6 +97,7 @@ function TabGroup({
   const { $fmt } = useIntlUtls();
   const [tabsRemoveModal, tabsRemoveContextHolder] = Modal.useModal();
   const groupRef = useRef<HTMLDivElement>(null);
+  const tabListRef = useRef<HTMLDivElement>(null);
   const [selectedTabIds, setSelectedTabIds] = useState<string[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [dedupModalVisible, setDedupModalVisible] = useState(false);
@@ -114,6 +116,14 @@ function TabGroup({
     () => ({ groupId, groupName, createTime, isLocked, isStarred, selected }),
     [groupId, groupName, createTime, isLocked, isStarred, selected]
   );
+
+  // 框选相关状态
+  useMultiSelection({
+    groupData: group,
+    container: tabListRef.current!,
+    selectedTabIds,
+    setSelectedTabIds,
+  });
 
   const removeDesc = useMemo(() => {
     const typeName = $fmt(`home.tabGroup`);
@@ -449,6 +459,7 @@ function TabGroup({
           onDrop={handleTabItemDrop}
         >
           <StyledTabListWrapper
+            ref={tabListRef}
             className="tab-list-wrapper"
             style={{ minHeight: `${tabListHeight}px` }}
           >

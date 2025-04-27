@@ -11,7 +11,7 @@ export const StyledTabItemWrapper = styled.div<{ $bgColor?: string }>`
   align-items: center;
   width: 100%;
   height: 24px;
-  padding-left: 20px;
+  // padding-left: 20px;
   background: ${(props) => props.$bgColor || ''};
   .checkbox-item {
     margin-right: 12px;

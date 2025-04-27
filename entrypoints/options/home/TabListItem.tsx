@@ -228,6 +228,7 @@ export default memo(function TabListItem({
       <StyledTabItemWrapper
         className="tab-list-item"
         ref={tabRef}
+        data-id={tabId}
         $bgColor={highlight ? token.colorWarningHover : ''}
       >
         {/* checkbox */}
@@ -237,6 +238,7 @@ export default memo(function TabListItem({
         <Dropdown
           menu={{ items: moreItems, onClick: onMoreItemClick }}
           placement="bottomLeft"
+          trigger={['click']}
         >
           <StyledActionIconBtn
             className="tab-item-btn btn-more"
