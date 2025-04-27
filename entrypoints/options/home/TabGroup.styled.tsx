@@ -55,6 +55,7 @@ export const StyledTabActions = styled.div<{ theme: StyledThemeProps }>`
   margin: 8px 0;
   padding: 0 20px;
   font-size: 12px;
+  user-select: none;
   .checkall-wrapper {
     display: flex;
     align-items: center;
@@ -78,6 +79,7 @@ export const StyledTabActions = styled.div<{ theme: StyledThemeProps }>`
 export const StyledTabListWrapper = styled.div`
   min-height: 24px;
   margin-top: 8px;
+  margin-left: 20px;
   .tab-list-checkbox-group {
     width: 100%;
     display: block;
