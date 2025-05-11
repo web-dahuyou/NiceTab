@@ -47,6 +47,7 @@
     "@types/yargs-parser": "^21.0.3",
     "@wxt-dev/module-react": "^1.1.0",
     "typescript": "^5.5.4",
+    "vite": ">=6.1.6",
     "wxt": "^0.19.29",
     "yargs-parser": "^21.1.1"
   }
