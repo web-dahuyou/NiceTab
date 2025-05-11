@@ -48,11 +48,13 @@ export const initialSelectionBoxData = {
 };
 
 export default function useGlobalSelectionBox({
+  container = document.body,
   isAllowed,
   disabledSelectors = [],
   onMouseDown,
   onMouseUp,
 }: {
+  container?: HTMLElement;
   isAllowed?: boolean;
   disabledSelectors?: string[];
   onMouseDown?: () => void;
@@ -73,6 +75,11 @@ export default function useGlobalSelectionBox({
     (e: React.MouseEvent | MouseEvent) => {
       // 如果标签组被锁定或者不是左键点击，则不处理
       if (e.button !== 0 || !isAllowed) {
+        setIsSelecting(false);
+        return;
+      }
+
+      if (!container.contains(e.target as HTMLElement)) {
         setIsSelecting(false);
         return;
       }
@@ -105,7 +112,7 @@ export default function useGlobalSelectionBox({
       const isPressingMetaKey = !!e?.[`${metaKey}Key`];
       setActionType(isPressingMetaKey ? 'meta' : 'default');
     },
-    [isAllowed]
+    [container, isAllowed]
   );
 
   const handleMouseMove = useCallback(
@@ -142,18 +149,22 @@ export default function useGlobalSelectionBox({
 
   // 添加和移除事件监听器
   useEffect(() => {
+    if (!container) return;
+    container.removeEventListener('mousedown', handleMouseDown);
+    container.removeEventListener('mousemove', handleMouseMove);
+    container.removeEventListener('mouseup', handleMouseUp);
     // 添加鼠标点击、移动和抬起事件监听
-    document.addEventListener('mousedown', handleMouseDown);
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    container.addEventListener('mousedown', handleMouseDown);
+    container.addEventListener('mousemove', handleMouseMove);
+    container.addEventListener('mouseup', handleMouseUp);
 
     return () => {
       // 移除事件监听
-      document.removeEventListener('mousedown', handleMouseDown);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      container.removeEventListener('mousedown', handleMouseDown);
+      container.removeEventListener('mousemove', handleMouseMove);
+      container.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [handleMouseDown, handleMouseMove, handleMouseUp]);
+  }, [container, handleMouseDown, handleMouseMove, handleMouseUp]);
 
   return {
     isSelecting,
