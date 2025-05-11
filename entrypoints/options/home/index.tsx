@@ -79,12 +79,17 @@ export default function Home() {
 
   const { hotkeyList } = useHotkeys({ onAction: handleHotkeyAction });
 
+  const multiSelectContainerRef = useRef<HTMLDivElement>(null);
   const [isAllowed, setIsAllowed] = useState<boolean>(true);
   const onMouseUp = useCallback(() => {
     setIsAllowed(true);
   }, []);
   const { isSelecting, isSelectMoving, actionType, selectionBoxData } =
     useGlobalSelectionBox({
+      container:
+        multiSelectContainerRef.current ||
+        document.getElementById('tab-group-list-panel') ||
+        document.body,
       isAllowed,
       disabledSelectors: [
         '.tab-list-item',
@@ -274,7 +279,9 @@ export default function Home() {
           </StyledSidebarWrapper>
 
           {/* 标签组和标签页列表 */}
-          <TabGroupList virtual={virtualMap.tabList}></TabGroupList>
+          <div ref={multiSelectContainerRef} id="tab-group-list-panel">
+            <TabGroupList virtual={virtualMap.tabList}></TabGroupList>
+          </div>
         </StyledMainWrapper>
 
         {/* 吸底footer */}
