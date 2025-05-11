@@ -14,7 +14,7 @@ export default function App() {
     <ThemeProvider theme={{ ...themeTypeConfig, ...token }}>
       <GlobalStyle />
       <SendTargetActionHolder></SendTargetActionHolder>
-      <GlobalSearchPanel></GlobalSearchPanel>
+      <GlobalSearchPanel pageContext="contentScriptPage"></GlobalSearchPanel>
     </ThemeProvider>
   );
 }

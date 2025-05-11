@@ -15,7 +15,7 @@ const {
 
 const defaultTemplate = String.raw`{{url}} | {{title}}`;
 
-export default function FormModule(formItemProps: FormItemProps) {
+export default function FormModuleOtherActions(formItemProps: FormItemProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
 
