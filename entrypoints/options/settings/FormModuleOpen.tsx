@@ -16,7 +16,7 @@ const {
 
 const modifierKeyLabels = getKeysByOS();
 
-export default function FormModule(formItemProps: FormItemProps) {
+export default function FormModuleOpen(formItemProps: FormItemProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
 

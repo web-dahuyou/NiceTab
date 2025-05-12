@@ -36,7 +36,7 @@ import useMoveTo from './hooks/moveTo';
 import useMultiSelection from './hooks/multiSelection';
 
 const dndKey = dndKeys.tabItem;
-const { CONFIRM_BEFORE_DELETING_TABS } = ENUM_SETTINGS_PROPS;
+const { CONFIRM_BEFORE_DELETING_TABS, DELETE_AFTER_RESTORE } = ENUM_SETTINGS_PROPS;
 
 type TabGroupProps = GroupItem & {
   canDrag?: boolean;
@@ -67,7 +67,7 @@ const defaultGroupActions = [
   'copyLinks',
   'copyGroup',
 ];
-const defaultTabActions = ['remove', 'copy', 'moveTo'];
+const defaultTabActions = ['open', 'remove', 'copy', 'moveTo'];
 
 const blockSize = 50;
 
@@ -203,18 +203,33 @@ function TabGroup({
     handleTabCopy(selectedTabs);
   }, [selectedTabs]);
 
-  const handleTabRemove = useCallback((tabs: TabItem[]) => {
+  const handleTabsOpen = useCallback(() => {
     eventEmitter.emit('home:treeDataHook', {
-      action: 'handleTabItemRemove',
-      params: [group.groupId, tabs],
+      action: 'handleTabsOpen',
+      params: [group, selectedTabs],
     });
 
-    setTimeout(() => {
-      setSelectedTabIds((selectedTabIds) =>
-        selectedTabIds.filter((id) => !tabs.some((tab) => tab.tabId === id))
-      );
-    }, 0);
-  }, []);
+    const settings = settingsUtils.settings;
+    if (settings[DELETE_AFTER_RESTORE] && !group?.isLocked) {
+      setSelectedTabIds([]);
+    }
+  }, [group, selectedTabs]);
+
+  const handleTabRemove = useCallback(
+    (tabs: TabItem[]) => {
+      eventEmitter.emit('home:treeDataHook', {
+        action: 'handleTabItemRemove',
+        params: [group.groupId, tabs],
+      });
+
+      setTimeout(() => {
+        setSelectedTabIds((selectedTabIds) =>
+          selectedTabIds.filter((id) => !tabs.some((tab) => tab.tabId === id))
+        );
+      }, 0);
+    },
+    [group.groupId]
+  );
   // 删除确认
   const handleTabRemoveConfirm = useCallback(async () => {
     const settings = settingsUtils.settings || {};
@@ -425,6 +440,11 @@ function TabGroup({
                   <Divider type="vertical" style={{ background: token.colorBorder }} />
                 }
               >
+                {allowTabActions.includes('open') && (
+                  <span className="action-btn" onClick={handleTabsOpen}>
+                    {$fmt('common.open')}
+                  </span>
+                )}
                 {allowTabActions.includes('remove') && (
                   <span className="action-btn" onClick={handleTabRemoveConfirm}>
                     {$fmt('common.remove')}

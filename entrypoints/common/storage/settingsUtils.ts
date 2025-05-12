@@ -27,6 +27,7 @@ const {
   NAMED_GROUP_RESTORE_AS_GROUP,
   SILENT_OPEN_TAB_MODIFIER_KEY,
   OPEN_TAB_MODIFIER_KEY,
+  GLOBAL_SEARCH_DELETE_AFTER_OPEN,
   DELETE_UNLOCKED_EMPTY_GROUP,
   CONFIRM_BEFORE_DELETING_TABS,
   ALLOW_DUPLICATE_TABS,
@@ -69,6 +70,8 @@ export default class SettingsUtils {
     [OPEN_TAB_MODIFIER_KEY]: '', // 前台打开标签页的修饰键
     [UNNAMED_GROUP_RESTORE_AS_GROUP]: import.meta.env.FIREFOX ? false : true, // 是否以标签组形式恢复未命名标签组
     [NAMED_GROUP_RESTORE_AS_GROUP]: import.meta.env.FIREFOX ? false : true, // 是否以标签组形式恢复已命名标签组
+    /* 全局搜索配置 */
+    [GLOBAL_SEARCH_DELETE_AFTER_OPEN]: false, // 全局搜索打开标签页后是否从列表中删除
      /* 其他操作配置 */
     [DELETE_UNLOCKED_EMPTY_GROUP]: true, // 是否删除未锁定的空标签组
     [CONFIRM_BEFORE_DELETING_TABS]: false, // 删除标签页前是否需要确认

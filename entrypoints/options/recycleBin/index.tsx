@@ -125,7 +125,7 @@ export default function RecycleBin() {
           canDrag={false}
           canDrop={false}
           allowGroupActions={['remove', 'recover']}
-          allowTabActions={['remove', 'recover']}
+          allowTabActions={['open', 'remove', 'recover']}
           onRemove={() => handleTabGroupRemove(tag, group)}
           onRecover={() => handleTabGroupRecover(tag, group)}
           onTabChange={(tabItem: TabItem) => handleTabItemChange(tag, group, tabItem)}

@@ -176,7 +176,7 @@ export async function openAdminRoutePage(
 export async function reloadOtherAdminPage() {
   const currWindow = await browser.windows.getCurrent();
   sendRuntimeMessage({
-    msgType: 'reloadAdminPage',
+    msgType: 'reloadOtherAdminPage',
     data: { currWindowId: currWindow.id },
     targetPageContexts: ['optionsPage'],
   });

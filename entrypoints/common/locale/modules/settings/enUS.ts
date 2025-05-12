@@ -4,6 +4,7 @@ const enUS: Record<LocaleKey, string> = {
   'settings.block.common': 'Settings: Common',
   'settings.block.sendTabs': 'Settings: Sending Tabs',
   'settings.block.openTabs': 'Settings: Opening Tabs',
+  'settings.block.globalSearch': 'Settings: Global Search',
   'settings.block.otherActions': 'Settings: Other Actions',
   'settings.block.display': 'Settings: Displays',
   'settings.block.autoSync': 'Settings: Auto Sync',
@@ -55,6 +56,11 @@ const enUS: Record<LocaleKey, string> = {
   'settings.openTabModifierKey.tooltip': 'Foreground opening takes precedence over background opening. When the modifier keys for both types of opening are the same, the foreground opening action will be triggered.',
   'settings.unnamedGroupRestoreAsGroup': 'Restore the unnamed group as a browser tab group?',
   'settings.namedGroupRestoreAsGroup': 'Restore the named group as a browser tab group?',
+
+  /* 全局搜索配置 */
+  'settings.globalSearchDeleteAfterOpen': 'Remove tabs when opening tabs?',
+  'settings.globalSearchDeleteAfterOpen.yes': 'Remove (pinned tabs remain)',
+  'settings.globalSearchDeleteAfterOpen.no': 'All remain (recommended)',
 
   /* 其他操作配置 */
   'settings.deleteUnlockedEmptyGroup': 'Remove empty groups when clearing tabs?',

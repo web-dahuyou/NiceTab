@@ -93,7 +93,9 @@ export default function Root({
       handleThemeTypeChange(data.themeType);
     } else if (msgType === 'setLocale') {
       handleLocaleChange(data.locale);
-    } else if (msgType === 'reloadAdminPage') {
+    } else if (msgType === 'reloadAllAdminPage') {
+      updateAdminPageUrlDebounced();
+    } else if (msgType === 'reloadOtherAdminPage') {
       const currWindow = await browser.windows.getCurrent();
       if (data.currWindowId !== currWindow.id) {
         updateAdminPageUrlDebounced();

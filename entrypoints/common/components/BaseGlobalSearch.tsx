@@ -13,13 +13,17 @@ import VirtualList from 'rc-virtual-list';
 import { TagOutlined, ProductOutlined, ExportOutlined } from '@ant-design/icons';
 import { debounce } from 'lodash-es';
 import { pick, sendRuntimeMessage } from '~/entrypoints/common/utils';
+import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls, eventEmitter } from '~/entrypoints/common/hooks/global';
+import { settingsUtils } from '~/entrypoints/common/storage';
+import { updateAdminPageUrlDebounced } from '~/entrypoints/common/tabs';
 import { ContentGlobalContext } from '~/entrypoints/content/context';
 import {
   StyledEllipsis,
   StyledActionIconBtn,
 } from '~/entrypoints/common/style/Common.styled';
 import type {
+  PageContextType,
   TagItem,
   GroupItem,
   TabItem,
@@ -27,8 +31,10 @@ import type {
 } from '~/entrypoints/types';
 import { tabListUtils } from '../storage';
 
+const { GLOBAL_SEARCH_DELETE_AFTER_OPEN } = ENUM_SETTINGS_PROPS;
+
 export type SearchListItemProps = Pick<TagItem, 'tagId' | 'tagName' | 'static'> &
-  Pick<GroupItem, 'groupId' | 'groupName'> &
+  Pick<GroupItem, 'groupId' | 'groupName' | 'isLocked'> &
   Pick<TabItem, 'tabId' | 'title' | 'url'>;
 
 export type ActionCallbackFn = (
@@ -182,7 +188,7 @@ export function useSearchAction({
             ) {
               result.push({
                 ...pick(tag, ['tagId', 'tagName', 'static']),
-                ...pick(group, ['groupId', 'groupName']),
+                ...pick(group, ['groupId', 'groupName', 'isLocked']),
                 ...pick(tab, ['tabId', 'title', 'url']),
               });
             }
@@ -424,9 +430,11 @@ const modalStyles = {
 export const GlobalSearchPanel = forwardRef(
   (
     {
+      pageContext = 'optionsPage',
       tagList,
       onAction,
     }: {
+      pageContext?: PageContextType;
       tagList?: TagItem[];
       onAction?: ActionCallbackFn;
     },
@@ -439,16 +447,31 @@ export const GlobalSearchPanel = forwardRef(
     const [listHeight, setListHeight] = useState<number>(window.innerHeight * 0.5);
 
     const handleAction: ActionCallbackFn = useCallback(
-      (type, option) => {
+      async (type, option) => {
         setVisible(false);
-        if (onAction) {
-          onAction(type, option);
+
+        const { tagId, groupId, isLocked, tabId, title, url } = option || {};
+
+        if (type === 'open') {
+          const settings = await settingsUtils.getSettings();
+          if (!isLocked && settings?.[GLOBAL_SEARCH_DELETE_AFTER_OPEN]) {
+            await tabListUtils.removeTabs(groupId!, [{ tabId: tabId!, title, url }]);
+            if (pageContext === 'optionsPage') {
+              updateAdminPageUrlDebounced();
+            } else {
+              sendRuntimeMessage({
+                msgType: 'reloadAllAdminPage',
+                data: {},
+                targetPageContexts: ['optionsPage'],
+              });
+            }
+          }
+
+          // 如果是打开标签页，则不再执行后续的 “打开管理后台页面并定位当前标签页” 的操作了
           return;
         }
 
-        const { tagId, groupId, tabId } = option || {};
-
-        if (type === 'open') return;
+        onAction?.(type, option);
 
         setTimeout(() => {
           sendRuntimeMessage({
@@ -485,7 +508,7 @@ export const GlobalSearchPanel = forwardRef(
     }, [debounceResize]);
 
     const messageListener = async (msg: unknown) => {
-      console.log('browser.runtime.onMessage--globalSearch', msg);
+      // console.log('browser.runtime.onMessage--globalSearch', msg);
       const { msgType } = (msg || {}) as SendTabMsgEventProps;
 
       if (msgType === 'action:open-global-search-modal') {
