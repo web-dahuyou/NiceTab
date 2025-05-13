@@ -1,5 +1,4 @@
 import dayjs from 'dayjs';
-import emojiRegex from 'emoji-regex';
 import type {
   SyncRemoteType,
   SyncConfigItemProps,
@@ -15,6 +14,7 @@ import {
   extContentImporter,
   fetchApi,
   sendRuntimeMessage,
+  sanitizeContent,
 } from '~/entrypoints/common/utils';
 import { reloadOtherAdminPage } from '~/entrypoints/common/tabs';
 import {
@@ -183,8 +183,7 @@ export default class SyncUtils {
   async getApiParams() {
     let contentResult = await this.getSyncContent();
     // 需要注意，如果title中包含emoji字符，提交gist接口会报错，所以将emoji标签给过滤掉
-    const emojiReg = emojiRegex();
-    const tabListContent = contentResult?.tabList?.replaceAll(emojiReg, '') || '[]';
+    const tabListContent = sanitizeContent(contentResult?.tabList) || '[]';
 
     return {
       description: this.gistDescKey,

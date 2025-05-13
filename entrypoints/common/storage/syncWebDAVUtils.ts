@@ -1,5 +1,4 @@
 import dayjs from 'dayjs';
-import emojiRegex from 'emoji-regex';
 import { AuthType, createClient } from 'webdav';
 import type { WebDAVClient, FileStat } from 'webdav';
 import type {
@@ -14,6 +13,7 @@ import {
   extContentImporter,
   getRandomId,
   sendRuntimeMessage,
+  sanitizeContent,
 } from '~/entrypoints/common/utils';
 import { reloadOtherAdminPage } from '~/entrypoints/common/tabs';
 import {
@@ -197,8 +197,7 @@ export default class syncWebDAVUtils {
     }
 
     // 将emoji标签给过滤掉
-    const emojiReg = emojiRegex();
-    content = content.replaceAll(emojiReg, '');
+    content = sanitizeContent(content) || '[]';
     return content;
   }
 
