@@ -16,7 +16,8 @@ export type RuntimeMsgType =
   | 'setThemeType'
   | 'setLocale'
   | 'openAdminRoutePage'
-  | 'reloadAdminPage'
+  | 'reloadAllAdminPage'
+  | 'reloadOtherAdminPage'
   | 'sync:sync-status-change--gist'
   | 'sync:sync-status-change--webdav'
   | 'sendTabsActionStart'
@@ -48,8 +49,12 @@ export interface RuntimeMsgOpenAdminRoutePage {
   msgType: 'openAdminRoutePage';
   data: { path: string; query?: Record<string, any> };
 }
-export interface RuntimeMsgReloadAdminPage {
-  msgType: 'reloadAdminPage';
+export interface RuntimeMsgReloadAllAdminPage {
+  msgType: 'reloadAllAdminPage';
+  data: {};
+}
+export interface RuntimeMsgReloadOtherAdminPage {
+  msgType: 'reloadOtherAdminPage';
   data: { currWindowId?: number };
 }
 export interface RuntimeMsgSyncStatusChangeGist {
@@ -75,7 +80,8 @@ export type RuntimeMsgBaseProps =
   | RuntimeMsgSetThemeType
   | RuntimeMsgSetLocale
   | RuntimeMsgOpenAdminRoutePage
-  | RuntimeMsgReloadAdminPage
+  | RuntimeMsgReloadAllAdminPage
+  | RuntimeMsgReloadOtherAdminPage
   | RuntimeMsgSyncStatusChangeGist
   | RuntimeMsgSyncStatusChangeWebdav
   | RuntimeMsgSendTabsActionStart
@@ -98,8 +104,10 @@ export type SendRuntimeMessageBaseProps<T extends RuntimeMsgType> =
     ? RuntimeMsgSetLocale
     : T extends 'openAdminRoutePage'
     ? RuntimeMsgOpenAdminRoutePage
-    : T extends 'reloadAdminPage'
-    ? RuntimeMsgReloadAdminPage
+    : T extends 'reloadAllAdminPage'
+    ? RuntimeMsgReloadAllAdminPage
+    : T extends 'reloadOtherAdminPage'
+    ? RuntimeMsgReloadOtherAdminPage
     : T extends 'sync:sync-status-change--gist'
     ? RuntimeMsgSyncStatusChangeGist
     : T extends 'sync:sync-status-change--webdav'

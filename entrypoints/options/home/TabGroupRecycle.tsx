@@ -5,6 +5,7 @@ import { LockOutlined, StarOutlined, CloseOutlined } from '@ant-design/icons';
 import { GroupItem, TabItem } from '~/entrypoints/types';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
+import { openNewTab } from '~/entrypoints/common/tabs';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 
 import EditInput from '../components/EditInput';
@@ -29,7 +30,7 @@ type TabGroupProps = GroupItem & {
 };
 
 const defaultGroupActions = ['remove', 'recover'];
-const defaultTabActions = ['remove'];
+const defaultTabActions = ['open', 'remove'];
 
 function TabGroup({
   groupId,
@@ -105,6 +106,16 @@ function TabGroup({
     setRecoverModalVisible(false);
     onRecover?.();
   };
+
+  const handleTabsOpen = useCallback(() => {
+    if (selectedTabs.length === 1) {
+      openNewTab(selectedTabs[0].url, { active: true });
+    } else {
+      for (let tab of selectedTabs) {
+        openNewTab(tab.url);
+      }
+    }
+  }, [selectedTabs]);
 
   const handleTabRemove = useCallback((tabs: TabItem[]) => {
     setSelectedTabIds((selectedTabIds) =>
@@ -234,6 +245,11 @@ function TabGroup({
                   <Divider type="vertical" style={{ background: token.colorBorder }} />
                 }
               >
+                {allowTabActions.includes('open') && (
+                  <span className="action-btn" onClick={handleTabsOpen}>
+                    {$fmt('common.open')}
+                  </span>
+                )}
                 {allowTabActions.includes('remove') && (
                   <span
                     className="action-btn"

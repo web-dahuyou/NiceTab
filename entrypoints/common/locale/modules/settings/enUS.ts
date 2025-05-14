@@ -4,6 +4,7 @@ const enUS: Record<LocaleKey, string> = {
   'settings.block.common': 'Settings: Common',
   'settings.block.sendTabs': 'Settings: Sending Tabs',
   'settings.block.openTabs': 'Settings: Opening Tabs',
+  'settings.block.globalSearch': 'Settings: Global Search',
   'settings.block.otherActions': 'Settings: Other Actions',
   'settings.block.display': 'Settings: Displays',
   'settings.block.autoSync': 'Settings: Auto Sync',
@@ -40,10 +41,10 @@ const enUS: Record<LocaleKey, string> = {
   'settings.actionAutoCloseFlags.tooltip': 'Effective when the setting "Automatically close tabs when sending tabs" is set to "Do not".',
   'settings.allowDuplicateTabs': 'Retain duplicate tabs when sending tabs?',
   'settings.allowDuplicateTabs.yes': 'Retain',
-  'settings.allowDuplicateTabs.no': 'Remove duplicate tabs (for sending tabs or in merging groups)',
+  'settings.allowDuplicateTabs.no': 'Remove duplicate tabs (for the tabs being sent and when merging tab groups)',
   'settings.allowDuplicateGroups': 'Retain duplicate groups when sending tabs?',
   'settings.allowDuplicateGroups.yes': 'Retain',
-  'settings.allowDuplicateGroups.no': 'Merge duplicate groups (sending groups merge to Staging Area groups)',
+  'settings.allowDuplicateGroups.no': 'Merge duplicate groups (merge the groups being sent with those in the Staging Area)',
 
   /* 打开标签页配置 */
   'settings.restoreInNewWindow': 'Open tab group in a new window when opening?',
@@ -56,6 +57,11 @@ const enUS: Record<LocaleKey, string> = {
   'settings.unnamedGroupRestoreAsGroup': 'Restore the unnamed group as a browser tab group?',
   'settings.namedGroupRestoreAsGroup': 'Restore the named group as a browser tab group?',
 
+  /* 全局搜索配置 */
+  'settings.globalSearchDeleteAfterOpen': 'Remove tabs when opening tabs?',
+  'settings.globalSearchDeleteAfterOpen.yes': 'Remove (pinned tabs remain)',
+  'settings.globalSearchDeleteAfterOpen.no': 'All remain (recommended)',
+
   /* 其他操作配置 */
   'settings.deleteUnlockedEmptyGroup': 'Remove empty groups when clearing tabs?',
   'settings.deleteUnlockedEmptyGroup.yes': 'Automatically remove (retain locked groups)',
@@ -66,8 +72,8 @@ const enUS: Record<LocaleKey, string> = {
   'settings.linkTemplate.tooltip': 'Format for copy links, using the Mustache format',
   'settings.tabCountThreshold': 'Threshold setting for current category:',
   'settings.tabCountThreshold.tooltip': 'To ensure performance, when the number of tabs in the category exceeds a certain threshold, the right panel will enable virtual scrolling, displaying partial tab groups based on the scrolling position.',
-  'settings.tabInsertPosition': 'Insert position for moving or inserting tabs to the target tab group:',
-  'settings.tabInsertPosition.tooltip': 'If set to "Top", the tabs will be inserted at the top of the target tab group. If set to "Bottom", the tabs will be inserted at the bottom.',
+  'settings.tabInsertPosition': 'Position for inserting tabs when moving or inserting them into the target tab group:',
+  'settings.tabInsertPosition.tooltip': 'If set to "Top", the tabs will be inserted at the top of the target tab group. If set to "Bottom", the tabs will be inserted at the bottom of the target tab group.',
 
   /* 展示配置 */
   'settings.showOpenedTabCount': 'Display the number of open tabs on the extension icon?',

@@ -47,6 +47,9 @@ export type HomeCustomEventParamsProps = {
   action: 'handleTabGroupRestore',
   params: Parameters<TreeDataHookProps['handleTabGroupRestore']>
 } | {
+  action: 'handleTabsOpen',
+  params: Parameters<TreeDataHookProps['handleTabsOpen']>
+} | {
   action: 'handleTreeNodeDrop',
   params: Parameters<TreeDataHookProps['handleTreeNodeDrop']>
 } | {

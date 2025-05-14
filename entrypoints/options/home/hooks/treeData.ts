@@ -291,6 +291,23 @@ export function useTreeData() {
     },
     [treeData]
   );
+  // 打开标签页
+  const handleTabsOpen = useCallback(
+    async (group: Pick<GroupItem, 'groupId' | 'isLocked'>, tabs: TabItem[]) => {
+      if (tabs.length === 1) {
+        openNewTab(tabs[0].url, { active: true });
+      } else {
+        for (let tab of tabs) {
+          openNewTab(tab.url);
+        }
+      }
+      const settings = await settingsUtils.getSettings();
+      if (settings[DELETE_AFTER_RESTORE] && !group?.isLocked) {
+        handleTabItemRemove?.(group.groupId, tabs);
+      }
+    },
+    []
+  );
   // 删除标签页
   const handleTabItemRemove = useCallback(async (groupId: React.Key, tabs: TabItem[]) => {
     await tabListUtils.removeTabs(groupId, tabs);
@@ -626,6 +643,7 @@ export function useTreeData() {
     handleTabGroupCopy,
     handleTabGroupRestore,
     handleTreeNodeDrop,
+    handleTabsOpen,
     handleTabItemDrop,
     handleTabItemChange,
     handleTabItemCopy,

@@ -335,7 +335,10 @@ function AppLayout() {
   return (
     <ThemeProvider theme={{ ...themeTypeConfig, ...token }}>
       <SendTargetActionHolder ref={sendTargetActionRef}></SendTargetActionHolder>
-      <GlobalSearchPanel ref={globalSearchPanelRef}></GlobalSearchPanel>
+      <GlobalSearchPanel
+        ref={globalSearchPanelRef}
+        pageContext="optionsPage"
+      ></GlobalSearchPanel>
 
       <StyledPageContainer $widthType={pageWidthType} className="page-container">
         <GlobalStyle />

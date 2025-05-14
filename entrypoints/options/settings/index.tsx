@@ -12,18 +12,19 @@ import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import useUrlParams from '~/entrypoints/common/hooks/urlParams';
 import { sendRuntimeMessage, classNames } from '~/entrypoints/common/utils';
 import { reloadOtherAdminPage } from '~/entrypoints/common/tabs';
-import StickyFooter from '~/entrypoints/common/components/StickyFooter';
+// import StickyFooter from '~/entrypoints/common/components/StickyFooter';
 
 import FormModuleCommon from './FormModuleCommon';
 import FormModuleSend from './FormModuleSend';
 import FormModuleOpen from './FormModuleOpen';
+import FormModuleGlobalSearch from './FormModuleGlobalSearch';
+import FormModuleOtherActions from './FormModuleOtherActions';
 import FormModuleDisplay from './FormModuleDisplay';
 import FormModuleSync from './FormModuleSync';
-import FormModuleOtherActions from './FormModuleOtherActions';
 import {
   StyledSidebarWrapper,
   StyledMainWrapper,
-  StyledFooterWrapper,
+  // StyledFooterWrapper,
 } from './Settings.styled';
 
 const { LANGUAGE } = ENUM_SETTINGS_PROPS;
@@ -54,6 +55,11 @@ export default function Settings() {
       {
         key: 'openTabs',
         label: $fmt('settings.block.openTabs'),
+        icon: <SettingOutlined />,
+      },
+      {
+        key: 'globalSearch',
+        label: $fmt('settings.block.globalSearch'),
         icon: <SettingOutlined />,
       },
       {
@@ -190,6 +196,9 @@ export default function Settings() {
 
             {/* ******************* 打开标签页相关设置 ******************* */}
             <FormModuleOpen hidden={currModule !== 'openTabs'} />
+
+            {/* ******************* 全局搜索相关设置 ******************* */}
+            <FormModuleGlobalSearch hidden={currModule !== 'globalSearch'} />
 
             {/* ******************* 其他操作相关设置 ******************* */}
             <FormModuleOtherActions hidden={currModule !== 'otherActions'} />
