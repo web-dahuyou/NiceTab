@@ -10,38 +10,42 @@ export const StyledGroupWrapper = styled.div<{ $bgColor?: string }>`
   background: ${props => props.$bgColor || '#fff'};
 `;
 export const StyledGroupHeader = styled.div<{ theme: StyledThemeProps }>`
-  display: flex;
-  align-items: center;
+  padding: 0 8px;
   gap: 12px;
-  .group-status-wrapper {
+  .group-header-top {
     display: flex;
     align-items: center;
-    gap: 4px;
-  }
-  .group-header-right-part {
-    flex: 1;
+    gap: 12px;
+    .group-status-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .group-name-wrapper {
+      margin-right: 12px;
+    }
     .group-info {
       display: flex;
       align-items: center;
       font-size: 14px;
+      .tab-count {
+        margin-right: 8px;
+      }
+      .group-create-time {
+        color: ${(props) => props.theme.colorTextTertiary || '#999'};
+      }
     }
-    .tab-count {
-      margin-right: 8px;
-    }
-    .group-create-time {
-      color: ${(props) => props.theme.colorTextTertiary || '#999'};
-    }
-    .group-action-btns {
-      margin-top: 4px;
-      font-size: 14px;
-      .action-btn {
-        display: flex;
-        align-items: center;
-        color: ${(props) => props.theme.colorTextSecondary || '#333'};
-        cursor: pointer;
-        &:hover {
-          color: ${(props) => props.theme.colorPrimary || PRIMARY_COLOR};
-        }
+  }
+  .group-action-btns {
+    margin-top: 4px;
+    font-size: 14px;
+    .action-btn {
+      display: flex;
+      align-items: center;
+      color: ${(props) => props.theme.colorTextSecondary || '#333'};
+      cursor: pointer;
+      &:hover {
+        color: ${(props) => props.theme.colorPrimary || PRIMARY_COLOR};
       }
     }
   }
