@@ -304,44 +304,31 @@ function TabGroup({
       >
         {/* 标签组 header 展示、操作区域 */}
         <StyledGroupHeader className="group-header select-none">
-          {allowGroupActions.includes('remove') && !isLocked && (
-            <StyledActionIconBtn
-              className="btn-remove"
-              $size="16"
-              title={$fmt('common.remove')}
-              $hoverColor={ENUM_COLORS.red}
-              onClick={() => setModalVisible(true)}
-            >
-              <CloseOutlined />
-            </StyledActionIconBtn>
-          )}
-
-          {(isLocked || isStarred) && (
-            <div className="group-status-wrapper">
-              {isLocked && (
-                <LockOutlined
-                  style={{ fontSize: '22px', color: token.colorPrimaryHover }}
-                />
-              )}
-              {isStarred && (
-                <StarOutlined
-                  style={{ fontSize: '22px', color: token.colorPrimaryHover }}
-                />
-              )}
+          <div className="group-header-top">
+            {(isLocked || isStarred) && (
+              <div className="group-status-wrapper">
+                {isLocked && (
+                  <LockOutlined
+                    style={{ fontSize: '22px', color: token.colorPrimaryHover }}
+                  />
+                )}
+                {isStarred && (
+                  <StarOutlined
+                    style={{ fontSize: '22px', color: token.colorPrimaryHover }}
+                  />
+                )}
+              </div>
+            )}
+            <div className="group-name-wrapper">
+              <EditInput
+                value={groupName || UNNAMED_GROUP}
+                disabled={!allowGroupActions.includes('rename')}
+                maxWidth={240}
+                fontSize={20}
+                iconSize={16}
+                onValueChange={(value) => onChange?.({ groupName: value || UNNAMED_GROUP })}
+              ></EditInput>
             </div>
-          )}
-
-          <div className="group-name-wrapper">
-            <EditInput
-              value={groupName || UNNAMED_GROUP}
-              disabled={!allowGroupActions.includes('rename')}
-              maxWidth={240}
-              fontSize={20}
-              iconSize={16}
-              onValueChange={(value) => onChange?.({ groupName: value || UNNAMED_GROUP })}
-            ></EditInput>
-          </div>
-          <div className="group-header-right-part">
             <div className="group-info">
               <span className="tab-count" style={{ color: ENUM_COLORS.volcano }}>
                 {$fmt({
@@ -351,69 +338,61 @@ function TabGroup({
               </span>
               <span className="group-create-time">{createTime}</span>
             </div>
-            <Space
-              className="group-action-btns"
-              size={0}
-              split={
-                <Divider type="vertical" style={{ background: token.colorBorder }} />
-              }
-            >
-              {allowGroupActions.includes('remove') && !isLocked && (
-                <span className="action-btn" onClick={() => setModalVisible(true)}>
-                  {$fmt('home.tabGroup.remove')}
-                </span>
-              )}
-              {allowGroupActions.includes('restore') && (
-                <span className="action-btn" onClick={() => onRestore?.()}>
-                  {$fmt('home.tabGroup.open')}
-                </span>
-              )}
-              {allowGroupActions.includes('lock') && (
-                <span
-                  className="action-btn"
-                  onClick={() => onChange?.({ isLocked: !isLocked })}
-                >
-                  {$fmt(isLocked ? 'home.tabGroup.unlock' : 'home.tabGroup.lock')}
-                </span>
-              )}
-              {allowGroupActions.includes('star') && (
-                <span
-                  className="action-btn"
-                  onClick={() => onStarredChange?.(!isStarred)}
-                >
-                  {$fmt(isStarred ? 'home.tabGroup.unstar' : 'home.tabGroup.star')}
-                </span>
-              )}
-              {allowGroupActions.includes('moveTo') && (
-                <span
-                  className="action-btn"
-                  onClick={() => openMoveToModal?.({ groupId })}
-                >
-                  {$fmt('common.moveTo')}
-                </span>
-              )}
-              {allowGroupActions.includes('copyGroup') && (
-                <span className="action-btn" onClick={handleGroupCopy}>
-                  {$fmt('home.copyGroup')}
-                </span>
-              )}
-              {allowGroupActions.includes('copyLinks') && (
-                <span className="action-btn" onClick={handleCopy}>
-                  {$fmt('home.copyLinks')}
-                </span>
-              )}
-              {allowGroupActions.includes('dedup') && (
-                <span className="action-btn" onClick={() => setDedupModalVisible(true)}>
-                  {$fmt('common.dedup')}
-                </span>
-              )}
-              {allowGroupActions.includes('recover') && (
-                <span className="action-btn" onClick={() => setRecoverModalVisible(true)}>
-                  {$fmt('home.tabGroup.recover')}
-                </span>
-              )}
-            </Space>
           </div>
+          <Space
+            className="group-action-btns"
+            size={0}
+            split={<Divider type="vertical" style={{ background: token.colorBorder }} />}
+          >
+            {allowGroupActions.includes('remove') && !isLocked && (
+              <span className="action-btn" onClick={() => setModalVisible(true)}>
+                {$fmt('home.tabGroup.remove')}
+              </span>
+            )}
+            {allowGroupActions.includes('restore') && (
+              <span className="action-btn" onClick={() => onRestore?.()}>
+                {$fmt('home.tabGroup.open')}
+              </span>
+            )}
+            {allowGroupActions.includes('lock') && (
+              <span
+                className="action-btn"
+                onClick={() => onChange?.({ isLocked: !isLocked })}
+              >
+                {$fmt(isLocked ? 'home.tabGroup.unlock' : 'home.tabGroup.lock')}
+              </span>
+            )}
+            {allowGroupActions.includes('star') && (
+              <span className="action-btn" onClick={() => onStarredChange?.(!isStarred)}>
+                {$fmt(isStarred ? 'home.tabGroup.unstar' : 'home.tabGroup.star')}
+              </span>
+            )}
+            {allowGroupActions.includes('moveTo') && (
+              <span className="action-btn" onClick={() => openMoveToModal?.({ groupId })}>
+                {$fmt('common.moveTo')}
+              </span>
+            )}
+            {allowGroupActions.includes('copyGroup') && (
+              <span className="action-btn" onClick={handleGroupCopy}>
+                {$fmt('home.copyGroup')}
+              </span>
+            )}
+            {allowGroupActions.includes('copyLinks') && (
+              <span className="action-btn" onClick={handleCopy}>
+                {$fmt('home.copyLinks')}
+              </span>
+            )}
+            {allowGroupActions.includes('dedup') && (
+              <span className="action-btn" onClick={() => setDedupModalVisible(true)}>
+                {$fmt('common.dedup')}
+              </span>
+            )}
+            {allowGroupActions.includes('recover') && (
+              <span className="action-btn" onClick={() => setRecoverModalVisible(true)}>
+                {$fmt('home.tabGroup.recover')}
+              </span>
+            )}
+          </Space>
         </StyledGroupHeader>
 
         {/* tab 选择、操作区域 */}
