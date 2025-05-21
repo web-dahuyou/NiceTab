@@ -1,11 +1,21 @@
 import React, { useCallback, useState, memo, useRef } from 'react';
-import { theme, Checkbox, Tooltip, Popover, Dropdown, Modal, QRCode } from 'antd';
+import {
+  theme,
+  Space,
+  Checkbox,
+  Tooltip,
+  Popover,
+  Dropdown,
+  Modal,
+  QRCode,
+  Typography,
+} from 'antd';
 import type { MenuProps } from 'antd';
 import {
   CloseOutlined,
   EditOutlined,
   QrcodeOutlined,
-  MoreOutlined,
+  MenuOutlined,
   CopyOutlined,
 } from '@ant-design/icons';
 import { GroupItem, TabItem } from '~/entrypoints/types';
@@ -182,19 +192,44 @@ export default memo(function TabListItem({
   const moreItems: MenuProps['items'] = useMemo(
     () => [
       {
+        key: 'edit',
+        label: $fmt('common.edit'),
+        icon: <EditOutlined />,
+      },
+      {
         key: 'copy',
         label: $fmt('common.copy'),
         icon: <CopyOutlined />,
+      },
+      {
+        key: 'qrcode',
+        label: (
+          <Popover
+            color="#fbfbfb"
+            destroyTooltipOnHide
+            content={<QRCode value={tab.url!} color="#000" bordered={false} />}
+          >
+            <Space>
+              <QrcodeOutlined />
+              <Typography.Text>{$fmt('common.qrcode')}</Typography.Text>
+            </Space>
+          </Popover>
+        ),
       },
     ],
     [$fmt]
   );
 
-  const onMoreItemClick = useCallback<Required<MenuProps>['onClick']>(({ key }) => {
-    if (key === 'copy') {
-      onCopy?.([tab]);
-    }
-  }, []);
+  const onMoreItemClick = useCallback<Required<MenuProps>['onClick']>(
+    ({ key }) => {
+      if (key === 'copy') {
+        onCopy?.([tab]);
+      } else if (key === 'edit') {
+        setModalVisible(true);
+      }
+    },
+    [onCopy]
+  );
 
   const draggingListener = (value: boolean) => {
     setIsDragging(value);
@@ -231,51 +266,6 @@ export default memo(function TabListItem({
         data-id={tabId}
         $bgColor={highlight ? token.colorWarningHover : ''}
       >
-        {/* checkbox */}
-        {!group?.isLocked && (
-          <Checkbox className="checkbox-item" value={tab.tabId}></Checkbox>
-        )}
-        <Dropdown
-          menu={{ items: moreItems, onClick: onMoreItemClick }}
-          placement="bottomLeft"
-          trigger={['click']}
-        >
-          <StyledActionIconBtn
-            className="tab-item-btn btn-more"
-            $size="16"
-            title={$fmt('common.more')}
-          >
-            <MoreOutlined />
-          </StyledActionIconBtn>
-        </Dropdown>
-        {/* icon tab qrcode */}
-        {tab.url && (
-          <Popover
-            color="#fbfbfb"
-            destroyTooltipOnHide
-            trigger="click"
-            content={<QRCode value={tab.url} color="#000" bordered={false} />}
-          >
-            <StyledActionIconBtn
-              className="tab-item-btn btn-qrcode"
-              $size="16"
-              title={$fmt('common.qrcode')}
-              $hoverColor={token.colorPrimary}
-            >
-              <QrcodeOutlined />
-            </StyledActionIconBtn>
-          </Popover>
-        )}
-        {/* icon tab edit */}
-        <StyledActionIconBtn
-          className="tab-item-btn btn-edit"
-          $size="16"
-          title={$fmt('common.edit')}
-          $hoverColor={token.colorPrimary}
-          onClick={() => setModalVisible(true)}
-        >
-          <EditOutlined />
-        </StyledActionIconBtn>
         {/* icon tab remove */}
         {!group?.isLocked && (
           <StyledActionIconBtn
@@ -288,6 +278,23 @@ export default memo(function TabListItem({
             <CloseOutlined />
           </StyledActionIconBtn>
         )}
+        {/* checkbox */}
+        {!group?.isLocked && (
+          <Checkbox className="checkbox-item" value={tab.tabId}></Checkbox>
+        )}
+        <Dropdown
+          menu={{ items: moreItems, onClick: onMoreItemClick }}
+          trigger={['click']}
+        >
+          <StyledActionIconBtn
+            className="tab-item-btn btn-more"
+            $size="16"
+            title={$fmt('common.more')}
+          >
+            <MenuOutlined />
+          </StyledActionIconBtn>
+        </Dropdown>
+
         {/* icon tab favicon */}
         <Favicon pageUrl={tab.url!} favIconUrl={tab.favIconUrl}></Favicon>
         {/* tab title */}

@@ -311,7 +311,7 @@ export function useTreeData() {
   // 删除标签页
   const handleTabItemRemove = useCallback(async (groupId: React.Key, tabs: TabItem[]) => {
     await tabListUtils.removeTabs(groupId, tabs);
-    refreshTreeData();
+    await refreshTreeData();
   }, []);
   // 修改标签页
   const handleTabItemChange = useCallback(

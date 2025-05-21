@@ -10,14 +10,24 @@ export const StyledTabItemWrapper = styled.div<{ $bgColor?: string }>`
   display: flex;
   align-items: center;
   width: 100%;
-  height: 24px;
-  // padding-left: 20px;
+  height: 28px;
+  padding-left: 4px;
   background: ${(props) => props.$bgColor || ''};
   .checkbox-item {
     margin-right: 12px;
   }
   .tab-item-btn {
     margin-right: 8px;
+    &.btn-remove {
+      visibility: hidden;
+      pointer-eventes: none;
+    }
+  }
+  &:hover {
+    .btn-remove {
+      visibility: visible;
+      pointer-eventes: unset;
+    }
   }
 `;
 

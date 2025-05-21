@@ -94,11 +94,16 @@ export default function useTabsSelection({
 
   // 使用节流函数包装checkSelection，减少调用频率
   const checkSelectionThrottle = useMemo(
-    () => throttle(() => {
-      if (isGroupIntersecting) {
-        checkSelection();
-      }
-    }, 30, { leading: true, trailing: true }),
+    () =>
+      throttle(
+        () => {
+          if (isGroupIntersecting) {
+            checkSelection();
+          }
+        },
+        30,
+        { leading: true, trailing: true }
+      ),
     [checkSelection, isGroupIntersecting]
   );
 
@@ -107,7 +112,7 @@ export default function useTabsSelection({
       if (!isSelectMoving || !container) {
         setIsGroupIntersecting(false);
         return;
-      };
+      }
       const _isIntersecting = checkIsIntersecting(selectionBoxData, container);
       setIsGroupIntersecting(_isIntersecting);
     }, 30);

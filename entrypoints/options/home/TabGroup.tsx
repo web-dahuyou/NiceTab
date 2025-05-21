@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState, useMemo, memo, useCallback } from 'react';
 import { theme, message, Modal, Space, Divider, Checkbox, Spin, Skeleton } from 'antd';
 import type { CheckboxProps } from 'antd';
-import { LockOutlined, StarOutlined, CloseOutlined } from '@ant-design/icons';
+import { LockOutlined, StarOutlined } from '@ant-design/icons';
 import copyToClipboard from 'copy-to-clipboard';
 import { GroupItem, TabItem } from '~/entrypoints/types';
-import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import {
   ENUM_COLORS,
   UNNAMED_GROUP,
@@ -220,13 +219,12 @@ function TabGroup({
       eventEmitter.emit('home:treeDataHook', {
         action: 'handleTabItemRemove',
         params: [group.groupId, tabs],
+        callback: () => {
+          setSelectedTabIds((selectedTabIds) =>
+            selectedTabIds.filter((id) => !tabs.some((tab) => tab.tabId === id))
+          );
+        },
       });
-
-      setTimeout(() => {
-        setSelectedTabIds((selectedTabIds) =>
-          selectedTabIds.filter((id) => !tabs.some((tab) => tab.tabId === id))
-        );
-      }, 0);
     },
     [group.groupId]
   );
@@ -264,7 +262,7 @@ function TabGroup({
   const [rendering, setRendering] = useState(true);
   const [loading, setLoading] = useState(true);
   const tabListHeight = useMemo(() => {
-    return tabList.length * 24 || 24;
+    return tabList.length * 28 || 20;
   }, [tabList]);
 
   const [blockIndex, setBlockIndex] = useState<number>(1);
@@ -326,7 +324,9 @@ function TabGroup({
                 maxWidth={240}
                 fontSize={20}
                 iconSize={16}
-                onValueChange={(value) => onChange?.({ groupName: value || UNNAMED_GROUP })}
+                onValueChange={(value) =>
+                  onChange?.({ groupName: value || UNNAMED_GROUP })
+                }
               ></EditInput>
             </div>
             <div className="group-info">
