@@ -63,7 +63,7 @@ export const StyledBaseMainWrapper = styled.div<{
   transition: grid-template-columns 0.2s ease-in-out;
 
   .main-content-wrapper {
-    padding-left: 40px;
+    padding-left: 60px;
   }
 `;
 

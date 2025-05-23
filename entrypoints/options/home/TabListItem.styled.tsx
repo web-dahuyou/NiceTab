@@ -23,7 +23,7 @@ export const StyledTabItemWrapper = styled.div<{ $bgColor?: string }>`
       pointer-eventes: none;
     }
   }
-  &:hover {
+  &:not(.locked):hover {
     .btn-remove {
       visibility: visible;
       pointer-eventes: unset;

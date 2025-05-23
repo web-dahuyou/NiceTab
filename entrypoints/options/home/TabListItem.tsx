@@ -20,6 +20,7 @@ import {
 } from '@ant-design/icons';
 import { GroupItem, TabItem } from '~/entrypoints/types';
 import type { ModifierKeys } from '~/entrypoints/common/utils/click';
+import { classNames } from '~/entrypoints/common/utils';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
@@ -261,27 +262,23 @@ export default memo(function TabListItem({
   return (
     <>
       <StyledTabItemWrapper
-        className="tab-list-item"
+        className={classNames('tab-list-item', group?.isLocked && 'locked')}
         ref={tabRef}
         data-id={tabId}
         $bgColor={highlight ? token.colorWarningHover : ''}
       >
         {/* icon tab remove */}
-        {!group?.isLocked && (
-          <StyledActionIconBtn
-            className="tab-item-btn btn-remove"
-            $size="16"
-            title={$fmt('common.remove')}
-            $hoverColor={ENUM_COLORS.red}
-            onClick={handleTabRemove}
-          >
-            <CloseOutlined />
-          </StyledActionIconBtn>
-        )}
+        <StyledActionIconBtn
+          className="tab-item-btn btn-remove"
+          $size="16"
+          title={$fmt('common.remove')}
+          $hoverColor={ENUM_COLORS.red}
+          onClick={handleTabRemove}
+        >
+          <CloseOutlined />
+        </StyledActionIconBtn>
         {/* checkbox */}
-        {!group?.isLocked && (
-          <Checkbox className="checkbox-item" value={tab.tabId}></Checkbox>
-        )}
+        <Checkbox className="checkbox-item" value={tab.tabId}></Checkbox>
         <Dropdown
           menu={{ items: moreItems, onClick: onMoreItemClick }}
           trigger={['click']}

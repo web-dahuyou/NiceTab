@@ -109,14 +109,14 @@ export default function useTabsSelection({
 
   const checkGroupIntersectingThrottle = useMemo(() => {
     return throttle(() => {
-      if (!isSelectMoving || !container) {
+      if (groupData.isLocked || !isSelectMoving || !container) {
         setIsGroupIntersecting(false);
         return;
       }
       const _isIntersecting = checkIsIntersecting(selectionBoxData, container);
       setIsGroupIntersecting(_isIntersecting);
     }, 30);
-  }, [isSelectMoving, selectionBoxData, container]);
+  }, [groupData.isLocked, isSelectMoving, selectionBoxData, container]);
 
   useEffect(() => {
     // 使用节流函数减少调用频率

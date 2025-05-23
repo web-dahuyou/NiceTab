@@ -4,8 +4,10 @@ import type { FormItemProps } from 'antd';
 import type { SettingsProps } from '~/entrypoints/types';
 import { POPUP_MODULE_NAMES, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { groupActionOptions } from '~/entrypoints/options/home/constants';
 
 const {
+  GROUP_ACTION_BTNS_COMMONLY_USED,
   SHOW_OPENED_TAB_COUNT,
   SHOW_PAGE_CONTEXT_MENUS,
   POPUP_MODULE_DISPLAYS,
@@ -28,8 +30,38 @@ export default function FormModuleDisplay(formItemProps: FormItemProps) {
     });
   }, [$fmt]);
 
+  // 标签组按钮选项
+  const groupActionBtnOptions = useMemo(() => {
+    return groupActionOptions.map((option) => {
+      return {
+        label: $fmt(option.labelKey),
+        value: option.actionName,
+      };
+    });
+  }, [$fmt]);
+
   return (
     <Form.Item noStyle {...formItemProps}>
+      {/* 设置常用的标签组按钮 */}
+      <Form.Item<SettingsProps>
+        label={$fmt(`settings.${GROUP_ACTION_BTNS_COMMONLY_USED}`)}
+        name={GROUP_ACTION_BTNS_COMMONLY_USED}
+        tooltip={{
+          color: token.colorBgElevated,
+          title: (
+            <Typography.Text>
+              {$fmt(`settings.${GROUP_ACTION_BTNS_COMMONLY_USED}.tooltip`)}
+            </Typography.Text>
+          ),
+          styles: { root: { maxWidth: '320px', width: '320px' } },
+        }}
+        {...formItemProps}
+      >
+        <Checkbox.Group
+          options={groupActionBtnOptions}
+        ></Checkbox.Group>
+      </Form.Item>
+
       {/* 扩展图标上是否展示当前打开的标签页数 */}
       <Form.Item<SettingsProps>
         label={$fmt(`settings.${SHOW_OPENED_TAB_COUNT}`)}
