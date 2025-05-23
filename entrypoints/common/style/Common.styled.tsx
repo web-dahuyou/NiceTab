@@ -22,6 +22,7 @@ export const StyledEllipsisLines = css<{ $lines?: number }>`
 // action icon btn
 export const StyledActionIconBtn = styled.i<{
   theme: StyledThemeProps;
+  disabled?: boolean;
   $size?: number | string;
   $color?: string;
   $hoverColor?: string;
@@ -35,7 +36,7 @@ export const StyledActionIconBtn = styled.i<{
   font-size: ${(props) => `${props.$size || 14}px`};
   color: ${(props) => props.$color || props.theme.colorTextSecondary || '#666'};
   transition: all 0.2s;
-  cursor: pointer;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
   &:hover {
     transform: scale(${(props) => props.$hoverScale || 1.2});
     color: ${(props) => props.$hoverColor || props.theme.colorTextSecondary || '#666'};

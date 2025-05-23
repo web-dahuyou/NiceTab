@@ -138,6 +138,7 @@ export enum ENUM_SETTINGS_PROPS {
   TAB_COUNT_THRESHOLD = 'tabCountThreshold', // 分类中标签页超过该数量时，则右侧面板开启虚拟滚动
   TAB_INSERT_POSITION = 'tabInsertPosition', // 标签页插入位置：在标签组的标签页列表顶部还是底部
   /* 展示配置 */
+  GROUP_ACTION_BTNS_COMMONLY_USED = 'groupActionBtnsCommonlyUsed', // 常用的标签组操作按钮
   SHOW_OPENED_TAB_COUNT = 'showOpenedTabCount', // 扩展图标上是否显示打开的标签页数量
   SHOW_PAGE_CONTEXT_MENUS = 'showPageContextMenus', // 网页中是否显示NiceTab右键菜单
   POPUP_MODULE_DISPLAYS = 'popupModuleDisplays', // popup弹窗中需要展示的模块

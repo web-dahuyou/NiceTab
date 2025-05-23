@@ -7,7 +7,7 @@ export const StyledGroupWrapper = styled.div<{ $bgColor?: string }>`
   width: 100%;
   padding: 16px 8px;
   border-radius: 8px;
-  background: ${props => props.$bgColor || '#fff'};
+  background: ${(props) => props.$bgColor || '#fff'};
 `;
 export const StyledGroupHeader = styled.div<{ theme: StyledThemeProps }>`
   padding: 0 8px;
@@ -51,13 +51,27 @@ export const StyledGroupHeader = styled.div<{ theme: StyledThemeProps }>`
   }
 `;
 
+export const StyledGroupHeaderRecycle = styled(StyledGroupHeader)`
+  display: flex;
+  align-items: center;
+  .group-header-top {
+    .group-name-wrapper {
+      margin-right: 0;
+    }
+  }
+  .group-action-btns {
+    margin-top: 0;
+    padding: 0 8px;
+  }
+`;
+
 export const StyledTabActions = styled.div<{ theme: StyledThemeProps }>`
   display: flex;
   align-items: center;
   gap: 24px;
   height: 26px;
   margin: 8px 0;
-  padding: 0 20px;
+  padding: 0 30px;
   font-size: 12px;
   user-select: none;
   .checkall-wrapper {
@@ -83,7 +97,7 @@ export const StyledTabActions = styled.div<{ theme: StyledThemeProps }>`
 export const StyledTabListWrapper = styled.div`
   min-height: 24px;
   margin-top: 8px;
-  margin-left: 20px;
+  // margin-left: 24px;
   .tab-list-checkbox-group {
     width: 100%;
     display: block;
@@ -100,4 +114,4 @@ export const StyledTabListWrapper = styled.div`
 
 export default {
   name: 'option-tab-group-styled',
-}
+};

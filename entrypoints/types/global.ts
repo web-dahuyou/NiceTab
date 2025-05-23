@@ -150,6 +150,7 @@ export type SettingsProps = {
   tabCountThreshold?: number; // 分类中标签页超过该数量时，则右侧面板开启虚拟滚动
   tabInsertPosition?: 'top' | 'bottom'; // 标签页插入位置:在标签组的标签页列表顶部还是底部
   /* 展示配置 */
+  groupActionBtnsCommonlyUsed?: string[]; // 常用的标签组操作按钮
   showOpenedTabCount?: boolean; // 扩展图标上是否显示打开的标签页数量
   showPageContextMenus?: boolean; // 网页中是否显示NiceTab右键菜单
   popupModuleDisplays?: PopupModuleNames[]; // popup面板中需要展示的模块

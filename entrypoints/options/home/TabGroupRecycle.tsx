@@ -12,7 +12,7 @@ import EditInput from '../components/EditInput';
 import TabListItem from './TabListItem';
 import {
   StyledGroupWrapper,
-  StyledGroupHeader,
+  StyledGroupHeaderRecycle,
   StyledTabActions,
   StyledTabListWrapper,
 } from './TabGroup.styled';
@@ -61,7 +61,7 @@ function TabGroup({
   );
 
   const tabListHeight = useMemo(() => {
-    return tabList.length * 24 || 24;
+    return tabList.length * 28 || 20;
   }, [tabList]);
 
   const removeDesc = useMemo(() => {
@@ -153,44 +153,34 @@ function TabGroup({
         data-gid={groupId}
         $bgColor={selected ? token.colorPrimaryBg : token.colorBgContainer}
         ref={groupRef}
+        style={{ paddingTop: '4px' }}
       >
         {/* 标签组 header 展示、操作区域 */}
-        <StyledGroupHeader className="group-header select-none">
-          {allowGroupActions.includes('remove') && !isLocked && (
-            <StyledActionIconBtn
-              className="btn-remove"
-              $size="16"
-              title={$fmt('common.remove')}
-              $hoverColor={ENUM_COLORS.red}
-              onClick={() => setModalVisible(true)}
-            >
-              <CloseOutlined />
-            </StyledActionIconBtn>
-          )}
-
-          <div className="group-status-wrapper">
-            {isLocked && (
-              <LockOutlined
-                style={{ fontSize: '22px', color: token.colorPrimaryHover }}
-              />
+        <StyledGroupHeaderRecycle className="group-header select-none">
+          <div className="group-header-top">
+            {(isLocked || isStarred) && (
+              <div className="group-status-wrapper">
+                {isLocked && (
+                  <LockOutlined
+                    style={{ fontSize: '22px', color: token.colorPrimaryHover }}
+                  />
+                )}
+                {isStarred && (
+                  <StarOutlined
+                    style={{ fontSize: '22px', color: token.colorPrimaryHover }}
+                  />
+                )}
+              </div>
             )}
-            {isStarred && (
-              <StarOutlined
-                style={{ fontSize: '22px', color: token.colorPrimaryHover }}
-              />
-            )}
-          </div>
-
-          <div className="group-name-wrapper">
-            <EditInput
-              value={groupName || UNNAMED_GROUP}
-              disabled={!allowGroupActions.includes('rename')}
-              maxWidth={240}
-              fontSize={20}
-              iconSize={16}
-            ></EditInput>
-          </div>
-          <div className="group-header-right-part">
+            <div className="group-name-wrapper">
+              <EditInput
+                value={groupName || UNNAMED_GROUP}
+                disabled={!allowGroupActions.includes('rename')}
+                maxWidth={240}
+                fontSize={16}
+                iconSize={16}
+              ></EditInput>
+            </div>
             <div className="group-info">
               <span className="tab-count" style={{ color: ENUM_COLORS.volcano }}>
                 {$fmt({
@@ -200,26 +190,24 @@ function TabGroup({
               </span>
               <span className="group-create-time">{createTime}</span>
             </div>
-            <Space
-              className="group-action-btns"
-              size={0}
-              split={
-                <Divider type="vertical" style={{ background: token.colorBorder }} />
-              }
-            >
-              {allowGroupActions.includes('remove') && !isLocked && (
-                <span className="action-btn" onClick={() => setModalVisible(true)}>
-                  {$fmt('home.tabGroup.remove')}
-                </span>
-              )}
-              {allowGroupActions.includes('recover') && (
-                <span className="action-btn" onClick={() => setRecoverModalVisible(true)}>
-                  {$fmt('home.tabGroup.recover')}
-                </span>
-              )}
-            </Space>
           </div>
-        </StyledGroupHeader>
+          <Space
+            className="group-action-btns"
+            size={0}
+            split={<Divider type="vertical" style={{ background: token.colorBorder }} />}
+          >
+            {allowGroupActions.includes('remove') && !isLocked && (
+              <span className="action-btn" onClick={() => setModalVisible(true)}>
+                {$fmt('home.tabGroup.remove')}
+              </span>
+            )}
+            {allowGroupActions.includes('recover') && (
+              <span className="action-btn" onClick={() => setRecoverModalVisible(true)}>
+                {$fmt('home.tabGroup.recover')}
+              </span>
+            )}
+          </Space>
+        </StyledGroupHeaderRecycle>
 
         {/* tab 选择、操作区域 */}
         {tabList?.length > 0 && !isLocked && (
