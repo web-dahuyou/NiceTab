@@ -7,6 +7,7 @@ import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { groupActionOptions } from '~/entrypoints/options/home/constants';
 
 const {
+  GROUP_ACTION_BTN_STYLE,
   GROUP_ACTION_BTNS_COMMONLY_USED,
   SHOW_OPENED_TAB_COUNT,
   SHOW_PAGE_CONTEXT_MENUS,
@@ -42,6 +43,18 @@ export default function FormModuleDisplay(formItemProps: FormItemProps) {
 
   return (
     <Form.Item noStyle {...formItemProps}>
+      {/* 标签组和标签页操作按钮样式 */}
+      <Form.Item<SettingsProps>
+        label={$fmt(`settings.${GROUP_ACTION_BTN_STYLE}`)}
+        name={GROUP_ACTION_BTN_STYLE}
+        {...formItemProps}
+      >
+        <Radio.Group>
+          <Radio value="text">{$fmt('common.text')}</Radio>
+          <Radio value="icon">{$fmt('common.icon')}</Radio>
+        </Radio.Group>
+      </Form.Item>
+
       {/* 设置常用的标签组按钮 */}
       <Form.Item<SettingsProps>
         label={$fmt(`settings.${GROUP_ACTION_BTNS_COMMONLY_USED}`)}

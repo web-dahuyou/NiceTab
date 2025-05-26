@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { PRIMARY_COLOR } from '~/entrypoints/common/constants';
 import type { StyledThemeProps } from '~/entrypoints/types';
+import { StyleBtnDisabled } from '~/entrypoints/common/style/Common.styled';
 
 export const StyledGroupWrapper = styled.div<{ $bgColor?: string }>`
   position: relative;
@@ -46,6 +47,9 @@ export const StyledGroupHeader = styled.div<{ theme: StyledThemeProps }>`
       cursor: pointer;
       &:hover {
         color: ${(props) => props.theme.colorPrimary || PRIMARY_COLOR};
+      }
+      &.disabled {
+        ${StyleBtnDisabled}
       }
     }
   }

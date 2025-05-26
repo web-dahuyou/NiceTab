@@ -6,6 +6,7 @@ import {
   type FlatIndexLocationWithAlign,
 } from 'react-virtuoso';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { settingsUtils } from '~/entrypoints/common/storage';
 import type { TreeDataNodeTag, TreeDataNodeTabGroup, MoveToCallbackProps } from './types';
 import { StyledGroupList } from './Home.styled';
 import TabGroup from './TabGroup';
@@ -27,6 +28,8 @@ const ListItem = memo(
       handleTabGroupCopy,
       handleTabGroupRestore,
     } = treeDataHook;
+
+    const settings = settingsUtils.settings || {};
 
     // 移动单个标签组
     const handleTabGroupMoveTo = async ({
@@ -71,6 +74,7 @@ const ListItem = memo(
         //   !virtual && tabGroup.key === selectedTabGroupKey ? refreshKey : undefined
         // }
         {...tabGroup.originData}
+        actionBtnStyle={settings.groupActionBtnStyle || 'text'}
         onChange={(data) => handleTabGroupChange(tabGroup, data)}
         onRemove={() => handleTabGroupRemove(tabGroup)}
         onRestore={() => handleTabGroupRestore(tabGroup)}
