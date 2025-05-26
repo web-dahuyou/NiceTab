@@ -58,9 +58,9 @@ const enUS: Record<LocaleKey, string> = {
   'settings.namedGroupRestoreAsGroup': 'Restore the named group as a browser tab group?',
 
   /* 全局搜索配置 */
-  'settings.globalSearchDeleteAfterOpen': 'Remove tabs when opening tabs?',
+  'settings.globalSearchDeleteAfterOpen': 'Remove tabs from the NiceTab list after opening them?',
   'settings.globalSearchDeleteAfterOpen.yes': 'Remove (pinned tabs remain)',
-  'settings.globalSearchDeleteAfterOpen.no': 'All remain (recommended)',
+  'settings.globalSearchDeleteAfterOpen.no': 'Keep all (recommended)',
 
   /* 其他操作配置 */
   'settings.deleteUnlockedEmptyGroup': 'Remove empty groups when clearing tabs?',
