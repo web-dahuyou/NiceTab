@@ -12,7 +12,12 @@ import type {
 } from '~/entrypoints/types';
 import { settingsUtils, themeUtils } from '~/entrypoints/common/storage';
 import { capitalize } from '~/entrypoints/common/utils';
-import { PRIMARY_COLOR, THEME_TYPE_CONFIG, defaultThemeType, defaultLanguage } from '../constants';
+import {
+  PRIMARY_COLOR,
+  THEME_TYPE_CONFIG,
+  defaultThemeType,
+  defaultLanguage,
+} from '../constants';
 
 export const eventEmitter = mitt<EventsEmitterProps>();
 
@@ -93,7 +98,9 @@ export function useCustomLocale() {
 
 // theme type (light | dark)
 export function useThemeTypeConfig() {
-  const [themeTypeConfig, setThemeTypeConfig] = useState<ThemeTypeConfig>(THEME_TYPE_CONFIG.light);
+  const [themeTypeConfig, setThemeTypeConfig] = useState<ThemeTypeConfig>(
+    THEME_TYPE_CONFIG.light
+  );
 
   const changeThemeType = async (themeType: ThemeTypes = defaultThemeType) => {
     const settings = await settingsUtils.getSettings();
@@ -123,9 +130,7 @@ export function useIntlUtls() {
       description = '',
       values = undefined,
       opts = undefined,
-    } = typeof idOrFormatMsg === 'string'
-      ? { id: idOrFormatMsg }
-      : idOrFormatMsg;
+    } = typeof idOrFormatMsg === 'string' ? { id: idOrFormatMsg } : idOrFormatMsg;
 
     const descriptor = { id, defaultMessage, description };
 
@@ -144,5 +149,5 @@ export default {
   useAntdLocale,
   useCustomLocale,
   useIntlUtls,
-  eventEmitter
+  eventEmitter,
 };

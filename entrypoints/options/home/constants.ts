@@ -19,11 +19,11 @@ export const defaultGroupActions = [
 
 export const defaultTabActions = ['open', 'remove', 'copy', 'moveTo'];
 
-export interface GroupActionOption {
+export interface ActionOption {
   actionName: string;
   labelKey: LocaleKeys;
 }
-export const groupActionOptions: GroupActionOption[] = [
+export const groupActionOptions: ActionOption[] = [
   {
     actionName: 'remove',
     labelKey: 'home.tabGroup.remove',
@@ -55,6 +55,25 @@ export const groupActionOptions: GroupActionOption[] = [
   {
     actionName: 'dedup',
     labelKey: 'common.dedup',
+  },
+];
+
+export const tabsActionOptions: ActionOption[] = [
+  {
+    actionName: 'open',
+    labelKey: 'common.open',
+  },
+  {
+    actionName: 'remove',
+    labelKey: 'common.remove',
+  },
+  {
+    actionName: 'copy',
+    labelKey: 'common.copy',
+  },
+  {
+    actionName: 'moveTo',
+    labelKey: 'common.moveTo',
   },
 ];
 
