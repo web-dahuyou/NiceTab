@@ -2,10 +2,13 @@ import { useEffect, useRef, useState, useMemo, memo, useCallback } from 'react';
 import { theme, message, Modal, Checkbox, Spin, Skeleton } from 'antd';
 import type { CheckboxProps } from 'antd';
 import {
+  CloseOutlined,
   DeleteOutlined,
   LockOutlined,
+  LockFilled,
   UnlockOutlined,
   StarOutlined,
+  StarFilled,
   ExportOutlined,
   SendOutlined,
   CopyOutlined,
@@ -284,7 +287,7 @@ function TabGroup({
       {
         key: 'remove',
         label: $fmt(actionMap['remove'].labelKey),
-        icon: <DeleteOutlined />,
+        icon: <CloseOutlined />,
         disabled: isLocked,
         // validator: () => !isLocked,
         onClick: () => setModalVisible(true),
@@ -471,12 +474,12 @@ function TabGroup({
             {(isLocked || isStarred) && (
               <div className="group-status-wrapper">
                 {isLocked && (
-                  <LockOutlined
+                  <LockFilled
                     style={{ fontSize: '22px', color: token.colorPrimaryHover }}
                   />
                 )}
                 {isStarred && (
-                  <StarOutlined
+                  <StarFilled
                     style={{ fontSize: '22px', color: token.colorPrimaryHover }}
                   />
                 )}

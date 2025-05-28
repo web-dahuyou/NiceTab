@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import type { StyledThemeProps } from '~/entrypoints/types';
 import { StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
 
-export const StyledContainer = styled.div<{theme: StyledThemeProps}>`
+export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
   min-width: 460px;
   max-width: 600px;
   min-height: 420px;
@@ -25,7 +25,9 @@ export const StyledContainer = styled.div<{theme: StyledThemeProps}>`
       flex-shrink: 0;
       font-weight: bold;
     }
-    button { font-size: 12px; }
+    button {
+      font-size: 12px;
+    }
     .block-content {
       flex: 1;
       width: 0;
@@ -36,13 +38,13 @@ export const StyledContainer = styled.div<{theme: StyledThemeProps}>`
     &.quick-actions {
       .action-btn {
         display: inline-flex;
-        color: ${props => props.theme.colorTextSecondary || '#333'};
+        color: ${(props) => props.theme.colorTextSecondary || '#333'};
         cursor: pointer;
         &:not(.disabled):hover {
           color: ${(props) => props.theme.colorPrimary};
         }
         &.disabled {
-          color: ${props => props.theme.colorTextQuaternary || 'rgba(0, 0, 0, 0.25)'};
+          color: ${(props) => props.theme.colorTextQuaternary || 'rgba(0, 0, 0, 0.25)'};
           cursor: not-allowed;
         }
       }
@@ -57,44 +59,101 @@ export const StyledContainer = styled.div<{theme: StyledThemeProps}>`
     font-size: 14px;
     font-weight: bold;
   }
+  .block-opened-tabs {
+    padding-bottom: 12px;
+  }
 `;
 
-export const StyledList = styled.div<{theme: StyledThemeProps}>`
-  flex: 1;
-  overflow-y: auto;
-  .tab-item {
-    position: relative;
+
+export const StyledGroupWrapper = styled.div<{ $color?: string }>`
+  margin: 4px 0;
+  position: relative;
+  &:after {
+    content: '';
+    position: absolute;
+    width: calc(100% - 6px);
+    height: 100%;
+    top: 0;
+    left: 4px;
+    border-radius: 6px;
+    border: 1px solid #d9d9d9;
+    pointer-events: none;
+  }
+  .group-title {
     display: flex;
     align-items: center;
-    padding: 6px 10px;
+    padding: 6px 12px;
+    gap: 8px;
     cursor: pointer;
-    &:hover, &.active {
-      background: ${props => props.theme.colorPrimaryBg || 'rgba(0, 0, 0, 0.1)'};
+    .collapse-icon-btn {
+      font-size: 14px;
     }
-    &.active:before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 3px;
-      height: 100%;
-      background: ${props => props.theme.colorPrimary};
-    }
-    .tab-item-title {
+    .group-name {
       flex: 1;
       overflow: hidden;
       font-size: 12px;
-      color: ${props => props.theme.colorText || '#000'};
+      color: ${(props) => props.theme.colorText || '#000'};
       ${StyledEllipsis}
     }
-    .action-icon-btn {
-      flex-shrink: 0;
-      margin-left: 8px;
-    }
-    &.discarded {
-      .tab-item-title, .btn-discarded {
-        color: ${props => props.theme.colorTextQuaternary || 'rgba(0, 0, 0, 0.25)'};
+  }
+  .tab-list {
+    display: block;
+    .tab-list-item {
+      position: relative;
+      padding-left: 24px;
+      .group-color-flag {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: ${(props) => props.$color || 'transparent'};
       }
+    }
+  }
+  &.collapsed {
+    .tab-list {
+      display: none;
+    }
+  }
+`;
+
+export const StyledTabItem = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  cursor: pointer;
+  &:hover,
+  &.active {
+    background: ${(props) => props.theme.colorPrimaryBg || 'rgba(0, 0, 0, 0.1)'};
+  }
+  // &.active:before {
+  //   content: '';
+  //   position: absolute;
+  //   left: 0;
+  //   top: 0;
+  //   width: 3px;
+  //   height: 100%;
+  //   background: ${(props) => props.theme.colorPrimary};
+  // }
+  .tab-item-title {
+    flex: 1;
+    overflow: hidden;
+    font-size: 12px;
+    color: ${(props) => props.theme.colorText || '#000'};
+    ${StyledEllipsis}
+  }
+  .action-icon-btn {
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+  &.discarded {
+    .tab-item-title,
+    .btn-discarded {
+      color: ${(props) => props.theme.colorTextQuaternary || 'rgba(0, 0, 0, 0.25)'};
     }
   }
 `;
@@ -109,4 +168,4 @@ export const StyledFavIcon = styled.i<{ $icon?: string }>`
 
 export default {
   name: 'popup-app-styled',
-}
+};
