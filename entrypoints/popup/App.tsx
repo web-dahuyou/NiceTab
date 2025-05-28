@@ -1,9 +1,9 @@
-import React, { useContext, useCallback, useEffect, useState } from 'react';
+import { useContext, useCallback, useEffect, useState } from 'react';
 import { browser, Tabs } from 'wxt/browser';
 import { ThemeProvider } from 'styled-components';
 import { theme, Space, Dropdown, Button, type MenuProps } from 'antd';
-import { CloseOutlined, DownOutlined, CoffeeOutlined } from '@ant-design/icons';
-import { classNames, sendRuntimeMessage } from '~/entrypoints/common/utils';
+import { DownOutlined } from '@ant-design/icons';
+import { sendRuntimeMessage, isGroupSupported } from '~/entrypoints/common/utils';
 import '~/assets/css/reset.css';
 import '~/assets/css/index.css';
 import './App.css';
@@ -20,12 +20,10 @@ import {
   POPUP_MODULE_NAMES,
 } from '~/entrypoints/common/constants';
 import ColorList from '~/entrypoints/common/components/ColorList.tsx';
-import Favicon from '~/entrypoints/common/components/Favicon';
-import {
-  StyledActionIconBtn,
-  GlobalStyle,
-} from '~/entrypoints/common/style/Common.styled';
-import { StyledContainer, StyledList } from './App.styled';
+import { GlobalStyle } from '~/entrypoints/common/style/Common.styled';
+import TabGroupItem, { type GroupListItem } from './TabGroupItem';
+import { type TabActions } from './TabItem';
+import { StyledContainer } from './App.styled';
 
 import { initFaviconApiData } from '~/entrypoints/common/utils/favicon';
 initFaviconApiData();
@@ -53,6 +51,7 @@ export default function App() {
   const { $fmt } = useIntlUtls();
   const { version, themeTypeConfig } = NiceGlobalContext;
   const [tabs, setTabs] = useState<Tabs.Tab[]>([]);
+  const [tabGroupList, setTabGroupList] = useState<GroupListItem[]>([]);
   const [modules, setModules] = useState<PopupModuleNames[]>([]);
   const [actionBtns, setActionBtns] = useState<ActionBtnItem[]>([]);
 
@@ -143,41 +142,89 @@ export default function App() {
     NiceGlobalContext.setThemeData(themeData);
     sendRuntimeMessage({ msgType: 'setPrimaryColor', data: themeData });
   };
-  const handleTabItemClick = useCallback((tab: Tabs.Tab) => {
+  const handleTabActive = useCallback((tab: Tabs.Tab) => {
     browser.tabs.highlight({ tabs: [tab.index] });
   }, []);
 
-  const handleDiscard = useCallback(
-    async (event: React.MouseEvent<HTMLElement, MouseEvent>, tab: Tabs.Tab) => {
-      event.stopPropagation();
-      if (tab.active || tab.discarded) return;
+  const handleTabDiscard = useCallback(async (tab: Tabs.Tab) => {
+    if (tab.active || tab.discarded) return;
 
-      tab.id && (await browser.tabs.discard(tab.id));
-      browser.tabs.query({ currentWindow: true }).then(async (allTabs) => {
-        const { tab: adminTab } = await getAdminTabInfo();
-        setTabs(allTabs?.filter((t) => t.id !== adminTab?.id && !t.pinned));
-      });
-    },
-    []
-  );
+    tab.id && (await browser.tabs.discard(tab.id));
+    browser.tabs.query({ currentWindow: true }).then(async (allTabs) => {
+      const { tab: adminTab } = await getAdminTabInfo();
+      handleTabsChange(allTabs?.filter((t) => t.id !== adminTab?.id && !t.pinned));
+    });
+  }, []);
 
-  const handleDelete = useCallback(
-    async (event: React.MouseEvent<HTMLElement, MouseEvent>, tab: Tabs.Tab) => {
-      event.stopPropagation();
+  const handleTabRemove = useCallback(
+    async (tab: Tabs.Tab) => {
       const { tab: adminTab } = await getAdminTabInfo();
       const newTabs = tabs.filter(
         (t) => t.id !== tab.id && t.id !== adminTab?.id && !t.pinned
       );
-      setTabs(newTabs);
+      handleTabsChange(newTabs);
       if (tab.id) {
         await browser.tabs.remove(tab.id);
         browser.tabs.query({ currentWindow: true }).then(async (allTabs) => {
-          setTabs(allTabs?.filter((t) => t.id !== adminTab?.id && !t.pinned));
+          handleTabsChange(allTabs?.filter((t) => t.id !== adminTab?.id && !t.pinned));
         });
       }
     },
     [tabs]
   );
+
+  const handleTabAction = useCallback(
+    async (action: TabActions, tab: Tabs.Tab) => {
+      if (action === 'active') {
+        handleTabActive(tab);
+      } else if (action === 'discard') {
+        handleTabDiscard(tab);
+      } else if (action === 'remove') {
+        handleTabRemove(tab);
+      }
+    },
+    [tabs]
+  );
+
+  const handleTabsChange = useCallback(async (tabs: Tabs.Tab[]) => {
+    setTabs(tabs);
+    let groupList: GroupListItem[] = [];
+    if (!isGroupSupported()) {
+      groupList = tabs.map((item) => ({
+        groupId: -1,
+        groupName: '',
+        tabs: [item],
+      }));
+    } else {
+      groupList = tabs.reduce<GroupListItem[]>((result, tab) => {
+        const groupId = tab.groupId || -1;
+        if (groupId === -1) {
+          return result.concat({ groupId: -1, groupName: '', tabs: [tab] });
+        }
+
+        const group = result.find((item) => item.groupId === groupId);
+        if (!group) {
+          return result.concat({ groupId, groupName: '', tabs: [tab] });
+        }
+
+        group.tabs.push(tab);
+        return result;
+      }, []);
+
+      if (browser.tabGroups?.get) {
+        for (const group of groupList) {
+          if (group.groupId === -1) continue;
+          const tabGroup = await browser.tabGroups.get(group.groupId);
+          console.log('tabGroup', tabGroup);
+          group.groupName = tabGroup?.title || group.groupName;
+          group.collapsed = tabGroup?.collapsed;
+          group.color = tabGroup?.color;
+        }
+      }
+    }
+    console.log('groupList', groupList);
+    setTabGroupList(groupList);
+  }, []);
 
   const init = async () => {
     const settings = await settingsUtils.getSettings();
@@ -190,7 +237,7 @@ export default function App() {
     if (modules.includes('openedTabs')) {
       browser.tabs.query({ currentWindow: true }).then(async (allTabs) => {
         const { tab: adminTab } = await getAdminTabInfo();
-        setTabs(allTabs?.filter((t) => t.id !== adminTab?.id && !t.pinned));
+        handleTabsChange(allTabs?.filter((t) => t.id !== adminTab?.id && !t.pinned));
       });
     }
   };
@@ -298,48 +345,16 @@ export default function App() {
         </div>
 
         {/* 模块-已打开标签页列表 */}
-        {modules.includes('openedTabs') && (
-          <StyledList className="tab-list">
-            {tabs.map((tab) => (
-              <li
-                key={tab.id}
-                className={classNames(
-                  'tab-item',
-                  tab.active && 'active',
-                  tab.discarded && 'discarded'
-                )}
-                title={tab.title}
-                onClick={() => handleTabItemClick(tab)}
-              >
-                <Favicon pageUrl={tab.url!} favIconUrl={tab.favIconUrl}></Favicon>
-                <span className="tab-item-title">{tab.title}</span>
-
-                {!tab.active && (
-                  <StyledActionIconBtn
-                    className={classNames(
-                      'action-icon-btn',
-                      tab.discarded && 'btn-discarded'
-                    )}
-                    $size={16}
-                    title={$fmt(tab.discarded ? 'common.hibernated' : 'common.hibernate')}
-                    onClick={(event) => handleDiscard(event, tab)}
-                  >
-                    <CoffeeOutlined />
-                  </StyledActionIconBtn>
-                )}
-
-                <StyledActionIconBtn
-                  className="action-icon-btn"
-                  $size={16}
-                  $hoverColor="red"
-                  title={$fmt('common.remove')}
-                  onClick={(event) => handleDelete(event, tab)}
-                >
-                  <CloseOutlined />
-                </StyledActionIconBtn>
-              </li>
+        {modules.includes('openedTabs') && tabGroupList.length && (
+          <div className="block-opened-tabs">
+            {tabGroupList.map((group, index) => (
+              <TabGroupItem
+                key={~group.groupId || index}
+                group={group}
+                onAction={handleTabAction}
+              ></TabGroupItem>
             ))}
-          </StyledList>
+          </div>
         )}
       </StyledContainer>
     </ThemeProvider>
