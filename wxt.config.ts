@@ -14,7 +14,7 @@ export default defineConfig({
     plugins: [svgr({ svgrOptions: { icon: true } })],
   }),
   manifest: {
-    name: 'Nice Tab Manager | 标签页管理器',
+    name: 'Nice Tab Manager',
     permissions: [
       'storage',
       'tabs',

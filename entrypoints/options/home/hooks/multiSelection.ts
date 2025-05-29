@@ -30,6 +30,7 @@ export default function useTabsSelection({
   const { selectionBoxHook } = useContext(HomeContext);
   const { isSelectMoving, selectionBoxData, actionType } = selectionBoxHook;
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isGroupIntersecting, setIsGroupIntersecting] = useState<boolean>(false);
 
   useEffect(() => {
     if (!isSelectMoving) {
@@ -93,27 +94,46 @@ export default function useTabsSelection({
 
   // 使用节流函数包装checkSelection，减少调用频率
   const checkSelectionThrottle = useMemo(
-    () => throttle(checkSelection, 10, { leading: true, trailing: true }),
-    [checkSelection]
+    () =>
+      throttle(
+        () => {
+          if (isGroupIntersecting) {
+            checkSelection();
+          }
+        },
+        30,
+        { leading: true, trailing: true }
+      ),
+    [checkSelection, isGroupIntersecting]
   );
 
+  const checkGroupIntersectingThrottle = useMemo(() => {
+    return throttle(() => {
+      if (groupData.isLocked || !isSelectMoving || !container) {
+        setIsGroupIntersecting(false);
+        return;
+      }
+      const _isIntersecting = checkIsIntersecting(selectionBoxData, container);
+      setIsGroupIntersecting(_isIntersecting);
+    }, 30);
+  }, [groupData.isLocked, isSelectMoving, selectionBoxData, container]);
+
   useEffect(() => {
-    // 只有在选择过程中才检查相交
-    if (!isSelectMoving) return;
-
-    // 首先检查选择框是否与容器相交，避免不必要的计算
-    const _isIntersecting = checkIsIntersecting(selectionBoxData, container);
-
-    if (_isIntersecting) {
-      // 使用节流函数减少调用频率
-      checkSelectionThrottle();
-    }
+    // 使用节流函数减少调用频率
+    checkSelectionThrottle();
 
     // 组件卸载时取消未执行的节流函数
     return () => {
       checkSelectionThrottle.cancel();
     };
-  }, [isSelectMoving, selectionBoxData, container, checkSelectionThrottle]);
+  }, [checkSelectionThrottle]);
+
+  useEffect(() => {
+    checkGroupIntersectingThrottle();
+    return () => {
+      checkGroupIntersectingThrottle.cancel();
+    };
+  }, [checkGroupIntersectingThrottle]);
 
   return {
     checkSelection,

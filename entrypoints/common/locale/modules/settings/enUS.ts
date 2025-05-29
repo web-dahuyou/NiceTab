@@ -76,6 +76,9 @@ const enUS: Record<LocaleKey, string> = {
   'settings.tabInsertPosition.tooltip': 'If set to "Top", the tabs will be inserted at the top of the target tab group. If set to "Bottom", the tabs will be inserted at the bottom of the target tab group.',
 
   /* 展示配置 */
+  'settings.groupActionBtnStyle': 'action button style (for tab group and tabs):',
+  'settings.groupActionBtnsCommonlyUsed': 'Commonly used tab group action buttons:',
+  'settings.groupActionBtnsCommonlyUsed.tooltip': 'Selected buttons are displayed outside, the others will be collapsed into the "more" menu.',
   'settings.showOpenedTabCount': 'Display the number of open tabs on the extension icon?',
   'settings.showPageContextMenus': 'Display ContextMenu on your webpage?',
   'settings.popupModuleDisplays': 'Choose the modules to be displayed in the "Popup Panel"',

@@ -93,6 +93,8 @@ const enUS: Record<LocaleKey, string> = {
   'common.globalSearch': 'Global Search',
   'common.top': 'Top',
   'common.bottom': 'Bottom',
+  'common.text': 'Text',
+  'common.icon': 'Icon',
 };
 
 export default enUS;

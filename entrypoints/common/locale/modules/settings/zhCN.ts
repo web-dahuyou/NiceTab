@@ -74,6 +74,9 @@ const zhCN = {
   'settings.tabInsertPosition.tooltip': '设置为“顶部”时，标签页将插入到标签组的顶部；设置为“底部”时，新标签页将插入到标签组的底部。',
 
   /* 展示配置 */
+  'settings.groupActionBtnStyle': '标签组和标签页操作按钮样式：',
+  'settings.groupActionBtnsCommonlyUsed': '常用的标签组操作按钮配置：',
+  'settings.groupActionBtnsCommonlyUsed.tooltip': '选中的按钮在外层展示，未选中的按钮将折叠到更多菜单中',
   'settings.showOpenedTabCount': '是否在扩展图标上显示打开的标签页数量：',
   'settings.showPageContextMenus': '是否在网页中显示NiceTab右键菜单：',
   'settings.popupModuleDisplays': 'Popup面板模块展示设置：',

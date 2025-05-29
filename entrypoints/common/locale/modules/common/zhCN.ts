@@ -91,6 +91,8 @@ const zhCN = {
   'common.globalSearch': '全局搜索',
   'common.top': '顶部',
   'common.bottom': '底部',
+  'common.text': '文本',
+  'common.icon': '图标',
 };
 
 export type LocaleKey = keyof typeof zhCN;

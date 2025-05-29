@@ -1,15 +1,29 @@
 import { useEffect, useRef, useState, useMemo, memo, useCallback } from 'react';
-import { theme, message, Modal, Space, Divider, Checkbox, Spin, Skeleton } from 'antd';
+import { theme, message, Modal, Checkbox, Spin, Skeleton } from 'antd';
 import type { CheckboxProps } from 'antd';
-import { LockOutlined, StarOutlined, CloseOutlined } from '@ant-design/icons';
+import {
+  CloseOutlined,
+  DeleteOutlined,
+  LockOutlined,
+  LockFilled,
+  UnlockOutlined,
+  StarOutlined,
+  StarFilled,
+  ExportOutlined,
+  SendOutlined,
+  CopyOutlined,
+  BlockOutlined,
+} from '@ant-design/icons';
 import copyToClipboard from 'copy-to-clipboard';
-import { GroupItem, TabItem } from '~/entrypoints/types';
-import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
+import { IconRepeat } from '~/entrypoints/common/components/icon/CustomIcon';
+import { GroupItem, TabItem, ActionBtnStyle } from '~/entrypoints/types';
+import { type LocaleKeys } from '~/entrypoints/common/locale';
 import {
   ENUM_COLORS,
   UNNAMED_GROUP,
   ENUM_SETTINGS_PROPS,
 } from '~/entrypoints/common/constants';
+import { classNames } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { tabListUtils, settingsUtils } from '~/entrypoints/common/storage';
 import DndComponent from '~/entrypoints/common/components/DndComponent';
@@ -18,6 +32,7 @@ import DropComponent from '~/entrypoints/common/components/DropComponent';
 import { HomeContext } from './hooks/treeData';
 import { eventEmitter } from './hooks/homeCustomEvent';
 import EditInput from '../components/EditInput';
+import ActionBtnList, { type ActionOptionItem } from '../components/ActionBtnList';
 import TabListItem from './TabListItem';
 import {
   StyledGroupWrapper,
@@ -30,13 +45,24 @@ import type {
   DndTabItemOnDropCallback,
   MoveToCallbackProps,
 } from './types';
-import { dndKeys } from './constants';
+import {
+  dndKeys,
+  defaultGroupActions,
+  defaultTabActions,
+  groupActionOptions,
+  tabsActionOptions,
+  type ActionOption,
+} from './constants';
 import MoveToModal from './MoveToModal';
 import useMoveTo from './hooks/moveTo';
 import useMultiSelection from './hooks/multiSelection';
 
 const dndKey = dndKeys.tabItem;
-const { CONFIRM_BEFORE_DELETING_TABS, DELETE_AFTER_RESTORE } = ENUM_SETTINGS_PROPS;
+const {
+  CONFIRM_BEFORE_DELETING_TABS,
+  DELETE_AFTER_RESTORE,
+  GROUP_ACTION_BTNS_COMMONLY_USED,
+} = ENUM_SETTINGS_PROPS;
 
 type TabGroupProps = GroupItem & {
   canDrag?: boolean;
@@ -44,6 +70,7 @@ type TabGroupProps = GroupItem & {
   allowGroupActions?: string[];
   allowTabActions?: string[];
   selected?: boolean;
+  actionBtnStyle?: ActionBtnStyle;
   onChange?: (data: Partial<GroupItem>) => void;
   onRemove?: () => void;
   onRestore?: () => void;
@@ -55,19 +82,6 @@ type TabGroupProps = GroupItem & {
   // onTabRemove?: (groupId: string, tabs: TabItem[]) => void;
   onMoveTo?: ({ moveData, targetData, selected }: MoveToCallbackProps) => void;
 };
-
-const defaultGroupActions = [
-  'remove',
-  'rename',
-  'restore',
-  'lock',
-  'star',
-  'dedup',
-  'moveTo',
-  'copyLinks',
-  'copyGroup',
-];
-const defaultTabActions = ['open', 'remove', 'copy', 'moveTo'];
 
 const blockSize = 50;
 
@@ -83,6 +97,7 @@ function TabGroup({
   allowTabActions = defaultTabActions,
   canDrag = true,
   canDrop = true,
+  actionBtnStyle = 'text',
   onChange,
   onRemove,
   onRestore,
@@ -220,13 +235,12 @@ function TabGroup({
       eventEmitter.emit('home:treeDataHook', {
         action: 'handleTabItemRemove',
         params: [group.groupId, tabs],
+        callback: () => {
+          setSelectedTabIds((selectedTabIds) =>
+            selectedTabIds.filter((id) => !tabs.some((tab) => tab.tabId === id))
+          );
+        },
       });
-
-      setTimeout(() => {
-        setSelectedTabIds((selectedTabIds) =>
-          selectedTabIds.filter((id) => !tabs.some((tab) => tab.tabId === id))
-        );
-      }, 0);
     },
     [group.groupId]
   );
@@ -260,11 +274,163 @@ function TabGroup({
     });
   }, []);
 
+  const getGroupActionOptions: () => ActionOptionItem[] = useCallback(() => {
+    const actionMap = groupActionOptions.reduce<Record<string, ActionOption>>(
+      (result, option) => {
+        result[option.actionName] = option;
+        return result;
+      },
+      {}
+    );
+
+    const btns: ActionOptionItem[] = [
+      {
+        key: 'remove',
+        label: $fmt(actionMap['remove'].labelKey),
+        icon: <CloseOutlined />,
+        disabled: isLocked,
+        // validator: () => !isLocked,
+        onClick: () => setModalVisible(true),
+      },
+      {
+        key: 'restore',
+        label: $fmt(actionMap['restore'].labelKey),
+        icon: <ExportOutlined />,
+        onClick: () => onRestore?.(),
+      },
+      {
+        key: 'lock',
+        label: $fmt(
+          isLocked ? 'home.tabGroup.unlock' : 'home.tabGroup.lock'
+        ) as LocaleKeys,
+        icon: isLocked ? <UnlockOutlined /> : <LockOutlined />,
+        onClick: () => onChange?.({ isLocked: !isLocked }),
+      },
+      {
+        key: 'star',
+        label: $fmt(
+          isStarred ? 'home.tabGroup.unstar' : 'home.tabGroup.star'
+        ) as LocaleKeys,
+        icon: <StarOutlined />,
+        onClick: () => onStarredChange?.(!isStarred),
+      },
+      {
+        key: 'moveTo',
+        label: $fmt(actionMap['moveTo'].labelKey),
+        icon: <SendOutlined />,
+        onClick: () => openMoveToModal?.({ groupId }),
+      },
+      {
+        key: 'copyGroup',
+        label: $fmt(actionMap['copyGroup'].labelKey),
+        icon: <IconRepeat />,
+        onClick: handleGroupCopy,
+      },
+      {
+        key: 'copyLinks',
+        label: $fmt(actionMap['copyLinks'].labelKey),
+        icon: <CopyOutlined />,
+        onClick: handleCopy,
+      },
+      {
+        key: 'dedup',
+        label: $fmt(actionMap['dedup'].labelKey),
+        icon: <BlockOutlined />,
+        disabled: isLocked,
+        onClick: () => setDedupModalVisible(true),
+      },
+    ];
+
+    return btns.filter((item) => {
+      const isAllowed = allowGroupActions.includes(item.key);
+      const isValid = item.validator?.() ?? true;
+      return isAllowed && isValid;
+    });
+  }, [
+    $fmt,
+    allowGroupActions,
+    groupId,
+    isLocked,
+    isStarred,
+    onRestore,
+    onChange,
+    onStarredChange,
+    openMoveToModal,
+    handleCopy,
+    handleGroupCopy,
+  ]);
+
+  const groupActions = useMemo(() => {
+    const settings = settingsUtils.settings;
+    const outerList: ActionOptionItem[] = [],
+      innerList: ActionOptionItem[] = [];
+
+    const groupActionBtnOptions = getGroupActionOptions();
+
+    groupActionBtnOptions.forEach((item) => {
+      if (settings[GROUP_ACTION_BTNS_COMMONLY_USED]?.includes(item.key)) {
+        outerList.push(item);
+      } else {
+        innerList.push(item);
+      }
+    });
+
+    return { outerList, innerList };
+  }, [getGroupActionOptions]);
+
+  const selectedTabsActions: ActionOptionItem[] = useMemo(() => {
+    const actionMap = tabsActionOptions.reduce<Record<string, ActionOption>>(
+      (result, option) => {
+        result[option.actionName] = option;
+        return result;
+      },
+      {}
+    );
+
+    return [
+      {
+        key: 'remove',
+        label: $fmt(actionMap['remove'].labelKey),
+        icon: <DeleteOutlined />,
+        disabled: isLocked,
+        onClick: handleTabRemoveConfirm,
+      },
+      {
+        key: 'open',
+        label: $fmt(actionMap['open'].labelKey),
+        icon: <ExportOutlined />,
+        onClick: handleTabsOpen,
+      },
+      {
+        key: 'copy',
+        label: $fmt(actionMap['copy'].labelKey),
+        icon: <CopyOutlined />,
+        disabled: isLocked,
+        onClick: handleSelectedTabsCopy,
+      },
+      {
+        key: 'moveTo',
+        label: $fmt(actionMap['moveTo'].labelKey),
+        icon: <SendOutlined />,
+        disabled: isLocked,
+        onClick: () => openMoveToModal?.({ groupId, tabs: selectedTabs }),
+      },
+    ].filter((item) => allowTabActions.includes(item.key));
+  }, [
+    $fmt,
+    groupId,
+    selectedTabs,
+    handleTabsOpen,
+    handleTabRemoveConfirm,
+    handleSelectedTabsCopy,
+    openMoveToModal,
+  ]);
+
   /* 下面是分段加载相关 */
   const [rendering, setRendering] = useState(true);
   const [loading, setLoading] = useState(true);
   const tabListHeight = useMemo(() => {
-    return tabList.length * 24 || 24;
+    return tabList.length * 28 || 20;
   }, [tabList]);
 
   const [blockIndex, setBlockIndex] = useState<number>(1);
@@ -297,51 +463,40 @@ function TabGroup({
   return (
     <>
       <StyledGroupWrapper
-        className="tab-group-wrapper"
+        className={classNames('tab-group-wrapper', isLocked && 'locked')}
         data-gid={groupId}
         $bgColor={selected ? token.colorPrimaryBg : token.colorBgContainer}
         ref={groupRef}
       >
         {/* 标签组 header 展示、操作区域 */}
         <StyledGroupHeader className="group-header select-none">
-          {allowGroupActions.includes('remove') && !isLocked && (
-            <StyledActionIconBtn
-              className="btn-remove"
-              $size="16"
-              title={$fmt('common.remove')}
-              $hoverColor={ENUM_COLORS.red}
-              onClick={() => setModalVisible(true)}
-            >
-              <CloseOutlined />
-            </StyledActionIconBtn>
-          )}
-
-          {(isLocked || isStarred) && (
-            <div className="group-status-wrapper">
-              {isLocked && (
-                <LockOutlined
-                  style={{ fontSize: '22px', color: token.colorPrimaryHover }}
-                />
-              )}
-              {isStarred && (
-                <StarOutlined
-                  style={{ fontSize: '22px', color: token.colorPrimaryHover }}
-                />
-              )}
+          <div className="group-header-top">
+            {(isLocked || isStarred) && (
+              <div className="group-status-wrapper">
+                {isLocked && (
+                  <LockFilled
+                    style={{ fontSize: '22px', color: token.colorPrimaryHover }}
+                  />
+                )}
+                {isStarred && (
+                  <StarFilled
+                    style={{ fontSize: '22px', color: token.colorPrimaryHover }}
+                  />
+                )}
+              </div>
+            )}
+            <div className="group-name-wrapper">
+              <EditInput
+                value={groupName || UNNAMED_GROUP}
+                disabled={!allowGroupActions.includes('rename')}
+                maxWidth={240}
+                fontSize={20}
+                iconSize={16}
+                onValueChange={(value) =>
+                  onChange?.({ groupName: value || UNNAMED_GROUP })
+                }
+              ></EditInput>
             </div>
-          )}
-
-          <div className="group-name-wrapper">
-            <EditInput
-              value={groupName || UNNAMED_GROUP}
-              disabled={!allowGroupActions.includes('rename')}
-              maxWidth={240}
-              fontSize={20}
-              iconSize={16}
-              onValueChange={(value) => onChange?.({ groupName: value || UNNAMED_GROUP })}
-            ></EditInput>
-          </div>
-          <div className="group-header-right-part">
             <div className="group-info">
               <span className="tab-count" style={{ color: ENUM_COLORS.volcano }}>
                 {$fmt({
@@ -351,78 +506,21 @@ function TabGroup({
               </span>
               <span className="group-create-time">{createTime}</span>
             </div>
-            <Space
-              className="group-action-btns"
-              size={0}
-              split={
-                <Divider type="vertical" style={{ background: token.colorBorder }} />
-              }
-            >
-              {allowGroupActions.includes('remove') && !isLocked && (
-                <span className="action-btn" onClick={() => setModalVisible(true)}>
-                  {$fmt('home.tabGroup.remove')}
-                </span>
-              )}
-              {allowGroupActions.includes('restore') && (
-                <span className="action-btn" onClick={() => onRestore?.()}>
-                  {$fmt('home.tabGroup.open')}
-                </span>
-              )}
-              {allowGroupActions.includes('lock') && (
-                <span
-                  className="action-btn"
-                  onClick={() => onChange?.({ isLocked: !isLocked })}
-                >
-                  {$fmt(isLocked ? 'home.tabGroup.unlock' : 'home.tabGroup.lock')}
-                </span>
-              )}
-              {allowGroupActions.includes('star') && (
-                <span
-                  className="action-btn"
-                  onClick={() => onStarredChange?.(!isStarred)}
-                >
-                  {$fmt(isStarred ? 'home.tabGroup.unstar' : 'home.tabGroup.star')}
-                </span>
-              )}
-              {allowGroupActions.includes('moveTo') && (
-                <span
-                  className="action-btn"
-                  onClick={() => openMoveToModal?.({ groupId })}
-                >
-                  {$fmt('common.moveTo')}
-                </span>
-              )}
-              {allowGroupActions.includes('copyGroup') && (
-                <span className="action-btn" onClick={handleGroupCopy}>
-                  {$fmt('home.copyGroup')}
-                </span>
-              )}
-              {allowGroupActions.includes('copyLinks') && (
-                <span className="action-btn" onClick={handleCopy}>
-                  {$fmt('home.copyLinks')}
-                </span>
-              )}
-              {allowGroupActions.includes('dedup') && (
-                <span className="action-btn" onClick={() => setDedupModalVisible(true)}>
-                  {$fmt('common.dedup')}
-                </span>
-              )}
-              {allowGroupActions.includes('recover') && (
-                <span className="action-btn" onClick={() => setRecoverModalVisible(true)}>
-                  {$fmt('home.tabGroup.recover')}
-                </span>
-              )}
-            </Space>
           </div>
+          <ActionBtnList
+            actionBtnStyle={actionBtnStyle}
+            {...groupActions}
+          ></ActionBtnList>
         </StyledGroupHeader>
 
         {/* tab 选择、操作区域 */}
-        {tabList?.length > 0 && !isLocked && (
+        {tabList?.length > 0 && (
           <StyledTabActions>
             <div className="checkall-wrapper">
               <Checkbox
                 checked={isAllChecked}
                 indeterminate={checkAllIndeterminate}
+                disabled={isLocked}
                 onChange={handleSelectAll}
               ></Checkbox>
               <span
@@ -433,37 +531,11 @@ function TabGroup({
               </span>
             </div>
             {selectedTabIds.length > 0 && (
-              <Space
-                className="tab-action-btns select-none"
-                size={0}
-                split={
-                  <Divider type="vertical" style={{ background: token.colorBorder }} />
-                }
-              >
-                {allowTabActions.includes('open') && (
-                  <span className="action-btn" onClick={handleTabsOpen}>
-                    {$fmt('common.open')}
-                  </span>
-                )}
-                {allowTabActions.includes('remove') && (
-                  <span className="action-btn" onClick={handleTabRemoveConfirm}>
-                    {$fmt('common.remove')}
-                  </span>
-                )}
-                {allowTabActions.includes('copy') && (
-                  <span className="action-btn" onClick={handleSelectedTabsCopy}>
-                    {$fmt('common.copy')}
-                  </span>
-                )}
-                {allowTabActions.includes('moveTo') && (
-                  <span
-                    className="action-btn"
-                    onClick={() => openMoveToModal?.({ groupId, tabs: selectedTabs })}
-                  >
-                    {$fmt('common.moveTo')}
-                  </span>
-                )}
-              </Space>
+              <ActionBtnList
+                actionBtnStyle={actionBtnStyle}
+                outerList={selectedTabsActions}
+                iconSize={14}
+              ></ActionBtnList>
             )}
           </StyledTabActions>
         )}
@@ -480,7 +552,7 @@ function TabGroup({
         >
           <StyledTabListWrapper
             ref={tabListRef}
-            className="tab-list-wrapper"
+            className={classNames('tab-list-wrapper', isLocked && 'locked')}
             style={{ minHeight: `${tabListHeight}px` }}
           >
             {rendering ? (
@@ -490,6 +562,7 @@ function TabGroup({
                 <Checkbox.Group
                   className="tab-list-checkbox-group"
                   value={selectedTabIds}
+                  disabled={isLocked}
                   onChange={setSelectedTabIds}
                 >
                   {tabListLocal.map((tab, index) => (

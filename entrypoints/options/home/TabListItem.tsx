@@ -1,15 +1,26 @@
 import React, { useCallback, useState, memo, useRef } from 'react';
-import { theme, Checkbox, Tooltip, Popover, Dropdown, Modal, QRCode } from 'antd';
+import {
+  theme,
+  Space,
+  Checkbox,
+  Tooltip,
+  Popover,
+  Dropdown,
+  Modal,
+  QRCode,
+  Typography,
+} from 'antd';
 import type { MenuProps } from 'antd';
 import {
   CloseOutlined,
   EditOutlined,
   QrcodeOutlined,
-  MoreOutlined,
+  MenuOutlined,
   CopyOutlined,
 } from '@ant-design/icons';
 import { GroupItem, TabItem } from '~/entrypoints/types';
 import type { ModifierKeys } from '~/entrypoints/common/utils/click';
+import { classNames } from '~/entrypoints/common/utils';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
@@ -182,19 +193,44 @@ export default memo(function TabListItem({
   const moreItems: MenuProps['items'] = useMemo(
     () => [
       {
+        key: 'edit',
+        label: $fmt('common.edit'),
+        icon: <EditOutlined />,
+      },
+      {
         key: 'copy',
         label: $fmt('common.copy'),
         icon: <CopyOutlined />,
+      },
+      {
+        key: 'qrcode',
+        label: (
+          <Popover
+            color="#fbfbfb"
+            destroyTooltipOnHide
+            content={<QRCode value={tab.url!} color="#000" bordered={false} />}
+          >
+            <Space>
+              <QrcodeOutlined />
+              <Typography.Text>{$fmt('common.qrcode')}</Typography.Text>
+            </Space>
+          </Popover>
+        ),
       },
     ],
     [$fmt]
   );
 
-  const onMoreItemClick = useCallback<Required<MenuProps>['onClick']>(({ key }) => {
-    if (key === 'copy') {
-      onCopy?.([tab]);
-    }
-  }, []);
+  const onMoreItemClick = useCallback<Required<MenuProps>['onClick']>(
+    ({ key }) => {
+      if (key === 'copy') {
+        onCopy?.([tab]);
+      } else if (key === 'edit') {
+        setModalVisible(true);
+      }
+    },
+    [onCopy]
+  );
 
   const draggingListener = (value: boolean) => {
     setIsDragging(value);
@@ -226,18 +262,25 @@ export default memo(function TabListItem({
   return (
     <>
       <StyledTabItemWrapper
-        className="tab-list-item"
+        className={classNames('tab-list-item', group?.isLocked && 'locked')}
         ref={tabRef}
         data-id={tabId}
         $bgColor={highlight ? token.colorWarningHover : ''}
       >
+        {/* icon tab remove */}
+        <StyledActionIconBtn
+          className="tab-item-btn btn-remove"
+          $size="16"
+          title={$fmt('common.remove')}
+          $hoverColor={ENUM_COLORS.red}
+          onClick={handleTabRemove}
+        >
+          <CloseOutlined />
+        </StyledActionIconBtn>
         {/* checkbox */}
-        {!group?.isLocked && (
-          <Checkbox className="checkbox-item" value={tab.tabId}></Checkbox>
-        )}
+        <Checkbox className="checkbox-item" value={tab.tabId}></Checkbox>
         <Dropdown
           menu={{ items: moreItems, onClick: onMoreItemClick }}
-          placement="bottomLeft"
           trigger={['click']}
         >
           <StyledActionIconBtn
@@ -245,49 +288,10 @@ export default memo(function TabListItem({
             $size="16"
             title={$fmt('common.more')}
           >
-            <MoreOutlined />
+            <MenuOutlined />
           </StyledActionIconBtn>
         </Dropdown>
-        {/* icon tab qrcode */}
-        {tab.url && (
-          <Popover
-            color="#fbfbfb"
-            destroyTooltipOnHide
-            trigger="click"
-            content={<QRCode value={tab.url} color="#000" bordered={false} />}
-          >
-            <StyledActionIconBtn
-              className="tab-item-btn btn-qrcode"
-              $size="16"
-              title={$fmt('common.qrcode')}
-              $hoverColor={token.colorPrimary}
-            >
-              <QrcodeOutlined />
-            </StyledActionIconBtn>
-          </Popover>
-        )}
-        {/* icon tab edit */}
-        <StyledActionIconBtn
-          className="tab-item-btn btn-edit"
-          $size="16"
-          title={$fmt('common.edit')}
-          $hoverColor={token.colorPrimary}
-          onClick={() => setModalVisible(true)}
-        >
-          <EditOutlined />
-        </StyledActionIconBtn>
-        {/* icon tab remove */}
-        {!group?.isLocked && (
-          <StyledActionIconBtn
-            className="tab-item-btn btn-remove"
-            $size="16"
-            title={$fmt('common.remove')}
-            $hoverColor={ENUM_COLORS.red}
-            onClick={handleTabRemove}
-          >
-            <CloseOutlined />
-          </StyledActionIconBtn>
-        )}
+
         {/* icon tab favicon */}
         <Favicon pageUrl={tab.url!} favIconUrl={tab.favIconUrl}></Favicon>
         {/* tab title */}

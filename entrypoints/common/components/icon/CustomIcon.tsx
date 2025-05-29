@@ -3,6 +3,7 @@ import type { GetProps } from 'antd';
 import ThemeSvg from '~/assets/icon/theme.svg?react';
 import TimeAscendingSvg from '~/assets/icon/time-asc.svg?react';
 import TimeDescendingSvg from '~/assets/icon/time-desc.svg?react';
+import RepeatSvg from '~/assets/icon/repeat.svg?react';
 
 export type CustomIconComponentProps = GetProps<typeof Icon>;
 
@@ -18,9 +19,14 @@ export const IconTimeAscending = (props: Partial<CustomIconComponentProps>) => (
 export const IconTimeDescending = (props: Partial<CustomIconComponentProps>) => (
   <Icon component={TimeDescendingSvg} {...props} />
 );
+// 复制图标
+export const IconRepeat = (props: Partial<CustomIconComponentProps>) => (
+  <Icon component={RepeatSvg} {...props} />
+);
 
 export default {
   IconTheme,
   IconTimeAscending,
   IconTimeDescending,
+  IconRepeat,
 };

@@ -3,6 +3,11 @@ import type { StyledThemeProps } from '~/entrypoints/types';
 
 export type { StyledThemeProps } from '~/entrypoints/types';
 
+export const StyleBtnDisabled = css`
+  color: ${(props) => props.theme.colorTextDisabled || 'rgba(0,0,0,0.25)'};
+  cursor: not-allowed;
+`;
+
 // 单行超长省略
 export const StyledEllipsis = css`
   overflow: hidden;
@@ -22,6 +27,7 @@ export const StyledEllipsisLines = css<{ $lines?: number }>`
 // action icon btn
 export const StyledActionIconBtn = styled.i<{
   theme: StyledThemeProps;
+  disabled?: boolean;
   $size?: number | string;
   $color?: string;
   $hoverColor?: string;
@@ -38,7 +44,28 @@ export const StyledActionIconBtn = styled.i<{
   cursor: pointer;
   &:hover {
     transform: scale(${(props) => props.$hoverScale || 1.2});
-    color: ${(props) => props.$hoverColor || props.theme.colorTextSecondary || '#666'};
+    color: ${(props) => props.$hoverColor || props.theme.colorPrimary || '#666'};
+  }
+  &.disabled {
+    transform: scale(1);
+    ${StyleBtnDisabled}
+  }
+`;
+
+export const StyledActionTextBtn = styled.span<{
+  theme: StyledThemeProps;
+  disabled?: boolean;
+  $color?: string;
+}>`
+  display: flex;
+  align-items: center;
+  color: ${(props) => props.theme.colorTextSecondary || '#333'};
+  cursor: pointer;
+  &:hover {
+    color: ${(props) => props.theme.colorPrimary || '#666'};
+  }
+  &.disabled {
+    ${StyleBtnDisabled}
   }
 `;
 

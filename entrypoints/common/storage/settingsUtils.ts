@@ -1,5 +1,5 @@
 // import { storage } from 'wxt/storage';
-import type { LanguageTypes, SettingsProps, PageWidthTypes } from '~/entrypoints/types';
+import type { LanguageTypes, SettingsProps, PageWidthTypes, ActionBtnStyle } from '~/entrypoints/types';
 import {
   ENUM_SETTINGS_PROPS,
   POPUP_MODULE_NAMES,
@@ -8,39 +8,48 @@ import {
   DEFAULT_EXCLUDE_DOMAINS,
   defaultAutoSyncType,
 } from '../constants';
+import { defaultGroupActions } from '~/entrypoints/options/home/constants';
 
 const {
   LANGUAGE,
   THEME_TYPE,
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
   OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED,
+  AUTO_PIN_ADMIN_TAB,
+  /* 发送标签页配置 */
   SHOW_SEND_TARGET_MODAL,
-  OPEN_ADMIN_TAB_AFTER_SEND_TABS,
   ALLOW_SEND_PINNED_TABS,
   EXCLUDE_DOMAINS_FOR_SENDING,
+  OPEN_ADMIN_TAB_AFTER_SEND_TABS,
   CLOSE_TABS_AFTER_SEND_TABS,
   ACTION_AUTO_CLOSE_FLAGS,
-  AUTO_PIN_ADMIN_TAB,
-  RESTORE_IN_NEW_WINDOW,
-  DELETE_AFTER_RESTORE,
-  UNNAMED_GROUP_RESTORE_AS_GROUP,
-  NAMED_GROUP_RESTORE_AS_GROUP,
-  SILENT_OPEN_TAB_MODIFIER_KEY,
-  OPEN_TAB_MODIFIER_KEY,
-  GLOBAL_SEARCH_DELETE_AFTER_OPEN,
-  DELETE_UNLOCKED_EMPTY_GROUP,
-  CONFIRM_BEFORE_DELETING_TABS,
   ALLOW_DUPLICATE_TABS,
   ALLOW_DUPLICATE_GROUPS,
+  /* 打开标签页配置 */
+  RESTORE_IN_NEW_WINDOW,
+  DELETE_AFTER_RESTORE,
+  SILENT_OPEN_TAB_MODIFIER_KEY,
+  OPEN_TAB_MODIFIER_KEY,
+  UNNAMED_GROUP_RESTORE_AS_GROUP,
+  NAMED_GROUP_RESTORE_AS_GROUP,
+  /* 全局搜索配置 */
+  GLOBAL_SEARCH_DELETE_AFTER_OPEN,
+  /* 其他操作配置 */
+  DELETE_UNLOCKED_EMPTY_GROUP,
+  CONFIRM_BEFORE_DELETING_TABS,
   LINK_TEMPLATE,
   TAB_COUNT_THRESHOLD,
   TAB_INSERT_POSITION,
+  /* 展示配置 */
+  GROUP_ACTION_BTN_STYLE,
+  GROUP_ACTION_BTNS_COMMONLY_USED,
   SHOW_OPENED_TAB_COUNT,
   SHOW_PAGE_CONTEXT_MENUS,
   POPUP_MODULE_DISPLAYS,
   AUTO_EXPAND_HOME_TREE,
   MAIN_CONTENT_WIDTH_TYPE,
   SHOW_TAB_TITLE_TOOLTIP,
+  /* 自动同步配置 */
   AUTO_SYNC,
   AUTO_SYNC_INTERVAL,
   AUTO_SYNC_TYPE,
@@ -72,13 +81,15 @@ export default class SettingsUtils {
     [NAMED_GROUP_RESTORE_AS_GROUP]: import.meta.env.FIREFOX ? false : true, // 是否以标签组形式恢复已命名标签组
     /* 全局搜索配置 */
     [GLOBAL_SEARCH_DELETE_AFTER_OPEN]: false, // 全局搜索打开标签页后是否从列表中删除
-     /* 其他操作配置 */
+    /* 其他操作配置 */
     [DELETE_UNLOCKED_EMPTY_GROUP]: true, // 是否删除未锁定的空标签组
     [CONFIRM_BEFORE_DELETING_TABS]: false, // 删除标签页前是否需要确认
     [LINK_TEMPLATE]: '{{url}} | {{title}}', // 复制的链接模板
     [TAB_COUNT_THRESHOLD]: 300, // 分类中标签页超过该数量时，则右侧面板开启虚拟滚动
     [TAB_INSERT_POSITION]: 'bottom' as 'top' | 'bottom', // 标签页插入位置：在标签组的标签页列表顶部还是底部
     /* 展示配置 */
+    [GROUP_ACTION_BTN_STYLE]: 'text' as ActionBtnStyle, // 操作按钮样式
+    [GROUP_ACTION_BTNS_COMMONLY_USED]: defaultGroupActions, // 常用的标签组操作按钮
     [SHOW_OPENED_TAB_COUNT]: true, // 扩展图标上是否显示打开的标签页数量
     [SHOW_PAGE_CONTEXT_MENUS]: true, // 网页中是否显示NiceTab右键菜单
     [POPUP_MODULE_DISPLAYS]: POPUP_MODULE_NAMES, // popup面板中需要展示的模块
