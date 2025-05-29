@@ -167,10 +167,11 @@ export default function Settings() {
           >
             <div className="sidebar-inner-content">
               <Menu
+                selectedKeys={[currModule]}
                 mode="vertical"
                 items={blockModuleOptions}
                 onClick={onModuleChange}
-              ></Menu>
+              />
             </div>
             <div className="sidebar-inner-footer">
               {/* ******************* 保存 ******************* */}
