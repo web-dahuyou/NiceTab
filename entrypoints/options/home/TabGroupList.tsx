@@ -14,10 +14,10 @@ import { HomeContext } from './hooks/treeData';
 import { getSelectedCounts } from './utils';
 
 const ListItem = memo(
-  ({ tabGroup, virtual }: { tabGroup: TreeDataNodeTabGroup; virtual?: boolean }) => {
+  ({ tabGroup }: { tabGroup: TreeDataNodeTabGroup; virtual?: boolean }) => {
     const { treeDataHook } = useContext(HomeContext);
     const {
-      selectedTagKey,
+      // selectedTagKey,
       selectedTabGroupKey,
       handleSelect,
       refreshTreeData,
@@ -149,11 +149,11 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
 
   return (
     <StyledGroupList className="main-content-wrapper">
-      {virtual && (
+      {/* {virtual && (
         <div className="tip">
           <Typography.Text type="warning">{$fmt('home.tip.tooManyTabs')}</Typography.Text>
         </div>
-      )}
+      )} */}
       <div className="count-info">
         <span className="count-item">{$fmt('home.tag.countInfo')}：</span>
         <span className="count-item">

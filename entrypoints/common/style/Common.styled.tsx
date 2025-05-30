@@ -40,7 +40,7 @@ export const StyledActionIconBtn = styled.i<{
   height: ${(props) => `${+(props.$size || 16) + 2}px`};
   font-size: ${(props) => `${props.$size || 14}px`};
   color: ${(props) => props.$color || props.theme.colorTextSecondary || '#666'};
-  transition: all 0.2s;
+  transition: transform 0.2s, color 0.2s;
   cursor: pointer;
   &:hover {
     transform: scale(${(props) => props.$hoverScale || 1.2});

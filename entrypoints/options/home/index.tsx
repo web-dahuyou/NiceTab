@@ -56,8 +56,7 @@ import { getSelectedCounts } from './utils';
 import TreeBox from './TreeBox';
 import TabGroupList from './TabGroupList';
 // import FooterFloatButton from './FooterFloatButton';
-
-const { TAB_COUNT_THRESHOLD } = ENUM_SETTINGS_PROPS;
+// const { TAB_COUNT_THRESHOLD } = ENUM_SETTINGS_PROPS;
 
 export default function Home() {
   const { token } = theme.useToken();
@@ -108,12 +107,13 @@ export default function Home() {
 
   // 是否开启虚拟滚动（数据量大时开启虚拟滚动）
   const virtualMap = useMemo(() => {
-    const settings = settingsUtils.settings || {};
+    // const settings = settingsUtils.settings || {};
     const { groupCount = 0, tabCount = 0 } = getSelectedCounts(selectedTag.originData);
     // console.log('virtualMap', groupCount, tabCount);
     return {
       tree: (countInfo?.groupCount || 0) > 200 || groupCount > 30,
-      tabList: tabCount > (settings?.[TAB_COUNT_THRESHOLD] || 300),
+      // tabList: tabCount > (settings?.[TAB_COUNT_THRESHOLD] || 300),
+      tabList: tabCount > 100,
     };
   }, [selectedTag.originData, countInfo?.groupCount]);
 
