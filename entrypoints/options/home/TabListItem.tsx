@@ -18,7 +18,7 @@ import {
   MenuOutlined,
   CopyOutlined,
 } from '@ant-design/icons';
-import { GroupItem, TabItem } from '~/entrypoints/types';
+import { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
 import type { ModifierKeys } from '~/entrypoints/common/utils/click';
 import { classNames } from '~/entrypoints/common/utils';
 import { openNewTab } from '~/entrypoints/common/tabs';
@@ -36,6 +36,7 @@ import Favicon from '~/entrypoints/common/components/Favicon';
 import TabItemEditModal from './TabItemEditModal';
 
 type TabItemProps = TabItem & {
+  tag: Pick<TagItem, 'isLocked' | 'isStarred'>;
   group: Pick<GroupItem, 'groupId' | 'isLocked' | 'isStarred'>;
   highlight?: boolean;
   onRemove?: (tabs: TabItem[]) => void;
@@ -82,6 +83,7 @@ export default memo(function TabListItem({
   title,
   url,
   favIconUrl,
+  tag,
   group,
   highlight,
   onRemove,
@@ -196,11 +198,13 @@ export default memo(function TabListItem({
         key: 'edit',
         label: $fmt('common.edit'),
         icon: <EditOutlined />,
+        disabled: tag.isLocked || group.isLocked,
       },
       {
         key: 'copy',
         label: $fmt('common.copy'),
         icon: <CopyOutlined />,
+        disabled: tag.isLocked || group.isLocked,
       },
       {
         key: 'qrcode',
@@ -262,7 +266,10 @@ export default memo(function TabListItem({
   return (
     <>
       <StyledTabItemWrapper
-        className={classNames('tab-list-item', group?.isLocked && 'locked')}
+        className={classNames(
+          'tab-list-item',
+          (tag.isLocked || group?.isLocked) && 'locked'
+        )}
         ref={tabRef}
         data-id={tabId}
         $bgColor={highlight ? token.colorWarningHover : ''}

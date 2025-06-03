@@ -126,7 +126,6 @@ export default function Root({
 
           algorithm: theme[themeTypeConfig.algorithm],
           token: {
-            motion: false,
             colorPrimary: primaryColor || PRIMARY_COLOR,
             colorBgContainer: themeTypeConfig.bgColor || '#fff',
           },

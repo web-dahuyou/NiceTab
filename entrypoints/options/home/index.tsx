@@ -44,8 +44,9 @@ import {
   StyledHelpInfoBox,
 } from './Home.styled';
 import ToggleSidebarBtn from '../components/ToggleSidebarBtn';
-import SearchTabsBtn from './SearchTabsBtn';
-import SortingBtns from './SortingBtns';
+import ToggleLockedBtn from './components/ToggleLockedBtn';
+import SearchTabsBtn from './components/SearchTabsBtn';
+import SortingBtns from './components/SortingBtns';
 import HotkeyList from '../components/HotkeyList';
 // import StickyFooter from '~/entrypoints/common/components/StickyFooter';
 // import Footer from './footer/index';
@@ -55,7 +56,7 @@ import useHotkeys from './hooks/hotkeys';
 import { getSelectedCounts } from './utils';
 import TreeBox from './TreeBox';
 import TabGroupList from './TabGroupList';
-// import FooterFloatButton from './FooterFloatButton';
+// import FooterFloatButton from './components/FooterFloatButton';
 // const { TAB_COUNT_THRESHOLD } = ENUM_SETTINGS_PROPS;
 
 export default function Home() {
@@ -70,6 +71,7 @@ export default function Home() {
     toggleExpand,
     refreshTreeData,
     handleTagCreate,
+    handleTagChange,
     handleHotkeyAction,
   } = treeDataHook || {};
 
@@ -89,7 +91,7 @@ export default function Home() {
         multiSelectContainerRef.current ||
         document.getElementById('tab-group-list-panel') ||
         document.body,
-      isAllowed,
+      isAllowed: isAllowed && !selectedTag.originData?.isLocked,
       disabledSelectors: [
         '.tab-list-item',
         '.checkall-wrapper',
@@ -166,6 +168,17 @@ export default function Home() {
     reloadOtherAdminPage();
   };
 
+  const lockTagBtnVisible = useMemo(() => {
+    return !selectedTag.originData?.static;
+  }, [selectedTag.originData]);
+
+  const onLockStatusChange = async (status: boolean) => {
+    const selectedKeys = await stateUtils.getHomeSelectedKeys();
+    handleTagChange(selectedKeys.selectedTagKey || '', {
+      isLocked: status,
+    });
+  };
+
   useEffect(() => {
     recycleUtils.checkAndClear();
 
@@ -215,6 +228,12 @@ export default function Home() {
                   onCollapseChange={onCollapseChange}
                 ></ToggleSidebarBtn>
                 <SearchTabsBtn></SearchTabsBtn>
+                {lockTagBtnVisible && (
+                  <ToggleLockedBtn
+                    isLocked={selectedTag?.originData?.isLocked}
+                    onLockStatusChange={onLockStatusChange}
+                  ></ToggleLockedBtn>
+                )}
                 {selectedTagKey ? <SortingBtns onSort={onNameSort}></SortingBtns> : null}
                 {selectedTagKey ? (
                   <SortingBtns

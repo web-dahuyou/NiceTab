@@ -4,6 +4,7 @@ import { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
 export type TreeDataNodeTabGroup = TreeDataNode & {
   type: 'tabGroup';
   parentKey: string;
+  parentData?: Partial<TagItem>;
   title: string;
   icon?: React.ReactNode;
   originData: GroupItem;
