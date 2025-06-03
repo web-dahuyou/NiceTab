@@ -1,16 +1,16 @@
-import React, { useMemo, useState, useRef, memo } from 'react';
+import React, { useMemo, useRef, memo } from 'react';
 import { theme } from 'antd';
 import { CloseOutlined, PlusOutlined, SendOutlined } from '@ant-design/icons';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { ENUM_COLORS, UNNAMED_TAG, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
-import { StyledTreeNodeItem } from './Home.styled';
-import type { RenderTreeNodeProps, TreeDataNodeTabGroup } from './types';
-import { dndKeys } from './constants';
-import EditInput from '../components/EditInput';
+import EditInput from '~/entrypoints/options/components/EditInput';
 import DropComponent from '~/entrypoints/common/components/DropComponent';
-import { type TreeDataHookProps } from './hooks/treeData';
-import { eventEmitter as homeEventEmitter } from './hooks/homeCustomEvent';
+import { dndKeys } from '../constants';
+import type { RenderTreeNodeProps, TreeDataNodeTabGroup } from '../types';
+import { StyledTreeNodeItem } from '../Home.styled';
+import { type TreeDataHookProps } from '../hooks/treeData';
+import { eventEmitter as homeEventEmitter } from '../hooks/homeCustomEvent';
 
 const allowDropKey = dndKeys.tabItem;
 
@@ -23,7 +23,11 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
 
   // 是否锁定
   const isLocked = useMemo(() => {
-    return !!node?.originData?.isLocked;
+    if (node.type === 'tag') {
+      return node.originData?.isLocked;
+    }
+
+    return node?.originData?.isLocked || node?.parentData?.isLocked;
   }, [node]);
 
   // 是否是中转站
@@ -123,6 +127,8 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
             <span className="tree-node-title">
               <EditInput
                 value={node.title || unnamedNodeName}
+                disabled={isLocked}
+                visible={!isLocked}
                 fontSize={14}
                 iconSize={14}
                 onValueChange={handleRenameChange}
@@ -133,11 +139,11 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
           )}
 
           <span className="tree-node-icon-group">
-            {node.type === 'tag' && (
+            {node.type === 'tag' && !node.originData?.isLocked && (
               <>
                 {node.children?.length ? (
                   <StyledActionIconBtn
-                    className="btn-add"
+                    className="btn-send"
                     $size="14"
                     title={$fmt('home.moveAllGroupTo')}
                     $hoverColor={token.colorPrimaryHover}

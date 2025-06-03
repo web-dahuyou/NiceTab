@@ -1,7 +1,7 @@
 import { FloatButton } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
-import SearchList from './footer/SearchList';
+import SearchList from '../footer/SearchList';
 
 export default function FooterFloatButton() {
   const { $fmt } = useIntlUtls();

@@ -56,7 +56,7 @@ export default function FormModuleOtherActions(formItemProps: FormItemProps) {
       </Form.Item>
 
       {/* 单个分类中标签页数量超过预定值则开启虚拟滚动 */}
-      <Form.Item<SettingsProps>
+      {/* <Form.Item<SettingsProps>
         label={$fmt({
           id: `settings.${TAB_COUNT_THRESHOLD}`,
           values: { mark: '：' },
@@ -79,7 +79,7 @@ export default function FormModuleOtherActions(formItemProps: FormItemProps) {
           keyboard={true}
           style={{ width: '300px' }}
         />
-      </Form.Item>
+      </Form.Item> */}
 
       {/* 复制链接的格式 */}
       <Form.Item<SettingsProps>

@@ -32,6 +32,8 @@ const zhCN = {
   'home.tag.remove': '删除',
   'home.tag.recover': '还原',
   'home.tag.countInfo': '当前分类统计',
+  'home.tag.lock': '锁定该分类',
+  'home.tag.unlock': '解锁该分类',
 
   'home.tabGroup.add': '创建标签组',
   'home.tabGroup.remove': '删除该组',

@@ -9,7 +9,7 @@ import type { TagItem, GroupItem } from '~/entrypoints/types';
 import type { TreeDataNodeTag, TreeDataNodeUnion, MoveToCallbackProps } from './types';
 import { HomeContext, type TreeDataHookProps } from './hooks/treeData';
 import { eventEmitter as homeEventEmitter } from './hooks/homeCustomEvent';
-import RenderTreeNode from './RenderTreeNode';
+import RenderTreeNode from './components/RenderTreeNode';
 import {
   useTreeNodeAction,
   RemoveActionModal,
@@ -116,7 +116,16 @@ function TreeBox() {
     (node: TreeDataNode) => {
       const _node = node as TreeDataNodeUnion;
       // 中转站分类不可拖拽
-      if (_node.type === 'tag' && _node?.originData?.static) return false;
+      if (
+        _node.type === 'tag' &&
+        _node.originData?.static &&
+        _node.originData?.isLocked
+      ) {
+        return false;
+      }
+      if (_node.type === 'tabGroup' && _node.parentData?.isLocked) {
+        return false;
+      }
       if (isEditing) return false;
       return true;
     },

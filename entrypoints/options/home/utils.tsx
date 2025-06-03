@@ -1,5 +1,10 @@
 import type { TreeProps } from 'antd';
-import { PushpinOutlined, TagOutlined, ProductOutlined } from '@ant-design/icons';
+import {
+  PushpinOutlined,
+  TagOutlined,
+  ProductOutlined,
+  LockFilled,
+} from '@ant-design/icons';
 import { getLocaleMessages } from '~/entrypoints/common/utils';
 import type { TagItem } from '~/entrypoints/types';
 import type { TreeDataNodeUnion, MoveDataProps, CascaderOption } from './types';
@@ -11,16 +16,23 @@ export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
     key: tag.tagId,
     title: tag.tagName,
     isLeaf: false,
-    icon: tag.static ? <PushpinOutlined /> : <TagOutlined />,
+    icon: tag.static ? (
+      <PushpinOutlined />
+    ) : tag.isLocked ? (
+      <LockFilled />
+    ) : (
+      <TagOutlined />
+    ),
     originData: { ...tag },
     children: tag?.groupList?.map((group) => {
       return {
         type: 'tabGroup',
         parentKey: tag.tagId,
+        parentData: { isLocked: tag.isLocked, isStarred: tag.isStarred },
         key: group.groupId,
         title: group.groupName,
         isLeaf: true,
-        icon: <ProductOutlined />,
+        icon: group.isLocked ? <LockFilled /> : <ProductOutlined />,
         originData: { ...group },
       };
     }),
