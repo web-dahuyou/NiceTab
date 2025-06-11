@@ -11,8 +11,9 @@ export interface ActionBtnProps {
   btnStyle?: ActionBtnStyle;
   size?: number;
   disabled?: boolean;
+  hoverColor?: string;
   onClick?: () => void;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export default function ActionIconBtn({
@@ -21,6 +22,7 @@ export default function ActionIconBtn({
   btnStyle = 'icon',
   size,
   disabled,
+  hoverColor,
   onClick,
   children,
 }: ActionBtnProps) {
@@ -32,8 +34,9 @@ export default function ActionIconBtn({
   return btnStyle === 'icon' ? (
     <StyledActionIconBtn
       className={classNames(className, disabled && 'disabled')}
-      $size={size}
       title={label}
+      $size={size}
+      $hoverColor={hoverColor}
       onClick={handleClick}
     >
       {children}
@@ -41,6 +44,7 @@ export default function ActionIconBtn({
   ) : (
     <StyledActionTextBtn
       className={classNames(className, disabled && 'disabled')}
+      $hoverColor={hoverColor}
       onClick={handleClick}
     >
       {children || label}

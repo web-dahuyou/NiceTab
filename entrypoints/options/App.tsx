@@ -83,7 +83,7 @@ import SendTargetActionHolder, {
   type SendTargetActionHolderProps,
 } from '~/entrypoints/options/home/SendTargetActionHolder';
 import { GlobalSearchPanel } from '~/entrypoints/common/components/BaseGlobalSearch';
-import { useGlobalSearchPanel } from './home/hooks/globalSearch';
+import { useGlobalSearchPanel } from '~/entrypoints/common/hooks/globalSearch';
 import { type LocaleKeys } from '~/entrypoints/common/locale';
 
 import { initFaviconApiData } from '~/entrypoints/common/utils/favicon';
@@ -220,7 +220,7 @@ function AppLayout() {
     });
   }, [$fmt]);
 
-  const { globalSearchPanelRef, openGlobalSearchPanel } = useGlobalSearchPanel();
+  const { globalSearchPanelRef, open: openGlobalSearchPanel } = useGlobalSearchPanel();
 
   // 导航菜单
   const onSelect = useCallback(

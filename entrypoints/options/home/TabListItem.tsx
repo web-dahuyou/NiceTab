@@ -198,13 +198,13 @@ export default memo(function TabListItem({
         key: 'edit',
         label: $fmt('common.edit'),
         icon: <EditOutlined />,
-        disabled: tag.isLocked || group.isLocked,
+        disabled: tag?.isLocked || group.isLocked,
       },
       {
         key: 'copy',
         label: $fmt('common.copy'),
         icon: <CopyOutlined />,
-        disabled: tag.isLocked || group.isLocked,
+        disabled: tag?.isLocked || group.isLocked,
       },
       {
         key: 'qrcode',
@@ -268,7 +268,7 @@ export default memo(function TabListItem({
       <StyledTabItemWrapper
         className={classNames(
           'tab-list-item',
-          (tag.isLocked || group?.isLocked) && 'locked'
+          (tag?.isLocked || group?.isLocked) && 'locked'
         )}
         ref={tabRef}
         data-id={tabId}

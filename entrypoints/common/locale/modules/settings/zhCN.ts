@@ -47,7 +47,7 @@ const zhCN = {
   /* 打开标签页配置 */
   'settings.restoreInNewWindow': '是否在新窗口打开标签组{mark}',
   'settings.deleteAfterRestore': '打开标签页/标签组时-是否自动删除标签页{mark}',
-  'settings.deleteAfterRestore.yes': '从NiceTab列表中删除（仍保留固定标签页）',
+  'settings.deleteAfterRestore.yes': '从NiceTab列表中删除（仍保留锁定的标签页）',
   'settings.deleteAfterRestore.no': '保留在NiceTab列表中（推荐）',
   'settings.silentOpenTabModifierKey': '静默（后台）打开标签页使用的修饰键：',
   'settings.openTabModifierKey': '前台打开标签页使用的修饰键：',
@@ -57,7 +57,7 @@ const zhCN = {
 
   /* 全局搜索配置 */
   'settings.globalSearchDeleteAfterOpen': '打开标签页后是否从列表中删除：',
-  'settings.globalSearchDeleteAfterOpen.yes': '从NiceTab列表中删除（仍保留固定标签页）',
+  'settings.globalSearchDeleteAfterOpen.yes': '从NiceTab列表中删除（仍保留锁定的标签页）',
   'settings.globalSearchDeleteAfterOpen.no': '保留在NiceTab列表中（推荐）',
 
   /* 其他操作配置 */

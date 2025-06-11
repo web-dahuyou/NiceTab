@@ -651,5 +651,6 @@ export function useTreeData() {
     handleTabItemRemove,
     handleHotkeyAction,
     selectedKeyChange,
+    init,
   };
 }

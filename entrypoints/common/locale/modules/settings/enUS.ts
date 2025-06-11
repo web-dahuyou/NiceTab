@@ -49,7 +49,7 @@ const enUS: Record<LocaleKey, string> = {
   /* 打开标签页配置 */
   'settings.restoreInNewWindow': 'Open tab group in a new window when opening?',
   'settings.deleteAfterRestore': 'Remove tabs when opening tabs or tab group?',
-  'settings.deleteAfterRestore.yes': 'Remove (pinned tabs remain)',
+  'settings.deleteAfterRestore.yes': 'Remove (locked tabs remain)',
   'settings.deleteAfterRestore.no': 'All remain (recommended)',
   'settings.silentOpenTabModifierKey': 'Modifier key for opening a tab silently (in background):',
   'settings.openTabModifierKey': 'Modifier key for opening a tab in the foreground:',
@@ -59,7 +59,7 @@ const enUS: Record<LocaleKey, string> = {
 
   /* 全局搜索配置 */
   'settings.globalSearchDeleteAfterOpen': 'Remove tabs when opening tabs?',
-  'settings.globalSearchDeleteAfterOpen.yes': 'Remove (pinned tabs remain)',
+  'settings.globalSearchDeleteAfterOpen.yes': 'Remove (locked tabs remain)',
   'settings.globalSearchDeleteAfterOpen.no': 'All remain (recommended)',
 
   /* 其他操作配置 */
