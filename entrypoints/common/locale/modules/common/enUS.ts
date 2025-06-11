@@ -45,6 +45,9 @@ const enUS: Record<LocaleKey, string> = {
   'common.cancleSelect': 'Cancel Selection',
   'common.enableSelect': 'Enable Selection',
   'common.disableSelect': 'Disable Selection',
+  'common.multiSelection': 'Multi Selection',
+  'common.enableAction': 'Enable {action}',
+  'common.disableAction': 'Disable {action}',
   'common.name': 'Name',
   'common.title': 'Title',
   'common.url': 'URL',
@@ -95,6 +98,11 @@ const enUS: Record<LocaleKey, string> = {
   'common.bottom': 'Bottom',
   'common.text': 'Text',
   'common.icon': 'Icon',
+  'common.selectedTabCount': `{count, plural,
+    =0 {No Tabs}
+    one {# Tab}
+    other {# Tabs}
+  } Selected`,
 };
 
 export default enUS;

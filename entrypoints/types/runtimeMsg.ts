@@ -125,7 +125,10 @@ export type SendRuntimeMessageParams<T extends RuntimeMsgType = any> =
   };
 
 /* 给tabs标签页发送消息 */
-export type SendTabMsgType = 'action:open-send-target-modal' | 'action:callback-message';
+export type SendTabMsgType =
+  | 'action:open-send-target-modal'
+  | 'action:callback-message'
+  | 'action:global-search-panel-data-refesh';
 
 export interface SendTabMsgOpenSendTargetModal {
   msgType: 'action:open-send-target-modal';
@@ -149,16 +152,23 @@ export interface SendTabMsgOpenGlobalSearchModal {
   };
 }
 
+export interface SendTabMsgRefreshGlobalSearchModal {
+  msgType: 'action:refresh-global-search-modal';
+  data?: {};
+}
+
 export type SendTabMsgBaseProps =
   | RuntimeMsgBaseProps
   | SendTabMsgOpenSendTargetModal
   | SendTabMsgCallbackMessage
-  | SendTabMsgOpenGlobalSearchModal;
+  | SendTabMsgOpenGlobalSearchModal
+  | SendTabMsgRefreshGlobalSearchModal;
 
 // sendTabMessage event props
 export type SendTabMsgEventProps = SendTabMsgBaseProps & {
   onlyCurrentTab?: boolean;
   onlyCurrentWindow?: boolean;
+  sendToAdminTab?: boolean;
 };
 
 export default { name: 'runtime-msg-types' };

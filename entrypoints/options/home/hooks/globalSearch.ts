@@ -1,30 +1,14 @@
-import { useCallback, useContext, useRef } from 'react';
+import { useCallback, useContext } from 'react';
 import { eventEmitter } from '~/entrypoints/common/hooks/global';
+import { useGlobalSearchPanel } from '~/entrypoints/common/hooks/globalSearch';
 import { type ActionCallbackFn } from '~/entrypoints/common/components/BaseGlobalSearch';
 import type { TreeDataNodeUnion } from '../types';
 import { HomeContext } from '../hooks/treeData';
 
-export interface GlobalSearchHandle {
-  open: () => void;
-}
-
-export function useGlobalSearchPanel() {
-  const globalSearchPanelRef = useRef<GlobalSearchHandle>(null);
-
-  const openGlobalSearchPanel = useCallback(async () => {
-    globalSearchPanelRef.current?.open?.();
-  }, []);
-
-  return {
-    globalSearchPanelRef,
-    openGlobalSearchPanel,
-  };
-}
-
 export default function useGlobalSearch() {
   const { treeDataHook } = useContext(HomeContext);
   const { tagList, selectedKeyChange } = treeDataHook;
-  const { globalSearchPanelRef, openGlobalSearchPanel } = useGlobalSearchPanel();
+  const { globalSearchPanelRef, open, close } = useGlobalSearchPanel();
 
   const onAction: ActionCallbackFn = useCallback(
     (type, option) => {
@@ -54,7 +38,8 @@ export default function useGlobalSearch() {
   return {
     globalSearchPanelRef,
     tagList,
-    openGlobalSearchPanel,
+    open,
+    close,
     onAction,
   };
 }

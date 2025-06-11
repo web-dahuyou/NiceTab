@@ -3,6 +3,10 @@ import { type TreeDataHookProps } from './treeData';
 
 export type HomeCustomEventParamsProps = (
   | {
+      action: 'init';
+      params: Parameters<TreeDataHookProps['init']>;
+    }
+  | {
       action: 'handleSelect';
       params: Parameters<TreeDataHookProps['handleSelect']>;
     }

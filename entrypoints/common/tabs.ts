@@ -38,6 +38,7 @@ export async function sendTabMessage(
     data,
     onlyCurrentTab = false,
     onlyCurrentWindow = false,
+    sendToAdminTab = false,
   }: SendTabMsgEventProps,
   errorCallback?: () => void
 ) {
@@ -69,7 +70,7 @@ export async function sendTabMessage(
     const allTabs = await getAllTabs(win.id);
     const filteredTabs = allTabs.filter((tab) => {
       if (!tab?.id) return false;
-      if (adminTab && adminTab.id === tab.id) return false;
+      if (!sendToAdminTab && adminTab && adminTab.id === tab.id) return false;
       return true;
     });
 
@@ -397,6 +398,11 @@ export async function openNewTab(
   url?: string,
   { active = false, openToNext = false }: { active?: boolean; openToNext?: boolean } = {}
 ) {
+  if (!browser?.tabs?.create) {
+    window.open(url, '_blank');
+    return;
+  }
+
   if (!openToNext) {
     url && browser.tabs.create({ url, active });
     return;

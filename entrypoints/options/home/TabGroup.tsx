@@ -295,6 +295,7 @@ function TabGroup({
         label: $fmt(actionMap['remove'].labelKey),
         icon: <CloseOutlined />,
         disabled: tagLocked || isLocked,
+        hoverColor: ENUM_COLORS.red,
         // validator: () => !isLocked,
         onClick: () => setModalVisible(true),
       },
@@ -403,6 +404,7 @@ function TabGroup({
         label: $fmt(actionMap['remove'].labelKey),
         icon: <DeleteOutlined />,
         disabled: tagLocked || isLocked,
+        hoverColor: ENUM_COLORS.red,
         onClick: handleTabRemoveConfirm,
       },
       {

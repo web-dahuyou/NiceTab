@@ -6,6 +6,7 @@ import contextMenusRegister, {
 import commandsRegister from '~/entrypoints/common/commands';
 import tabUtils from '~/entrypoints/common/tabs';
 import initSettingsStorageListener, {
+  initTabListStorageListener,
   themeUtils,
   settingsUtils,
   stateUtils,
@@ -75,7 +76,6 @@ async function initTabsUpdateListener() {
     changeInfo: Tabs.OnUpdatedChangeInfoType,
     tab: Tabs.Tab
   ) {
-
     const adminTabUrl = browser.runtime.getURL('/options.html');
     const tabs = await browser.tabs.query({
       url: `${adminTabUrl}*`,
@@ -105,6 +105,13 @@ export default defineBackground(() => {
     setBadge();
     initPopup();
     autoSyncAlarm.checkReset(settings, oldSettings);
+  });
+
+  initTabListStorageListener(async () => {
+    tabUtils.sendTabMessage({
+      msgType: 'action:refresh-global-search-modal',
+      sendToAdminTab: true,
+    });
   });
 
   // 注册 contextMenus

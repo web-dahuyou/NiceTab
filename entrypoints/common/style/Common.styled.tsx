@@ -66,13 +66,14 @@ export const StyledActionTextBtn = styled.span<{
   theme: StyledThemeProps;
   disabled?: boolean;
   $color?: string;
+  $hoverColor?: string;
 }>`
   display: flex;
   align-items: center;
   color: ${(props) => props.theme.colorTextSecondary || '#333'};
   cursor: pointer;
   &:hover {
-    color: ${(props) => props.theme.colorPrimary || '#666'};
+    color: ${(props) => props.$hoverColor || props.theme.colorPrimary || '#666'};
   }
   &.disabled {
     ${StyleBtnDisabled}
