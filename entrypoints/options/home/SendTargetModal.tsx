@@ -3,7 +3,7 @@ import { Modal, Cascader, Typography } from 'antd';
 import styled from 'styled-components';
 import { ContentGlobalContext } from '~/entrypoints/content/context';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { tabListUtils } from '~/entrypoints/common/storage';
+import { stateUtils, tabListUtils } from '~/entrypoints/common/storage';
 import { StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
 import type { SendTargetProps } from '~/entrypoints/types';
 import type { CascaderOption } from './types';
@@ -93,12 +93,43 @@ export default function SendTargetModal({
 
     setTargetValue([]);
     setTargetOptions([]);
+    await stateUtils.setStateByModule('global', { lastSelectedTargetValue: targetValue });
   };
+
+  const initDataFromState = useCallback(async (cascaderData: CascaderOption[]) => {
+    const { lastSelectedTargetValue } = (await stateUtils.getState('global')) || {};
+    let selectedTargetValue = ['0'];
+    if (lastSelectedTargetValue?.length) {
+      selectedTargetValue = lastSelectedTargetValue;
+    }
+    setTargetValue(selectedTargetValue);
+    const selectedOptions = [];
+    const selectedTagInfo = cascaderData.find(
+      (item) => item.value === selectedTargetValue[0]
+    );
+    if (!selectedTagInfo) {
+      selectedTargetValue = ['0'];
+      setTargetValue(selectedTargetValue);
+      return;
+    }
+    selectedOptions.push(selectedTagInfo);
+    if (selectedTargetValue[1] != null) {
+      const selectedGroupInfo = selectedTagInfo.children?.find(
+        (item) => item.value === selectedTargetValue[1]
+      );
+      if (selectedGroupInfo) {
+        selectedOptions.push(selectedGroupInfo);
+      }
+    }
+
+    setTargetOptions(selectedOptions);
+  }, []);
 
   const initData = async () => {
     const tagList = await tabListUtils.getTagList();
     const cascaderData = await getTotalCascaderData(tagList);
     setOptions(cascaderData);
+    initDataFromState(cascaderData);
   };
 
   useEffect(() => {

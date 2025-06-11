@@ -4,6 +4,7 @@ import type { SnapshotItem } from './tabList';
 export interface GlobalStateProps {
   openedTabsManualSave?: SnapshotItem[];
   openedTabsAutoSave?: SnapshotItem[];
+  lastSelectedTargetValue?: string[];
 }
 
 /* 首页状态 */
