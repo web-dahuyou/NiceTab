@@ -10,6 +10,7 @@ const {
   CONFIRM_BEFORE_DELETING_TABS,
   LINK_TEMPLATE,
   TAB_COUNT_THRESHOLD,
+  GROUP_INSERT_POSITION,
   TAB_INSERT_POSITION,
 } = ENUM_SETTINGS_PROPS;
 
@@ -111,7 +112,27 @@ export default function FormModuleOtherActions(formItemProps: FormItemProps) {
         </Space>
       </Form.Item>
 
-      {/* 插入位置 */}
+      {/* 标签组插入位置 */}
+      <Form.Item<SettingsProps>
+        label={$fmt(`settings.${GROUP_INSERT_POSITION}`)}
+        name={GROUP_INSERT_POSITION}
+        tooltip={{
+          color: token.colorBgElevated,
+          title: (
+            <Typography.Text>
+              {$fmt(`settings.${GROUP_INSERT_POSITION}.tooltip`)}
+            </Typography.Text>
+          ),
+          styles: { root: { maxWidth: '320px', width: '320px' } },
+        }}
+      >
+        <Radio.Group>
+          <Radio value="top">{$fmt('common.top')}</Radio>
+          <Radio value="bottom">{$fmt('common.bottom')}</Radio>
+        </Radio.Group>
+      </Form.Item>
+
+      {/* 标签页插入位置 */}
       <Form.Item<SettingsProps>
         label={$fmt(`settings.${TAB_INSERT_POSITION}`)}
         name={TAB_INSERT_POSITION}

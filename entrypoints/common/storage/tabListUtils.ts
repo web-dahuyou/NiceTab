@@ -10,6 +10,7 @@ import type {
   SnapshotGroupItem,
   SnapshotTabItem,
   SnapshotItem,
+  InsertPositions,
 } from '~/entrypoints/types';
 import dayjs from 'dayjs';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
@@ -32,8 +33,23 @@ const {
   ALLOW_DUPLICATE_GROUPS,
   LINK_TEMPLATE,
   LANGUAGE,
+  GROUP_INSERT_POSITION,
   TAB_INSERT_POSITION,
 } = ENUM_SETTINGS_PROPS;
+
+// 标签组按星标状态排序
+export function sortbyStarred(list: GroupItem[]) {
+  return list
+    .map((g, idx) => ({ ...g, idx }))
+    .sort((a, b) => {
+      if (!!a.isStarred === !!b.isStarred) {
+        return a.idx - b.idx;
+      } else {
+        return b.isStarred ? 1 : -1;
+      }
+    })
+    .map((g) => omit(g, ['idx']));
+}
 
 /**
  * @description: 列表去重（新列表从队首插入）
@@ -90,11 +106,7 @@ export function getMergedGroupList(
   let resultGroups = [...resultMap.values()];
   const newGroups = [...newMap.values()];
 
-  const unstarredIndex = resultGroups.findIndex((g) => !g.isStarred);
-  const idx = unstarredIndex > -1 ? unstarredIndex : resultGroups.length;
-  resultGroups.splice(idx, 0, ...newGroups);
-
-  return resultGroups;
+  return sortbyStarred([...resultGroups, ...newGroups]);
 }
 
 /**
@@ -103,6 +115,7 @@ export function getMergedGroupList(
  * @param insertList 新插入的列表
  * @param key 合并对象依据的字段名
  * @param exceptValue item[key] = exceptValue 的数据项不合并
+ * @param insertPosition 插入到队首还是队尾
  * @return 返回合并后的列表
  */
 export function mergeGroupsAndTabs({
@@ -110,11 +123,13 @@ export function mergeGroupsAndTabs({
   insertList,
   key = 'groupName',
   exceptValue,
+  insertPosition = 'top',
 }: {
   targetList: GroupItem[];
   insertList: GroupItem[];
   key?: keyof GroupItem;
   exceptValue?: string | number | boolean;
+  insertPosition?: InsertPositions;
 }) {
   // 分离不需要合并的数据项
   function getSeparatedList(list: GroupItem[]) {
@@ -135,8 +150,8 @@ export function mergeGroupsAndTabs({
 
   const mergedList = getMergedGroupList(
     {
-      list: _tResultList,
-      insertList: _iResultList,
+      list: insertPosition === 'top' ? _iResultList : _tResultList,
+      insertList: insertPosition === 'top' ? _tResultList : _iResultList,
       key,
     },
     (prev, curr) => {
@@ -145,7 +160,9 @@ export function mergeGroupsAndTabs({
     }
   );
 
-  return [...mergedList, ..._tExceptList, ..._iExceptList];
+  const tExceptList = insertPosition === 'top' ? _iExceptList : _tExceptList;
+  const iExceptList = insertPosition === 'top' ? _tExceptList : _iExceptList;
+  return [...mergedList, ...tExceptList, ...iExceptList];
 }
 
 export function getCopyGroup(group: GroupItem) {
@@ -600,27 +617,29 @@ export default class TabListUtils {
       const sameNameGroupIndex = targetTag?.groupList?.findIndex(
         (g) => g.groupName === sourceGroup?.groupName
       );
+
+      const settings = await Store.settingsUtils.getSettings();
+      const insertPosition = settings?.[GROUP_INSERT_POSITION] || 'top';
+      const targetGroup = isCopy ? getCopyGroup(sourceGroup) : { ...sourceGroup };
+
       // 如果开启自动合并，则同名标签组会自动合并
       if (autoMerge && ~sameNameGroupIndex) {
         const targetSameNameGroup = targetTag?.groupList[sameNameGroupIndex];
-        const moveTabList = isCopy
-          ? sourceGroup?.tabList?.map((tab) => ({ ...tab, tabId: getRandomId() }))
-          : sourceGroup?.tabList;
-        targetTag?.groupList?.splice(sameNameGroupIndex, 1, {
-          ...targetSameNameGroup,
-          tabList: getUniqueList(
-            [...targetSameNameGroup?.tabList].concat(moveTabList || []),
-            'url'
-          ),
+
+        targetTag.groupList = mergeGroupsAndTabs({
+          targetList: targetTag.groupList || [],
+          insertList: [targetGroup],
+          // exceptValue: UNNAMED_GROUP,
+          insertPosition,
         });
         await this.setTagList(tagList);
         return { targetGroupId: targetSameNameGroup.groupId };
       } else {
-        const targetGroup = isCopy ? getCopyGroup(sourceGroup) : { ...sourceGroup };
-        targetTag.groupList = this.groupListSortbyStarred([
-          ...targetTag?.groupList,
-          targetGroup,
-        ]);
+        targetTag.groupList = this.groupListSortbyStarred({
+          list: targetTag?.groupList,
+          insertList: [targetGroup],
+          insertPosition,
+        });
 
         await this.setTagList(tagList);
         return { targetGroupId: targetGroup.groupId };
@@ -671,20 +690,24 @@ export default class TabListUtils {
       }
       const targetTag = tagList?.[targetTagIndex];
 
+      const settings = await Store.settingsUtils.getSettings();
+      const insertPosition = settings?.[GROUP_INSERT_POSITION] || 'top';
       // 如果开启自动合并，则同名标签组会自动合并
       if (autoMerge) {
         targetTag.groupList = mergeGroupsAndTabs({
           targetList: targetTag.groupList || [],
           insertList: allSourceGroups,
           // exceptValue: UNNAMED_GROUP,
+          insertPosition,
         });
 
         await this.setTagList(tagList);
       } else {
-        targetTag.groupList = this.groupListSortbyStarred([
-          ...targetTag?.groupList,
-          ...allSourceGroups,
-        ]);
+        targetTag.groupList = this.groupListSortbyStarred({
+          list: targetTag?.groupList,
+          insertList: allSourceGroups,
+          insertPosition,
+        });
         await this.setTagList(tagList);
       }
 
@@ -747,17 +770,18 @@ export default class TabListUtils {
   }
 
   // 标签组按星标状态排序
-  groupListSortbyStarred(list: GroupItem[]) {
-    return list
-      .map((g, idx) => ({ ...g, idx }))
-      .sort((a, b) => {
-        if (!!a.isStarred === !!b.isStarred) {
-          return a.idx - b.idx;
-        } else {
-          return b.isStarred ? 1 : -1;
-        }
-      })
-      .map((g) => omit(g, ['idx']));
+  groupListSortbyStarred({
+    list,
+    insertList,
+    insertPosition,
+  }: {
+    list: GroupItem[];
+    insertList: GroupItem[];
+    insertPosition: InsertPositions;
+  }) {
+    const _list =
+      insertPosition === 'top' ? [...insertList, ...list] : [...list, ...insertList];
+    return sortbyStarred(_list);
   }
 
   /* 标签相关方法 */
@@ -839,8 +863,8 @@ export default class TabListUtils {
 
     tag0.groupList = getMergedGroupList(
       {
-        list: tag0.groupList,
-        insertList: newGroups,
+        list: newGroups,
+        insertList: tag0.groupList,
         key: 'groupName',
       },
       (prev, curr) => {
@@ -1240,6 +1264,8 @@ export default class TabListUtils {
   async mergeTags(source: TagItem[], target: TagItem[]) {
     const targetMap = new Map<TagItem['tagName'], TagItem>();
     const newTagMap = new Map<TagItem['tagName'], TagItem>();
+    const settings = await Store.settingsUtils.getSettings();
+    const insertPosition = settings?.[GROUP_INSERT_POSITION] || 'top';
 
     for (let tag of target) {
       let mapTag = targetMap.get(tag.tagName);
@@ -1250,6 +1276,7 @@ export default class TabListUtils {
             targetList: mapTag.groupList,
             insertList: tag.groupList,
             exceptValue: UNNAMED_GROUP,
+            insertPosition,
           }),
         };
         targetMap.set(tag.tagName, mapTag);
@@ -1265,6 +1292,7 @@ export default class TabListUtils {
           targetList: mapTag.groupList,
           insertList: tag.groupList,
           exceptValue: UNNAMED_GROUP,
+          insertPosition,
         });
 
         targetMap.set(tag.tagName, mapTag);
@@ -1275,6 +1303,7 @@ export default class TabListUtils {
             targetList: newMapTag.groupList,
             insertList: tag.groupList,
             exceptValue: UNNAMED_GROUP,
+            insertPosition,
           });
 
           newTagMap.set(tag.tagName, newMapTag);
@@ -1285,6 +1314,7 @@ export default class TabListUtils {
               targetList: tag.groupList,
               insertList: [],
               exceptValue: UNNAMED_GROUP,
+              insertPosition,
             }),
           });
         }
@@ -1323,10 +1353,13 @@ export default class TabListUtils {
       const stagingAreaInsertIndex = tags?.findIndex((tag) => tag?.static);
 
       if (~stagingAreaInsertIndex) {
+        const settings = await Store.settingsUtils.getSettings();
+        const insertPosition = settings?.[GROUP_INSERT_POSITION] || 'top';
         stagingAreaTag.groupList = mergeGroupsAndTabs({
           targetList: stagingAreaTag.groupList,
           insertList: tags?.[stagingAreaInsertIndex].groupList,
           exceptValue: UNNAMED_GROUP,
+          insertPosition,
         });
         tags.splice(stagingAreaInsertIndex, 1);
       }

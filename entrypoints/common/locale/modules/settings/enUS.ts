@@ -72,6 +72,8 @@ const enUS: Record<LocaleKey, string> = {
   'settings.linkTemplate.tooltip': 'Format for copy links, using the Mustache format',
   'settings.tabCountThreshold': 'Threshold setting for current category:',
   'settings.tabCountThreshold.tooltip': 'To ensure performance, when the number of tabs in the category exceeds a certain threshold, the right panel will enable virtual scrolling, displaying partial tab groups based on the scrolling position.',
+  'settings.groupInsertPosition': 'Position for inserting tab groups when moving or inserting them into the target category:',
+  'settings.groupInsertPosition.tooltip': 'If set to "Top", the tab groups will be inserted at the top of the target category. If set to "Bottom", the tab groups will be inserted at the bottom of the target category.',
   'settings.tabInsertPosition': 'Position for inserting tabs when moving or inserting them into the target tab group:',
   'settings.tabInsertPosition.tooltip': 'If set to "Top", the tabs will be inserted at the top of the target tab group. If set to "Bottom", the tabs will be inserted at the bottom of the target tab group.',
 

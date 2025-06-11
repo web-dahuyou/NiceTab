@@ -136,6 +136,7 @@ export enum ENUM_SETTINGS_PROPS {
   CONFIRM_BEFORE_DELETING_TABS = 'confirmBeforeDeletingTabs', // 删除标签页前是否需要确认
   LINK_TEMPLATE = 'linkTemplate', // 链接模板
   TAB_COUNT_THRESHOLD = 'tabCountThreshold', // 分类中标签页超过该数量时，则右侧面板开启虚拟滚动
+  GROUP_INSERT_POSITION = 'groupInsertPosition', // 标签组插入位置：在分类的标签组列表顶部还是底部
   TAB_INSERT_POSITION = 'tabInsertPosition', // 标签页插入位置：在标签组的标签页列表顶部还是底部
   /* 展示配置 */
   GROUP_ACTION_BTN_STYLE = 'groupActionBtnStyle', // 操作按钮样式
