@@ -43,6 +43,9 @@ const zhCN = {
   'common.cancleSelect': '取消选择',
   'common.enableSelect': '开启选择',
   'common.disableSelect': '关闭选择',
+  'common.multiSelection': '多选',
+  'common.enableAction': '开启{action}',
+  'common.disableAction': '关闭{action}',
   'common.name': '名称',
   'common.title': '标题',
   'common.url': '网址',
@@ -93,6 +96,7 @@ const zhCN = {
   'common.bottom': '底部',
   'common.text': '文本',
   'common.icon': '图标',
+  'common.selectedTabCount': `已选择{count}个标签页`,
 };
 
 export type LocaleKey = keyof typeof zhCN;

@@ -120,6 +120,8 @@ export type PageWidthTypes = 'fixed' | 'responsive';
 
 export type ActionBtnStyle = 'icon' | 'text';
 
+export type InsertPositions = 'top' | 'bottom';
+
 // 管理后台-设置信息
 export type SettingsProps = {
   language?: LanguageTypes; // 语言
@@ -150,7 +152,8 @@ export type SettingsProps = {
   confirmBeforeDeletingTabs?: boolean; // 删除标签页前是否确认
   linkTemplate?: string; // 链接模板
   tabCountThreshold?: number; // 分类中标签页超过该数量时，则右侧面板开启虚拟滚动
-  tabInsertPosition?: 'top' | 'bottom'; // 标签页插入位置:在标签组的标签页列表顶部还是底部
+  groupInsertPosition?: InsertPositions; // 标签组插入位置：在分类的标签组列表顶部还是底部
+  tabInsertPosition?: InsertPositions; // 标签页插入位置:在标签组的标签页列表顶部还是底部
   /* 展示配置 */
   groupActionBtnStyle?: ActionBtnStyle; // 操作按钮样式
   groupActionBtnsCommonlyUsed?: string[]; // 常用的标签组操作按钮

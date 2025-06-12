@@ -35,6 +35,7 @@ type CustomStyleProps = {
 export default function EditInput({
   type = 'text',
   value,
+  visible = true,
   disabled,
   maxLength = 40,
   maxWidth,
@@ -47,6 +48,7 @@ export default function EditInput({
 }: InputProps &
   CustomStyleProps & {
     value: string;
+    visible?: boolean;
     onValueChange?: (value?: string) => void;
     onEditingStatusChange?: (status: boolean) => void;
     stopPropagation?: boolean;
@@ -76,6 +78,7 @@ export default function EditInput({
   };
   const handleClick = (e: React.MouseEvent) => {
     stopPropagation && e.stopPropagation();
+    if (disabled) return;
     setIsEditing(true);
     onEditingStatusChange?.(true);
     setTimeout(() => {
@@ -111,11 +114,12 @@ export default function EditInput({
           <span className="text-readonly" title={innerValue}>
             {innerValue}
           </span>
-          {!disabled && (
+          {visible && (
             <StyledActionIconBtn
               $size={iconSize}
               $hoverColor={token.colorPrimaryHover}
               title={$fmt('common.edit')}
+              disabled={disabled}
               onClick={handleClick}
             >
               <EditOutlined />

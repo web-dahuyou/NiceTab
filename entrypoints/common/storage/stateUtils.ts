@@ -11,6 +11,7 @@ export default class StateUtils {
     global: {
       openedTabsManualSave: [],
       openedTabsAutoSave: [],
+      lastSelectedTargetValue: ['0'],
     },
   };
   state: StateProps = this.initialState;

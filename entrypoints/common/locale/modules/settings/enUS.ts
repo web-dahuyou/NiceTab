@@ -49,7 +49,7 @@ const enUS: Record<LocaleKey, string> = {
   /* 打开标签页配置 */
   'settings.restoreInNewWindow': 'Open tab group in a new window when opening?',
   'settings.deleteAfterRestore': 'Remove tabs when opening tabs or tab group?',
-  'settings.deleteAfterRestore.yes': 'Remove (pinned tabs remain)',
+  'settings.deleteAfterRestore.yes': 'Remove (locked tabs remain)',
   'settings.deleteAfterRestore.no': 'All remain (recommended)',
   'settings.silentOpenTabModifierKey': 'Modifier key for opening a tab silently (in background):',
   'settings.openTabModifierKey': 'Modifier key for opening a tab in the foreground:',
@@ -59,7 +59,7 @@ const enUS: Record<LocaleKey, string> = {
 
   /* 全局搜索配置 */
   'settings.globalSearchDeleteAfterOpen': 'Remove tabs when opening tabs?',
-  'settings.globalSearchDeleteAfterOpen.yes': 'Remove (pinned tabs remain)',
+  'settings.globalSearchDeleteAfterOpen.yes': 'Remove (locked tabs remain)',
   'settings.globalSearchDeleteAfterOpen.no': 'All remain (recommended)',
 
   /* 其他操作配置 */
@@ -72,13 +72,15 @@ const enUS: Record<LocaleKey, string> = {
   'settings.linkTemplate.tooltip': 'Format for copy links, using the Mustache format',
   'settings.tabCountThreshold': 'Threshold setting for current category:',
   'settings.tabCountThreshold.tooltip': 'To ensure performance, when the number of tabs in the category exceeds a certain threshold, the right panel will enable virtual scrolling, displaying partial tab groups based on the scrolling position.',
+  'settings.groupInsertPosition': 'Position for inserting tab groups when moving or inserting them into the target category:',
+  'settings.groupInsertPosition.tooltip': 'If set to "Top", the tab groups will be inserted at the top of the target category. If set to "Bottom", the tab groups will be inserted at the bottom of the target category.',
   'settings.tabInsertPosition': 'Position for inserting tabs when moving or inserting them into the target tab group:',
   'settings.tabInsertPosition.tooltip': 'If set to "Top", the tabs will be inserted at the top of the target tab group. If set to "Bottom", the tabs will be inserted at the bottom of the target tab group.',
 
   /* 展示配置 */
-  'settings.groupActionBtnStyle': 'action button style (for tab group and tabs):',
-  'settings.groupActionBtnsCommonlyUsed': 'Commonly used tab group action buttons:',
-  'settings.groupActionBtnsCommonlyUsed.tooltip': 'Selected buttons are displayed outside, the others will be collapsed into the "more" menu.',
+  'settings.groupActionBtnStyle': 'Action button style (for tab groups and tabs):',
+  'settings.groupActionBtnsCommonlyUsed': 'Configure commonly used tab group action buttons:',
+  'settings.groupActionBtnsCommonlyUsed.tooltip': 'Selected buttons will be displayed prominently, while unselected ones will be collapsed into the "More" menu.',
   'settings.showOpenedTabCount': 'Display the number of open tabs on the extension icon?',
   'settings.showPageContextMenus': 'Display ContextMenu on your webpage?',
   'settings.popupModuleDisplays': 'Choose the modules to be displayed in the "Popup Panel"',

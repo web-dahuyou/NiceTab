@@ -47,7 +47,7 @@ const zhCN = {
   /* 打开标签页配置 */
   'settings.restoreInNewWindow': '是否在新窗口打开标签组{mark}',
   'settings.deleteAfterRestore': '打开标签页/标签组时-是否自动删除标签页{mark}',
-  'settings.deleteAfterRestore.yes': '从NiceTab列表中删除（仍保留固定标签页）',
+  'settings.deleteAfterRestore.yes': '从NiceTab列表中删除（仍保留锁定的标签页）',
   'settings.deleteAfterRestore.no': '保留在NiceTab列表中（推荐）',
   'settings.silentOpenTabModifierKey': '静默（后台）打开标签页使用的修饰键：',
   'settings.openTabModifierKey': '前台打开标签页使用的修饰键：',
@@ -57,7 +57,7 @@ const zhCN = {
 
   /* 全局搜索配置 */
   'settings.globalSearchDeleteAfterOpen': '打开标签页后是否从列表中删除：',
-  'settings.globalSearchDeleteAfterOpen.yes': '从NiceTab列表中删除（仍保留固定标签页）',
+  'settings.globalSearchDeleteAfterOpen.yes': '从NiceTab列表中删除（仍保留锁定的标签页）',
   'settings.globalSearchDeleteAfterOpen.no': '保留在NiceTab列表中（推荐）',
 
   /* 其他操作配置 */
@@ -70,6 +70,8 @@ const zhCN = {
   'settings.linkTemplate.tooltip': '复制链接所用的模板格式, 采用 Mustache 格式',
   'settings.tabCountThreshold': '当前分类中标签页数量阈值设置：',
   'settings.tabCountThreshold.tooltip': '为了保证交互性能，当前分类中标签页数量超过设定值时，右侧面板将开启虚拟滚动，根据滚动位置展示部分标签组。',
+  'settings.groupInsertPosition': '移动或插入标签组到目标分类中的位置：',
+  'settings.groupInsertPosition.tooltip': '设置为“顶部”时，标签组将插入到分类的顶部；设置为“底部”时，新标签组将插入到分类的底部。',
   'settings.tabInsertPosition': '移动或插入标签页到目标标签组中的位置：',
   'settings.tabInsertPosition.tooltip': '设置为“顶部”时，标签页将插入到标签组的顶部；设置为“底部”时，新标签页将插入到标签组的底部。',
 

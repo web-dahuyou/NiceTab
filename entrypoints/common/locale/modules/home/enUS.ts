@@ -34,6 +34,8 @@ const enUS: Record<LocaleKey, string> = {
   'home.tag.remove': 'Remove',
   'home.tag.recover': 'Recover',
   'home.tag.countInfo': 'Current Counts',
+  'home.tag.lock': 'Lock the Tag',
+  'home.tag.unlock': 'Unlock the Tag',
 
   'home.tabGroup.add': 'Create Tab Group',
   'home.tabGroup.remove': 'Remove',

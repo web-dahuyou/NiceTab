@@ -39,13 +39,23 @@ export const StyledActionIconBtn = styled.i<{
   width: ${(props) => `${+(props.$size || 16) + 2}px`};
   height: ${(props) => `${+(props.$size || 16) + 2}px`};
   font-size: ${(props) => `${props.$size || 14}px`};
-  color: ${(props) => props.$color || props.theme.colorTextSecondary || '#666'};
-  transition: all 0.2s;
+  transition: transform 0.2s, color 0.2s;
   cursor: pointer;
-  &:hover {
-    transform: scale(${(props) => props.$hoverScale || 1.2});
-    color: ${(props) => props.$hoverColor || props.theme.colorPrimary || '#666'};
-  }
+  ${(props) =>
+    props.disabled
+      ? `
+        transform: scale(1);
+        color: ${props.theme.colorTextDisabled || 'rgba(0,0,0,0.25)'};
+        cursor: not-allowed;
+      `
+      : `
+        color: ${props.$color || props.theme.colorTextSecondary || '#666'};
+        &:hover {
+          transform: scale(${props.$hoverScale || 1.2});
+          color: ${props.$hoverColor || props.theme.colorPrimary || '#666'};
+        }
+      `};
+
   &.disabled {
     transform: scale(1);
     ${StyleBtnDisabled}
@@ -56,13 +66,14 @@ export const StyledActionTextBtn = styled.span<{
   theme: StyledThemeProps;
   disabled?: boolean;
   $color?: string;
+  $hoverColor?: string;
 }>`
   display: flex;
   align-items: center;
   color: ${(props) => props.theme.colorTextSecondary || '#333'};
   cursor: pointer;
   &:hover {
-    color: ${(props) => props.theme.colorPrimary || '#666'};
+    color: ${(props) => props.$hoverColor || props.theme.colorPrimary || '#666'};
   }
   &.disabled {
     ${StyleBtnDisabled}

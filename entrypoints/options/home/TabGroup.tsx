@@ -65,6 +65,7 @@ const {
 } = ENUM_SETTINGS_PROPS;
 
 type TabGroupProps = GroupItem & {
+  tagLocked?: boolean;
   canDrag?: boolean;
   canDrop?: boolean;
   allowGroupActions?: string[];
@@ -86,6 +87,7 @@ type TabGroupProps = GroupItem & {
 const blockSize = 50;
 
 function TabGroup({
+  tagLocked,
   groupId,
   groupName,
   createTime,
@@ -126,6 +128,10 @@ function TabGroup({
     moveData,
   } = useMoveTo();
   const { treeDataHook } = useContext(HomeContext);
+
+  const tag = useMemo(() => {
+    return { isLocked: tagLocked };
+  }, [tagLocked]);
 
   const group = useMemo(
     () => ({ groupId, groupName, createTime, isLocked, isStarred, selected }),
@@ -288,7 +294,8 @@ function TabGroup({
         key: 'remove',
         label: $fmt(actionMap['remove'].labelKey),
         icon: <CloseOutlined />,
-        disabled: isLocked,
+        disabled: tagLocked || isLocked,
+        hoverColor: ENUM_COLORS.red,
         // validator: () => !isLocked,
         onClick: () => setModalVisible(true),
       },
@@ -303,6 +310,7 @@ function TabGroup({
         label: $fmt(
           isLocked ? 'home.tabGroup.unlock' : 'home.tabGroup.lock'
         ) as LocaleKeys,
+        disabled: tagLocked,
         icon: isLocked ? <UnlockOutlined /> : <LockOutlined />,
         onClick: () => onChange?.({ isLocked: !isLocked }),
       },
@@ -311,18 +319,21 @@ function TabGroup({
         label: $fmt(
           isStarred ? 'home.tabGroup.unstar' : 'home.tabGroup.star'
         ) as LocaleKeys,
+        disabled: tagLocked,
         icon: <StarOutlined />,
         onClick: () => onStarredChange?.(!isStarred),
       },
       {
         key: 'moveTo',
         label: $fmt(actionMap['moveTo'].labelKey),
+        disabled: tagLocked,
         icon: <SendOutlined />,
         onClick: () => openMoveToModal?.({ groupId }),
       },
       {
         key: 'copyGroup',
         label: $fmt(actionMap['copyGroup'].labelKey),
+        disabled: tagLocked,
         icon: <IconRepeat />,
         onClick: handleGroupCopy,
       },
@@ -336,7 +347,7 @@ function TabGroup({
         key: 'dedup',
         label: $fmt(actionMap['dedup'].labelKey),
         icon: <BlockOutlined />,
-        disabled: isLocked,
+        disabled: tagLocked || isLocked,
         onClick: () => setDedupModalVisible(true),
       },
     ];
@@ -392,7 +403,8 @@ function TabGroup({
         key: 'remove',
         label: $fmt(actionMap['remove'].labelKey),
         icon: <DeleteOutlined />,
-        disabled: isLocked,
+        disabled: tagLocked || isLocked,
+        hoverColor: ENUM_COLORS.red,
         onClick: handleTabRemoveConfirm,
       },
       {
@@ -405,14 +417,14 @@ function TabGroup({
         key: 'copy',
         label: $fmt(actionMap['copy'].labelKey),
         icon: <CopyOutlined />,
-        disabled: isLocked,
+        disabled: tagLocked || isLocked,
         onClick: handleSelectedTabsCopy,
       },
       {
         key: 'moveTo',
         label: $fmt(actionMap['moveTo'].labelKey),
         icon: <SendOutlined />,
-        disabled: isLocked,
+        disabled: tagLocked || isLocked,
         onClick: () => openMoveToModal?.({ groupId, tabs: selectedTabs }),
       },
     ].filter((item) => allowTabActions.includes(item.key));
@@ -488,7 +500,7 @@ function TabGroup({
             <div className="group-name-wrapper">
               <EditInput
                 value={groupName || UNNAMED_GROUP}
-                disabled={!allowGroupActions.includes('rename')}
+                disabled={!allowGroupActions.includes('rename') || tagLocked || isLocked}
                 maxWidth={240}
                 fontSize={20}
                 iconSize={16}
@@ -520,7 +532,7 @@ function TabGroup({
               <Checkbox
                 checked={isAllChecked}
                 indeterminate={checkAllIndeterminate}
-                disabled={isLocked}
+                disabled={tagLocked || isLocked}
                 onChange={handleSelectAll}
               ></Checkbox>
               <span
@@ -562,12 +574,14 @@ function TabGroup({
                 <Checkbox.Group
                   className="tab-list-checkbox-group"
                   value={selectedTabIds}
-                  disabled={isLocked}
+                  disabled={tagLocked || isLocked}
                   onChange={setSelectedTabIds}
                 >
                   {tabListLocal.map((tab, index) => (
                     <DndComponent<DndTabItemProps>
-                      canDrag={canDrag && !isLocked && selectedTabIds.length === 0}
+                      canDrag={
+                        canDrag && !tagLocked && !isLocked && selectedTabIds.length === 0
+                      }
                       key={tab.tabId || index}
                       data={{ ...tab, index, groupId, dndKey }}
                       dndKey={dndKey}
@@ -575,6 +589,7 @@ function TabGroup({
                     >
                       <TabListItem
                         key={tab.tabId || index}
+                        tag={tag}
                         group={group}
                         {...tab}
                         highlight={

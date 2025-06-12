@@ -267,6 +267,7 @@ function TabGroup({
             {tabList.map((tab, index) => (
               <TabListItem
                 key={tab.tabId || index}
+                tag={{ isLocked: false }}
                 group={group}
                 {...tab}
                 onRemove={handleTabRemove}

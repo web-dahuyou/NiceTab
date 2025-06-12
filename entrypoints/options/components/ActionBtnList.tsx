@@ -9,6 +9,7 @@ export interface ActionOptionItem {
   label: string;
   icon?: React.ReactNode;
   disabled?: boolean;
+  hoverColor?: string;
   validator?: () => boolean;
   onClick?: () => void;
 }
@@ -43,6 +44,7 @@ export default function ActionBtnList({
           key={item.key}
           label={item.label}
           btnStyle={actionBtnStyle}
+          hoverColor={item.hoverColor}
           size={iconSize}
           disabled={item.disabled}
           onClick={item.onClick}

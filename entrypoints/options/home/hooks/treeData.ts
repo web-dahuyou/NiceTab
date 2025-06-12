@@ -187,8 +187,8 @@ export function useTreeData() {
   }, [handleSelect]);
   // 修改分类
   const handleTagChange = useCallback(
-    async (tag: TreeDataNodeTag, data: Partial<TagItem>) => {
-      await tabListUtils.updateTag(tag.key, data);
+    async (tagId: TreeDataNodeTag['key'], data: Partial<TagItem>) => {
+      await tabListUtils.updateTag(tagId || treeData?.[0]?.key, data);
       refreshTreeData();
     },
     []
@@ -399,8 +399,8 @@ export function useTreeData() {
         tag: {
           create: () => handleTagCreate(),
           remove: () => handleTagRemove(node.key, selectedTagKey),
-          rename: () =>
-            handleTagChange(node as TreeDataNodeTag, (data as Partial<TagItem>) || {}),
+          rename: () => handleTagChange(node.key, (data as Partial<TagItem>) || {}),
+          change: () => handleTagChange(node.key, (data as Partial<TagItem>) || {}),
           moveTo: () => {}, // 在index.tsx中实现
         },
         tabGroup: {
@@ -511,6 +511,7 @@ export function useTreeData() {
   const handleHotkeyAction = useCallback(
     async ({ action }: { action: string }) => {
       if (!selectedTagKey) return;
+      if (selectedTag.originData.isLocked) return;
       if (selectedTabGroupKey) {
         await tabListUtils.tabGroupMove(
           action === 'moveUp' ? 'up' : 'down',
@@ -650,5 +651,6 @@ export function useTreeData() {
     handleTabItemRemove,
     handleHotkeyAction,
     selectedKeyChange,
+    init,
   };
 }

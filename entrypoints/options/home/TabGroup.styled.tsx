@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { PRIMARY_COLOR } from '~/entrypoints/common/constants';
+import { ENUM_COLORS, PRIMARY_COLOR } from '~/entrypoints/common/constants';
 import type { StyledThemeProps } from '~/entrypoints/types';
 import { StyleBtnDisabled } from '~/entrypoints/common/style/Common.styled';
 
@@ -40,18 +40,6 @@ export const StyledGroupHeader = styled.div<{ theme: StyledThemeProps }>`
   .group-action-btns {
     margin-top: 4px;
     font-size: 14px;
-    .action-btn {
-      display: flex;
-      align-items: center;
-      color: ${(props) => props.theme.colorTextSecondary || '#333'};
-      cursor: pointer;
-      &:hover {
-        color: ${(props) => props.theme.colorPrimary || PRIMARY_COLOR};
-      }
-      &.disabled {
-        ${StyleBtnDisabled}
-      }
-    }
   }
 `;
 
@@ -66,6 +54,18 @@ export const StyledGroupHeaderRecycle = styled(StyledGroupHeader)`
   .group-action-btns {
     margin-top: 0;
     padding: 0 8px;
+    .action-btn {
+      display: flex;
+      align-items: center;
+      color: ${(props) => props.theme.colorTextSecondary || '#333'};
+      cursor: pointer;
+      &:hover {
+        color: ${(props) => props.theme.colorPrimary || PRIMARY_COLOR};
+      }
+      &.disabled {
+        ${StyleBtnDisabled}
+      }
+    }
   }
 `;
 
