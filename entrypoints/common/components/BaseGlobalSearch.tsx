@@ -353,19 +353,6 @@ export function useSearchAction({
     initData();
   }, [initData]);
 
-  const messageListener = async (msg: unknown) => {
-    // console.log('browser.runtime.onMessage--refreshGlobalSearchModal', msg);
-    const { msgType, data } = (msg || {}) as SendTabMsgEventProps;
-
-    if (msgType === 'action:refresh-global-search-modal') {
-      refreshData();
-    }
-  };
-
-  useEffect(() => {
-    browser.runtime.onMessage.addListener(messageListener);
-  }, []);
-
   return {
     options,
     value,
@@ -462,6 +449,11 @@ const StyledBatchActionHeader = styled.div`
   gap: 24px;
 `;
 
+export interface GlobalSearchBoxHandle {
+  focus: () => void;
+  refreshData: () => void;
+}
+
 export const GlobalSearchBox = forwardRef(
   (
     {
@@ -547,6 +539,9 @@ export const GlobalSearchBox = forwardRef(
     useImperativeHandle(ref, () => ({
       focus: () => {
         selectRef.current?.focus();
+      },
+      refreshData: () => {
+        refreshData();
       },
     }));
 
@@ -659,7 +654,7 @@ export const GlobalSearchPanel = forwardRef(
     const { $fmt } = useIntlUtls();
     const contentContext = useContext(ContentGlobalContext);
     const [visible, setVisible] = useState<boolean>(false);
-    const searchBoxRef = useRef<HTMLDivElement>(null);
+    const searchBoxRef = useRef<GlobalSearchBoxHandle>(null);
     const [listHeight, setListHeight] = useState<number>(window.innerHeight * 0.5);
 
     const handleAction: ActionCallbackFn = useCallback(
@@ -745,26 +740,38 @@ export const GlobalSearchPanel = forwardRef(
       debounceResize();
     }, [debounceResize]);
 
-    const messageListener = async (msg: unknown) => {
-      // console.log('browser.runtime.onMessage--globalSearch', msg);
-      const { msgType } = (msg || {}) as SendTabMsgEventProps;
+    const messageListener = useCallback(
+      async (msg: unknown) => {
+        // console.log('browser.runtime.onMessage--globalSearch', msg);
+        const { msgType } = (msg || {}) as SendTabMsgEventProps;
 
-      if (msgType === 'action:open-global-search-modal') {
-        setVisible(true);
-      }
-    };
+        if (msgType === 'action:open-global-search-modal') {
+          setVisible(true);
+        } else if (msgType === 'action:refresh-global-search-modal') {
+          if (visible) {
+            searchBoxRef.current?.refreshData();
+          }
+        }
+      },
+      [visible]
+    );
 
     const eventEmitterListener = useCallback(async () => {
       setVisible(true);
     }, []);
 
     useEffect(() => {
-      window.addEventListener('resize', handleResize);
       browser.runtime.onMessage.addListener(messageListener);
+      return () => {
+        browser.runtime.onMessage.removeListener(messageListener);
+      };
+    }, [messageListener]);
+
+    useEffect(() => {
+      window.addEventListener('resize', handleResize);
       eventEmitter.on('global:open-global-search-modal', eventEmitterListener);
       return () => {
         window.removeEventListener('resize', handleResize);
-        browser.runtime.onMessage.removeListener(messageListener);
         eventEmitter.off('global:open-global-search-modal', eventEmitterListener);
       };
     }, []);

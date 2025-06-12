@@ -108,10 +108,12 @@ export default defineBackground(() => {
   });
 
   initTabListStorageListener(async () => {
-    tabUtils.sendTabMessage({
-      msgType: 'action:refresh-global-search-modal',
-      sendToAdminTab: true,
-    });
+    setTimeout(() => {
+      tabUtils.sendTabMessage({
+        msgType: 'action:refresh-global-search-modal',
+        sendToAdminTab: true,
+      });
+    }, 500);
   });
 
   // 注册 contextMenus
