@@ -33,6 +33,10 @@ export const groupActionOptions: ActionOption[] = [
     labelKey: 'home.tabGroup.open',
   },
   {
+    actionName: 'recover',
+    labelKey: 'home.tabGroup.recover',
+  },
+  {
     actionName: 'lock',
     labelKey: 'home.tabGroup.lock',
   },

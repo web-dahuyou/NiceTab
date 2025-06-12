@@ -1,5 +1,11 @@
 // import { storage } from 'wxt/storage';
-import type { LanguageTypes, SettingsProps, PageWidthTypes, ActionBtnStyle } from '~/entrypoints/types';
+import type {
+  LanguageTypes,
+  SettingsProps,
+  PageWidthTypes,
+  ActionBtnStyle,
+  InsertPositions,
+} from '~/entrypoints/types';
 import {
   ENUM_SETTINGS_PROPS,
   POPUP_MODULE_NAMES,
@@ -39,6 +45,7 @@ const {
   CONFIRM_BEFORE_DELETING_TABS,
   LINK_TEMPLATE,
   TAB_COUNT_THRESHOLD,
+  GROUP_INSERT_POSITION,
   TAB_INSERT_POSITION,
   /* 展示配置 */
   GROUP_ACTION_BTN_STYLE,
@@ -86,7 +93,8 @@ export default class SettingsUtils {
     [CONFIRM_BEFORE_DELETING_TABS]: false, // 删除标签页前是否需要确认
     [LINK_TEMPLATE]: '{{url}} | {{title}}', // 复制的链接模板
     [TAB_COUNT_THRESHOLD]: 100, // 分类中标签页超过该数量时，则右侧面板开启虚拟滚动
-    [TAB_INSERT_POSITION]: 'bottom' as 'top' | 'bottom', // 标签页插入位置：在标签组的标签页列表顶部还是底部
+    [GROUP_INSERT_POSITION]: 'top' as InsertPositions, // 标签组插入位置：在分类的标签组列表顶部还是底部
+    [TAB_INSERT_POSITION]: 'bottom' as InsertPositions, // 标签页插入位置：在标签组的标签页列表顶部还是底部
     /* 展示配置 */
     [GROUP_ACTION_BTN_STYLE]: 'text' as ActionBtnStyle, // 操作按钮样式
     [GROUP_ACTION_BTNS_COMMONLY_USED]: defaultGroupActions, // 常用的标签组操作按钮
