@@ -70,6 +70,7 @@ Based on the above reasons, I decided to develop the `NiceTab` extension. incorp
 - Option to **Show "Send To" modal when sending tabs**.
 - Option to **Retain duplicate groups when sending tabs**.
 - Option to **Retain duplicate tabs when sending tabs**.
+- "**Staging Area**" category is fixed at the top; tabs/tab groups sent will be automatically save to the category.
 - Option to **Show "Send To" modal when sending tabs**. You can send tabs to a specified category or tab group.
 - Configurable **Exclude domains for sending tabs** (regex supported) so certain sites or pages are never sent to NiceTab.
 - Option to **Open tab group in a new window when opening**.
@@ -90,12 +91,13 @@ Based on the above reasons, I decided to develop the `NiceTab` extension. incorp
 - Supports sending native browser tab groups into NiceTab, and re-open them as native tab groups in your browser.
 - Supports keyboard shortcuts for certain operations, such as reordering categories or tab groups.
 - Tabs support custom editing of title and URL.
-- "**Staging Area**" category is fixed at the top; tabs/tab groups sent will be automatically save to the category.
 - Supports sorting tab groups by group name or creation time.
 - Supports one-click copying of all links in a tab group, with a customizable link template.
 - Supports tab and URL search, and jump straight to the result.
 - Supports import/export and remote sync for both tabs (existing) and preference settings (newly supported).
 - Supports manually hibernate inactive tabs from memory. Hibernated tabs are still visible on the tab strip and will automatically reload when activated.
+- Supports category locking, preventing accidental operations.
+
 
 ## Screenshots of Features
 
