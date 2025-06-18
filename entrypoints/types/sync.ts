@@ -82,4 +82,7 @@ export type SyncStartEventProps = {
   syncType: SyncType;
 };
 
+// 自动同步时间单位
+export type AutoSyncTimeUnits = 'm' | 'h';
+
 export default { name: 'sync-types' };

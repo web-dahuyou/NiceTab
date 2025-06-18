@@ -1,10 +1,15 @@
 import { Alarms } from 'wxt/browser';
 import type { SettingsProps } from '~/entrypoints/types';
 import { settingsUtils, syncUtils, syncWebDAVUtils } from '../storage';
-import { ENUM_SETTINGS_PROPS, defaultAutoSyncType } from '../constants';
+import {
+  ENUM_SETTINGS_PROPS,
+  defaultAutoSyncType,
+  defaultAutoSyncRelation,
+} from '../constants';
 import CommonAlarm from './utils';
 
-const { AUTO_SYNC, AUTO_SYNC_INTERVAL, AUTO_SYNC_TYPE } = ENUM_SETTINGS_PROPS;
+const { AUTO_SYNC, AUTO_SYNC_TIME_UNIT, AUTO_SYNC_INTERVAL, AUTO_SYNC_TYPE } =
+  ENUM_SETTINGS_PROPS;
 
 export const AUTO_SYNC_ALARM_KEY = 'auto-sync-alarm-key';
 
@@ -13,6 +18,17 @@ class AutoSyncAlarm extends CommonAlarm {
     super(AUTO_SYNC_ALARM_KEY);
   }
 
+  convert(settings: SettingsProps) {
+    const timeUnit = settings[AUTO_SYNC_TIME_UNIT];
+    let periodInMinutes = settings[AUTO_SYNC_INTERVAL];
+
+    // convert to minutes
+    if (timeUnit === 'h') {
+      periodInMinutes = (periodInMinutes || defaultAutoSyncRelation.h) * 60;
+    }
+
+    return periodInMinutes;
+  }
   async create() {
     const settings = await settingsUtils.getSettings();
     const autoSync = settings[AUTO_SYNC];
@@ -22,9 +38,9 @@ class AutoSyncAlarm extends CommonAlarm {
       return;
     }
 
-    return await this.createAlarm({
-      periodInMinutes: settings[AUTO_SYNC_INTERVAL],
-    });
+    const periodInMinutes = this.convert(settings);
+
+    return await this.createAlarm({ periodInMinutes });
   }
   async reset() {
     const settings = await settingsUtils.getSettings();
@@ -35,18 +51,17 @@ class AutoSyncAlarm extends CommonAlarm {
       return;
     }
 
-    await this.resetAlarm({
-      periodInMinutes: settings[AUTO_SYNC_INTERVAL],
-    });
+    const periodInMinutes = this.convert(settings);
+
+    await this.resetAlarm({ periodInMinutes });
   }
 
   async checkReset(settings: SettingsProps, oldSettings: SettingsProps) {
-    const { [AUTO_SYNC]: autoSync, [AUTO_SYNC_INTERVAL]: autoSyncInterval } = settings;
-    const { [AUTO_SYNC]: autoSyncOld, [AUTO_SYNC_INTERVAL]: autoSyncIntervalOld } =
-      oldSettings;
-
-    if (autoSync !== autoSyncOld || autoSyncInterval !== autoSyncIntervalOld) {
-      await this.reset();
+    for (const key of [AUTO_SYNC, AUTO_SYNC_TIME_UNIT, AUTO_SYNC_INTERVAL]) {
+      if (oldSettings[key] !== settings[key]) {
+        await this.reset();
+        break;
+      }
     }
   }
 }

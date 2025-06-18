@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Form, Checkbox, Radio, Typography, theme } from 'antd';
-import type { FormItemProps } from 'antd';
+import type { FormItemProps, FormInstance } from 'antd';
 import type { SettingsProps } from '~/entrypoints/types';
 import { POPUP_MODULE_NAMES, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -17,9 +17,12 @@ const {
   SHOW_TAB_TITLE_TOOLTIP,
 } = ENUM_SETTINGS_PROPS;
 
-export default function FormModuleDisplay(formItemProps: FormItemProps) {
+export default function FormModuleDisplay(
+  props: FormItemProps & { form: FormInstance<SettingsProps> }
+) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
+  const { form, ...formItemProps } = props;
 
   // popup面板显示模块选项
   const popupModuleDisplayOptions = useMemo(() => {
@@ -70,9 +73,7 @@ export default function FormModuleDisplay(formItemProps: FormItemProps) {
         }}
         {...formItemProps}
       >
-        <Checkbox.Group
-          options={groupActionBtnOptions}
-        ></Checkbox.Group>
+        <Checkbox.Group options={groupActionBtnOptions}></Checkbox.Group>
       </Form.Item>
 
       {/* 扩展图标上是否展示当前打开的标签页数 */}

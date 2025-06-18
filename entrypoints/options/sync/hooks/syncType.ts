@@ -5,6 +5,13 @@ import { syncTypeMap } from '~/entrypoints/common/constants';
 export function useSyncType() {
   const { $fmt } = useIntlUtls();
 
+  const autoSyncTimeUnitOptions = useMemo(() => {
+    return [
+      { type: 'm', label: $fmt('settings.autoSyncTimeUnit.m'), unit: 'minute', min: 5, max: 60, step: 5, },
+      { type: 'h', label: $fmt('settings.autoSyncTimeUnit.h'), unit: 'hour', min: 1, max: 24, step: 1, },
+    ];
+  }, [$fmt]);
+
   const autoSyncTypeOptions = useMemo(() => {
     return [
       // { type: [syncTypeMap.AUTO_PULL_MERGE], label: $fmt('settings.syncType.autoPullMerge') },
@@ -25,6 +32,7 @@ export function useSyncType() {
 
 
   return {
+    autoSyncTimeUnitOptions,
     autoSyncTypeOptions,
     manualSyncTypeOptions,
   };
