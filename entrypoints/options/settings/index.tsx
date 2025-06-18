@@ -122,7 +122,7 @@ export default function Settings() {
   };
 
   useEffect(() => {
-    form?.setFieldValue(LANGUAGE, locale);
+    form.setFieldsValue({ [LANGUAGE]: locale });
   }, [locale]);
 
   const { urlParams } = useUrlParams();
@@ -190,26 +190,25 @@ export default function Settings() {
             onFinish={onFinish}
           >
             {/* ******************* 通用设置 ******************* */}
-            <FormModuleCommon hidden={currModule !== 'common'} />
+            <FormModuleCommon hidden={currModule !== 'common'} form={form} />
 
             {/* ******************* 发送标签页相关设置 ******************* */}
-            <FormModuleSend hidden={currModule !== 'sendTabs'} />
+            <FormModuleSend hidden={currModule !== 'sendTabs'} form={form} />
 
             {/* ******************* 打开标签页相关设置 ******************* */}
-            <FormModuleOpen hidden={currModule !== 'openTabs'} />
+            <FormModuleOpen hidden={currModule !== 'openTabs'} form={form} />
 
             {/* ******************* 全局搜索相关设置 ******************* */}
-            <FormModuleGlobalSearch hidden={currModule !== 'globalSearch'} />
+            <FormModuleGlobalSearch hidden={currModule !== 'globalSearch'} form={form} />
 
             {/* ******************* 其他操作相关设置 ******************* */}
-            <FormModuleOtherActions hidden={currModule !== 'otherActions'} />
+            <FormModuleOtherActions hidden={currModule !== 'otherActions'} form={form} />
 
             {/* ******************* 展示相关设置 ******************* */}
-            <FormModuleDisplay hidden={currModule !== 'display'} />
+            <FormModuleDisplay hidden={currModule !== 'display'} form={form} />
 
             {/* ******************* 远程同步相关设置 ******************* */}
-            <FormModuleSync hidden={currModule !== 'autoSync'} />
-
+            <FormModuleSync hidden={currModule !== 'autoSync'} form={form} />
           </Form>
         </div>
       </StyledMainWrapper>

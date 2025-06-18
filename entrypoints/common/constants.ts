@@ -20,6 +20,7 @@ import type {
   TabEvents,
   SyncType,
   AutoSyncType,
+  AutoSyncTimeUnits,
   PopupModuleNames,
   PageContextType,
 } from '~/entrypoints/types';
@@ -149,6 +150,7 @@ export enum ENUM_SETTINGS_PROPS {
   SHOW_TAB_TITLE_TOOLTIP = 'showTabTitleTooltip', // 是否显示标签页标题的tooltip
   /* 自动同步配置 */
   AUTO_SYNC = 'autoSync', // 是否开启自动同步
+  AUTO_SYNC_TIME_UNIT = 'autoSyncTimeUnit', // 自动时间单位
   AUTO_SYNC_INTERVAL = 'autoSyncInterval', // 自动同步间隔时间
   AUTO_SYNC_TYPE = 'autoSyncType', // 自动同步方式
 }
@@ -208,6 +210,12 @@ export const syncTypeMap: Record<string, SyncType> = {
 };
 
 export const defaultAutoSyncType: AutoSyncType = 'auto-push-merge';
+
+export const defaultAutoSyncTimeUnit: AutoSyncTimeUnits = 'm';
+export const defaultAutoSyncRelation: Record<AutoSyncTimeUnits, number> = {
+  m: 30,
+  h: 6,
+};
 
 // 页面上下文类型枚举
 export const pageContextTypes: PageContextType[] = [

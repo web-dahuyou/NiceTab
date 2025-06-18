@@ -1,5 +1,5 @@
 import { Form, Radio, Typography, theme } from 'antd';
-import type { FormItemProps } from 'antd';
+import type { FormItemProps, FormInstance } from 'antd';
 import type { SettingsProps } from '~/entrypoints/types';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -16,9 +16,12 @@ const {
 
 const modifierKeyLabels = getKeysByOS();
 
-export default function FormModuleOpen(formItemProps: FormItemProps) {
+export default function FormModuleOpen(
+  props: FormItemProps & { form: FormInstance<SettingsProps> }
+) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
+  const { form, ...formItemProps } = props;
 
   return (
     <Form.Item noStyle {...formItemProps}>

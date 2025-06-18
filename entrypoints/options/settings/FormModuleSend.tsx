@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Form, Input, Checkbox, Radio, Typography, theme } from 'antd';
-import type { FormItemProps } from 'antd';
+import type { FormItemProps, FormInstance } from 'antd';
 import { type LocaleKeys } from '~/entrypoints/common/locale';
 import type { SettingsProps } from '~/entrypoints/types';
 import {
@@ -20,9 +20,12 @@ const {
   ALLOW_DUPLICATE_GROUPS,
 } = ENUM_SETTINGS_PROPS;
 
-export default function FormModuleSend(formItemProps: FormItemProps) {
+export default function FormModuleSend(
+  props: FormItemProps & { form: FormInstance<SettingsProps> }
+) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
+  const { form, ...formItemProps } = props;
 
   // 发送标签页自动关闭标签页的操作选项
   const actionAutoCloseFlagOptions = useMemo(() => {
@@ -33,6 +36,8 @@ export default function FormModuleSend(formItemProps: FormItemProps) {
       };
     });
   }, [$fmt]);
+
+  const closeTabsAfterSendTabs = Form.useWatch(CLOSE_TABS_AFTER_SEND_TABS, form);
 
   return (
     <Form.Item noStyle {...formItemProps}>
@@ -127,29 +132,23 @@ export default function FormModuleSend(formItemProps: FormItemProps) {
         </Radio.Group>
       </Form.Item>
       {/* 发送标签页各种操作单独控制, 当 `发送标签页后是否关闭标签页` 设置为保留标签页时生效 */}
-      <Form.Item noStyle dependencies={[CLOSE_TABS_AFTER_SEND_TABS]}>
-        {({ getFieldValue }) => {
-          return (
-            <Form.Item
-              label={$fmt(`settings.${ACTION_AUTO_CLOSE_FLAGS}`)}
-              name={ACTION_AUTO_CLOSE_FLAGS}
-              tooltip={{
-                color: token.colorBgElevated,
-                title: (
-                  <Typography.Text>
-                    {$fmt(`settings.${ACTION_AUTO_CLOSE_FLAGS}.tooltip`)}
-                  </Typography.Text>
-                ),
-                styles: { root: { maxWidth: '320px', width: '320px' } },
-              }}
-            >
-              <Checkbox.Group
-                options={actionAutoCloseFlagOptions}
-                disabled={getFieldValue(CLOSE_TABS_AFTER_SEND_TABS)}
-              ></Checkbox.Group>
-            </Form.Item>
-          );
+      <Form.Item
+        label={$fmt(`settings.${ACTION_AUTO_CLOSE_FLAGS}`)}
+        name={ACTION_AUTO_CLOSE_FLAGS}
+        tooltip={{
+          color: token.colorBgElevated,
+          title: (
+            <Typography.Text>
+              {$fmt(`settings.${ACTION_AUTO_CLOSE_FLAGS}.tooltip`)}
+            </Typography.Text>
+          ),
+          styles: { root: { maxWidth: '320px', width: '320px' } },
         }}
+      >
+        <Checkbox.Group
+          options={actionAutoCloseFlagOptions}
+          disabled={closeTabsAfterSendTabs}
+        ></Checkbox.Group>
       </Form.Item>
       {/* 发送标签页时-是否允许重复的标签组 */}
       <Form.Item<SettingsProps>

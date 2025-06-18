@@ -103,6 +103,8 @@ const enUS: Record<LocaleKey, string> = {
     one {# Tab}
     other {# Tabs}
   } Selected`,
+  'common.minute': 'Minutes',
+  'common.hour': 'Hours',
 };
 
 export default enUS;

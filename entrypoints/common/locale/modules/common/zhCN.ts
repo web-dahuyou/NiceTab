@@ -97,6 +97,8 @@ const zhCN = {
   'common.text': '文本',
   'common.icon': '图标',
   'common.selectedTabCount': `已选择{count}个标签页`,
+  'common.minute': '分钟',
+  'common.hour': '小时',
 };
 
 export type LocaleKey = keyof typeof zhCN;

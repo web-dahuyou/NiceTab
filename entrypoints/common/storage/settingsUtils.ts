@@ -13,6 +13,8 @@ import {
   defaultThemeType,
   DEFAULT_EXCLUDE_DOMAINS,
   defaultAutoSyncType,
+  defaultAutoSyncTimeUnit,
+  defaultAutoSyncRelation,
 } from '../constants';
 import { defaultGroupActions } from '~/entrypoints/options/home/constants';
 
@@ -58,6 +60,7 @@ const {
   SHOW_TAB_TITLE_TOOLTIP,
   /* 自动同步配置 */
   AUTO_SYNC,
+  AUTO_SYNC_TIME_UNIT,
   AUTO_SYNC_INTERVAL,
   AUTO_SYNC_TYPE,
 } = ENUM_SETTINGS_PROPS;
@@ -106,7 +109,8 @@ export default class SettingsUtils {
     [SHOW_TAB_TITLE_TOOLTIP]: false, // 是否显示标签页标题的tooltip
     /* 自动同步配置 */
     [AUTO_SYNC]: false, // 是否开启自动同步
-    [AUTO_SYNC_INTERVAL]: 30, // 自动同步间隔时间
+    [AUTO_SYNC_TIME_UNIT]: defaultAutoSyncTimeUnit, // 自动同步时间单位
+    [AUTO_SYNC_INTERVAL]: defaultAutoSyncRelation[defaultAutoSyncTimeUnit], // 自动同步间隔时间
     [AUTO_SYNC_TYPE]: defaultAutoSyncType, // 自动同步方式
   };
   storageKey: `local:${string}` = 'local:settings';
