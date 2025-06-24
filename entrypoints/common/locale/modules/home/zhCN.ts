@@ -27,7 +27,6 @@ const zhCN = {
   'home.recoverDesc': '您确定要还原该{type}吗？',
   'home.recoverAllDesc': '您确定要全部还原吗？',
   'home.copyLinks': '复制链接',
-  'home.copyGroup': '复制标签组',
 
   'home.tag.remove': '删除',
   'home.tag.recover': '还原',

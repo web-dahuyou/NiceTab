@@ -77,6 +77,7 @@ const zhCN = {
   'common.yes': '是',
   'common.no': '否',
   'common.copy': '复制',
+  'common.clone': '克隆',
   'common.import': '导入',
   'common.export': '导出',
   'common.none': '无',

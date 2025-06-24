@@ -51,6 +51,8 @@ import {
   defaultTabActions,
   groupActionOptions,
   tabsActionOptions,
+  type GroupActionName,
+  type TabActionName,
   type ActionOption,
 } from './constants';
 import MoveToModal from './MoveToModal';
@@ -68,8 +70,8 @@ type TabGroupProps = GroupItem & {
   tagLocked?: boolean;
   canDrag?: boolean;
   canDrop?: boolean;
-  allowGroupActions?: string[];
-  allowTabActions?: string[];
+  allowGroupActions?: GroupActionName[];
+  allowTabActions?: TabActionName[];
   selected?: boolean;
   actionBtnStyle?: ActionBtnStyle;
   onChange?: (data: Partial<GroupItem>) => void;
@@ -196,7 +198,7 @@ function TabGroup({
     onCopy?.(groupId);
   }, [groupId]);
 
-  const handleCopy = useCallback(() => {
+  const handleCopyLinks = useCallback(() => {
     const tabLinks = tabListUtils.copyLinks(tabList);
     const result = copyToClipboard(tabLinks);
     if (result) {
@@ -222,6 +224,16 @@ function TabGroup({
 
   const handleSelectedTabsCopy = useCallback(() => {
     handleTabCopy(selectedTabs);
+  }, [selectedTabs]);
+
+  const handleSelectedTabsCopyLinks = useCallback(() => {
+    const tabLinks = tabListUtils.copyLinks(selectedTabs);
+    const result = copyToClipboard(tabLinks);
+    if (result) {
+      messageApi.success($fmt('common.CopySuccess'));
+    } else {
+      messageApi.error($fmt('common.CopyFailed'));
+    }
   }, [selectedTabs]);
 
   const handleTabsOpen = useCallback(() => {
@@ -281,13 +293,10 @@ function TabGroup({
   }, []);
 
   const getGroupActionOptions: () => ActionOptionItem[] = useCallback(() => {
-    const actionMap = groupActionOptions.reduce<Record<string, ActionOption>>(
-      (result, option) => {
-        result[option.actionName] = option;
-        return result;
-      },
-      {}
-    );
+    const actionMap = groupActionOptions.reduce((result, option) => {
+      result[option.actionName] = option;
+      return result;
+    }, {} as Record<GroupActionName, ActionOption>);
 
     const btns: ActionOptionItem[] = [
       {
@@ -331,17 +340,17 @@ function TabGroup({
         onClick: () => openMoveToModal?.({ groupId }),
       },
       {
-        key: 'copyGroup',
-        label: $fmt(actionMap['copyGroup'].labelKey),
-        disabled: tagLocked,
-        icon: <IconRepeat />,
-        onClick: handleGroupCopy,
-      },
-      {
         key: 'copyLinks',
         label: $fmt(actionMap['copyLinks'].labelKey),
         icon: <CopyOutlined />,
-        onClick: handleCopy,
+        onClick: handleCopyLinks,
+      },
+      {
+        key: 'clone',
+        label: $fmt(actionMap['clone'].labelKey),
+        disabled: tagLocked,
+        icon: <IconRepeat />,
+        onClick: handleGroupCopy,
       },
       {
         key: 'dedup',
@@ -367,7 +376,7 @@ function TabGroup({
     onChange,
     onStarredChange,
     openMoveToModal,
-    handleCopy,
+    handleCopyLinks,
     handleGroupCopy,
   ]);
 
@@ -390,13 +399,10 @@ function TabGroup({
   }, [getGroupActionOptions]);
 
   const selectedTabsActions: ActionOptionItem[] = useMemo(() => {
-    const actionMap = tabsActionOptions.reduce<Record<string, ActionOption>>(
-      (result, option) => {
-        result[option.actionName] = option;
-        return result;
-      },
-      {}
-    );
+    const actionMap = tabsActionOptions.reduce((result, option) => {
+      result[option.actionName] = option;
+      return result;
+    }, {} as Record<TabActionName, ActionOption<'tab'>>);
 
     return [
       {
@@ -414,18 +420,24 @@ function TabGroup({
         onClick: handleTabsOpen,
       },
       {
-        key: 'copy',
-        label: $fmt(actionMap['copy'].labelKey),
-        icon: <CopyOutlined />,
-        disabled: tagLocked || isLocked,
-        onClick: handleSelectedTabsCopy,
-      },
-      {
         key: 'moveTo',
         label: $fmt(actionMap['moveTo'].labelKey),
         icon: <SendOutlined />,
         disabled: tagLocked || isLocked,
         onClick: () => openMoveToModal?.({ groupId, tabs: selectedTabs }),
+      },
+      {
+        key: 'copyLinks',
+        label: $fmt(actionMap['copyLinks'].labelKey),
+        icon: <CopyOutlined />,
+        onClick: handleSelectedTabsCopyLinks,
+      },
+      {
+        key: 'clone',
+        label: $fmt(actionMap['clone'].labelKey),
+        icon: <IconRepeat />,
+        disabled: tagLocked || isLocked,
+        onClick: handleSelectedTabsCopy,
       },
     ].filter((item) => allowTabActions.includes(item.key));
   }, [
@@ -435,6 +447,7 @@ function TabGroup({
     handleTabsOpen,
     handleTabRemoveConfirm,
     handleSelectedTabsCopy,
+    handleSelectedTabsCopyLinks,
     openMoveToModal,
   ]);
 

@@ -165,7 +165,7 @@ export function mergeGroupsAndTabs({
   return [...mergedList, ...tExceptList, ...iExceptList];
 }
 
-export function getCopyGroup(group: GroupItem) {
+export function getCloneGroup(group: GroupItem) {
   return {
     ...group,
     groupId: getRandomId(),
@@ -393,7 +393,7 @@ export default class TabListUtils {
     await this.setTagList(tagList);
   }
   // 复制标签组
-  async copyGroup(groupId: string) {
+  async cloneGroup(groupId: string) {
     const settings = await Store.settingsUtils.getSettings();
     const language = settings[LANGUAGE];
     const customMessages = getCustomLocaleMessages(language);
@@ -403,8 +403,8 @@ export default class TabListUtils {
       if (groupIdx != undefined && ~groupIdx) {
         const group = t.groupList[groupIdx];
         t.groupList.splice(groupIdx + 1, 0, {
-          ...getCopyGroup(group),
-          groupName: `${group.groupName}_${customMessages['common.copy']}`,
+          ...getCloneGroup(group),
+          groupName: `${group.groupName}_${customMessages['common.clone']}`,
         });
         break;
       }
@@ -620,7 +620,7 @@ export default class TabListUtils {
 
       const settings = await Store.settingsUtils.getSettings();
       const insertPosition = settings?.[GROUP_INSERT_POSITION] || 'top';
-      const targetGroup = isCopy ? getCopyGroup(sourceGroup) : { ...sourceGroup };
+      const targetGroup = isCopy ? getCloneGroup(sourceGroup) : { ...sourceGroup };
 
       // 如果开启自动合并，则同名标签组会自动合并
       if (autoMerge && ~sameNameGroupIndex) {
@@ -684,7 +684,7 @@ export default class TabListUtils {
       const sourceTag = tagList?.[sourceTagIndex];
       let allSourceGroups: GroupItem[] = [];
       if (isCopy) {
-        allSourceGroups = sourceTag.groupList?.map((group) => getCopyGroup(group));
+        allSourceGroups = sourceTag.groupList?.map((group) => getCloneGroup(group));
       } else {
         allSourceGroups = sourceTag.groupList?.splice(0);
       }

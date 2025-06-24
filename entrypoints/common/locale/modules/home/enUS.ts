@@ -29,7 +29,6 @@ const enUS: Record<LocaleKey, string> = {
   'home.recoverDesc': 'Are you sure you want to recover the {type}?',
   'home.recoverAllDesc': 'Are you sure you want to recover All?',
   'home.copyLinks': 'Copy Links',
-  'home.copyGroup': 'Copy Group',
 
   'home.tag.remove': 'Remove',
   'home.tag.recover': 'Recover',
