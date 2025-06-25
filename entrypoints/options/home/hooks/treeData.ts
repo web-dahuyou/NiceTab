@@ -258,7 +258,7 @@ export function useTreeData() {
   }, []);
   // 复制标签组
   const handleTabGroupCopy = useCallback(async (groupId: string) => {
-    await tabListUtils.copyGroup(groupId);
+    await tabListUtils.cloneGroup(groupId);
     refreshTreeData();
   }, []);
   // 打开标签组

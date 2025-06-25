@@ -79,6 +79,8 @@ export default forwardRef(
           onSelect?.(option.key);
         } else if (actionType === 'setting') {
           setDrawerVisible(true);
+        } else if (actionType === 'resetStatus') {
+          syncWebDAVUtils.setSyncStatus(option.key, 'idle');
         } else {
           setActionTime(dayjs().format('YYYY-MM-DD_HH:mm:ss'));
           await syncWebDAVUtils.syncStart(option, actionType as SyncType);

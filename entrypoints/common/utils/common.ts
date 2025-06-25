@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { FETCH_ERROR } from '~/entrypoints/common/constants';
 import { handleUrlWidthParams } from './url';
 
 // 合并class  示例：classNames(className1, className2, className3)
@@ -128,16 +129,29 @@ export function getMergedList<T, K extends keyof T>(
   return [...resultMap.values()];
 }
 
+// 通用超时包装方法
+export async function withTimeout<T>(promise: Promise<T>, timeout = 5000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(FETCH_ERROR.TIMEOUT)), timeout)
+    ),
+  ]);
+}
+
 // 请求api
 export const fetchApi = (
   url: string,
   params: Record<string, any> = {},
-  options?: RequestInit,
+  options?: RequestInit & { timeout?: number },
   responseType: XMLHttpRequestResponseType = 'json'
 ) => {
+  const timeout = options?.timeout ?? 10000; // 默认超时时间 10 秒
+  const controller = new AbortController();
   const _options = {
     method: 'GET',
     ...options,
+    signal: controller.signal,
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
       // 'Content-Type': 'application/x-www-form-urlencoded',
@@ -152,9 +166,17 @@ export const fetchApi = (
     _options.body = JSON.stringify(params);
   }
 
+  let timeoutId: ReturnType<typeof setTimeout>;
+
   return new Promise((resolve, reject) => {
+    timeoutId = setTimeout(() => {
+      controller.abort();
+      reject(new Error(FETCH_ERROR.TIMEOUT));
+    }, timeout);
+
     fetch(_url, _options)
       .then(async (res) => {
+        clearTimeout(timeoutId);
         if (res.ok) {
           if (responseType === 'json') {
             resolve(await res.json());
@@ -165,7 +187,18 @@ export const fetchApi = (
         reject(await res.json());
       })
       .catch((err) => {
-        reject(err);
+        clearTimeout(timeoutId);
+        // console.log('fetch-err', err);
+        if (err?.name === 'AbortError') {
+          reject(new Error(FETCH_ERROR.ABORTED));
+        } else if (
+          err?.name === 'TypeError' &&
+          (err?.message === 'Failed to fetch' || err?.message?.includes('NetworkError'))
+        ) {
+          reject(new Error(FETCH_ERROR.NETWORK_ERROR));
+        } else {
+          reject(err);
+        }
       });
   });
 };

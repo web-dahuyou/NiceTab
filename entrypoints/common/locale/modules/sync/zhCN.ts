@@ -32,6 +32,7 @@ const zhCN = {
   'sync.tip.manualPullForce': '拉取远程数据，覆盖本地数据',
   'sync.tip.manualPushMerge': '拉取远程数据，与本地合并，然后推送',
   'sync.tip.manualPushForce': '推送本地数据到远程（强制覆盖）',
+  'sync.tip.resetStatus': '状态重置',
   'sync.tip.tokenChange': '修改access token会清空本地{type}的同步历史记录',
   // 'sync.tip.contentTooLarge': '远程文件内容太大，返回的内容被 gist API 截断了，取消合并到本地',
   'sync.tip.syncHistory': '同步历史只保留最近的50条记录，您还可以手动清空历史记录',

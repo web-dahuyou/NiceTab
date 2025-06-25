@@ -77,6 +77,7 @@ const zhCN = {
   'common.yes': '是',
   'common.no': '否',
   'common.copy': '复制',
+  'common.clone': '克隆',
   'common.import': '导入',
   'common.export': '导出',
   'common.none': '无',
@@ -99,6 +100,10 @@ const zhCN = {
   'common.selectedTabCount': `已选择{count}个标签页`,
   'common.minute': '分钟',
   'common.hour': '小时',
+  'common.requestFailed': '请求失败',
+  'common.timeout': '请求超时',
+  'common.aborted': '请求取消',
+  'common.networkError': '网络连接异常',
 };
 
 export type LocaleKey = keyof typeof zhCN;
