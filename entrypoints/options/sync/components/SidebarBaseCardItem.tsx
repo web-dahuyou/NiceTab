@@ -5,6 +5,7 @@ import {
   SyncOutlined,
   CloudDownloadOutlined,
   CloudUploadOutlined,
+  ReloadOutlined,
 } from '@ant-design/icons';
 import type { SyncType } from '~/entrypoints/types';
 import { classNames } from '~/entrypoints/common/utils';
@@ -54,7 +55,7 @@ export default function BaseCardItem<T extends { label: string } = RemoteOptionP
     if (!validator?.(option)) return;
 
     onAction?.(option, syncTypeMap['MANUAL_PUSH_MERGE']);
-  }, [option]);
+  }, [option, onAction]);
 
   const defaultCardTitle = useMemo(() => {
     return (
@@ -152,8 +153,20 @@ export default function BaseCardItem<T extends { label: string } = RemoteOptionP
           <CloudUploadOutlined key={syncTypeMap['MANUAL_PUSH_FORCE']} />
         </div>
       </Tooltip>,
+      <Tooltip
+        color={token.colorBgElevated}
+        destroyTooltipOnHide
+        title={<Typography.Text>{$fmt('sync.tip.resetStatus')}</Typography.Text>}
+      >
+        <div
+          className="icon-btn-wrapper"
+          onClick={() => onAction?.(option, 'resetStatus')}
+        >
+          <ReloadOutlined />
+        </div>
+      </Tooltip>,
     ];
-  }, [option, onAction, $fmt]);
+  }, [option, onAction, handlePushMerge, $fmt]);
 
   return (
     <>
