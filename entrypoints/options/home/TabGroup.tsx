@@ -161,7 +161,7 @@ function TabGroup({
   // 已选择的tabItem数组
   const selectedTabs = useMemo(() => {
     return tabList.filter((tab) => selectedTabIds.includes(tab.tabId));
-  }, [selectedTabIds]);
+  }, [tabList, selectedTabIds]);
   // 是否全选
   const isAllChecked = useMemo(() => {
     return tabList.length > 0 && selectedTabIds.length === tabList.length;
