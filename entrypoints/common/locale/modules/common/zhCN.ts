@@ -100,6 +100,10 @@ const zhCN = {
   'common.selectedTabCount': `已选择{count}个标签页`,
   'common.minute': '分钟',
   'common.hour': '小时',
+  'common.requestFailed': '请求失败',
+  'common.timeout': '请求超时',
+  'common.aborted': '请求取消',
+  'common.networkError': '网络连接异常',
 };
 
 export type LocaleKey = keyof typeof zhCN;

@@ -185,6 +185,19 @@ export const UNNAMED_GROUP = 'Unnamed Group';
 
 // export const IS_GROUP_SUPPORT = typeof browser.tabs.group === 'function' && !!browser.tabGroups;
 
+// 请求异常
+export enum FETCH_ERROR {
+  TIMEOUT = 'ERROR:FETCH_TIMEOUT',
+  ABORTED = 'ERROR:FETCH_ABORTED',
+  NETWORK_ERROR = 'ERROR:FETCH_NETWORK_ERROR',
+}
+// 异常文案多语言 message id
+export const fetchErrorMessageOptions = [
+  { type: FETCH_ERROR.TIMEOUT, messageId: 'common.timeout' },
+  { type: FETCH_ERROR.ABORTED, messageId: 'common.aborted' },
+  { type: FETCH_ERROR.NETWORK_ERROR, messageId: 'common.networkError' },
+];
+
 // 状态标识
 export const SUCCESS_KEY = 'success';
 export const FAILED_KEY = 'failed';

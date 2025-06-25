@@ -18,6 +18,7 @@ import {
 } from '~/entrypoints/common/utils';
 import { reloadOtherAdminPage } from '~/entrypoints/common/tabs';
 import {
+  fetchErrorMessageOptions,
   SUCCESS_KEY,
   FAILED_KEY,
   syncTypeMap,
@@ -373,6 +374,21 @@ export default class SyncUtils {
     });
   }
 
+  // 格式化错误信息
+  formatErrorMsg(errorMsg: string, createdIntl: ReturnType<typeof getCreatedIntl>) {
+    const messageItem = fetchErrorMessageOptions.find((item) => errorMsg === item.type);
+    if (messageItem?.messageId) {
+      return createdIntl.formatMessage({ id: messageItem.messageId });
+    }
+    return (
+      errorMsg ||
+      createdIntl.formatMessage(
+        { id: `common.actionFailed` },
+        { action: createdIntl.formatMessage({ id: 'common.sync' }) }
+      )
+    );
+  }
+
   // 开始同步入口
   async syncStart(remoteType: SyncRemoteType, syncType: SyncType) {
     const { accessToken, gistId } = this.config[remoteType] || {};
@@ -408,11 +424,7 @@ export default class SyncUtils {
         remoteType,
         syncType,
         {} as GistResponseItemProps,
-        error.message ||
-          createdIntl.formatMessage(
-            { id: `common.actionFailed` },
-            { action: createdIntl.formatMessage({ id: 'common.sync' }) }
-          )
+        this.formatErrorMsg(error.message, createdIntl)
       );
     }
 
