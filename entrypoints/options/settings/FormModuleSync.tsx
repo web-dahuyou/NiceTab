@@ -1,6 +1,8 @@
-import { Space, Form, Radio, Typography, Slider, theme } from 'antd';
+import { Space, Form, Radio, Button, Typography, TimePicker, Slider, theme } from 'antd';
+import dayjs, { type Dayjs } from 'dayjs';
+import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import type { FormItemProps, RadioChangeEvent, FormInstance } from 'antd';
-import type { AutoSyncTimeUnits, SettingsProps } from '~/entrypoints/types';
+import type { AutoSyncTimeUnits, SettingsProps, TimeRange } from '~/entrypoints/types';
 import type { LocaleKeys } from '~/entrypoints/common/locale';
 import {
   ENUM_SETTINGS_PROPS,
@@ -10,8 +12,13 @@ import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import { useSyncType } from '../sync/hooks/syncType';
 
-const { AUTO_SYNC, AUTO_SYNC_INTERVAL, AUTO_SYNC_TIME_UNIT, AUTO_SYNC_TYPE } =
-  ENUM_SETTINGS_PROPS;
+const {
+  AUTO_SYNC,
+  AUTO_SYNC_INTERVAL,
+  AUTO_SYNC_TIME_UNIT,
+  AUTO_SYNC_TIME_RANGES,
+  AUTO_SYNC_TYPE,
+} = ENUM_SETTINGS_PROPS;
 
 export default function FormModuleSync(
   props: FormItemProps & { form: FormInstance<SettingsProps> }
@@ -24,9 +31,17 @@ export default function FormModuleSync(
 
   const autoSync = Form.useWatch(AUTO_SYNC, form);
   const timeUnit = Form.useWatch(AUTO_SYNC_TIME_UNIT, form);
+  const timeRanges = Form.useWatch(AUTO_SYNC_TIME_RANGES, form);
 
   const [minuteValue, setMinuteValue] = useState<number>(defaultAutoSyncRelation.m);
   const [hourValue, setHourValue] = useState<number>(defaultAutoSyncRelation.h);
+
+  const timeRangesValue = useMemo(() => {
+    return (timeRanges || []).map<[Dayjs | null, Dayjs | null]>((range) => [
+      range?.[0] ? dayjs(range?.[0], 'HH:mm') : null,
+      range?.[1] ? dayjs(range?.[1], 'HH:mm') : null,
+    ]);
+  }, [timeRanges]);
 
   const getTimeUnitOption = useCallback(
     (timeUnit: AutoSyncTimeUnits) => {
@@ -82,12 +97,20 @@ export default function FormModuleSync(
   useEffect(() => {
     settingsUtils.getSettings().then((settings) => {
       const { autoSyncTimeUnit, autoSyncInterval } = settings || {};
+      const option = getTimeUnitOption(autoSyncTimeUnit || 'm');
+      let interval =
+        autoSyncInterval || defaultAutoSyncRelation[option.type as AutoSyncTimeUnits];
 
+      if (interval < option.min) interval = option.min;
+      if (interval > option.max) interval = option.max;
       if (autoSyncTimeUnit === 'm') {
-        setMinuteValue(autoSyncInterval || defaultAutoSyncRelation.m);
+        setMinuteValue(interval);
       } else if (autoSyncTimeUnit === 'h') {
-        setHourValue(autoSyncInterval || defaultAutoSyncRelation.h);
+        setHourValue(interval);
       }
+      form.setFieldsValue({
+        [AUTO_SYNC_INTERVAL]: interval,
+      });
     });
   }, []);
 
@@ -138,6 +161,58 @@ export default function FormModuleSync(
           />
         </Form.Item>
       </Form.Item>
+      {/* 自动同步开启时段 */}
+      <Form.Item
+        label={$fmt(`settings.${AUTO_SYNC_TIME_RANGES}`)}
+        style={{ marginBottom: 0 }}
+      >
+        <Form.List name={AUTO_SYNC_TIME_RANGES}>
+          {(fields, { add, remove }, { errors }) => (
+            <>
+              {fields.map((field) => (
+                <Space key={field.key} style={{ display: 'flex', marginBottom: 8 }}>
+                  <Form.Item validateTrigger={['onBlur']} style={{ marginBottom: 0 }}>
+                    <TimePicker.RangePicker
+                      value={timeRangesValue[field.name]}
+                      format="HH:mm"
+                      minuteStep={15}
+                      inputReadOnly
+                      disabled={!autoSync}
+                      onCalendarChange={(dates, dateStrings) => {
+                        const newValue = [...timeRangesValue].map((range) => {
+                          return range.map(
+                            (value) => value?.format('HH:mm') || ''
+                          ) as TimeRange;
+                        });
+                        newValue.splice(field.name, 1, dateStrings);
+
+                        form.setFieldsValue({
+                          [AUTO_SYNC_TIME_RANGES]: newValue,
+                        });
+                      }}
+                    />
+                  </Form.Item>
+                  {fields.length > 1 && autoSync && (
+                    <MinusCircleOutlined onClick={() => remove(field.name)} />
+                  )}
+                </Space>
+              ))}
+              <Form.Item>
+                <Button
+                  type="dashed"
+                  icon={<PlusOutlined />}
+                  disabled={!autoSync}
+                  onClick={() => add()}
+                >
+                  {$fmt(`settings.${AUTO_SYNC_TIME_RANGES}.addRange`)}
+                </Button>
+                <Form.ErrorList errors={errors} />
+              </Form.Item>
+            </>
+          )}
+        </Form.List>
+      </Form.Item>
+
       {/* 自动同步方式 */}
       <Form.Item<SettingsProps>
         label={$fmt(`settings.${AUTO_SYNC_TYPE}`)}

@@ -95,6 +95,8 @@ const zhCN = {
   'settings.autoSyncTimeUnit.m': '分钟',
   'settings.autoSyncTimeUnit.h': '小时',
   'settings.autoSyncInterval': '自动同步间隔时间（{unit}）：',
+  'settings.autoSyncTimeRanges': '自动同步开启时段：',
+  'settings.autoSyncTimeRanges.addRange': '添加时段',
   'settings.autoSyncType': '自动同步方式：',
   'settings.autoSyncType.tooltip': '合并推送不进行diff对比删除操作，而是合并远程和本地，然后推送到远程，想要同步删除操作，请删除标签页后手动覆盖推送到远程。',
   'settings.syncType.autoPullMerge': '自动拉取-合并到本地',

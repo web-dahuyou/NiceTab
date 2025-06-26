@@ -15,6 +15,7 @@ import {
   fetchApi,
   sendRuntimeMessage,
   sanitizeContent,
+  omit,
 } from '~/entrypoints/common/utils';
 import { reloadOtherAdminPage } from '~/entrypoints/common/tabs';
 import {
@@ -23,6 +24,7 @@ import {
   FAILED_KEY,
   syncTypeMap,
   defaultLanguage,
+  syncExcludedSettingsProps,
 } from '~/entrypoints/common/constants';
 import { getCreatedIntl } from '~/entrypoints/common/locale';
 import Store from './instanceStore';
@@ -328,8 +330,8 @@ export default class SyncUtils {
             const localSettings = await Store.settingsUtils.getSettings();
             settings = {
               ...localSettings,
-              ...settings,
-              autoSync: localSettings.autoSync, // 自动同步开关，本地优先级高于远程（防止其他设备的设置覆盖本地的开关）
+              // 自动同步相关配置，本地优先级高于远程（防止其他设备的设置覆盖本地的配置）
+              ...omit(settings, syncExcludedSettingsProps),
             };
           }
           await Store.settingsUtils.setSettings(settings);

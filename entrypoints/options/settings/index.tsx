@@ -5,9 +5,13 @@ import { SettingOutlined } from '@ant-design/icons';
 import { isEqual } from 'lodash-es';
 import { useBlocker } from 'react-router-dom';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
-import type { SettingsProps } from '~/entrypoints/types';
+import type { SettingsProps, TimeRange } from '~/entrypoints/types';
 import { settingsUtils } from '~/entrypoints/common/storage';
-import { ENUM_SETTINGS_PROPS, defaultLanguage } from '~/entrypoints/common/constants';
+import {
+  ENUM_SETTINGS_PROPS,
+  defaultLanguage,
+  defaultTimeRange,
+} from '~/entrypoints/common/constants';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import useUrlParams from '~/entrypoints/common/hooks/urlParams';
 import { sendRuntimeMessage, classNames } from '~/entrypoints/common/utils';
@@ -27,9 +31,16 @@ import {
   // StyledFooterWrapper,
 } from './Settings.styled';
 
-const { LANGUAGE } = ENUM_SETTINGS_PROPS;
+const { LANGUAGE, AUTO_SYNC_TIME_RANGES } = ENUM_SETTINGS_PROPS;
 
 type MenuItem = Required<MenuProps>['items'][number];
+
+function handleTimeRanges(timeRanges?: TimeRange[]): TimeRange[] {
+  return (timeRanges || []).map((range) => [
+    range?.[0] || defaultTimeRange[0],
+    range?.[1] || defaultTimeRange[1],
+  ]);
+}
 
 export default function Settings() {
   const NiceGlobalContext = useContext(GlobalContext);
@@ -99,8 +110,14 @@ export default function Settings() {
 
   const onFinish: FormProps<SettingsProps>['onFinish'] = async (values) => {
     const settings = await settingsUtils.getSettings();
-    const newSettings = { ...settingsUtils.initialSettings, ...settings, ...values };
+    const newSettings = {
+      ...settingsUtils.initialSettings,
+      ...settings,
+      ...values,
+      [AUTO_SYNC_TIME_RANGES]: handleTimeRanges(values[AUTO_SYNC_TIME_RANGES]),
+    };
     console.log('Save Success: newSettings', newSettings);
+    form.setFieldsValue(newSettings);
 
     await settingsUtils.setSettings(newSettings);
     NiceGlobalContext.setSettings(newSettings);
@@ -135,6 +152,7 @@ export default function Settings() {
   }, [urlParams]);
   useEffect(() => {
     settingsUtils.getSettings().then((settings) => {
+      console.log('settings', settings);
       setInitialFormValues(settings);
       form?.setFieldsValue(settings);
     });
