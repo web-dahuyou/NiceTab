@@ -128,6 +128,8 @@ export type ActionBtnStyle = 'icon' | 'text';
 
 export type InsertPositions = 'top' | 'bottom';
 
+export type TimeRange = [string, string];
+
 // 管理后台-设置信息
 export type SettingsProps = {
   language?: LanguageTypes; // 语言
@@ -173,6 +175,7 @@ export type SettingsProps = {
   autoSync?: boolean; // 是否开启自动同步
   autoSyncTimeUnit?: AutoSyncTimeUnits; // 自动同步时间单位
   autoSyncInterval?: number; // 自动同步间隔时间
+  autoSyncTimeRanges?: TimeRange[]; // 自动同步开启时段（支持设置多个时间段）
   autoSyncType?: AutoSyncType; // 自动同步方式
 };
 

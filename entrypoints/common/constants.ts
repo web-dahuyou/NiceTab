@@ -21,6 +21,7 @@ import type {
   SyncType,
   AutoSyncType,
   AutoSyncTimeUnits,
+  TimeRange,
   PopupModuleNames,
   PageContextType,
 } from '~/entrypoints/types';
@@ -152,6 +153,7 @@ export enum ENUM_SETTINGS_PROPS {
   AUTO_SYNC = 'autoSync', // 是否开启自动同步
   AUTO_SYNC_TIME_UNIT = 'autoSyncTimeUnit', // 自动时间单位
   AUTO_SYNC_INTERVAL = 'autoSyncInterval', // 自动同步间隔时间
+  AUTO_SYNC_TIME_RANGES = 'autoSyncTimeRanges', // 自动同步开启时段
   AUTO_SYNC_TYPE = 'autoSyncType', // 自动同步方式
 }
 
@@ -229,6 +231,15 @@ export const defaultAutoSyncRelation: Record<AutoSyncTimeUnits, number> = {
   m: 30,
   h: 6,
 };
+export const defaultTimeRange = ['00:00', '23:59'] as TimeRange;
+// 远程同步相关的设置项不要被远程覆盖
+export const syncExcludedSettingsProps = [
+  ENUM_SETTINGS_PROPS.AUTO_SYNC,
+  ENUM_SETTINGS_PROPS.AUTO_SYNC_TIME_UNIT,
+  ENUM_SETTINGS_PROPS.AUTO_SYNC_INTERVAL,
+  ENUM_SETTINGS_PROPS.AUTO_SYNC_TIME_RANGES,
+  ENUM_SETTINGS_PROPS.AUTO_SYNC_TYPE,
+]
 
 // 页面上下文类型枚举
 export const pageContextTypes: PageContextType[] = [

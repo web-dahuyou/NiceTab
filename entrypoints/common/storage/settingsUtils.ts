@@ -15,6 +15,7 @@ import {
   defaultAutoSyncType,
   defaultAutoSyncTimeUnit,
   defaultAutoSyncRelation,
+  defaultTimeRange,
 } from '../constants';
 import { defaultGroupActions } from '~/entrypoints/options/home/constants';
 
@@ -62,6 +63,7 @@ const {
   AUTO_SYNC,
   AUTO_SYNC_TIME_UNIT,
   AUTO_SYNC_INTERVAL,
+  AUTO_SYNC_TIME_RANGES,
   AUTO_SYNC_TYPE,
 } = ENUM_SETTINGS_PROPS;
 
@@ -111,6 +113,7 @@ export default class SettingsUtils {
     [AUTO_SYNC]: false, // 是否开启自动同步
     [AUTO_SYNC_TIME_UNIT]: defaultAutoSyncTimeUnit, // 自动同步时间单位
     [AUTO_SYNC_INTERVAL]: defaultAutoSyncRelation[defaultAutoSyncTimeUnit], // 自动同步间隔时间
+    [AUTO_SYNC_TIME_RANGES]: [defaultTimeRange], // 自动同步开启时段
     [AUTO_SYNC_TYPE]: defaultAutoSyncType, // 自动同步方式
   };
   storageKey: `local:${string}` = 'local:settings';

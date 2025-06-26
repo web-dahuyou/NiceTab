@@ -97,6 +97,8 @@ const enUS: Record<LocaleKey, string> = {
   'settings.autoSyncTimeUnit.m': 'Minute',
   'settings.autoSyncTimeUnit.h': 'Hour',
   'settings.autoSyncInterval': 'Auto Sync Interval (in {unit})',
+  'settings.autoSyncTimeRanges': 'Auto Sync Effective Time Range：',
+  'settings.autoSyncTimeRanges.addRange': 'Add New Time Range',
   'settings.autoSyncType': 'Auto Sync Type',
   'settings.autoSyncType.tooltip': 'A merging push does not perform a diff - comparison deletion. It merges remote and local data and then pushes the result to the remote. To sync deletions, remove items locally and then manually overwrite the remote.',
   'settings.syncType.autoPullMerge': 'Auto Pull (Merge): Pull remote data and merge to local.',
