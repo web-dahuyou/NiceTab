@@ -152,7 +152,6 @@ export default function Settings() {
   }, [urlParams]);
   useEffect(() => {
     settingsUtils.getSettings().then((settings) => {
-      console.log('settings', settings);
       setInitialFormValues(settings);
       form?.setFieldsValue(settings);
     });

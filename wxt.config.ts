@@ -67,6 +67,9 @@ export default defineConfig({
       'action:sendRightTabs': {
         description: '__MSG_action_sendRightTabs__',
       },
+      'action:startSync': {
+        description: '__MSG_action_startSync__',
+      },
       // 激活option面板
       _execute_action: {
         suggested_key: {

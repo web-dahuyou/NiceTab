@@ -9,7 +9,7 @@ import '~/assets/css/index.css';
 import './App.css';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { getAdminTabInfo, openNewTab, discardOtherTabs } from '~/entrypoints/common/tabs';
-import { getMenus } from '~/entrypoints/common/contextMenus';
+import { getMenus, actionHandler } from '~/entrypoints/common/contextMenus';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import { TAB_EVENTS, SHORTCUTS_PAGE_URL } from '~/entrypoints/common/constants';
 import type { PopupModuleNames } from '~/entrypoints/types';
@@ -17,6 +17,7 @@ import {
   GITHUB_URL,
   THEME_COLORS,
   ENUM_SETTINGS_PROPS,
+  ENUM_ACTION_NAME,
   POPUP_MODULE_NAMES,
 } from '~/entrypoints/common/constants';
 import ColorList from '~/entrypoints/common/components/ColorList.tsx';
@@ -85,7 +86,7 @@ export default function App() {
       setTimeout(() => {
         init();
       }, 500);
-    } else if (actionType === 'globalSearch') {
+    } else {
       sendRuntimeMessage({
         msgType: 'sendTabsActionStart',
         data: { actionName },
@@ -116,7 +117,7 @@ export default function App() {
         key: 'globalSearch',
         label: $fmt('common.globalSearch'),
         onClick: () => {
-          handleAction('globalSearch', 'action:globalSearch');
+          handleAction('globalSearch', ENUM_ACTION_NAME.GLOBAL_SEARCH);
         },
       },
       {
@@ -124,6 +125,13 @@ export default function App() {
         label: $fmt('common.hibernateTabs'),
         onClick: () => {
           discardOtherTabs();
+        },
+      },
+      {
+        key: 'startSync',
+        label: $fmt('common.startSync'),
+        onClick: () => {
+          handleAction('startSync', ENUM_ACTION_NAME.START_SYNC);
         },
       },
       {

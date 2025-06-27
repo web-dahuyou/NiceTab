@@ -399,8 +399,8 @@ export default class syncWebDAVUtils {
     const { syncType } = data || {};
     const config = await this.getConfig();
     const configList = config.configList?.filter((item) => !!item.webdavConnectionUrl);
-    configList.forEach((option) => {
-      this.syncStart(option, syncType);
-    });
+    for (const option of configList) {
+      await this.syncStart(option, syncType);
+    }
   }
 }
