@@ -294,6 +294,11 @@ function AppLayout() {
           icon: <CoffeeOutlined />,
           label: $fmt('common.hibernateTabs'),
         },
+        {
+          key: 'startSync',
+          icon: <SyncOutlined />,
+          label: $fmt('common.startSync'),
+        },
         { key: 'reload', icon: <ReloadOutlined />, label: $fmt('common.reload') },
       ]),
     [$fmt]
@@ -316,6 +321,8 @@ function AppLayout() {
       $message.success($fmt('common.saveSuccess'));
     } else if (key === 'restoreSnapshot') {
       await restoreOpenedTabsSnapshot('manualSave');
+    } else if (key === 'startSync') {
+      actionHandler(ENUM_ACTION_NAME.START_SYNC);
     }
   };
 

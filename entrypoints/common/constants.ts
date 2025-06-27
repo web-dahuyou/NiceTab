@@ -107,6 +107,7 @@ export enum ENUM_ACTION_NAME {
   SEND_RIGHT_TABS = 'action:sendRightTabs', // 发送右侧标签页
   OPEN_ADMIN_TAB = 'action:openAdminTab', // 打开管理后台
   GLOBAL_SEARCH = 'action:globalSearch', // 全局搜索
+  START_SYNC = 'action:startSync', // 开始同步
 }
 // 设置项枚举
 export enum ENUM_SETTINGS_PROPS {

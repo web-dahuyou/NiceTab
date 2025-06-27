@@ -95,6 +95,7 @@ const enUS: Record<LocaleKey, string> = {
   'common.confirmReminder': 'Comfirm Reminder',
   'common.note': 'Note',
   'common.globalSearch': 'Global Search',
+  'common.startSync': 'Start Sync',
   'common.top': 'Top',
   'common.bottom': 'Bottom',
   'common.text': 'Text',

@@ -93,6 +93,7 @@ const zhCN = {
   'common.confirmReminder': '确认提醒',
   'common.note': '注意',
   'common.globalSearch': '全局搜索',
+  'common.startSync': '开始同步',
   'common.top': '顶部',
   'common.bottom': '底部',
   'common.text': '文本',
