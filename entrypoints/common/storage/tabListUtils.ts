@@ -1259,6 +1259,25 @@ export default class TabListUtils {
 
     await this.setTagList(tagList);
   }
+  // 标签页按名称排序
+  async tabsSortbyName(sortType: string, groupId: Key, tagId: Key) {
+    const tagList = await this.getTagList();
+
+    for (const tag of tagList) {
+      if (tag.tagId !== tagId) continue;
+      for (const group of tag?.groupList) {
+        if (group.groupId !== groupId) continue;
+
+        if (sortType === 'ascending') {
+          group.tabList?.sort((a, b) => a.title!?.localeCompare(b.title!));
+        } else {
+          group.tabList?.sort((a, b) => b.title!?.localeCompare(a.title!));
+        }
+      }
+    }
+
+    await this.setTagList(tagList);
+  }
 
   // 导入合并
   async mergeTags(source: TagItem[], target: TagItem[]) {

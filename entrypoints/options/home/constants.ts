@@ -15,6 +15,8 @@ export const defaultGroupActions = [
   'moveTo',
   'copyLinks',
   'clone',
+  'tabsSortAsc',
+  'tabsSortDesc',
 ];
 
 export const defaultTabActions = ['open', 'remove', 'clone', 'copyLinks', 'moveTo'];
@@ -58,6 +60,14 @@ export const groupActionOptions: ActionOption[] = [
   {
     actionName: 'dedup',
     labelKey: 'common.dedup',
+  },
+  {
+    actionName: 'tabsSortAsc',
+    labelKey: 'home.tabGroup.tabsSortAsc',
+  },
+  {
+    actionName: 'tabsSortDesc',
+    labelKey: 'home.tabGroup.tabsSortDesc',
   },
 ];
 
