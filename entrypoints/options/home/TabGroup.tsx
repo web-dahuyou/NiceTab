@@ -13,6 +13,8 @@ import {
   SendOutlined,
   CopyOutlined,
   BlockOutlined,
+  SortAscendingOutlined,
+  SortDescendingOutlined,
 } from '@ant-design/icons';
 import copyToClipboard from 'copy-to-clipboard';
 import { IconRepeat } from '~/entrypoints/common/components/icon/CustomIcon';
@@ -67,6 +69,7 @@ const {
 } = ENUM_SETTINGS_PROPS;
 
 type TabGroupProps = GroupItem & {
+  tagId?: string;
   tagLocked?: boolean;
   canDrag?: boolean;
   canDrop?: boolean;
@@ -89,6 +92,7 @@ type TabGroupProps = GroupItem & {
 const blockSize = 50;
 
 function TabGroup({
+  tagId,
   tagLocked,
   groupId,
   groupName,
@@ -292,6 +296,13 @@ function TabGroup({
     });
   }, []);
 
+  const handleTabsSort = useCallback((sortType: string) => {
+    eventEmitter.emit('home:treeDataHook', {
+      action: 'handleTabsSort',
+      params: [{ tagId: tagId!, groupId: group.groupId, sortType }],
+    });
+  }, []);
+
   const getGroupActionOptions: () => ActionOptionItem[] = useCallback(() => {
     const actionMap = groupActionOptions.reduce((result, option) => {
       result[option.actionName] = option;
@@ -359,6 +370,20 @@ function TabGroup({
         disabled: tagLocked || isLocked,
         onClick: () => setDedupModalVisible(true),
       },
+      {
+        key: 'tabsSortAsc',
+        label: $fmt(actionMap['tabsSortAsc'].labelKey),
+        icon: <SortAscendingOutlined />,
+        disabled: tagLocked || isLocked,
+        onClick: () => handleTabsSort('ascending'),
+      },
+      {
+        key: 'tabsSortDesc',
+        label: $fmt(actionMap['tabsSortDesc'].labelKey),
+        icon: <SortDescendingOutlined />,
+        disabled: tagLocked || isLocked,
+        onClick: () => handleTabsSort('descending'),
+      },
     ];
 
     return btns.filter((item) => {
@@ -378,6 +403,7 @@ function TabGroup({
     openMoveToModal,
     handleCopyLinks,
     handleGroupCopy,
+    handleTabsSort,
   ]);
 
   const groupActions = useMemo(() => {

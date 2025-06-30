@@ -45,6 +45,8 @@ const enUS: Record<LocaleKey, string> = {
   'home.tabGroup.unstar': 'Untop',
   'home.tabGroup.recover': 'Recover',
   'home.tabGroup.open': 'Open Group',
+  'home.tabGroup.tabsSortAsc': 'Title Ascending',
+  'home.tabGroup.tabsSortDesc': 'Title Descending',
 
   'home.tabGroup.count': `{count, plural,
     =0 {No Groups}
@@ -82,7 +84,7 @@ const enUS: Record<LocaleKey, string> = {
 
   'home.help.content': `
     <li>The left-side list displays the tags, and the secondary menus represent the tab groups. The list supports searching for both tags and tab groups. The right-side panel displays all the tab groups and the tabs within each tab group.</li>
-    <li>The tabs in the right-side panel support drag-and-drop sorting and cross-group movement. You can also drag the tabs from the right-side panel to the groups in the left-side list. Additionally, you can click the “Move To” button to move tab group and tabs.</li>
+    <li>The tabs in the right-side panel support drag-and-drop sorting and cross-group movement. You can also drag the tabs from the right-side panel to the groups in the left-side list. Additionally, you can click the "Move To" button to move tab group and tabs.</li>
     <li>When a tab group is locked, the group and its tabs cannot be removed or moved out. However, tabs from other tab groups can be moved into the locked group. To remove a tab group, you need to first unlock it.</li>
     <li>When a tab group is starred, it will be placed at the top of the current category. Moving other tab groups to a position before the starred tab group will automatically star them as well. If a starred tab group is moved to a position after a non-starred tab group, the star status will be automatically released.</li>
     <li>The Staging Area is a special category, fixed at the top of the list. When sending tabs, they will be saved to the Staging Area.</li>

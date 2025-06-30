@@ -451,6 +451,19 @@ export function useTreeData() {
     refreshTreeData();
   };
 
+  const handleTabsSort = async ({
+    tagId,
+    groupId,
+    sortType,
+  }: {
+    tagId: string;
+    groupId: string;
+    sortType: string;
+  }) => {
+    await tabListUtils.tabsSortbyName(sortType, groupId, tagId);
+    refreshTreeData();
+  };
+
   // 刷新treeData
   const refreshTreeData = async (
     callback?: (treeData: TreeDataNodeUnion[]) => void,
@@ -649,6 +662,7 @@ export function useTreeData() {
     handleTabItemChange,
     handleTabItemCopy,
     handleTabItemRemove,
+    handleTabsSort,
     handleHotkeyAction,
     selectedKeyChange,
     init,

@@ -91,6 +91,10 @@ export type HomeCustomEventParamsProps = (
       params: Parameters<TreeDataHookProps['handleTabItemRemove']>;
     }
   | {
+      action: 'handleTabsSort';
+      params: Parameters<TreeDataHookProps['handleTabsSort']>;
+    }
+  | {
       action: 'selectedKeyChange';
       params: Parameters<TreeDataHookProps['selectedKeyChange']>;
     }
