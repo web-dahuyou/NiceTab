@@ -13,19 +13,9 @@
   (Note that due to longer review times, the Edge store release may lag behind the Chrome version.)
 - Firefox Browser Add-ons: [Firefox Browser Addons](https://addons.mozilla.org/firefox/addon/nice-tab-manager) 
 
-### Notes
-For security reasons, Firefox may not allow privileged URLs such as:
-- chrome: URLs
-- javascript: URLs  
-- data: URLs
-- file: URLs
-- Firefox's privileged about: URLs (e.g., `about:config`, `about:addons`, `about:debugging`). Non-privileged URLs (e.g., `about:blank`) are allowed.
-
-If a page URL matches any of the above cases, opening tab may not work. Please manually copy the URL to open it.
-
 ## Overview
 
-- NiceTab is a browser extension that makes managing your browser tabs quick and convenient.
+- NiceTab is an `open source` browser extension that makes managing your browser tabs quick and convenient.
 - Named `NiceTab` with the hope that it would be a "nice" tab management tool.
 - Similar to other tab management extensions like `OneTab`, `Toby`, `SessionBuddy`, `N-Tab` and `KepTab`. it supports browsers such as Chrome, Firefox, Microsoft Edge, and any Chromium based browser.
 - Developed using `React` and based on the [`wxt framework`](https://wxt.dev/), which provides built-in templates for `Vanilla`, `Vue`, `React`, `Svelte`, and `Solid`.
@@ -208,6 +198,16 @@ Switch between Chinese and English in the management dashboard.
 - In `Dashboard > Import & Export` page, import or export tabs in NiceTab, OneTab, SessionBuddy, Toby or KepTab formats.
 - In `Dashboard > Sync` page, sync tabs to your Github and Gitee accounts as needed, just configure your access token (note, token permissions only check `gists` scope).
 - In `Dashboard > Recycle Bin` page, view and manage any deleted categories, tab groups, or tabs. You can restore or permanently delete them.
+
+### Notes
+For security reasons, Firefox may not allow privileged URLs such as:
+- chrome: URLs
+- javascript: URLs  
+- data: URLs
+- file: URLs
+- Firefox's privileged about: URLs (e.g., `about:config`, `about:addons`, `about:debugging`). Non-privileged URLs (e.g., `about:blank`) are allowed.
+
+If a page URL matches any of the above cases, opening tab may not work. Please manually copy the URL to open it.
 
 ## Community & Feedback
 
