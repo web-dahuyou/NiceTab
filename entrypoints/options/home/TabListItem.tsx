@@ -233,7 +233,7 @@ export default memo(function TabListItem({
         setModalVisible(true);
       }
     },
-    [onCopy]
+    [tab, onCopy]
   );
 
   const draggingListener = (value: boolean) => {

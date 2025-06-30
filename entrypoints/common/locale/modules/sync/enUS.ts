@@ -34,6 +34,7 @@ const enUS: Record<LocaleKey, string> = {
   'sync.tip.manualPullForce': 'Pull remote data, force to overwrite local.',
   'sync.tip.manualPushMerge': 'Pull remote data, merge to local, and then push to remote.',
   'sync.tip.manualPushForce': 'Push local data to remote (force to overwrite).',
+  'sync.tip.resetStatus': 'Status Reset',
   'sync.tip.tokenChange': 'Changing the access token will clear the local {type} sync history',
   // 'sync.tip.contentTooLarge': 'Remote file too large, truncated by gist API; cannot merge to local.',
   'sync.tip.syncHistory': 'Sync history only retains the last 50 records, you can also clear the history manually.',

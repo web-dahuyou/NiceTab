@@ -64,7 +64,11 @@ export default function SyncConfigFormItem({ form, type }: SyncConfigFormItemPro
           <Input
             ref={tokenInputRef}
             onChange={(e) =>
-              form?.setFieldValue([type, 'accessToken'], e.target.value?.trim())
+              form?.setFieldsValue({
+                [type]: {
+                  accessToken: e.target.value?.trim(),
+                },
+              })
             }
           />
         </Form.Item>

@@ -79,6 +79,7 @@ const enUS: Record<LocaleKey, string> = {
   'common.yes': 'Yes',
   'common.no': 'No',
   'common.copy': 'Copy',
+  'common.clone': 'Clone',
   'common.import': 'Import',
   'common.export': 'Export',
   'common.none': 'None',
@@ -94,6 +95,7 @@ const enUS: Record<LocaleKey, string> = {
   'common.confirmReminder': 'Comfirm Reminder',
   'common.note': 'Note',
   'common.globalSearch': 'Global Search',
+  'common.startSync': 'Start Sync',
   'common.top': 'Top',
   'common.bottom': 'Bottom',
   'common.text': 'Text',
@@ -103,6 +105,12 @@ const enUS: Record<LocaleKey, string> = {
     one {# Tab}
     other {# Tabs}
   } Selected`,
+  'common.minute': 'Minutes',
+  'common.hour': 'Hours',
+  'common.requestFailed': 'Request Failed',
+  'common.timeout': 'Request Timeout',
+  'common.aborted': 'Request Aborted',
+  'common.networkError': 'Network Connection Error',
 };
 
 export default enUS;

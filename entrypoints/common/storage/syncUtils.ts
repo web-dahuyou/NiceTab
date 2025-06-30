@@ -15,13 +15,16 @@ import {
   fetchApi,
   sendRuntimeMessage,
   sanitizeContent,
+  omit,
 } from '~/entrypoints/common/utils';
 import { reloadOtherAdminPage } from '~/entrypoints/common/tabs';
 import {
+  fetchErrorMessageOptions,
   SUCCESS_KEY,
   FAILED_KEY,
   syncTypeMap,
   defaultLanguage,
+  syncExcludedSettingsProps,
 } from '~/entrypoints/common/constants';
 import { getCreatedIntl } from '~/entrypoints/common/locale';
 import Store from './instanceStore';
@@ -274,7 +277,7 @@ export default class SyncUtils {
   ) {
     // 如果没有gist数据，则直接输出失败结果
     if (!gistData?.id) {
-      this.handleSyncResult(remoteType, syncType, gistData);
+      await this.handleSyncResult(remoteType, syncType, gistData);
       return;
     }
     let result: GistResponseItemProps = {} as GistResponseItemProps;
@@ -295,7 +298,7 @@ export default class SyncUtils {
         if (fileInfo.size && fileInfo.size > 10 * 1024 * 1024) {
           const settings = await Store.settingsUtils.getSettings();
           const createdIntl = getCreatedIntl(settings.language || defaultLanguage);
-          this.handleSyncResult(
+          await this.handleSyncResult(
             remoteType,
             syncType,
             result,
@@ -327,8 +330,8 @@ export default class SyncUtils {
             const localSettings = await Store.settingsUtils.getSettings();
             settings = {
               ...localSettings,
-              ...settings,
-              autoSync: localSettings.autoSync, // 自动同步开关，本地优先级高于远程（防止其他设备的设置覆盖本地的开关）
+              // 自动同步相关配置，本地优先级高于远程（防止其他设备的设置覆盖本地的配置）
+              ...omit(settings, syncExcludedSettingsProps),
             };
           }
           await Store.settingsUtils.setSettings(settings);
@@ -352,7 +355,7 @@ export default class SyncUtils {
       }
     }
 
-    this.handleSyncResult(remoteType, syncType, result);
+    await this.handleSyncResult(remoteType, syncType, result);
     reloadOtherAdminPage();
   }
   // 处理同步结果并保存
@@ -365,12 +368,27 @@ export default class SyncUtils {
     // gitee 请求接口返回的 updated_at 时间有时候不更新，还是使用本地时间吧
     // const syncTime = dayjs(result?.updated_at || result?.created_at).format('YYYY-MM-DD HH:mm:ss');
     const syncTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
-    this.addSyncResult(remoteType, {
+    await this.addSyncResult(remoteType, {
       syncType,
       syncTime,
       syncResult: reason || !result.id ? FAILED_KEY : SUCCESS_KEY,
       reason,
     });
+  }
+
+  // 格式化错误信息
+  formatErrorMsg(errorMsg: string, createdIntl: ReturnType<typeof getCreatedIntl>) {
+    const messageItem = fetchErrorMessageOptions.find((item) => errorMsg === item.type);
+    if (messageItem?.messageId) {
+      return createdIntl.formatMessage({ id: messageItem.messageId });
+    }
+    return (
+      errorMsg ||
+      createdIntl.formatMessage(
+        { id: `common.actionFailed` },
+        { action: createdIntl.formatMessage({ id: 'common.sync' }) }
+      )
+    );
   }
 
   // 开始同步入口
@@ -397,8 +415,8 @@ export default class SyncUtils {
           await this.handleBySyncType(remoteType, syncType, gistDataById);
         } else {
           const data = await this.createGist(remoteType);
-          this.setConfigByType(remoteType, { gistId: data.id || '' });
-          this.handleSyncResult(remoteType, syncType, data);
+          await this.setConfigByType(remoteType, { gistId: data.id || '' });
+          await this.handleSyncResult(remoteType, syncType, data);
         }
       }
     } catch (error: any) {
@@ -408,11 +426,7 @@ export default class SyncUtils {
         remoteType,
         syncType,
         {} as GistResponseItemProps,
-        error.message ||
-          createdIntl.formatMessage(
-            { id: `common.actionFailed` },
-            { action: createdIntl.formatMessage({ id: 'common.sync' }) }
-          )
+        this.formatErrorMsg(error.message, createdIntl)
       );
     }
 
@@ -423,8 +437,8 @@ export default class SyncUtils {
   async autoSyncStart(data: { syncType: SyncType }) {
     const { syncType } = data || {};
     await this.getConfig();
-    ['github', 'gitee'].forEach(async (remoteType) => {
+    for (const remoteType of ['github', 'gitee']) {
       await this.syncStart(remoteType as SyncRemoteType, syncType);
-    });
+    }
   }
 }

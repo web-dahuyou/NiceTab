@@ -4,11 +4,16 @@ import {
   ENUM_SETTINGS_PROPS,
   TAB_EVENTS,
   defaultLanguage,
+  syncTypeMap,
 } from './constants';
 import tabUtils from '~/entrypoints/common/tabs';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import type { SendTargetProps } from '~/entrypoints/types';
-import initSettingsStorageListener, { settingsUtils } from './storage';
+import initSettingsStorageListener, {
+  settingsUtils,
+  syncUtils,
+  syncWebDAVUtils,
+} from './storage';
 import { getCommandsHotkeys } from './commands';
 import { pick, omit, isUrlMatched, sendRuntimeMessage } from './utils';
 
@@ -41,6 +46,7 @@ export const getMenuHotkeys = async () => {
     ENUM_ACTION_NAME.SEND_OTHER_TABS,
     ENUM_ACTION_NAME.SEND_LEFT_TABS,
     ENUM_ACTION_NAME.SEND_RIGHT_TABS,
+    ENUM_ACTION_NAME.START_SYNC,
   ].reduce<ContextMenuHotKeys>((result, id) => {
     const hotkey = commandsHotkeysMap.get(id) || noneKey;
     return { ...result, [id]: hotkey };
@@ -165,6 +171,16 @@ export const getMenus = async (): Promise<CreateMenuPropertiesType[]> => {
     enabled: _hasFilteredRightTabs,
   };
 
+  const _startSyncMenu: CreateMenuPropertiesType = {
+    tag: 'common',
+    id: ENUM_ACTION_NAME.START_SYNC,
+    parentId: 'menuGroup:more',
+    title:
+      customMessages['common.startSync'] +
+      ` (${hotkeysMap?.[ENUM_ACTION_NAME.START_SYNC]})`,
+    contexts,
+  };
+
   return [
     _openAdminTab,
     _openGlobalSearch,
@@ -174,6 +190,7 @@ export const getMenus = async (): Promise<CreateMenuPropertiesType[]> => {
     _moreMenus,
     _sendLeftTabs,
     _sendRightTabs,
+    _startSyncMenu,
   ];
 };
 
@@ -215,6 +232,13 @@ export async function actionHandler(actionName: string, targetData?: SendTargetP
     case ENUM_ACTION_NAME.OPEN_ADMIN_TAB:
       await tabUtils.openAdminRoutePage({ path: '/home' });
       break;
+    case ENUM_ACTION_NAME.START_SYNC:
+      tabUtils.openAdminRoutePage({ path: '/sync' });
+      setTimeout(() => {
+        syncUtils.autoSyncStart({ syncType: syncTypeMap.MANUAL_PUSH_MERGE });
+        syncWebDAVUtils.autoSyncStart({ syncType: syncTypeMap.MANUAL_PUSH_MERGE });
+      }, 600);
+      break;
     case ENUM_ACTION_NAME.GLOBAL_SEARCH:
       sendRuntimeMessage({
         msgType: 'sendTabsActionStart',
@@ -253,6 +277,11 @@ export async function strategyHandler(actionName: string) {
   // };
 
   if (actionName === ENUM_ACTION_NAME.OPEN_ADMIN_TAB) {
+    actionHandler(actionName);
+    return;
+  }
+
+  if (actionName === ENUM_ACTION_NAME.START_SYNC) {
     actionHandler(actionName);
     return;
   }

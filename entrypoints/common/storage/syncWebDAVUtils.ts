@@ -14,18 +14,40 @@ import {
   getRandomId,
   sendRuntimeMessage,
   sanitizeContent,
+  omit,
 } from '~/entrypoints/common/utils';
 import { reloadOtherAdminPage } from '~/entrypoints/common/tabs';
 import {
+  FETCH_ERROR,
+  fetchErrorMessageOptions,
   SUCCESS_KEY,
   FAILED_KEY,
   syncTypeMap,
   defaultLanguage,
+  syncExcludedSettingsProps,
 } from '~/entrypoints/common/constants';
 import { getCreatedIntl } from '~/entrypoints/common/locale';
 import Store from './instanceStore';
 
 type ModuleType = 'tabList' | 'settings';
+
+// 通用超时包装方法
+async function withTimeout<T>(
+  promise: (signal: AbortSignal) => Promise<T>,
+  timeout = 10000
+): Promise<T> {
+  const controller = new AbortController();
+
+  return Promise.race([
+    promise(controller.signal),
+    new Promise<T>((_, reject) => {
+      setTimeout(() => {
+        controller.abort();
+        reject(new Error(FETCH_ERROR.TIMEOUT));
+      }, timeout);
+    }),
+  ]);
+}
 
 export default class syncWebDAVUtils {
   storageConfigKey: `local:${string}` = 'local:syncWevDAVConfig';
@@ -92,7 +114,7 @@ export default class syncWebDAVUtils {
         key,
         status,
       },
-      targetPageContexts: ['optionsPage']
+      targetPageContexts: ['optionsPage'],
     });
   }
   async addSyncResult(key: string, resultItem: SyncResultItemProps) {
@@ -131,6 +153,31 @@ export default class syncWebDAVUtils {
     });
   }
 
+  // 格式化错误信息
+  formatErrorMsg(error: Error, createdIntl: ReturnType<typeof getCreatedIntl>) {
+    let errorMsg = error.message;
+    if (error?.name === 'AbortError') {
+      errorMsg = FETCH_ERROR.ABORTED;
+    } else if (
+      error?.name === 'TypeError' &&
+      (error?.message === 'Failed to fetch' || error?.message?.includes('NetworkError'))
+    ) {
+      errorMsg = FETCH_ERROR.NETWORK_ERROR;
+    }
+
+    const messageItem = fetchErrorMessageOptions.find((item) => errorMsg === item.type);
+    if (messageItem?.messageId) {
+      return createdIntl.formatMessage({ id: messageItem.messageId });
+    }
+    return (
+      error.message ||
+      createdIntl.formatMessage(
+        { id: `common.actionFailed` },
+        { action: createdIntl.formatMessage({ id: 'common.sync' }) }
+      )
+    );
+  }
+
   // 递归处理, webdav 自带的 exists 方法直接判断虽然不影响功能, 但是请求会报错
   async recursiveHandler(
     path: string,
@@ -146,41 +193,48 @@ export default class syncWebDAVUtils {
     return true;
   }
 
-  // 递归判断目录是否存在
-  async isDirExists(client: WebDAVClient, dir: string) {
-    return this.recursiveHandler(dir, async (pre, curr) => {
-      // console.log('recursiveHandler-traverse-handler', pre, curr);
-      const contentList = (await client.getDirectoryContents(pre)) as FileStat[];
-      // console.log('recursiveHandler-traverse-contentList', contentList);
-      return contentList.some(
-        (item) => item.type === 'directory' && item.basename === curr
-      );
-    });
-  }
+  // // 递归判断目录是否存在
+  // async isDirExists(client: WebDAVClient, dir: string) {
+  //   return this.recursiveHandler(dir, async (pre, curr) => {
+  //     const contentList = (await withTimeout(
+  //       client.getDirectoryContents(pre)
+  //     )) as FileStat[];
+  //     return contentList.some(
+  //       (item) => item.type === 'directory' && item.basename === curr
+  //     );
+  //   });
+  // }
 
-  // 判断文件是否存在
-  async isFileExists(client: WebDAVClient, dir: string, filename: string) {
-    const isDirExists = this.isDirExists(client, dir);
-    if (!isDirExists) return false;
-    const contentList = (await client.getDirectoryContents(dir)) as FileStat[];
-    return contentList.some((item) => item.type === 'file' && item.basename === filename);
-  }
+  // // 判断文件是否存在
+  // async isFileExists(client: WebDAVClient, dir: string, filename: string) {
+  //   const isDirExists = await this.isDirExists(client, dir);
+  //   if (!isDirExists) return false;
+  //   const contentList = (await withTimeout(
+  //     client.getDirectoryContents(dir)
+  //   )) as FileStat[];
+  //   return contentList.some((item) => item.type === 'file' && item.basename === filename);
+  // }
 
   // 自己实现的创建目录
   // 强迫症, 请求不存在的资源时会报错, 虽然 webdav client catch 了这个错误, 但是错误请求真实发生了. 所以自己递归处理
   async createDirectory(client: WebDAVClient, dir: string) {
     return this.recursiveHandler(dir, async (pre, curr) => {
-      // console.log('recursiveHandler-traverse-handler', pre, curr);
       try {
-        const contentList = (await client.getDirectoryContents(pre)) as FileStat[];
+        const contentList = (await withTimeout((signal: AbortSignal) =>
+          client.getDirectoryContents(pre, { signal })
+        )) as FileStat[];
         const isDirExists = contentList.some(
           (item) => item.type === 'directory' && item.basename === curr
         );
         if (isDirExists) return true;
-        await client.createDirectory(pre + curr);
+        await withTimeout((signal: AbortSignal) =>
+          client.createDirectory(pre + curr, { signal })
+        );
         return true;
       } catch (error) {
-        await client.createDirectory(pre + curr);
+        await withTimeout((signal: AbortSignal) =>
+          client.createDirectory(pre + curr, { signal })
+        );
         return true;
       }
     });
@@ -220,21 +274,28 @@ export default class syncWebDAVUtils {
       syncType === syncTypeMap.AUTO_PUSH_FORCE
     ) {
       const localContent = await this.getSyncContent();
-      const result = await client.putFileContents(filepath, localContent);
+      const result = await withTimeout((signal: AbortSignal) =>
+        client.putFileContents(filepath, localContent, { signal })
+      );
       await this.handleSyncResult(configItem.key, syncType, result);
       // 同步设置信息失败单独catch, 不影响列表的同步
       const localSettings = await Store.settingsUtils.getSettings();
       const settingsContent = JSON.stringify(localSettings);
-      await client.putFileContents(settingsFilepath, settingsContent);
+      await withTimeout((signal: AbortSignal) =>
+        client.putFileContents(settingsFilepath, settingsContent, { signal })
+      );
       return;
     }
 
     let remoteFileContent = '';
-    const isFileExists = await client.exists(filepath);
+    const isFileExists = await withTimeout(() => client.exists(filepath));
     if (isFileExists) {
-      remoteFileContent = (await client.getFileContents(filepath, {
-        format: 'text',
-      })) as string;
+      remoteFileContent = (await withTimeout((signal: AbortSignal) =>
+        client.getFileContents(filepath, {
+          format: 'text',
+          signal,
+        })
+      )) as string;
     }
 
     if (
@@ -247,11 +308,14 @@ export default class syncWebDAVUtils {
 
     // 同步设置信息（重要性比较低）
     let remoteSettingsContent = '';
-    const isSettingsFileExists = await client.exists(settingsFilepath);
+    const isSettingsFileExists = await withTimeout(() => client.exists(settingsFilepath));
     if (isSettingsFileExists) {
-      remoteSettingsContent = (await client.getFileContents(settingsFilepath, {
-        format: 'text',
-      })) as string;
+      remoteSettingsContent = (await withTimeout((signal: AbortSignal) =>
+        client.getFileContents(settingsFilepath, {
+          format: 'text',
+          signal,
+        })
+      )) as string;
     }
 
     if (!!remoteSettingsContent) {
@@ -264,10 +328,12 @@ export default class syncWebDAVUtils {
           const localSettings = await Store.settingsUtils.getSettings();
           settings = {
             ...localSettings,
-            ...settings,
-            autoSync: localSettings.autoSync // 自动同步开关，本地优先级高于远程（防止其他设备的设置覆盖本地的开关）
+            // 自动同步相关配置，本地优先级高于远程（防止其他设备的设置覆盖本地的配置）
+            ...omit(settings, syncExcludedSettingsProps),
           };
-          await client.putFileContents(settingsFilepath, JSON.stringify(settings));
+          await withTimeout((signal: AbortSignal) =>
+            client.putFileContents(settingsFilepath, JSON.stringify(settings), { signal })
+          );
         }
         await Store.settingsUtils.setSettings(settings);
         sendRuntimeMessage({ msgType: 'setLocale', data: { locale: settings.language } });
@@ -283,7 +349,9 @@ export default class syncWebDAVUtils {
       syncType === syncTypeMap.AUTO_PUSH_MERGE
     ) {
       const localContent = await this.getSyncContent();
-      const result = await client.putFileContents(filepath, localContent);
+      const result = await withTimeout((signal: AbortSignal) =>
+        client.putFileContents(filepath, localContent, { signal })
+      );
       await this.handleSyncResult(configItem.key, syncType, result);
     } else {
       await this.handleSyncResult(configItem.key, syncType, true);
@@ -319,11 +387,7 @@ export default class syncWebDAVUtils {
         configItem.key,
         syncType,
         false,
-        error.message ||
-          createdIntl.formatMessage(
-            { id: `common.actionFailed` },
-            { action: createdIntl.formatMessage({ id: 'common.sync' }) }
-          )
+        this.formatErrorMsg(error, createdIntl)
       );
     }
 
@@ -335,8 +399,8 @@ export default class syncWebDAVUtils {
     const { syncType } = data || {};
     const config = await this.getConfig();
     const configList = config.configList?.filter((item) => !!item.webdavConnectionUrl);
-    configList.forEach((option) => {
-      this.syncStart(option, syncType);
-    });
+    for (const option of configList) {
+      await this.syncStart(option, syncType);
+    }
   }
 }

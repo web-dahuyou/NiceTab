@@ -1,0 +1,12 @@
+node_modules
+/.output
+/.wxt
+/dist
+/build
+/public
+wxt.config.ts
+web-ext.config.ts
+ts.config.json
+*.md
+*.d.ts
+*.lock

@@ -14,13 +14,18 @@ export const defaultGroupActions = [
   'dedup',
   'moveTo',
   'copyLinks',
-  'copyGroup',
+  'clone',
+  'tabsSortAsc',
+  'tabsSortDesc',
 ];
 
-export const defaultTabActions = ['open', 'remove', 'copy', 'moveTo'];
+export const defaultTabActions = ['open', 'remove', 'clone', 'copyLinks', 'moveTo'];
 
-export interface ActionOption {
-  actionName: string;
+export type GroupActionName = typeof defaultGroupActions[number];
+export type TabActionName = typeof defaultTabActions[number];
+
+export interface ActionOption<T extends 'group' | 'tab' = 'group'> {
+  actionName: T extends 'group' ? GroupActionName : TabActionName;
   labelKey: LocaleKeys;
 }
 export const groupActionOptions: ActionOption[] = [
@@ -31,10 +36,6 @@ export const groupActionOptions: ActionOption[] = [
   {
     actionName: 'restore',
     labelKey: 'home.tabGroup.open',
-  },
-  {
-    actionName: 'recover',
-    labelKey: 'home.tabGroup.recover',
   },
   {
     actionName: 'lock',
@@ -49,8 +50,8 @@ export const groupActionOptions: ActionOption[] = [
     labelKey: 'common.moveTo',
   },
   {
-    actionName: 'copyGroup',
-    labelKey: 'home.copyGroup',
+    actionName: 'clone',
+    labelKey: 'common.clone',
   },
   {
     actionName: 'copyLinks',
@@ -60,9 +61,17 @@ export const groupActionOptions: ActionOption[] = [
     actionName: 'dedup',
     labelKey: 'common.dedup',
   },
+  {
+    actionName: 'tabsSortAsc',
+    labelKey: 'home.tabGroup.tabsSortAsc',
+  },
+  {
+    actionName: 'tabsSortDesc',
+    labelKey: 'home.tabGroup.tabsSortDesc',
+  },
 ];
 
-export const tabsActionOptions: ActionOption[] = [
+export const tabsActionOptions: ActionOption<'tab'>[] = [
   {
     actionName: 'open',
     labelKey: 'common.open',
@@ -72,8 +81,12 @@ export const tabsActionOptions: ActionOption[] = [
     labelKey: 'common.remove',
   },
   {
-    actionName: 'copy',
-    labelKey: 'common.copy',
+    actionName: 'clone',
+    labelKey: 'common.clone',
+  },
+  {
+    actionName: 'copyLinks',
+    labelKey: 'home.copyLinks',
   },
   {
     actionName: 'moveTo',

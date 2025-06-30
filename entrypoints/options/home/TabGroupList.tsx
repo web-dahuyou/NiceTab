@@ -69,6 +69,7 @@ const ListItem = memo(
     return (
       <TabGroup
         key={tabGroup.key}
+        tagId={tabGroup.parentKey}
         tagLocked={tabGroup.parentData?.isLocked}
         selected={tabGroup.key === selectedTabGroupKey}
         // refreshKey={

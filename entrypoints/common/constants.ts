@@ -20,6 +20,8 @@ import type {
   TabEvents,
   SyncType,
   AutoSyncType,
+  AutoSyncTimeUnits,
+  TimeRange,
   PopupModuleNames,
   PageContextType,
 } from '~/entrypoints/types';
@@ -105,6 +107,7 @@ export enum ENUM_ACTION_NAME {
   SEND_RIGHT_TABS = 'action:sendRightTabs', // 发送右侧标签页
   OPEN_ADMIN_TAB = 'action:openAdminTab', // 打开管理后台
   GLOBAL_SEARCH = 'action:globalSearch', // 全局搜索
+  START_SYNC = 'action:startSync', // 开始同步
 }
 // 设置项枚举
 export enum ENUM_SETTINGS_PROPS {
@@ -149,7 +152,9 @@ export enum ENUM_SETTINGS_PROPS {
   SHOW_TAB_TITLE_TOOLTIP = 'showTabTitleTooltip', // 是否显示标签页标题的tooltip
   /* 自动同步配置 */
   AUTO_SYNC = 'autoSync', // 是否开启自动同步
+  AUTO_SYNC_TIME_UNIT = 'autoSyncTimeUnit', // 自动时间单位
   AUTO_SYNC_INTERVAL = 'autoSyncInterval', // 自动同步间隔时间
+  AUTO_SYNC_TIME_RANGES = 'autoSyncTimeRanges', // 自动同步开启时段
   AUTO_SYNC_TYPE = 'autoSyncType', // 自动同步方式
 }
 
@@ -183,6 +188,19 @@ export const UNNAMED_GROUP = 'Unnamed Group';
 
 // export const IS_GROUP_SUPPORT = typeof browser.tabs.group === 'function' && !!browser.tabGroups;
 
+// 请求异常
+export enum FETCH_ERROR {
+  TIMEOUT = 'ERROR:FETCH_TIMEOUT',
+  ABORTED = 'ERROR:FETCH_ABORTED',
+  NETWORK_ERROR = 'ERROR:FETCH_NETWORK_ERROR',
+}
+// 异常文案多语言 message id
+export const fetchErrorMessageOptions = [
+  { type: FETCH_ERROR.TIMEOUT, messageId: 'common.timeout' },
+  { type: FETCH_ERROR.ABORTED, messageId: 'common.aborted' },
+  { type: FETCH_ERROR.NETWORK_ERROR, messageId: 'common.networkError' },
+];
+
 // 状态标识
 export const SUCCESS_KEY = 'success';
 export const FAILED_KEY = 'failed';
@@ -208,6 +226,21 @@ export const syncTypeMap: Record<string, SyncType> = {
 };
 
 export const defaultAutoSyncType: AutoSyncType = 'auto-push-merge';
+
+export const defaultAutoSyncTimeUnit: AutoSyncTimeUnits = 'm';
+export const defaultAutoSyncRelation: Record<AutoSyncTimeUnits, number> = {
+  m: 30,
+  h: 6,
+};
+export const defaultTimeRange = ['00:00', '23:59'] as TimeRange;
+// 远程同步相关的设置项不要被远程覆盖
+export const syncExcludedSettingsProps = [
+  ENUM_SETTINGS_PROPS.AUTO_SYNC,
+  ENUM_SETTINGS_PROPS.AUTO_SYNC_TIME_UNIT,
+  ENUM_SETTINGS_PROPS.AUTO_SYNC_INTERVAL,
+  ENUM_SETTINGS_PROPS.AUTO_SYNC_TIME_RANGES,
+  ENUM_SETTINGS_PROPS.AUTO_SYNC_TYPE,
+]
 
 // 页面上下文类型枚举
 export const pageContextTypes: PageContextType[] = [

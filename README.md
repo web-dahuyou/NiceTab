@@ -35,7 +35,7 @@ If a page URL matches any of the above cases, opening tab may not work. Please m
 
 I personally get anxious when there are too many tabs open, and switching to a specific tab among them is a hassle. After using OneTab, managing tabs became much easier, improving efficiency and saving memory, so I used it for a long time.
 
-However, I felt a few aspects weren’t quite smooth:
+However, I felt a few aspects weren't quite smooth:
 
 - Group names are lost after exporting and re-importing tabs.
 - Because renaming group names isn't persisted, I gave up on renaming them. Once many groups accumulate, locating a specific group is difficult.
@@ -50,24 +50,42 @@ Based on the above reasons, I decided to develop the `NiceTab` extension. incorp
 
 ## Features
 
-- Manage categories, tab groups, and tabs. Includes easy saving, restoring, starring (favorites), locking, adding, deleting, editing, searching, and drag-and-drop reordering, etc.
-- Categories support expand/collapse, creation of categories and tab groups, making it easy to move other tab groups/tabs to new categories/groups.
+Comprehensive user guide (coming soon...)
+
+### General Features
+
+- Supports sending all tabs, current tabs, other tabs, left-side tabs, and right-side tabs in just one click.
+- Supports sending native browser tab groups into NiceTab, and re-open them as native tab groups in your browser.
+- Supports browser command shortcuts (open the NiceTab-Admin-Page, send all tabs, send the current tab, etc.).
+- Preferences support.
 - Offers **import** in multiple formats, with local file saving supported. Currently supports for `NiceTab`, `OneTab`, `Toby`, `SessionBuddy` and `KepTab`. More formats can be added later as needed.
-- Supports **remote syncing** (note that merging push do not perform a diff-comparison delete; it merges remote and local, then pushes to remote. To sync deletions, remove them locally and then manually overwrite the remote):
-  - Gists Sync: You can sync your data to GitHub or Gitee by configuring your personal access token (note, token permissions only check `gists` scope). Potentially more platforms may be supported in the future.
-  - WebDAV Sync: You can sync your data to a WebDAV service by configuring the WebDAV URL, username, and password (supports multiple WebDAV accounts).
-  - Auto Sync: Automatic synchronization is supported; you can enable/disable it and set syncing frequency and method.
+- **Remote sync**.
 - Supports manual switch for **Light/Dark** themes.
 - Supports **Theme color switch**, currently with several preset theme colors(More can be added later as needed).
 - **Multilingual support**, currently Chinese and English (contributions for more natural English or additional languages are welcome).
 - Supports **Recycle Bin** feature: deleted tabs, tab groups, and categories go to a recycle bin where you can restore or permanently delete them.
-- Supports browser command shortcuts (open the NiceTab-Admin-Page, send all tabs, send the current tab, etc.).
+- Supports manually hibernate inactive tabs from memory. Hibernated tabs are still visible on the tab strip and will automatically reload when activated.
+
+### List Management
+
+- Manage categories, tab groups, and tabs. Includes easy saving, restoring, starring (favorites), locking, adding, deleting, editing, searching, and drag-and-drop reordering, etc.
+- Supports global search for tab and URL, and jump straight to the result.
+- Supports category locking, preventing accidental operations.
+- Categories support expand/collapse, creation of categories and tab groups, making it easy to move other tab groups/tabs to new categories/groups.
+- Supports keyboard shortcuts for certain operations, such as reordering categories or tab groups.
+- Supports sorting tab groups by group name or creation time.
+- Supports one-click copying of all links in a tab group, with a customizable link template.
+- Supports manual deduplication of tabs.
+- Supports multi-select tabs, move or copy tabs across tab groups.
+- Tabs support custom editing of title and URL.
+
+### Preferences
+
 - Option to **Open NiceTab Admin Page after launching the browser**.
 - Option to **Pin the NiceTab Admin Page**.
 - Option to **Send pinned tabs to NiceTab when sending tabs**.
 - Option to **Open NiceTab Admin Page when sending tabs**.
 - Option to **Automatically close tabs when sending tabs**.
-- Option to **Show "Send To" modal when sending tabs**.
 - Option to **Retain duplicate groups when sending tabs**.
 - Option to **Retain duplicate tabs when sending tabs**.
 - "**Staging Area**" category is fixed at the top; tabs/tab groups sent will be automatically save to the category.
@@ -85,19 +103,17 @@ Based on the above reasons, I decided to develop the `NiceTab` extension. incorp
 - Option to **Display ContextMenu on your webpage**.
 - Configurable **popup panel modules**: you can configure which modules to display in the popup. If none are selected, clicking the extension icon sends all tabs to NiceTab by default.
 - Option to **Automatically expand the tree list on Home Page**.
-- Supports manual deduplication of tabs.
-- Supports multi-select tabs, move or copy tabs across tab groups.
-- Supports sending all tabs, current tabs, other tabs, left-side tabs, and right-side tabs in just one click.
-- Supports sending native browser tab groups into NiceTab, and re-open them as native tab groups in your browser.
-- Supports keyboard shortcuts for certain operations, such as reordering categories or tab groups.
-- Tabs support custom editing of title and URL.
-- Supports sorting tab groups by group name or creation time.
-- Supports one-click copying of all links in a tab group, with a customizable link template.
-- Supports tab and URL search, and jump straight to the result.
-- Supports import/export and remote sync for both tabs (existing) and preference settings (newly supported).
-- Supports manually hibernate inactive tabs from memory. Hibernated tabs are still visible on the tab strip and will automatically reload when activated.
-- Supports category locking, preventing accidental operations.
+- ...More settings can be found in extension `NiceTab Admin Page > Settings`.
 
+### Remote Sync
+
+- Supports both `Gists` and `WebDAV` sync.
+  - Gists Sync: You can sync your data to GitHub or Gitee by configuring your personal access token (note, token permissions only check `gists` scope). Potentially more platforms may be supported in the future.
+  - WebDAV Sync: You can sync your data to a WebDAV service by configuring the WebDAV URL, username, and password (supports multiple WebDAV accounts).
+- Supports remote sync for both tab list and preferences.
+- Auto Sync: Automatic synchronization is supported; you can enable/disable it and set syncing frequency and method.
+
+**Note**: note that merging push do not perform a diff-comparison delete; it merges remote and local, then pushes to remote. To sync deletions, remove them locally and then manually overwrite the remote.
 
 ## Screenshots of Features
 
@@ -208,7 +224,7 @@ Feel free to join our QQ group: 924270240
 - [styled-components](https://styled-components.com/)  
 - [react-intl](https://formatjs.io/docs/react-intl)  
 - [pragmatic-drag-and-drop](https://atlassian.design/components/pragmatic-drag-and-drop/about)  
-- [“Complete Guide to Developing Chrome Extensions” (Chinese)](https://www.cnblogs.com/liuxianan/p/chrome-plugin-develop.html)
+- ["Complete Guide to Developing Chrome Extensions" (Chinese)](https://www.cnblogs.com/liuxianan/p/chrome-plugin-develop.html)
 
 ## Extension Development
 

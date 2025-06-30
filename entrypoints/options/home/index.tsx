@@ -184,9 +184,11 @@ export default function Home() {
 
     return initTabListStorageListener(async (tabList) => {
       const currWindow = await browser.windows.getCurrent();
-      if (!currWindow.focused) {
-        updateAdminPageUrlDebounced();
-      }
+      setTimeout(() => {
+        if (!currWindow.focused) {
+          updateAdminPageUrlDebounced();
+        }
+      }, 500);
     });
   }, []);
 

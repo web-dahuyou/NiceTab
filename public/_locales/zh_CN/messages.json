@@ -19,5 +19,8 @@
 	},
 	"action_globalSearch": {
 		"message": "全局搜索"
+	},
+	"action_startSync": {
+		"message": "开始同步"
 	}
 }

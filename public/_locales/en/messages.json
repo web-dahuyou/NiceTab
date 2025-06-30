@@ -19,5 +19,8 @@
   },
   "action_globalSearch": {
     "message": "Global Search"
-  }
+  },
+  "action_startSync": {
+		"message": "Start Sync"
+	}
 }

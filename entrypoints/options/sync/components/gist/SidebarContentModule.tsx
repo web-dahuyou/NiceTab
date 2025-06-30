@@ -102,6 +102,8 @@ export default forwardRef(
           onSelect?.(option.key);
         } else if (actionType === 'setting') {
           setDrawerVisible(true);
+        } else if (actionType === 'resetStatus') {
+          syncUtils.setSyncStatus(option.key, 'idle');
         } else {
           setActionTime(dayjs().format('YYYY-MM-DD_HH:mm:ss'));
           await syncUtils.syncStart(option.key, actionType as SyncType);

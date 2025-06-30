@@ -258,7 +258,7 @@ export function useTreeData() {
   }, []);
   // 复制标签组
   const handleTabGroupCopy = useCallback(async (groupId: string) => {
-    await tabListUtils.copyGroup(groupId);
+    await tabListUtils.cloneGroup(groupId);
     refreshTreeData();
   }, []);
   // 打开标签组
@@ -448,6 +448,19 @@ export function useTreeData() {
       sourceIndex,
       _targetIndex
     );
+    refreshTreeData();
+  };
+
+  const handleTabsSort = async ({
+    tagId,
+    groupId,
+    sortType,
+  }: {
+    tagId: string;
+    groupId: string;
+    sortType: string;
+  }) => {
+    await tabListUtils.tabsSortbyName(sortType, groupId, tagId);
     refreshTreeData();
   };
 
@@ -649,6 +662,7 @@ export function useTreeData() {
     handleTabItemChange,
     handleTabItemCopy,
     handleTabItemRemove,
+    handleTabsSort,
     handleHotkeyAction,
     selectedKeyChange,
     init,

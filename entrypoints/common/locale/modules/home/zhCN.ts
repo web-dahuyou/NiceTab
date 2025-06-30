@@ -27,7 +27,6 @@ const zhCN = {
   'home.recoverDesc': '您确定要还原该{type}吗？',
   'home.recoverAllDesc': '您确定要全部还原吗？',
   'home.copyLinks': '复制链接',
-  'home.copyGroup': '复制标签组',
 
   'home.tag.remove': '删除',
   'home.tag.recover': '还原',
@@ -44,6 +43,8 @@ const zhCN = {
   'home.tabGroup.unstar': '取消星标',
   'home.tabGroup.recover': '还原该组',
   'home.tabGroup.open': '打开该组',
+  'home.tabGroup.tabsSortAsc': '标签名称升序',
+  'home.tabGroup.tabsSortDesc': '标签名称降序',
 
   'home.tabGroup.count': '{count}个标签组',
   'home.tabGroup.name': '标签组名称',
