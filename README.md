@@ -6,26 +6,9 @@
   English | <a href="./README-zh.md">中文</a>
 </p>
 
-## Extension Installation
-
-- Google Chrome Web Store: [Chrome Web Store](https://chromewebstore.google.com/detail/fonflmjnjbkigocpoommgmhljdpljain)
-- Microsoft Edge Add-ons: [Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/ompjiaelpibiggcnanhbdblkhfdmkgnl)  
-  (Note that due to longer review times, the Edge store release may lag behind the Chrome version.)
-- Firefox Browser Add-ons: [Firefox Browser Addons](https://addons.mozilla.org/firefox/addon/nice-tab-manager) 
-
-### Notes
-For security reasons, Firefox may not allow privileged URLs such as:
-- chrome: URLs
-- javascript: URLs  
-- data: URLs
-- file: URLs
-- Firefox's privileged about: URLs (e.g., `about:config`, `about:addons`, `about:debugging`). Non-privileged URLs (e.g., `about:blank`) are allowed.
-
-If a page URL matches any of the above cases, opening tab may not work. Please manually copy the URL to open it.
-
 ## Overview
 
-- NiceTab is a browser extension that makes managing your browser tabs quick and convenient.
+- NiceTab is an `open source` browser extension that makes managing your browser tabs quick and convenient.
 - Named `NiceTab` with the hope that it would be a "nice" tab management tool.
 - Similar to other tab management extensions like `OneTab`, `Toby`, `SessionBuddy`, `N-Tab` and `KepTab`. it supports browsers such as Chrome, Firefox, Microsoft Edge, and any Chromium based browser.
 - Developed using `React` and based on the [`wxt framework`](https://wxt.dev/), which provides built-in templates for `Vanilla`, `Vue`, `React`, `Svelte`, and `Solid`.
@@ -48,9 +31,27 @@ Additionally, the `N-Tab` extension is open-source, but after reviewing it, I fo
 
 Based on the above reasons, I decided to develop the `NiceTab` extension. incorporate additional features upon some features from `OneTab`, `N-Tab`, to enhance the experience.
 
+## Extension Installation
+
+- Google Chrome Web Store: [Chrome Web Store](https://chromewebstore.google.com/detail/fonflmjnjbkigocpoommgmhljdpljain)
+- Microsoft Edge Add-ons: [Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/ompjiaelpibiggcnanhbdblkhfdmkgnl)
+  (Note that due to longer review times, the Edge store release may lag behind the Chrome version.)
+- Firefox Browser Add-ons: [Firefox Browser Addons](https://addons.mozilla.org/firefox/addon/nice-tab-manager)
+
+### Notes
+For security reasons, Firefox may not allow privileged URLs such as:
+- chrome: URLs
+- javascript: URLs
+- data: URLs
+- file: URLs
+- Firefox's privileged about: URLs (e.g., `about:config`, `about:addons`, `about:debugging`). Non-privileged URLs (e.g., `about:blank`) are allowed.
+
+If a page URL matches any of the above cases, opening tab may not work. Please manually copy the URL to open it.
+
+
 ## Features
 
-Comprehensive user guide (coming soon...)
+Comprehensive user guide | <a href="./GUIDE-zh.md">NiceTab 用户指南</a> (English version is coming soon...)
 
 ### General Features
 
@@ -217,13 +218,13 @@ Feel free to join our QQ group: 924270240
 
 ## References
 
-- [Chrome for Developers - Extensions API Docs](https://developer.chrome.com/docs/extensions/reference/api?hl=zh-cn)  
-- [WXT Official Site](https://wxt.dev/)  
-- [Ant Design](https://ant-design.antgroup.com/)  
-- [React Router](https://reactrouter.com/)  
-- [styled-components](https://styled-components.com/)  
-- [react-intl](https://formatjs.io/docs/react-intl)  
-- [pragmatic-drag-and-drop](https://atlassian.design/components/pragmatic-drag-and-drop/about)  
+- [Chrome for Developers - Extensions API Docs](https://developer.chrome.com/docs/extensions/reference/api?hl=zh-cn)
+- [WXT Official Site](https://wxt.dev/)
+- [Ant Design](https://ant-design.antgroup.com/)
+- [React Router](https://reactrouter.com/)
+- [styled-components](https://styled-components.com/)
+- [react-intl](https://formatjs.io/docs/react-intl)
+- [pragmatic-drag-and-drop](https://atlassian.design/components/pragmatic-drag-and-drop/about)
 - ["Complete Guide to Developing Chrome Extensions" (Chinese)](https://www.cnblogs.com/liuxianan/p/chrome-plugin-develop.html)
 
 ## Extension Development

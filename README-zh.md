@@ -6,31 +6,16 @@
   中文 | <a href="./README.md">English</a>
 </p>
 
-## 扩展安装
-- 谷歌 Chrome 应用商店：[Chrome Web Store](https://chromewebstore.google.com/detail/fonflmjnjbkigocpoommgmhljdpljain)
-- 微软 Edge 商店：[Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/ompjiaelpibiggcnanhbdblkhfdmkgnl) （（由于审核周期比较长，版本发布会比Chrome版本慢））
-- Firefox 附加组件: [Firefox Browser Addons](https://addons.mozilla.org/firefox/addon/nice-tab-manager) 
-
-### 注意事项
-出于安全原因，在 Firefox 中，可能不允许使用特权 URL，例如：
-- chrome: URL
-- javascript: URL
-- data: URL
-- file: URL
-- Firefox 的特权 about: URL（例如，`about:config`、`about:addons`、`about:debugging`）。非特权 URL（例如 `about:blank`）是允许的。
-
-如果页面链接符合上述场景，点击链接可能无法打开页面，请手动复制链接进行访问。
-
 ## 基础介绍
-- 本项目是一个方便快捷管理浏览器标签页的浏览器插件。
-- 取名 `NiceTab` 是希望它是一个用起来很 nice 的 tab 标签页管理工具（不过本人的UI和交互设计太差，只能凑合凑合了）。 
+- 本项目是一个免费开源的浏览器标签页管理器插件，OneTab、Toby、SessionBuddy 等扩展的升级替代品，功能丰富易用。
+- 取名 `NiceTab` 是希望它是一个用起来很 nice 的 tab 标签页管理工具（不过本人的UI和交互设计太差，只能凑合凑合了）。
 - 类似于 `OneTab`、`Toby`、`SessionBuddy`、`N-Tab`、`KepTab` 等标签页管理插件，支持**谷歌Chrome**、**Firefox**、**微软Edge**等浏览器。
 - 采用 `react` 语言，基于[wxt框架](https://wxt.dev/)开发（wxt框架内置 `vanilla | vue | react | svelte | solid` 语言的初始化模板）。
 - UI直接使用了 `Ant Design` 这个常用的 UI 框架。
 
 ## 项目初衷
-我本人有点强迫症，浏览器标签页开多了就会焦虑，而且想要在众多标签页中切换到指定的页面也比较费劲儿。   
-后来用上 OneTab 之后，管理标签页方便了不少，提升了效率也节省了内存。因此很长一段时间一直使用 OneTab 插件来管理浏览器标签页。   
+我本人有点强迫症，浏览器标签页开多了就会焦虑，而且想要在众多标签页中切换到指定的页面也比较费劲儿。
+后来用上 OneTab 之后，管理标签页方便了不少，提升了效率也节省了内存。因此很长一段时间一直使用 OneTab 插件来管理浏览器标签页。
 
 经过一段时间对 OneTab 的使用体验，个人感觉有几个点不是特别顺手：
 - 标签组虽然能重命名，但是导出后再导入就会丢失。
@@ -44,9 +29,25 @@
 
 基于上面几点原因，最终促使我开发了 NiceTab 这个插件，在借鉴 `OneTab`、`N-Tab` 等插件现有部分功能的基础上，添加了一些其他的功能。
 
+## 扩展安装
+- 谷歌 Chrome 应用商店：[Chrome Web Store](https://chromewebstore.google.com/detail/fonflmjnjbkigocpoommgmhljdpljain)
+- 微软 Edge 商店：[Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/ompjiaelpibiggcnanhbdblkhfdmkgnl) （由于审核周期比较长，版本发布会比Chrome版本慢）
+- Firefox 附加组件: [Firefox Browser Addons](https://addons.mozilla.org/firefox/addon/nice-tab-manager)
+
+### 注意事项
+出于安全原因，在 Firefox 中，可能不允许使用特权 URL，例如：
+- chrome: URL
+- javascript: URL
+- data: URL
+- file: URL
+- Firefox 的特权 about: URL（例如，`about:config`、`about:addons`、`about:debugging`）。非特权 URL（例如 `about:blank`）是允许的。
+
+如果页面链接符合上述场景，点击链接可能无法打开页面，请手动复制链接进行访问。
 
 ## 功能介绍
-完善的用户指南（整理中...）
+<p>
+  详细用户操作指南见 <a href="./GUIDE-zh.md">NiceTab 用户指南</a>
+</p>
 
 ### 通用功能
 - 支持一键发送 所有标签页、当前标签页、其他标签页、左侧标签页、右侧标签页。
@@ -94,7 +95,7 @@
 - 支持设置 **是否在网页中显示NiceTab右键菜单**。
 - 支持 **Popup面板模块展示设置**，如果不选择面板模块，则左击扩展图标直接发送所有标签页。
 - 支持设置 **进入列表页时-是否自动展开全部节点**。
-- ...更多设置项可前往插件 `管理后台>偏好设置` 查看。 
+- ...更多设置项可前往插件 `管理后台>偏好设置` 查看。
 
 ### 远程同步功能
 
@@ -146,7 +147,7 @@
 
 ### 远程同步功能
 远程同步支持 gitee gists, github gists 和 webdav 同步。
-- gists 同步：您可根据需求将标签页同步到自己的 github 和 gitee 账号，只需要配置自己的 access token 即可。    
+- gists 同步：您可根据需求将标签页同步到自己的 github 和 gitee 账号，只需要配置自己的 access token 即可。
 - webdav 同步：您可根据需求将标签页同步到自己的 webDAV 网盘，只需要配置 webDAV 的 url，username，password即可（支持配置多个 webDAV 账号）。
 
 **注意**：
