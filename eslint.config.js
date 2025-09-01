@@ -28,7 +28,7 @@ export default [
       'react-hooks/exhaustive-deps': 'warn',
       'react/jsx-uses-react': 'off',
       'react/react-in-jsx-scope': 'off',
-      'import/order': 'warn',
+      'import/order': 'off',
       'prettier/prettier': 'warn',
     },
   },
