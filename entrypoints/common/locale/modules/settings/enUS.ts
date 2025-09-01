@@ -47,10 +47,10 @@ const enUS: Record<LocaleKey, string> = {
   'settings.allowDuplicateGroups.no': 'Merge duplicate groups (merge the groups being sent with those in the Staging Area)',
 
   /* 打开标签页配置 */
-  'settings.restoreInNewWindow': 'Open tab group in a new window when opening?',
-  'settings.deleteAfterRestore': 'Remove tabs when opening tabs or tab group?',
+  'settings.restoreInNewWindow': 'Open tab group in a new window?',
+  'settings.deleteAfterRestore': 'Remove tabs from the NiceTab list after opening tabs or tab group?',
   'settings.deleteAfterRestore.yes': 'Remove (locked tabs remain)',
-  'settings.deleteAfterRestore.no': 'All remain (recommended)',
+  'settings.deleteAfterRestore.no': 'Keep all (recommended)',
   'settings.silentOpenTabModifierKey': 'Modifier key for opening a tab silently (in background):',
   'settings.openTabModifierKey': 'Modifier key for opening a tab in the foreground:',
   'settings.openTabModifierKey.tooltip': 'Foreground opening takes precedence over background opening. When the modifier keys for both types of opening are the same, the foreground opening action will be triggered.',
@@ -58,9 +58,9 @@ const enUS: Record<LocaleKey, string> = {
   'settings.namedGroupRestoreAsGroup': 'Restore the named group as a browser tab group?',
 
   /* 全局搜索配置 */
-  'settings.globalSearchDeleteAfterOpen': 'Remove tabs when opening tabs?',
+  'settings.globalSearchDeleteAfterOpen': 'Remove tabs from the NiceTab list after opening them?',
   'settings.globalSearchDeleteAfterOpen.yes': 'Remove (locked tabs remain)',
-  'settings.globalSearchDeleteAfterOpen.no': 'All remain (recommended)',
+  'settings.globalSearchDeleteAfterOpen.no': 'Keep all (recommended)',
 
   /* 其他操作配置 */
   'settings.deleteUnlockedEmptyGroup': 'Remove empty groups when clearing tabs?',
@@ -93,12 +93,12 @@ const enUS: Record<LocaleKey, string> = {
 
   /* 自动同步配置 */
   'settings.autoSync': 'Enable Auto Sync?',
-  'settings.autoSyncTimeUnit': 'Auto Sync Time Unit',
-  'settings.autoSyncTimeUnit.m': 'Minute',
-  'settings.autoSyncTimeUnit.h': 'Hour',
-  'settings.autoSyncInterval': 'Auto Sync Interval (in {unit})',
-  'settings.autoSyncTimeRanges': 'Auto Sync Effective Time Range：',
-  'settings.autoSyncTimeRanges.addRange': 'Add New Time Range',
+  'settings.autoSyncTimeUnit': 'Auto-sync interval unit:',
+  'settings.autoSyncTimeUnit.m': 'Minutes',
+  'settings.autoSyncTimeUnit.h': 'Hours',
+  'settings.autoSyncInterval': 'Auto-sync interval ({unit}):',
+  'settings.autoSyncTimeRanges': 'Auto-sync active time ranges:',
+  'settings.autoSyncTimeRanges.addRange': 'Add time range',
   'settings.autoSyncType': 'Auto Sync Type',
   'settings.autoSyncType.tooltip': 'A merging push does not perform a diff - comparison deletion. It merges remote and local data and then pushes the result to the remote. To sync deletions, remove items locally and then manually overwrite the remote.',
   'settings.syncType.autoPullMerge': 'Auto Pull (Merge): Pull remote data and merge to local.',
