@@ -102,7 +102,7 @@ export default memo(function TabListItem({
 
   const tab = useMemo(
     () => ({ tabId, title, url, favIconUrl }),
-    [tabId, title, url, favIconUrl]
+    [tabId, title, url, favIconUrl],
   );
 
   // 确认编辑
@@ -111,7 +111,7 @@ export default memo(function TabListItem({
       onChange?.(newData);
       setModalVisible(false);
     },
-    [onChange]
+    [onChange],
   );
 
   const handleTabRemove = useCallback(async () => {
@@ -125,7 +125,7 @@ export default memo(function TabListItem({
       id: 'home.removeDesc',
       values: {
         type: `${$fmt(
-          'home.tab'
+          'home.tab',
         )}${` <div style="display: inline-flex; align-items: center; font-weight: bold;">
           [<strong style="display: inline-block; max-width: 280px" class="ellipsis">
             ${tab.title}</strong>
@@ -155,7 +155,7 @@ export default memo(function TabListItem({
       }
       setTooltipVisible(false);
     },
-    [tab, group.isLocked, onRemove]
+    [tab, group.isLocked, onRemove],
   );
 
   // 鼠标点击标签页
@@ -189,7 +189,7 @@ export default memo(function TabListItem({
         handleTabOpen(true);
       }
     },
-    [handleTabOpen]
+    [handleTabOpen],
   );
 
   const moreItems: MenuProps['items'] = useMemo(
@@ -222,7 +222,7 @@ export default memo(function TabListItem({
         ),
       },
     ],
-    [$fmt]
+    [$fmt, tag?.isLocked, group.isLocked, tab.url],
   );
 
   const onMoreItemClick = useCallback<Required<MenuProps>['onClick']>(
@@ -233,7 +233,7 @@ export default memo(function TabListItem({
         setModalVisible(true);
       }
     },
-    [tab, onCopy]
+    [tab, onCopy],
   );
 
   const draggingListener = (value: boolean) => {
@@ -268,7 +268,7 @@ export default memo(function TabListItem({
       <StyledTabItemWrapper
         className={classNames(
           'tab-list-item',
-          (tag?.isLocked || group?.isLocked) && 'locked'
+          (tag?.isLocked || group?.isLocked) && 'locked',
         )}
         ref={tabRef}
         data-id={tabId}

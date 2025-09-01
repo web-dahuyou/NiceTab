@@ -65,7 +65,7 @@ export function useTreeData() {
 
   const selectedTag: TreeDataNodeTag = useMemo(() => {
     const tag =
-      treeData.find((tag) => tag.type === 'tag' && tag.key === selectedTagKey) || {};
+      treeData.find(tag => tag.type === 'tag' && tag.key === selectedTagKey) || {};
     return tag as TreeDataNodeTag;
   }, [treeData, selectedTagKey]);
 
@@ -81,33 +81,33 @@ export function useTreeData() {
   const toggleExpand = useCallback(
     (bool: boolean) => {
       if (bool) {
-        setExpandedKeys(treeData.map((tag) => tag.key));
+        setExpandedKeys(treeData.map(tag => tag.key));
       } else {
         setExpandedKeys([]);
       }
     },
-    [treeData]
+    [treeData],
   );
   // 选中节点
   const handleSelect = useCallback(
     (
       treeData: TreeDataNodeUnion[],
       selectedKeys: React.Key[],
-      { node }: { node: TreeDataNodeUnion }
+      { node }: { node: TreeDataNodeUnion },
     ) => {
       let tagKey: React.Key = '',
         tabGroupKey: React.Key = '';
       if (node.type === 'tag') {
         tagKey = node.key;
         tabGroupKey = '';
-        setExpandedKeys((keys) => {
+        setExpandedKeys(keys => {
           return [...new Set([...keys, node.key])];
         });
       } else if (node.type === 'tabGroup') {
-        const tag = treeData.find((tag) => tag.key === node.parentKey);
+        const tag = treeData.find(tag => tag.key === node.parentKey);
         tagKey = tag?.key || '';
         tabGroupKey = node.key;
-        setExpandedKeys((keys) => {
+        setExpandedKeys(keys => {
           return [...new Set([...keys, node.parentKey])];
         });
       }
@@ -124,22 +124,22 @@ export function useTreeData() {
         () => {
           // 清除urlParams上的tagId和groupId
           setSearchParams({});
-        }
+        },
       );
     },
-    [setSearchParams]
+    [setSearchParams],
   );
   const onSelect = useCallback(
     (selectedKeys: React.Key[], { node }: { node: TreeDataNodeUnion }) => {
       handleSelect(treeData, selectedKeys, { node });
     },
-    [treeData, handleSelect]
+    [treeData, handleSelect],
   );
 
   const selectedKeyChange = useCallback(
     (
       { type, key, parentKey, tabId }: Partial<TreeDataNodeUnion & { tabId: string }>,
-      callback?: () => void
+      callback?: () => void,
     ) => {
       if (!key) return;
       handleSelect(treeData, [key], {
@@ -151,7 +151,7 @@ export function useTreeData() {
         callback?.();
       }, 300);
     },
-    [treeData, handleSelect]
+    [treeData, handleSelect],
   );
 
   // 删除分类
@@ -159,26 +159,26 @@ export function useTreeData() {
     async (tagKey: React.Key, currSelectedTagKey?: React.Key) => {
       if (!tagKey) return;
       await tabListUtils.removeTag(tagKey);
-      refreshTreeData((treeData) => {
+      refreshTreeData(treeData => {
         const tag0 = treeData?.[0];
         if (!tag0) return;
         if (currSelectedTagKey && currSelectedTagKey === tagKey) {
           handleSelect(treeData, [tag0?.key], { node: tag0 });
         } else {
-          const tag = treeData?.find((tag) => tag.key === currSelectedTagKey) || tag0;
+          const tag = treeData?.find(tag => tag.key === currSelectedTagKey) || tag0;
           handleSelect(treeData, [tag.key], { node: tag });
         }
       });
     },
-    [handleSelect]
+    [handleSelect],
   );
   // 创建分类
   const handleTagCreate = useCallback(async () => {
     const newTag = await tabListUtils.addTag();
-    refreshTreeData((treeData) => {
+    refreshTreeData(treeData => {
       // 优先渲染新的tree节点，再选中，防止渲染卡顿（创建时，选中新创建的节点）
       setTimeout(() => {
-        const treeTag = treeData.find((tag) => tag.key == newTag?.tagId);
+        const treeTag = treeData.find(tag => tag.key == newTag?.tagId);
         if (treeTag) {
           handleSelect(treeData, [treeTag.key], { node: treeTag });
         }
@@ -191,7 +191,7 @@ export function useTreeData() {
       await tabListUtils.updateTag(tagId || treeData?.[0]?.key, data);
       refreshTreeData();
     },
-    []
+    [],
   );
 
   // 删除标签组
@@ -199,20 +199,20 @@ export function useTreeData() {
     async (tabGroup: TreeDataNodeTabGroup) => {
       const tagKey = tabGroup.parentKey;
       if (!tabGroup.key || !tagKey) return;
-      const tag = treeData.find((tag) => tag.key === tagKey) as TreeDataNodeTag;
+      const tag = treeData.find(tag => tag.key === tagKey) as TreeDataNodeTag;
       await tabListUtils.removeTabGroup(tagKey, tabGroup.key);
       refreshTreeData();
     },
-    [treeData]
+    [treeData],
   );
   // 创建标签组
   const handleTabGroupCreate = useCallback(
     async (tagKey: React.Key) => {
       const { tagId, tabGroup } = await tabListUtils.createTabGroup(tagKey);
-      refreshTreeData((treeData) => {
-        const tag = treeData.find((tag) => tag.key === tagId) as TreeDataNodeTag;
+      refreshTreeData(treeData => {
+        const tag = treeData.find(tag => tag.key === tagId) as TreeDataNodeTag;
         const group = tag.children?.find(
-          (g) => g.key === tabGroup?.groupId
+          g => g.key === tabGroup?.groupId,
         ) as TreeDataNodeTabGroup;
         // 优先渲染新的tree节点，再选中，防止渲染卡顿（创建时，选中新创建的节点）
         setTimeout(() => {
@@ -220,7 +220,7 @@ export function useTreeData() {
         }, 0);
       });
     },
-    [handleSelect]
+    [handleSelect],
   );
   // 修改标签组
   const handleTabGroupChange = useCallback(
@@ -234,7 +234,7 @@ export function useTreeData() {
       });
       refreshTreeData();
     },
-    []
+    [],
   );
 
   // 标签组星标状态切换（需要调整排序）
@@ -243,13 +243,13 @@ export function useTreeData() {
       await tabListUtils.toggleTabGroupStarred(
         tabGroup.parentKey,
         tabGroup.key,
-        isStarred
+        isStarred,
       );
-      refreshTreeData((treeData) =>
-        handleSelect(treeData, [tabGroup.key], { node: tabGroup })
+      refreshTreeData(treeData =>
+        handleSelect(treeData, [tabGroup.key], { node: tabGroup }),
       );
     },
-    [handleSelect]
+    [handleSelect],
   );
   // 标签组去重
   const handleTabGroupDedup = useCallback(async (tabGroup: TreeDataNodeTabGroup) => {
@@ -265,7 +265,7 @@ export function useTreeData() {
   const handleTabGroupRestore = useCallback(
     async (tabGroup: TreeDataNodeTabGroup) => {
       const tagKey = tabGroup.parentKey;
-      const tag = treeData.find((tag) => tag.key === tagKey) as TreeDataNodeTag;
+      const tag = treeData.find(tag => tag.key === tagKey) as TreeDataNodeTag;
       const settings = await settingsUtils.getSettings();
       const { groupName, tabList = [], isLocked } = tabGroup?.originData || {};
       // 未命名的标签组，不以原生标签组形式打开
@@ -274,14 +274,14 @@ export function useTreeData() {
         (groupName !== UNNAMED_GROUP && !settings?.[NAMED_GROUP_RESTORE_AS_GROUP])
       ) {
         // 打开标签组 (标签页单独打开)
-        tabList.forEach((tab) => {
+        tabList.forEach(tab => {
           openNewTab(tab.url);
         });
       } else {
         // 打开标签组 (保持标签组形式)
         openNewGroup(
           groupName,
-          tabList.map((tab) => tab.url)
+          tabList.map(tab => tab.url),
         );
       }
       if (settings?.[DELETE_AFTER_RESTORE] && !isLocked) {
@@ -289,7 +289,7 @@ export function useTreeData() {
         refreshTreeData();
       }
     },
-    [treeData]
+    [treeData],
   );
   // 打开标签页
   const handleTabsOpen = useCallback(
@@ -306,7 +306,7 @@ export function useTreeData() {
         handleTabItemRemove?.(group.groupId, tabs);
       }
     },
-    []
+    [],
   );
   // 删除标签页
   const handleTabItemRemove = useCallback(async (groupId: React.Key, tabs: TabItem[]) => {
@@ -323,7 +323,7 @@ export function useTreeData() {
       });
       refreshTreeData();
     },
-    []
+    [],
   );
   // 复制标签页
   const handleTabItemCopy = useCallback(
@@ -331,7 +331,7 @@ export function useTreeData() {
       await tabListUtils.copyTabs(groupId as string, tabs);
       refreshTreeData();
     },
-    []
+    [],
   );
 
   // 拖拽
@@ -356,7 +356,7 @@ export function useTreeData() {
         dragNode.parentKey,
         node.parentKey,
         dragIndex,
-        dropIndex
+        dropIndex,
       );
     } else if (dragNode.type === 'tag' && node.type === 'tag') {
       await tabListUtils.onTagDrop(dragIndex, dropIndex);
@@ -366,14 +366,14 @@ export function useTreeData() {
         dragNode.parentKey,
         node.key,
         dragIndex,
-        dropIndex
+        dropIndex,
       );
     }
 
-    refreshTreeData((treeData) => {
+    refreshTreeData(treeData => {
       let node = dragNode;
       if (dragNode.type === 'tag') {
-        node = treeData.find((t) => t.key === dragNode.key) as typeof dragNode &
+        node = treeData.find(t => t.key === dragNode.key) as typeof dragNode &
           TreeDataNodeTag;
       } else if (dragNode.type === 'tabGroup') {
         for (let tag of treeData) {
@@ -409,7 +409,7 @@ export function useTreeData() {
           rename: () =>
             handleTabGroupChange(
               node as TreeDataNodeTabGroup,
-              (data as Partial<GroupItem>) || {}
+              (data as Partial<GroupItem>) || {},
             ),
           moveTo: () => {}, // 在index.tsx中实现
         },
@@ -425,7 +425,7 @@ export function useTreeData() {
       handleTabGroupCreate,
       handleTabGroupRemove,
       handleTabGroupChange,
-    ]
+    ],
   );
 
   // 拖拽标签页逻辑
@@ -446,7 +446,7 @@ export function useTreeData() {
       sourceData.groupId,
       targetData.groupId,
       sourceIndex,
-      _targetIndex
+      _targetIndex,
     );
     refreshTreeData();
   };
@@ -467,7 +467,7 @@ export function useTreeData() {
   // 刷新treeData
   const refreshTreeData = async (
     callback?: (treeData: TreeDataNodeUnion[]) => void,
-    { autoScroll = false }: { autoScroll?: boolean } = {}
+    { autoScroll = false }: { autoScroll?: boolean } = {},
   ) => {
     const tagList = tabListUtils.tagList;
     setTagList(tagList);
@@ -495,7 +495,7 @@ export function useTreeData() {
     const settings = await settingsUtils.getSettings();
     if (settings?.[AUTO_EXPAND_HOME_TREE]) {
       // 默认展开全部
-      setExpandedKeys(treeData.map((tag) => tag.key));
+      setExpandedKeys(treeData.map(tag => tag.key));
     }
 
     let tagId = urlParams.tagId;
@@ -507,8 +507,8 @@ export function useTreeData() {
       groupId = selectedKeys.selectedTabGroupKey || '';
     }
     let tag =
-      treeData?.find((tag) => tag.type === 'tag' && tag.key === tagId) || treeData?.[0];
-    let tabGroup = tag?.children?.find((g) => g.key === groupId) || tag?.children?.[0];
+      treeData?.find(tag => tag.type === 'tag' && tag.key === tagId) || treeData?.[0];
+    let tabGroup = tag?.children?.find(g => g.key === groupId) || tag?.children?.[0];
 
     if (!tag) return;
     handleSelect(treeData, [tabGroup ? tabGroup.key : tag.key], {
@@ -529,10 +529,10 @@ export function useTreeData() {
         await tabListUtils.tabGroupMove(
           action === 'moveUp' ? 'up' : 'down',
           selectedTagKey,
-          selectedTabGroupKey
+          selectedTabGroupKey,
         );
         refreshTreeData(
-          (treeData) => {
+          treeData => {
             let tabGroup = {} as TreeDataNodeTabGroup;
             for (let tag of treeData) {
               let hasFound = false;
@@ -548,14 +548,14 @@ export function useTreeData() {
             handleSelect(treeData, [tabGroup.key || selectedTagKey], {
               node: tabGroup.key
                 ? tabGroup
-                : (treeData.find((t) => t.key === selectedTagKey) as TreeDataNodeTag),
+                : (treeData.find(t => t.key === selectedTagKey) as TreeDataNodeTag),
             });
           },
-          { autoScroll: true }
+          { autoScroll: true },
         );
       } else {
         const tagIndex = treeData.findIndex(
-          (tag) => tag.type === 'tag' && tag.key === selectedTagKey
+          tag => tag.type === 'tag' && tag.key === selectedTagKey,
         );
         // if (action === 'moveUp' && tagIndex === 0 || action === 'moveDown' && tagIndex === treeData.length - 1) return;
         if (action === 'moveUp') {
@@ -571,18 +571,18 @@ export function useTreeData() {
         }
         await tabListUtils.onTagDrop(
           tagIndex,
-          action === 'moveUp' ? tagIndex - 1 : tagIndex + 2
+          action === 'moveUp' ? tagIndex - 1 : tagIndex + 2,
         );
         refreshTreeData(
-          (treeData) => {
-            const tag = treeData.find((t) => t.key === selectedTagKey) as TreeDataNodeTag;
+          treeData => {
+            const tag = treeData.find(t => t.key === selectedTagKey) as TreeDataNodeTag;
             handleSelect(treeData, [tag.key], { node: tag });
           },
-          { autoScroll: true }
+          { autoScroll: true },
         );
       }
     },
-    [treeData, selectedTagKey, selectedTabGroupKey, handleSelect]
+    [treeData, selectedTagKey, selectedTabGroupKey, handleSelect],
   );
 
   useEffect(() => {
@@ -602,13 +602,13 @@ export function useTreeData() {
     const selectedKeys = await stateUtils.getHomeSelectedKeys();
     const _tagId = selectedKeys.selectedTagKey || '';
     const _groupId = selectedKeys.selectedTabGroupKey || '';
-    refreshTreeData((treeData) => {
+    refreshTreeData(treeData => {
       const tag = treeData.find(
-        (t) => t.key === (_tagId || selectedTagKey)
+        t => t.key === (_tagId || selectedTagKey),
       ) as TreeDataNodeTag;
 
       const tabGroup = (tag || treeData?.[0])?.children?.find(
-        (g) => g.key === (_groupId || selectedTabGroupKey)
+        g => g.key === (_groupId || selectedTabGroupKey),
       ) as TreeDataNodeTabGroup;
 
       if (tabGroup) {
