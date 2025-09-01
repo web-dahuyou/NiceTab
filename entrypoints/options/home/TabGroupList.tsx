@@ -37,7 +37,7 @@ const ListItem = memo(
       targetData,
       selected,
     }: MoveToCallbackProps) => {
-      refreshTreeData((treeData) => {
+      refreshTreeData(treeData => {
         if (selected) {
           const { groupId, tabs } = moveData || {};
           const { targetTagId, targetGroupId } = targetData || {};
@@ -77,16 +77,16 @@ const ListItem = memo(
         // }
         {...tabGroup.originData}
         actionBtnStyle={settings.groupActionBtnStyle || 'text'}
-        onChange={(data) => handleTabGroupChange(tabGroup, data)}
+        onChange={data => handleTabGroupChange(tabGroup, data)}
         onRemove={() => handleTabGroupRemove(tabGroup)}
         onRestore={() => handleTabGroupRestore(tabGroup)}
-        onStarredChange={(isStarred) => handleTabGroupStarredChange(tabGroup, isStarred)}
+        onStarredChange={isStarred => handleTabGroupStarredChange(tabGroup, isStarred)}
         onDedup={() => handleTabGroupDedup(tabGroup)}
         onCopy={handleTabGroupCopy}
         onMoveTo={handleTabGroupMoveTo}
       ></TabGroup>
     );
-  }
+  },
 );
 
 export default function TabGroupList({ virtual }: { virtual?: boolean }) {
@@ -102,7 +102,7 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
 
   const initialConfig = useMemo(() => {
     const index =
-      selectedTag?.children?.findIndex((group) => group.key === selectedTabGroupKey) || 0;
+      selectedTag?.children?.findIndex(group => group.key === selectedTabGroupKey) || 0;
     return {
       index: index > -1 ? index : 0,
       align: 'start',
@@ -114,8 +114,7 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
   const scrollHandler = useCallback(() => {
     if (virtual && virtuosoRef.current) {
       const index =
-        selectedTag?.children?.findIndex((group) => group.key === selectedTabGroupKey) ||
-        0;
+        selectedTag?.children?.findIndex(group => group.key === selectedTabGroupKey) || 0;
       virtuosoRef.current?.scrollToIndex({
         index: index > -1 ? index : 0,
         align: 'start',
@@ -186,7 +185,7 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
               >
                 <ListItem tabGroup={tabGroup} virtual={virtual}></ListItem>
               </div>
-            )
+            ),
         )
       )}
     </StyledGroupList>
