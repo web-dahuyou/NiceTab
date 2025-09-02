@@ -135,7 +135,7 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
         body.scrollTo(0, groupTop + pagePaddingTop - window.innerHeight + 400);
       }
     }
-  }, [selectedTag, selectedTabGroupKey, refreshKey]);
+  }, [virtual, selectedTag, selectedTabGroupKey]);
 
   useEffect(() => {
     if (selectedTagKey === prevSelectedTagKey) {
@@ -146,7 +146,7 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
         scrollHandler();
       }, 100);
     }
-  }, [selectedTagKey, selectedTabGroupKey, refreshKey]);
+  }, [selectedTagKey, selectedTabGroupKey]);
 
   return (
     <StyledGroupList className="main-content-wrapper">

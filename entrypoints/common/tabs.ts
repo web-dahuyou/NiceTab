@@ -40,7 +40,7 @@ export async function sendTabMessage(
     onlyCurrentWindow = false,
     sendToAdminTab = false,
   }: SendTabMsgEventProps,
-  errorCallback?: () => void
+  errorCallback?: () => void,
 ) {
   if (onlyCurrentTab) {
     const currentTabs = await browser.tabs.query({ active: true, currentWindow: true });
@@ -68,13 +68,13 @@ export async function sendTabMessage(
   for (const win of windows) {
     const { tab: adminTab } = await getAdminTabInfo(win.id);
     const allTabs = await getAllTabs(win.id);
-    const filteredTabs = allTabs.filter((tab) => {
+    const filteredTabs = allTabs.filter(tab => {
       if (!tab?.id) return false;
       if (!sendToAdminTab && adminTab && adminTab.id === tab.id) return false;
       return true;
     });
 
-    filteredTabs?.forEach(async (tab) => {
+    filteredTabs?.forEach(async tab => {
       try {
         const res = await browser.tabs.sendMessage(tab.id!, { msgType, data });
         console.log('browser.tabs.sendMessage__result', res);
@@ -87,7 +87,7 @@ export async function sendTabMessage(
 // 执行contentScript展示message提示
 export async function executeContentScript(
   actionName: string,
-  resultType: 'success' | 'error' = 'success'
+  resultType: 'success' | 'error' = 'success',
 ) {
   const settings = await settingsUtils.getSettings();
   const language = settings[LANGUAGE] || defaultLanguage;
@@ -138,7 +138,7 @@ export async function getAdminTabInfo(windowId?: number) {
 // 打开管理后台
 export async function openAdminRoutePage(
   route: { path: string; query?: Record<string, string> },
-  needOpen = true
+  needOpen = true,
 ) {
   const paramsStr = objectToUrlParams(route?.query || {});
   const settings = await settingsUtils.getSettings();
@@ -195,7 +195,7 @@ export const updateAdminPageUrlDebounced = debounce(updateAdminPageUrl, 500);
 // 打开管理后台
 export async function openAdminTab(
   settingsData?: SettingsProps,
-  params?: { tagId: string; groupId: string }
+  params?: { tagId: string; groupId: string },
 ) {
   const settings = settingsData || (await settingsUtils.getSettings());
   const openAdminTabAfterSendTabs = settings[OPEN_ADMIN_TAB_AFTER_SEND_TABS];
@@ -205,10 +205,10 @@ export async function openAdminTab(
 export async function getFilteredTabs(
   tabs: Tabs.Tab[],
   settings: SettingsProps,
-  validator?: (tab: Tabs.Tab) => boolean
+  validator?: (tab: Tabs.Tab) => boolean,
 ) {
   const { tab: adminTab } = await getAdminTabInfo();
-  return tabs.filter((tab) => {
+  return tabs.filter(tab => {
     if (!tab?.id) return false;
     if (adminTab && adminTab.id === tab.id) return false;
     // 如果设置不允许发送固定标签页，则过滤掉固定标签页
@@ -231,9 +231,9 @@ export async function getFilteredTabs(
 }
 // 取消标签页高亮
 export async function cancelHighlightTabs(tabs?: Tabs.Tab[]) {
-  await new Promise((res) => setTimeout(res, 50));
+  await new Promise(res => setTimeout(res, 50));
   if (tabs) {
-    tabs.forEach((tab) => {
+    tabs.forEach(tab => {
       tab?.highlighted &&
         browser.tabs.update(tab.id, { highlighted: false, active: false });
     });
@@ -243,7 +243,7 @@ export async function cancelHighlightTabs(tabs?: Tabs.Tab[]) {
       currentWindow: true,
     });
     const { tab: adminTab } = await getAdminTabInfo();
-    highlightedTabs.forEach((tab) => {
+    highlightedTabs.forEach(tab => {
       if (adminTab && adminTab.id !== tab.id) {
         browser.tabs.update(tab.id, { highlighted: false, active: false });
       }
@@ -280,7 +280,7 @@ async function sendAllTabs(targetData: SendTargetProps = {}) {
     actionAutoCloseFlags?.includes('sendAllTabs')
   ) {
     setTimeout(() => {
-      browser.tabs.remove(filteredTabs.map((t) => t.id as number).filter(Boolean));
+      browser.tabs.remove(filteredTabs.map(t => t.id as number).filter(Boolean));
     }, 30);
   } else {
     // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
@@ -298,7 +298,7 @@ async function sendCurrentTab(targetData: SendTargetProps = {}) {
   const settings = await settingsUtils.getSettings();
   let filteredTabs = await getFilteredTabs(tabs, settings);
   // 发送当前选中的标签页时，选中的标签页成组，不考虑原生标签组（即多选时，选中的非标签组的标签页和标签组中的标签页合并到一个组）
-  filteredTabs = filteredTabs.map((tab) => ({ ...tab, groupId: -1 }));
+  filteredTabs = filteredTabs.map(tab => ({ ...tab, groupId: -1 }));
   if (!filteredTabs?.length) return;
   const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs, targetData);
   await openAdminTab(settings, { tagId, groupId });
@@ -307,7 +307,7 @@ async function sendCurrentTab(targetData: SendTargetProps = {}) {
     settings[CLOSE_TABS_AFTER_SEND_TABS] ||
     actionAutoCloseFlags?.includes('sendCurrentTab')
   ) {
-    browser.tabs.remove(filteredTabs.map((t) => t.id as number).filter(Boolean));
+    browser.tabs.remove(filteredTabs.map(t => t.id as number).filter(Boolean));
   } else {
     // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
     cancelHighlightTabs(filteredTabs);
@@ -329,7 +329,7 @@ async function sendOtherTabs(targetData: SendTargetProps = {}) {
     settings[CLOSE_TABS_AFTER_SEND_TABS] ||
     actionAutoCloseFlags?.includes('sendOtherTabs')
   ) {
-    browser.tabs.remove(filteredTabs.map((t) => t.id as number).filter(Boolean));
+    browser.tabs.remove(filteredTabs.map(t => t.id as number).filter(Boolean));
   }
   // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
   cancelHighlightTabs();
@@ -356,7 +356,7 @@ async function sendLeftTabs(targetData: SendTargetProps = {}, currTab?: Tabs.Tab
     settings[CLOSE_TABS_AFTER_SEND_TABS] ||
     actionAutoCloseFlags?.includes('sendLeftTabs')
   ) {
-    browser.tabs.remove(filteredTabs.map((t) => t.id as number).filter(Boolean));
+    browser.tabs.remove(filteredTabs.map(t => t.id as number).filter(Boolean));
   }
   // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
   cancelHighlightTabs();
@@ -383,10 +383,33 @@ async function sendRightTabs(targetData: SendTargetProps = {}, currTab?: Tabs.Ta
     settings[CLOSE_TABS_AFTER_SEND_TABS] ||
     actionAutoCloseFlags?.includes('sendRightTabs')
   ) {
-    browser.tabs.remove(filteredTabs.map((t) => t.id as number).filter(Boolean));
+    browser.tabs.remove(filteredTabs.map(t => t.id as number).filter(Boolean));
   }
   // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
   cancelHighlightTabs();
+}
+
+// 打开页面后等待加载完成才能执行discard
+export async function waitToDiscard(tab: Tabs.Tab) {
+  let title = '',
+    url = '';
+  // 等待标签页加载完成后再discard
+  if ((tab.title && tab.url) || tab.status === 'complete') {
+    browser.tabs.discard(tab.id!);
+  } else {
+    const listener = (tabId: number, changeInfo: Tabs.OnUpdatedChangeInfoType) => {
+      if (tabId === tab.id) {
+        if (changeInfo.title) title = changeInfo.title;
+        if (changeInfo.url) url = changeInfo.url;
+
+        if ((title && url) || changeInfo.status === 'complete') {
+          browser.tabs.discard(tabId);
+          browser.tabs.onUpdated.removeListener(listener);
+        }
+      }
+    };
+    browser.tabs.onUpdated.addListener(listener);
+  }
 }
 
 /*
@@ -396,15 +419,24 @@ openToNext：是否紧随管理后台页之后打开
 */
 export async function openNewTab(
   url?: string,
-  { active = false, openToNext = false }: { active?: boolean; openToNext?: boolean } = {}
+  {
+    active = false,
+    openToNext = false,
+    discard = false,
+  }: { active?: boolean; openToNext?: boolean; discard?: boolean } = {},
 ) {
+  if (!url) return;
+
   if (!browser?.tabs?.create) {
     window.open(url, '_blank');
     return;
   }
 
   if (!openToNext) {
-    url && browser.tabs.create({ url, active });
+    const tab = await browser.tabs.create({ url, active });
+    if (discard && tab.id && !active) {
+      waitToDiscard(tab);
+    }
     return;
   }
 
@@ -412,40 +444,63 @@ export async function openNewTab(
   const newTabIndex = (tab?.index || 0) + 1;
   // 注意：如果打开标签页不想 active, 则 active 必须设置默认值为 false，
   // create 方法 active参数传 undefined 也会激活 active
-  url && browser.tabs.create({ url, active, index: newTabIndex });
+  const createdTab = await browser.tabs.create({ url, active, index: newTabIndex });
+  if (discard && createdTab.id && !active) {
+    waitToDiscard(tab);
+  }
 }
 
 // 打开标签组
-export async function openNewGroup(groupName: string, urls: Array<string | undefined>) {
+export async function openNewGroup(
+  groupName: string,
+  urls: Array<string | undefined>,
+  { discard = false, asGroup = true }: { discard?: boolean; asGroup?: boolean },
+) {
   const settings = await settingsUtils.getSettings();
 
   if (settings[RESTORE_IN_NEW_WINDOW]) {
-    const _urls = urls.filter((url) => !!url) as string[];
+    const _urls = urls.filter(url => !!url) as string[];
     const windowInfo = await browser.windows.create({ focused: true, url: _urls });
-    if (!isGroupSupported()) return;
 
     const tabs = await browser.tabs.query({ windowId: windowInfo.id, pinned: false });
+
+    tabs
+      .filter(tab => !tab.active)
+      .forEach(tab => {
+        if (discard && tab.id) {
+          waitToDiscard(tab);
+        }
+      });
+
+    if (!isGroupSupported()) return;
+    if (!asGroup) return;
+
     const bsGroupId = await browser.tabs.group!({
       createProperties: { windowId: windowInfo.id },
-      tabIds: tabs.map((tab) => tab.id!),
+      tabIds: tabs.map(tab => tab.id!),
     });
     browser.tabGroups?.update(bsGroupId, { title: groupName });
   } else {
-    if (!isGroupSupported()) {
+    if (!isGroupSupported() || !asGroup) {
       for (let url of urls) {
-        openNewTab(url);
+        openNewTab(url, { discard });
       }
       return;
     }
 
     Promise.all(
-      urls.map((url) => {
+      urls.map(url => {
         return browser.tabs.create({ url, active: false });
-      })
-    ).then(async (tabs) => {
-      const filteredTabs = tabs.filter((tab) => !!tab.id);
+      }),
+    ).then(async tabs => {
+      const filteredTabs = tabs.filter(tab => !!tab.id);
+      filteredTabs.forEach(tab => {
+        if (discard && tab.id) {
+          waitToDiscard(tab);
+        }
+      });
       const bsGroupId = await browser.tabs.group!({
-        tabIds: filteredTabs.map((tab) => tab.id!),
+        tabIds: filteredTabs.map(tab => tab.id!),
       });
       browser.tabGroups?.update(bsGroupId, { title: groupName });
     });
@@ -465,11 +520,11 @@ export async function discardOtherTabs() {
 
 // 将已打开的标签页生保存为快照
 export const saveOpenedTabsAsSnapshot = async (
-  type: 'autoSave' | 'manualSave' = 'autoSave'
+  type: 'autoSave' | 'manualSave' = 'autoSave',
 ) => {
   const tabs = await browser.tabs.query({ currentWindow: true });
   const { tab: adminTab } = await getAdminTabInfo();
-  const filteredTabs = tabs.filter((tab) => {
+  const filteredTabs = tabs.filter(tab => {
     if (!tab?.id) return false;
     if (adminTab && adminTab.id === tab.id) return false;
     if (tab.pinned) return false;
@@ -487,7 +542,7 @@ export const saveOpenedTabsAsSnapshot = async (
 };
 // 恢复快照
 export const restoreOpenedTabsSnapshot = async (
-  type: 'autoSave' | 'manualSave' = 'autoSave'
+  type: 'autoSave' | 'manualSave' = 'autoSave',
 ) => {
   const globalState = await stateUtils.getState('global');
   if (type === 'autoSave') {
