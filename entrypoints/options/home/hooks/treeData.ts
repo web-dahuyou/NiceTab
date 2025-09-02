@@ -21,6 +21,7 @@ import { getTreeData } from '../utils';
 
 const {
   DELETE_AFTER_RESTORE,
+  DISCARD_WHEN_OPEN_TABS,
   UNNAMED_GROUP_RESTORE_AS_GROUP,
   NAMED_GROUP_RESTORE_AS_GROUP,
   AUTO_EXPAND_HOME_TREE,
@@ -268,22 +269,18 @@ export function useTreeData() {
       const tag = treeData.find(tag => tag.key === tagKey) as TreeDataNodeTag;
       const settings = await settingsUtils.getSettings();
       const { groupName, tabList = [], isLocked } = tabGroup?.originData || {};
-      // 未命名的标签组，不以原生标签组形式打开
-      if (
-        (groupName === UNNAMED_GROUP && !settings?.[UNNAMED_GROUP_RESTORE_AS_GROUP]) ||
-        (groupName !== UNNAMED_GROUP && !settings?.[NAMED_GROUP_RESTORE_AS_GROUP])
-      ) {
-        // 打开标签组 (标签页单独打开)
-        tabList.forEach(tab => {
-          openNewTab(tab.url);
-        });
-      } else {
-        // 打开标签组 (保持标签组形式)
-        openNewGroup(
-          groupName,
-          tabList.map(tab => tab.url),
-        );
-      }
+      const discard = settings?.[DISCARD_WHEN_OPEN_TABS];
+
+      const asGroup =
+        (groupName === UNNAMED_GROUP && settings?.[UNNAMED_GROUP_RESTORE_AS_GROUP]) ||
+        (groupName !== UNNAMED_GROUP && settings?.[NAMED_GROUP_RESTORE_AS_GROUP]);
+
+      openNewGroup(
+        groupName,
+        tabList.map(tab => tab.url),
+        { discard, asGroup },
+      );
+
       if (settings?.[DELETE_AFTER_RESTORE] && !isLocked) {
         await tabListUtils.removeTabGroup(tag.key, tabGroup.key);
         refreshTreeData();
@@ -293,13 +290,26 @@ export function useTreeData() {
   );
   // 打开标签页
   const handleTabsOpen = useCallback(
-    async (group: Pick<GroupItem, 'groupId' | 'isLocked'>, tabs: TabItem[]) => {
+    async (
+      group: Pick<GroupItem, 'groupName' | 'groupId' | 'isLocked'>,
+      tabs: TabItem[],
+    ) => {
       if (tabs.length === 1) {
         openNewTab(tabs[0].url, { active: true });
       } else {
-        for (let tab of tabs) {
-          openNewTab(tab.url);
-        }
+        const groupName = group.groupName;
+        const settings = await settingsUtils.getSettings();
+        const discard = settings?.[DISCARD_WHEN_OPEN_TABS];
+
+        const asGroup =
+          (groupName === UNNAMED_GROUP && settings?.[UNNAMED_GROUP_RESTORE_AS_GROUP]) ||
+          (groupName !== UNNAMED_GROUP && settings?.[NAMED_GROUP_RESTORE_AS_GROUP]);
+
+        openNewGroup(
+          groupName,
+          tabs.map(tab => tab.url),
+          { discard, asGroup },
+        );
       }
       const settings = await settingsUtils.getSettings();
       if (settings[DELETE_AFTER_RESTORE] && !group?.isLocked) {

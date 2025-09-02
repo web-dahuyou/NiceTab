@@ -149,6 +149,7 @@ export type SettingsProps = {
   /* 打开标签页配置 */
   restoreInNewWindow?: boolean; // 是否在新窗口打开标签组
   deleteAfterRestore?: boolean; // 恢复标签页/标签组时是否从列表中删除
+  discardWhenOpenTabs?: boolean; // 是否以休眠方式打开标签页
   silentOpenTabModifierKey?: string; // 静默打开标签页的修饰键
   openTabModifierKey?: string; // 前台打开标签页的修饰键
   unnamedGroupRestoreAsGroup?: boolean; // 是否以标签组形式恢复未命名标签组

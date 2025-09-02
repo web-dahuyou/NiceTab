@@ -49,6 +49,7 @@ const zhCN = {
   'settings.deleteAfterRestore': '打开标签页/标签组时-是否自动删除标签页{mark}',
   'settings.deleteAfterRestore.yes': '从NiceTab列表中删除（仍保留锁定的标签页）',
   'settings.deleteAfterRestore.no': '保留在NiceTab列表中（推荐）',
+  'settings.discardWhenOpenTabs': '打开多个标签页时是否自动休眠{mark}',
   'settings.silentOpenTabModifierKey': '静默（后台）打开标签页使用的修饰键：',
   'settings.openTabModifierKey': '前台打开标签页使用的修饰键：',
   'settings.openTabModifierKey.tooltip': '前台打开方式优先级高于后台打开方式，意味着如果后台打开和前台打开的修饰键相同，则触发前台打开',

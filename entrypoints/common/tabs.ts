@@ -389,6 +389,29 @@ async function sendRightTabs(targetData: SendTargetProps = {}, currTab?: Tabs.Ta
   cancelHighlightTabs();
 }
 
+// 打开页面后等待加载完成才能执行discard
+export async function waitToDiscard(tab: Tabs.Tab) {
+  let title = '',
+    url = '';
+  // 等待标签页加载完成后再discard
+  if ((tab.title && tab.url) || tab.status === 'complete') {
+    browser.tabs.discard(tab.id!);
+  } else {
+    const listener = (tabId: number, changeInfo: Tabs.OnUpdatedChangeInfoType) => {
+      if (tabId === tab.id) {
+        if (changeInfo.title) title = changeInfo.title;
+        if (changeInfo.url) url = changeInfo.url;
+
+        if ((title && url) || changeInfo.status === 'complete') {
+          browser.tabs.discard(tabId);
+          browser.tabs.onUpdated.removeListener(listener);
+        }
+      }
+    };
+    browser.tabs.onUpdated.addListener(listener);
+  }
+}
+
 /*
 打开新标签页
 active：打开标签页是否激活
@@ -396,15 +419,24 @@ openToNext：是否紧随管理后台页之后打开
 */
 export async function openNewTab(
   url?: string,
-  { active = false, openToNext = false }: { active?: boolean; openToNext?: boolean } = {},
+  {
+    active = false,
+    openToNext = false,
+    discard = false,
+  }: { active?: boolean; openToNext?: boolean; discard?: boolean } = {},
 ) {
+  if (!url) return;
+
   if (!browser?.tabs?.create) {
     window.open(url, '_blank');
     return;
   }
 
   if (!openToNext) {
-    url && browser.tabs.create({ url, active });
+    const tab = await browser.tabs.create({ url, active });
+    if (discard && tab.id && !active) {
+      waitToDiscard(tab);
+    }
     return;
   }
 
@@ -412,28 +444,46 @@ export async function openNewTab(
   const newTabIndex = (tab?.index || 0) + 1;
   // 注意：如果打开标签页不想 active, 则 active 必须设置默认值为 false，
   // create 方法 active参数传 undefined 也会激活 active
-  url && browser.tabs.create({ url, active, index: newTabIndex });
+  const createdTab = await browser.tabs.create({ url, active, index: newTabIndex });
+  if (discard && createdTab.id && !active) {
+    waitToDiscard(tab);
+  }
 }
 
 // 打开标签组
-export async function openNewGroup(groupName: string, urls: Array<string | undefined>) {
+export async function openNewGroup(
+  groupName: string,
+  urls: Array<string | undefined>,
+  { discard = false, asGroup = true }: { discard?: boolean; asGroup?: boolean },
+) {
   const settings = await settingsUtils.getSettings();
 
   if (settings[RESTORE_IN_NEW_WINDOW]) {
     const _urls = urls.filter(url => !!url) as string[];
     const windowInfo = await browser.windows.create({ focused: true, url: _urls });
-    if (!isGroupSupported()) return;
 
     const tabs = await browser.tabs.query({ windowId: windowInfo.id, pinned: false });
+
+    tabs
+      .filter(tab => !tab.active)
+      .forEach(tab => {
+        if (discard && tab.id) {
+          waitToDiscard(tab);
+        }
+      });
+
+    if (!isGroupSupported()) return;
+    if (!asGroup) return;
+
     const bsGroupId = await browser.tabs.group!({
       createProperties: { windowId: windowInfo.id },
       tabIds: tabs.map(tab => tab.id!),
     });
     browser.tabGroups?.update(bsGroupId, { title: groupName });
   } else {
-    if (!isGroupSupported()) {
+    if (!isGroupSupported() || !asGroup) {
       for (let url of urls) {
-        openNewTab(url);
+        openNewTab(url, { discard });
       }
       return;
     }
@@ -444,6 +494,11 @@ export async function openNewGroup(groupName: string, urls: Array<string | undef
       }),
     ).then(async tabs => {
       const filteredTabs = tabs.filter(tab => !!tab.id);
+      filteredTabs.forEach(tab => {
+        if (discard && tab.id) {
+          waitToDiscard(tab);
+        }
+      });
       const bsGroupId = await browser.tabs.group!({
         tabIds: filteredTabs.map(tab => tab.id!),
       });
