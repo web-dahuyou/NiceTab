@@ -393,23 +393,19 @@ async function sendRightTabs(targetData: SendTargetProps = {}, currTab?: Tabs.Ta
 export async function waitToDiscard(tab: Tabs.Tab) {
   let title = '',
     url = '';
-  // 等待标签页加载完成后再discard
-  if ((tab.title && tab.url) || tab.status === 'complete') {
-    browser.tabs.discard(tab.id!);
-  } else {
-    const listener = (tabId: number, changeInfo: Tabs.OnUpdatedChangeInfoType) => {
-      if (tabId === tab.id) {
-        if (changeInfo.title) title = changeInfo.title;
-        if (changeInfo.url) url = changeInfo.url;
 
-        if ((title && url) || changeInfo.status === 'complete') {
-          browser.tabs.discard(tabId);
-          browser.tabs.onUpdated.removeListener(listener);
-        }
+  // 等待标签页加载完成后再discard
+  const listener = (tabId: number, changeInfo: Tabs.OnUpdatedChangeInfoType) => {
+    if (tabId === tab.id) {
+      if (changeInfo.title) title = changeInfo.title;
+      if (changeInfo.url) url = changeInfo.url;
+      if ((title && url) || changeInfo.status === 'complete') {
+        browser.tabs.discard(tabId);
+        browser.tabs.onUpdated.removeListener(listener);
       }
-    };
-    browser.tabs.onUpdated.addListener(listener);
-  }
+    }
+  };
+  browser.tabs.onUpdated.addListener(listener);
 }
 
 /*

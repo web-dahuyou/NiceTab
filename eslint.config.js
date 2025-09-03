@@ -25,7 +25,7 @@ export default [
     },
     rules: {
       'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'warn',
+      'react-hooks/exhaustive-deps': 'off',
       'react/jsx-uses-react': 'off',
       'react/react-in-jsx-scope': 'off',
       'import/order': 'off',

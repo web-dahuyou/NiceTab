@@ -35,6 +35,7 @@ import {
   CameraOutlined,
   RollbackOutlined,
   SearchOutlined,
+  ReadOutlined,
 } from '@ant-design/icons';
 import styled, { ThemeProvider } from 'styled-components';
 import '~/assets/css/reset.css';
@@ -46,6 +47,7 @@ import {
   ENUM_ACTION_NAME,
   ENUM_SETTINGS_PROPS,
   SHORTCUTS_PAGE_URL,
+  USER_GUIDE_URL_MAP,
 } from '~/entrypoints/common/constants';
 import { actionHandler } from '../common/contextMenus';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -73,6 +75,7 @@ import type {
   StyledThemeProps,
   PageModuleNames,
   PageWidthTypes,
+  LanguageTypes,
 } from '~/entrypoints/types';
 import Home from './home/index.tsx';
 import Settings from './settings/index.tsx';
@@ -106,9 +109,8 @@ const StyledPageContainer = styled.div<{
     align-items: center;
     height: 60px;
     // box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    box-shadow: ${(props) =>
-      props.theme.boxShadow || '0 2px 12px 3px rgba(0, 0, 0, 0.1)'};
-    background: ${(props) => props.theme.colorBgContainer || '#fff'};
+    box-shadow: ${props => props.theme.boxShadow || '0 2px 12px 3px rgba(0, 0, 0, 0.1)'};
+    background: ${props => props.theme.colorBgContainer || '#fff'};
 
     .logo {
       width: 100px;
@@ -138,7 +140,7 @@ const StyledPageContainer = styled.div<{
   }
   @media screen and (min-width: 1200px) {
     .main-content {
-      width: ${(props) => (props.$widthType === 'fixed' ? '1200px' : '100%')};
+      width: ${props => (props.$widthType === 'fixed' ? '1200px' : '100%')};
     }
   }
 `;
@@ -197,7 +199,7 @@ const router = createHashRouter([
         path: '/',
         element: <Home />,
       },
-      ...navsTemplate.map((item) => pick(item, ['path', 'element'])),
+      ...navsTemplate.map(item => pick(item, ['path', 'element'])),
     ],
   },
 ]);
@@ -215,7 +217,7 @@ function AppLayout() {
 
   const { version, themeTypeConfig, pageWidthType, $message } = NiceGlobalContext;
   const navs = useMemo(() => {
-    return navsTemplate.map((item) => {
+    return navsTemplate.map(item => {
       return { ...item, label: $fmt(item.label) };
     });
   }, [$fmt]);
@@ -225,12 +227,12 @@ function AppLayout() {
   // 导航菜单
   const onSelect = useCallback(
     ({ key }: { key: string }) => {
-      const nav = navs.find((item) => item.key === key);
+      const nav = navs.find(item => item.key === key);
       if (nav) {
         nav && navigate(nav.path);
       }
     },
-    [navs, navigate]
+    [navs, navigate],
   );
   // 切换主题类型
   const handleThemeTypeChange = () => {
@@ -247,7 +249,7 @@ function AppLayout() {
   };
   // 切换语言
   const handleLocaleChange = useCallback(({ key }: { key: string }) => {
-    const option = LANGUAGE_OPTIONS.find((item) => item.key === key) || {
+    const option = LANGUAGE_OPTIONS.find(item => item.key === key) || {
       locale: 'zh-CN',
     };
     NiceGlobalContext.setLocale(option.locale);
@@ -283,6 +285,11 @@ function AppLayout() {
           label: $fmt('home.restoreSnapshot'),
         },
         {
+          key: 'userGuide',
+          icon: <ReadOutlined />,
+          label: $fmt('common.userGuide'),
+        },
+        {
           key: 'bindShortcuts',
           icon: <KeyOutlined />,
           label: $fmt('common.bindShortcuts'),
@@ -301,7 +308,7 @@ function AppLayout() {
         },
         { key: 'reload', icon: <ReloadOutlined />, label: $fmt('common.reload') },
       ]),
-    [$fmt]
+    [$fmt],
   );
 
   const handleExtActionClick: MenuProps['onClick'] = async ({ key }) => {
@@ -309,6 +316,14 @@ function AppLayout() {
       handleSendAllTabs();
     } else if (key === 'reload') {
       browser.runtime.reload();
+    } else if (key === 'userGuide') {
+      // TODO: 等英文版翻译完成后再启用
+      // const docPath = USER_GUIDE_URL_MAP[locale as LanguageTypes];
+      const docPath = USER_GUIDE_URL_MAP['zh-CN'];
+      openNewTab(docPath, {
+        active: true,
+        openToNext: true,
+      });
     } else if (key === 'bindShortcuts') {
       openNewTab(SHORTCUTS_PAGE_URL, {
         active: true,
@@ -327,7 +342,7 @@ function AppLayout() {
   };
 
   useEffect(() => {
-    const nav = navs.find((item) => item.path === location.pathname);
+    const nav = navs.find(item => item.path === location.pathname);
     setSelectedKeys([nav?.key || 'home']);
   }, [location.pathname]);
 

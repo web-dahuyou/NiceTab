@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>用户指南</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./css/github-markdown.css" />
+  <style>
+    body { display: flex; justify-content: center; padding: 20px; background-color: #fff; }
+    .markdown-body { box-sizing: border-box; min-width: 200px; max-width: 980px; width: 100%; padding: 45px; }
+    @media (max-width: 767px) { .markdown-body { padding: 15px; } }
+  </style>
+</head>
+<body>
+  <article class="markdown-body"><h1 id="贡献指南">贡献指南</h1>
+<h2 id="提交代码">提交代码</h2>
+<ol>
+<li><p><a href="https://github.com/web-dahuyou/NiceTab/fork">Fork</a> 仓库。</p>
+</li>
+<li><p>将上述Fork仓库克隆到本地。</p>
+<pre><code class="language-bash">git clone https://github.com/${yourname}/NiceTab
+</code></pre>
+</li>
+<li><p>从 <code>dev</code> 分支创建自己的分支 <code>dev-your-awesome-code</code>。</p>
+<pre><code class="language-bash">git checkout -b dev-your-awesome-code origin/dev
+</code></pre>
+</li>
+<li><p>提交修改（注意 <a href="https://github.com/angular/angular/blob/main/contributing-docs/commit-message-guidelines.html">commit message规范</a>）。</p>
+<pre><code class="language-bash">git commit -m &#39;feat: add a new feature&#39;
+</code></pre>
+</li>
+<li><p>将你的分支推送到你的远程仓库。</p>
+<pre><code class="language-bash">git push -u origin dev-your-awesome-code
+</code></pre>
+</li>
+<li><p>从 <code>dev-your-awesome-code</code> <a href="https://github.com/web-dahuyou/NiceTab/compare">创建PR</a> 到 <a href="https://github.com/web-dahuyou/NiceTab/compare/dev">web-dahuyou/NiceTab</a> <code>dev</code>分支。</p>
+<pre><code class="language-bash">https://github.com/web-dahuyou/NiceTab/compare/dev...${yourname}:NiceTab:dev-your-awesome-code
+</code></pre>
+</li>
+</ol>
+<h2 id="项目启动">项目启动</h2>
+<ul>
+<li>依赖安装：<code>pnpm install</code></li>
+<li>启动插件服务：<code>pnpm run dev</code></li>
+</ul>
+<p><strong>注意</strong>：每个js文件都必须有 <code>export default</code> 默认导出，否则本地启动服务时会报错。</p>
+<h3 id="指定浏览器可执行文件路径">指定浏览器可执行文件路径</h3>
+<p>默认情况下，<code>wxt</code> 会自动识别 <code>Chrome/Firefox</code> 的安装路径，并启动对应的浏览器。如果启动项目报错找不到浏览器安装路径</p>
+<pre><code>ERROR  No Chrome installations found.  
+</code></pre>
+<p>或者想自定义浏览器可执行文件，可以参考 <a href="https://wxt.dev/guide/essentials/config/browser-startup.html#set-browser-binaries">官方文档-Set Browser Binaries</a>，手动配置浏览器可执行文件的路径即可。</p>
+<pre><code class="language-js">// &lt;rootDir&gt;/web-ext.config.ts
+
+export default defineRunnerConfig({
+  binaries: {
+    chrome: &#39;/path/to/chrome-beta&#39;, // Use Chrome Beta instead of regular Chrome
+    firefox: &#39;firefoxdeveloperedition&#39;, // Use Firefox Developer Edition instead of regular Firefox
+    edge: &#39;/path/to/edge&#39;, // Open MS Edge when running &quot;wxt -b edge&quot;
+  },
+});
+</code></pre>
+<h3 id="持久化存储用户数据">持久化存储用户数据</h3>
+<p>如果希望每次启动项目时，都使用上次保存的用户数据，可以参考 <a href="https://wxt.dev/guide/essentials/config/browser-startup.html#persist-data">官方文档-persist-data</a> 进行持久化存储即可。</p>
+<pre><code class="language-js">// &lt;rootDir&gt;/web-ext.config.ts
+
+import { defineRunnerConfig } from &#39;wxt&#39;;
+
+// Mac/Linux
+export default defineRunnerConfig({
+   chromiumArgs: [&#39;--user-data-dir=./.wxt/chrome-data&#39;],
+});
+
+// Windows
+import path from &#39;path&#39;;
+export default defineRunnerConfig({
+   // 在Windows上，路径必须是绝对的
+   chromiumProfile: path.resolve(&#39;.wxt\\chrome-data&#39;),
+   keepProfileChanges: true
+})
+</code></pre>
+</article>
+</body>
+</html>

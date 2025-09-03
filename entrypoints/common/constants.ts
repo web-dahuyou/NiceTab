@@ -57,7 +57,7 @@ export const THEME_COLOR_NAMES: ThemeColors[] = [
 ];
 // 主色
 export const PRIMARY_COLOR = ENUM_COLORS.blue;
-export const THEME_COLORS: ColorItem[] = THEME_COLOR_NAMES.map((name) => {
+export const THEME_COLORS: ColorItem[] = THEME_COLOR_NAMES.map(name => {
   return {
     key: name,
     color: ENUM_COLORS?.[name],
@@ -241,7 +241,7 @@ export const syncExcludedSettingsProps = [
   ENUM_SETTINGS_PROPS.AUTO_SYNC_INTERVAL,
   ENUM_SETTINGS_PROPS.AUTO_SYNC_TIME_RANGES,
   ENUM_SETTINGS_PROPS.AUTO_SYNC_TYPE,
-]
+];
 
 // 页面上下文类型枚举
 export const pageContextTypes: PageContextType[] = [
@@ -249,6 +249,12 @@ export const pageContextTypes: PageContextType[] = [
   'popupPage',
   'contentScriptPage',
 ];
+
+// 用户指南页面链接
+export const USER_GUIDE_URL_MAP: Record<LanguageTypes, string> = {
+  'zh-CN': '/docs/GUIDE-zh.html',
+  'en-US': '/docs/GUIDE.html',
+};
 
 export default {
   ENUM_COLORS,
@@ -263,4 +269,5 @@ export default {
   defaultAutoSyncType,
   UNNAMED_TAG,
   UNNAMED_GROUP,
+  USER_GUIDE_URL_MAP,
 };
