@@ -12,13 +12,14 @@ import { getAdminTabInfo, openNewTab, discardOtherTabs } from '~/entrypoints/com
 import { getMenus, actionHandler } from '~/entrypoints/common/contextMenus';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import { TAB_EVENTS, SHORTCUTS_PAGE_URL } from '~/entrypoints/common/constants';
-import type { PopupModuleNames } from '~/entrypoints/types';
+import type { PopupModuleNames, LanguageTypes } from '~/entrypoints/types';
 import {
   GITHUB_URL,
   THEME_COLORS,
   ENUM_SETTINGS_PROPS,
   ENUM_ACTION_NAME,
   POPUP_MODULE_NAMES,
+  USER_GUIDE_URL_MAP,
 } from '~/entrypoints/common/constants';
 import ColorList from '~/entrypoints/common/components/ColorList.tsx';
 import { GlobalStyle } from '~/entrypoints/common/style/Common.styled';
@@ -49,7 +50,7 @@ function handleQuickJump(route: { path: string; query?: Record<string, any> }) {
 export default function App() {
   const { token } = theme.useToken();
   const NiceGlobalContext = useContext(GlobalContext);
-  const { $fmt } = useIntlUtls();
+  const { $fmt, locale } = useIntlUtls();
   const { version, themeTypeConfig } = NiceGlobalContext;
   const [tabs, setTabs] = useState<Tabs.Tab[]>([]);
   const [tabGroupList, setTabGroupList] = useState<GroupListItem[]>([]);
@@ -69,6 +70,19 @@ export default function App() {
       disabled: import.meta.env.FIREFOX,
       onClick: () => {
         openNewTab(SHORTCUTS_PAGE_URL, {
+          active: true,
+          openToNext: true,
+        });
+      },
+    },
+    {
+      path: '/user-guide',
+      label: $fmt('common.userGuide'),
+      onClick: () => {
+        // TODO: 等英文版翻译完成后再启用
+        // const docPath = USER_GUIDE_URL_MAP[locale as LanguageTypes];
+        const docPath = USER_GUIDE_URL_MAP['zh-CN'];
+        openNewTab(docPath, {
           active: true,
           openToNext: true,
         });
@@ -97,14 +111,14 @@ export default function App() {
   // 操作按钮
   const getActionBtns = async (): Promise<ActionBtnItem[]> => {
     let menus = await getMenus();
-    menus = menus.filter((menu) => menu.tag === 'sendTabs');
+    menus = menus.filter(menu => menu.tag === 'sendTabs');
 
     return [
       {
         type: 'group',
         key: 'group-sendTabs',
         label: $fmt('common.sendTabs'),
-        children: menus.map((menu) => ({
+        children: menus.map(menu => ({
           key: menu.id!,
           label: menu.title!,
           disabled: menu.enabled === false,
@@ -158,9 +172,9 @@ export default function App() {
     if (tab.active || tab.discarded) return;
 
     tab.id && (await browser.tabs.discard(tab.id));
-    browser.tabs.query({ currentWindow: true }).then(async (allTabs) => {
+    browser.tabs.query({ currentWindow: true }).then(async allTabs => {
       const { tab: adminTab } = await getAdminTabInfo();
-      handleTabsChange(allTabs?.filter((t) => t.id !== adminTab?.id && !t.pinned));
+      handleTabsChange(allTabs?.filter(t => t.id !== adminTab?.id && !t.pinned));
     });
   }, []);
 
@@ -168,17 +182,17 @@ export default function App() {
     async (tab: Tabs.Tab) => {
       const { tab: adminTab } = await getAdminTabInfo();
       const newTabs = tabs.filter(
-        (t) => t.id !== tab.id && t.id !== adminTab?.id && !t.pinned
+        t => t.id !== tab.id && t.id !== adminTab?.id && !t.pinned,
       );
       handleTabsChange(newTabs);
       if (tab.id) {
         await browser.tabs.remove(tab.id);
-        browser.tabs.query({ currentWindow: true }).then(async (allTabs) => {
-          handleTabsChange(allTabs?.filter((t) => t.id !== adminTab?.id && !t.pinned));
+        browser.tabs.query({ currentWindow: true }).then(async allTabs => {
+          handleTabsChange(allTabs?.filter(t => t.id !== adminTab?.id && !t.pinned));
         });
       }
     },
-    [tabs]
+    [tabs],
   );
 
   const handleTabAction = useCallback(
@@ -191,14 +205,14 @@ export default function App() {
         handleTabRemove(tab);
       }
     },
-    [tabs]
+    [tabs],
   );
 
   const handleTabsChange = useCallback(async (tabs: Tabs.Tab[]) => {
     setTabs(tabs);
     let groupList: GroupListItem[] = [];
     if (!isGroupSupported()) {
-      groupList = tabs.map((item) => ({
+      groupList = tabs.map(item => ({
         groupId: -1,
         groupName: '',
         tabs: [item],
@@ -210,7 +224,7 @@ export default function App() {
           return result.concat({ groupId: -1, groupName: '', tabs: [tab] });
         }
 
-        const group = result.find((item) => item.groupId === groupId);
+        const group = result.find(item => item.groupId === groupId);
         if (!group) {
           return result.concat({ groupId, groupName: '', tabs: [tab] });
         }
@@ -243,18 +257,18 @@ export default function App() {
     setActionBtns(_actionBtns);
 
     if (modules.includes('openedTabs')) {
-      browser.tabs.query({ currentWindow: true }).then(async (allTabs) => {
+      browser.tabs.query({ currentWindow: true }).then(async allTabs => {
         const { tab: adminTab } = await getAdminTabInfo();
-        handleTabsChange(allTabs?.filter((t) => t.id !== adminTab?.id && !t.pinned));
+        handleTabsChange(allTabs?.filter(t => t.id !== adminTab?.id && !t.pinned));
       });
     }
   };
 
   useEffect(() => {
     init();
-    TAB_EVENTS.forEach((event) => browser.tabs[event]?.addListener(init));
+    TAB_EVENTS.forEach(event => browser.tabs[event]?.addListener(init));
     return () => {
-      TAB_EVENTS.forEach((event) => browser.tabs[event]?.removeListener(init));
+      TAB_EVENTS.forEach(event => browser.tabs[event]?.removeListener(init));
     };
   }, []);
 
@@ -286,16 +300,18 @@ export default function App() {
             <div className="block quick-actions">
               <span className="block-title">{$fmt('common.goto')}：</span>
               <div className="block-content">
-                {quickJumpBtns.map((item) => (
-                  <Button
-                    size="small"
-                    key={item.path}
-                    disabled={item.disabled}
-                    onClick={item.onClick}
-                  >
-                    {item.label}
-                  </Button>
-                ))}
+                {quickJumpBtns
+                  .filter(item => !item.disabled)
+                  .map(item => (
+                    <Button
+                      size="small"
+                      key={item.path}
+                      disabled={item.disabled}
+                      onClick={item.onClick}
+                    >
+                      {item.label}
+                    </Button>
+                  ))}
               </div>
             </div>
           )}
@@ -304,7 +320,7 @@ export default function App() {
             <div className="block quick-actions">
               <span className="block-title">{$fmt('common.actions')}：</span>
               <div className="block-content">
-                {actionBtns.map((item) => {
+                {actionBtns.map(item => {
                   if (item.type === 'group' && item.children?.length) {
                     return (
                       <Dropdown

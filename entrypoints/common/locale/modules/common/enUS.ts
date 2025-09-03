@@ -111,6 +111,7 @@ const enUS: Record<LocaleKey, string> = {
   'common.timeout': 'Request Timeout',
   'common.aborted': 'Request Aborted',
   'common.networkError': 'Network Connection Error',
+  'common.userGuide': 'User Guide',
 };
 
 export default enUS;

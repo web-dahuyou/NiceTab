@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>用户指南</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./css/github-markdown.css" />
+  <style>
+    body { display: flex; justify-content: center; padding: 20px; background-color: #fff; }
+    .markdown-body { box-sizing: border-box; min-width: 200px; max-width: 980px; width: 100%; padding: 45px; }
+    @media (max-width: 767px) { .markdown-body { padding: 15px; } }
+  </style>
+</head>
+<body>
+  <article class="markdown-body"><h1 id="contributing-guide">Contributing Guide</h1>
+<h2 id="submitting-code">Submitting Code</h2>
+<ol>
+<li><p><a href="https://github.com/web-dahuyou/NiceTab/fork">Fork</a> the repository.</p>
+</li>
+<li><p>Clone your forked repository to your local machine.</p>
+<pre><code class="language-bash">git clone https://github.com/${yourname}/NiceTab
+</code></pre>
+</li>
+<li><p>Create your feature branch <code>dev-your-awesome-code</code> from the <code>dev</code> branch.</p>
+<pre><code class="language-bash">git checkout -b dev-your-awesome-code origin/dev
+</code></pre>
+</li>
+<li><p>Commit your changes (follow <a href="https://github.com/angular/angular/blob/main/contributing-docs/commit-message-guidelines.html">commit message conventions</a>).</p>
+<pre><code class="language-bash">git commit -m &#39;feat: add a new feature&#39;
+</code></pre>
+</li>
+<li><p>Push your branch to your remote repository.</p>
+<pre><code class="language-bash">git push -u origin dev-your-awesome-code
+</code></pre>
+</li>
+<li><p><a href="https://github.com/web-dahuyou/NiceTab/compare">Create a Pull Request</a> from your <code>dev-your-awesome-code</code> branch to the <code>dev</code> branch of <a href="https://github.com/web-dahuyou/NiceTab/compare/dev">web-dahuyou/NiceTab</a>.</p>
+<pre><code class="language-bash">https://github.com/web-dahuyou/NiceTab/compare/dev...${yourname}:NiceTab:dev-your-awesome-code
+</code></pre>
+</li>
+</ol>
+<h2 id="project-setup">Project Setup</h2>
+<ul>
+<li>Install dependencies:<br><code>pnpm install</code></li>
+<li>Start the dev server:<br><code>pnpm run dev</code></li>
+</ul>
+<p>Important: Each <code>.js .ts .tsx</code> file must have an <code>export default</code> statement. Otherwise, you&#39;ll encounter errors when running the local service.</p>
+<h3 id="set-browser-binaries">Set Browser Binaries</h3>
+<p>By default, <code>WXT</code> will try to automatically discover where <code>Chrome/Firefox</code> are installed. If you encounter an error:</p>
+<pre><code>ERROR  No Chrome installations found.  
+</code></pre>
+<p>Or you want to specify a browser executable binary.</p>
+<p>You can refer to the <a href="https://wxt.dev/guide/essentials/config/browser-startup.html#set-browser-binaries">docs - Set Browser Binaries</a> to manually configure the browser binary paths.</p>
+<pre><code class="language-js">// &lt;rootDir&gt;/web-ext.config.ts
+
+export default defineRunnerConfig({
+  binaries: {
+    chrome: &#39;/path/to/chrome-beta&#39;, // Use Chrome Beta instead of regular Chrome
+    firefox: &#39;firefoxdeveloperedition&#39;, // Use Firefox Developer Edition instead of regular Firefox
+    edge: &#39;/path/to/edge&#39;, // Open MS Edge when running &quot;wxt -b edge&quot;
+  },
+});
+</code></pre>
+<h3 id="persist-user-data">Persist User Data</h3>
+<p>If you want to preserve user data between development sessions, you can persist data by following the <a href="https://wxt.dev/guide/essentials/config/browser-startup.html#persist-data">official documentation - persist-data</a>.</p>
+<pre><code class="language-js">// &lt;rootDir&gt;/web-ext.config.ts
+
+import { defineRunnerConfig } from &#39;wxt&#39;;
+
+// Mac/Linux
+export default defineRunnerConfig({
+   chromiumArgs: [&#39;--user-data-dir=./.wxt/chrome-data&#39;],
+});
+
+// Windows
+import path from &#39;path&#39;;
+export default defineRunnerConfig({
+   // On Windows, the path must be absolute
+   chromiumProfile: path.resolve(&#39;.wxt\\chrome-data&#39;),
+   keepProfileChanges: true
+})
+</code></pre>
+</article>
+</body>
+</html>

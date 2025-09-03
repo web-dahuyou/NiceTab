@@ -24,7 +24,7 @@ import { pick, sendRuntimeMessage } from '~/entrypoints/common/utils';
 import { ENUM_COLORS, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls, eventEmitter } from '~/entrypoints/common/hooks/global';
 import { settingsUtils } from '~/entrypoints/common/storage';
-import { openNewGroup, updateAdminPageUrlDebounced } from '~/entrypoints/common/tabs';
+import { openNewTab, updateAdminPageUrlDebounced } from '~/entrypoints/common/tabs';
 import { ContentGlobalContext } from '~/entrypoints/content/context';
 import {
   StyledEllipsis,
@@ -518,11 +518,9 @@ export const GlobalSearchBox = forwardRef(
           const discard = settings?.[DISCARD_WHEN_OPEN_TABS];
           const groupByList = groupBy(selectedItems, 'groupId');
           for (const [groupId, items] of Object.entries(groupByList)) {
-            openNewGroup(
-              '',
-              items.map(tab => tab.url),
-              { discard, asGroup: false },
-            );
+            items.forEach(item => {
+              item.url && openNewTab(item.url, { discard });
+            });
 
             if (autoDelete && !items[0]?.isLocked) {
               await tabListUtils.removeTabs(
