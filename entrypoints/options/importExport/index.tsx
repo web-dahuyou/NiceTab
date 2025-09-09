@@ -11,6 +11,7 @@ import {
   extContentImporter,
   extContentExporter,
   sendRuntimeMessage,
+  niceTab2html,
 } from '~/entrypoints/common/utils';
 import { reloadOtherAdminPage } from '~/entrypoints/common/tabs';
 import { initialValues, formatTypeOptions, importModeOptions } from './constants';
@@ -40,7 +41,7 @@ export default function ImportExport() {
 
   const importFileExtname = useMemo(() => {
     const option =
-      formatTypeOptions.find((option) => option.type === formatType) ||
+      formatTypeOptions.find(option => option.type === formatType) ||
       formatTypeOptions[0];
     return option.extname;
   }, [formatType]);
@@ -56,7 +57,7 @@ export default function ImportExport() {
         await tabListUtils.importTags(tagList, importMode);
 
         messageApi.success(
-          $fmt({ id: 'common.actionSuccess', values: { action: $fmt('common.import') } })
+          $fmt({ id: 'common.actionSuccess', values: { action: $fmt('common.import') } }),
         );
         form.setFieldValue('importContent', '');
       } catch {
@@ -66,7 +67,7 @@ export default function ImportExport() {
     }, 500);
   };
   // 选择文件导入
-  const handleSelectFile: UploadProps['beforeUpload'] = (file) => {
+  const handleSelectFile: UploadProps['beforeUpload'] = file => {
     const reader = new FileReader();
     reader.onload = () => {
       const content = reader.result as string;
@@ -84,7 +85,7 @@ export default function ImportExport() {
   const getExportContent = useCallback(async () => {
     const formatType = exportFormatType || 1;
     const exportTagList = await tabListUtils.exportTags();
-    const formatOption = formatTypeOptions.find((option) => option.type === formatType);
+    const formatOption = formatTypeOptions.find(option => option.type === formatType);
     const funcName = formatOption?.funcName || 'niceTab';
     try {
       const content = extContentExporter?.[funcName]?.(exportTagList);
@@ -102,7 +103,7 @@ export default function ImportExport() {
     setTimeout(async () => {
       const now = dayjs().format('YYYY-MM-DD_HHmmss');
       const { label, extname, fileType } =
-        formatTypeOptions.find((item) => item.type == exportFormatType) ||
+        formatTypeOptions.find(item => item.type == exportFormatType) ||
         formatTypeOptions[0];
       const fileName = `export_${label}_${now}.${extname}`;
       const content = await getExportContent();
@@ -111,8 +112,22 @@ export default function ImportExport() {
     }, 500);
   }, [exportFormatType]);
 
+  // 导出为html格式
+  const saveAsHtml = useCallback(async () => {
+    setDownloadLoading(true);
+    setTimeout(async () => {
+      const now = dayjs().format('YYYY-MM-DD_HHmmss');
+
+      const exportTagList = await tabListUtils.exportTags();
+      const content = await niceTab2html(exportTagList);
+      const fileName = `export_NiceTab_html_${now}.html`;
+      saveAs(new Blob([content], { type: `text/html;charset=utf-8` }), fileName);
+      setDownloadLoading(false);
+    }, 500);
+  }, []);
+
   // 选择设置文件导入
-  const handleSelectSettingsFile: UploadProps['beforeUpload'] = (file) => {
+  const handleSelectSettingsFile: UploadProps['beforeUpload'] = file => {
     const reader = new FileReader();
     reader.onload = async () => {
       setSettingsImportLoading(true);
@@ -124,7 +139,7 @@ export default function ImportExport() {
         sendRuntimeMessage({ msgType: 'setLocale', data: { locale: settings.language } });
         reloadOtherAdminPage();
         messageApi.success(
-          $fmt({ id: 'common.actionSuccess', values: { action: $fmt('common.import') } })
+          $fmt({ id: 'common.actionSuccess', values: { action: $fmt('common.import') } }),
         );
       } catch (err) {
         console.error(err);
@@ -167,8 +182,8 @@ export default function ImportExport() {
             label={$fmt({ id: 'importExport.formatType', values: { action: 'import' } })}
             name="formatType"
           >
-            <Radio.Group onChange={(e) => setFormatType(e.target.value)}>
-              {formatTypeOptions.map((item) => (
+            <Radio.Group onChange={e => setFormatType(e.target.value)}>
+              {formatTypeOptions.map(item => (
                 <Radio value={item.type} key={item.type}>
                   {$fmt({
                     id: 'importExport.formatType.optionLabel',
@@ -179,8 +194,8 @@ export default function ImportExport() {
             </Radio.Group>
           </Form.Item>
           <Form.Item label={$fmt('importExport.importMode')} name="importMode">
-            <Radio.Group onChange={(e) => setImportMode(e.target.value)}>
-              {importModeOptions.map((item) => (
+            <Radio.Group onChange={e => setImportMode(e.target.value)}>
+              {importModeOptions.map(item => (
                 <Radio value={item.type} key={item.type}>
                   {$fmt({
                     id: 'importExport.importMode.optionLabel',
@@ -231,13 +246,22 @@ export default function ImportExport() {
               ))}
             </Radio.Group>
           </Form.Item> */}
-          <Form.Item>
-            <Space size={12} align="center">
-              <Button type="primary" loading={downloadLoading} onClick={handleDownload}>
-                {$fmt('importExport.exportToFile')}
-              </Button>
-            </Space>
-          </Form.Item>
+          <Space size={12} align="center">
+            <Form.Item>
+              <Space size={12} align="center">
+                <Button type="primary" loading={downloadLoading} onClick={handleDownload}>
+                  {$fmt('importExport.exportToFile')}
+                </Button>
+              </Space>
+            </Form.Item>
+            <Form.Item>
+              <Space size={12} align="center">
+                <Button type="primary" loading={downloadLoading} onClick={saveAsHtml}>
+                  {$fmt('importExport.saveAsHtml')}
+                </Button>
+              </Space>
+            </Form.Item>
+          </Space>
         </Form>
       </StyledWrapper>
 

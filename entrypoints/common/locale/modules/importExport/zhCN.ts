@@ -31,9 +31,10 @@ const zhCN = {
   'importExport.getContent': '生成内容',
   'importExport.copy': '复制到剪贴板',
   'importExport.exportToFile': '导出到本地',
+  'importExport.saveAsHtml': '保存为HTML',
   'importExport.CopySuccess': '复制成功',
   'importExport.CopyFailed': '复制失败',
-}
+};
 
 export type LocaleKey = keyof typeof zhCN;
 

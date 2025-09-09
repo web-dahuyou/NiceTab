@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import type {
   TagItem,
   TabItem,
@@ -16,6 +17,7 @@ import type {
   ExtContentParserFuncName,
 } from '~/entrypoints/types';
 import { getRandomId, newCreateTime } from '~/entrypoints/common/utils';
+import { UNNAMED_TAG, UNNAMED_GROUP } from '../constants';
 
 // 识别内容格式
 export const extContentFormatCheck = (content: string): ExtContentParserFuncName => {
@@ -83,13 +85,13 @@ export const extContentImporter: ExtContentImporterProps = {
   niceTab(content: string): TagItem[] {
     const tagList = JSON.parse(content || '[]') as TagItem[];
     const createTime = newCreateTime();
-    tagList.forEach((tag) => {
+    tagList.forEach(tag => {
       tag.tagId = tag.static ? '0' : getRandomId();
       tag.createTime = tag.createTime || createTime;
-      tag?.groupList?.forEach((group) => {
+      tag?.groupList?.forEach(group => {
         group.groupId = getRandomId();
         group.createTime = group.createTime || createTime;
-        group?.tabList?.forEach((tab) => {
+        group?.tabList?.forEach(tab => {
           const { favIconUrl } = tab;
           tab.tabId = getRandomId();
           tab.favIconUrl = favIconUrl?.startsWith('data:image/') ? '' : favIconUrl;
@@ -138,7 +140,7 @@ export const extContentImporter: ExtContentImporterProps = {
       if (!tabGroup?.title?.trim()) {
         tabGroup.title = `toby-${getRandomId()}`;
       }
-      const tabList = tabGroup.cards.map((tabItem) => ({
+      const tabList = tabGroup.cards.map(tabItem => ({
         tabId: getRandomId(),
         title: tabItem.customTitle || tabItem.title,
         url: tabItem.url,
@@ -159,17 +161,17 @@ export const extContentImporter: ExtContentImporterProps = {
     const sessionBuddyData = JSON.parse(content || '{}') as SessionBuddyData;
     const tagList = sessionBuddyData.collections || [];
     const createTime = newCreateTime();
-    return tagList.map((tag) => {
+    return tagList.map(tag => {
       return {
         tagId: getRandomId(),
         tagName: tag.title ? `SessionBuddy-${tag.title}` : 'SessionBuddy',
         createTime: tag.created ? newCreateTime(tag.created) : createTime,
-        groupList: tag.folders?.map((group) => {
+        groupList: tag.folders?.map(group => {
           return {
             groupId: getRandomId(),
             groupName: group.title || `sessionBuddy-${getRandomId()}`,
             createTime: createTime,
-            tabList: group.links?.map((tab) => {
+            tabList: group.links?.map(tab => {
               return {
                 tabId: getRandomId(),
                 title: tab.title,
@@ -189,9 +191,9 @@ export const extContentExporter: ExtContentExporterProps = {
   oneTab(tagList): string {
     let resultList: string[] = [];
     try {
-      tagList.forEach((tag) => {
-        tag?.groupList?.forEach((group) => {
-          group?.tabList?.forEach((tab) => {
+      tagList.forEach(tag => {
+        tag?.groupList?.forEach(group => {
+          group?.tabList?.forEach(tab => {
             resultList.push(`${tab.url} | ${tab.title}\n`);
           });
           resultList.push('\n');
@@ -216,7 +218,7 @@ export const extContentExporter: ExtContentExporterProps = {
         tag?.groupList?.forEach((group, grpIdx) => {
           const tabList: KepTabItem[] = [];
           const tabUrls: string[] = [];
-          group?.tabList?.forEach((tab) => {
+          group?.tabList?.forEach(tab => {
             if (tab.url) {
               tabList.push({
                 url: tab.url,
@@ -252,7 +254,7 @@ export const extContentExporter: ExtContentExporterProps = {
       (tagList as TagItem[]).forEach((tag, tagIdx) => {
         tag?.groupList?.forEach((group, grpIdx) => {
           const tabList: TobyItem[] = [];
-          group?.tabList?.forEach((tab) => {
+          group?.tabList?.forEach(tab => {
             if (tab.url) {
               tabList.push({
                 url: tab.url,
@@ -282,7 +284,83 @@ export const extContentExporter: ExtContentExporterProps = {
   },
 };
 
+// 将 legacy Netscape HTML 转化为 tagList 格式
+export function html2niceTab(html: string): TagItem[] {
+
+  return [];
+}
+
+// 将 tagList 转化为 legacy Netscape HTML 书签格式
+export function niceTab2html(tagList: Partial<TagItem>[]): string {
+  function indent(level: number) {
+    return ' '.repeat(level * 4);
+  }
+
+  function escapeHtml(text: string | undefined | null): string {
+    if (!text) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  let html = [];
+  html.push('<!DOCTYPE NETSCAPE-Bookmark-file-1>');
+  html.push('<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">');
+  html.push('<TITLE>Bookmarks</TITLE>');
+  html.push('<H1>Bookmarks</H1>');
+  html.push('<DL><p>');
+  html.push(
+    indent(1) +
+      `<DT><H3 ADD_DATE="${dayjs().unix()}" PERSONAL_TOOLBAR_FOLDER="true">NiceTab</H3>`,
+  );
+  html.push(indent(1) + '<DL><p>');
+
+  tagList?.forEach(tag => {
+    const tagAddDate = tag.createTime ? dayjs(tag.createTime).unix() : '';
+    const tagAddDateStr = tagAddDate ? ` ADD_DATE="${tagAddDate}"` : '';
+    // 分类名为文件夹
+    html.push(
+      indent(2) +
+        `<DT><H3${tagAddDateStr}>${escapeHtml(tag.tagName || UNNAMED_TAG)}</H3>`,
+    );
+    html.push(indent(2) + '<DL><p>');
+
+    tag?.groupList?.forEach(group => {
+      const groupAddDate = group.createTime ? dayjs(group.createTime).unix() : '';
+      const groupAddDateStr = groupAddDate ? ` ADD_DATE="${groupAddDate}"` : '';
+      // 分组名为子文件夹
+      html.push(
+        indent(3) +
+          `<DT><H3${groupAddDateStr}>${escapeHtml(group.groupName || UNNAMED_GROUP)}</H3>`,
+      );
+      html.push(indent(3) + '<DL><p>');
+
+      group?.tabList?.forEach(tab => {
+        if (tab.url) {
+          // 书签条目
+          const tabAddDate = groupAddDate || tagAddDate;
+          const tabAddDateStr = tabAddDate ? ` ADD_DATE="${tabAddDate}"` : '';
+          const title = escapeHtml(tab.title || tab.url);
+          const href = escapeHtml(tab.url);
+          html.push(indent(4) + `<DT><A HREF="${href}"${tabAddDateStr}>${title}</A>`);
+        }
+      });
+      html.push(indent(3) + '</DL><p>');
+    });
+
+    html.push(indent(2) + '</DL><p>');
+  });
+
+  html.push(indent(1) + '</DL><p>');
+  html.push('</DL><p>');
+  return html.join('\n');
+}
+
 export default {
   extContentImporter,
   extContentExporter,
+  niceTab2html,
 };
