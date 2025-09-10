@@ -141,7 +141,7 @@ function TabGroup({
 
   const group = useMemo(
     () => ({ groupId, groupName, createTime, isLocked, isStarred, selected }),
-    [groupId, groupName, createTime, isLocked, isStarred, selected]
+    [groupId, groupName, createTime, isLocked, isStarred, selected],
   );
 
   // 框选相关状态
@@ -164,7 +164,7 @@ function TabGroup({
 
   // 已选择的tabItem数组
   const selectedTabs = useMemo(() => {
-    return tabList.filter((tab) => selectedTabIds.includes(tab.tabId));
+    return tabList.filter(tab => selectedTabIds.includes(tab.tabId));
   }, [tabList, selectedTabIds]);
   // 是否全选
   const isAllChecked = useMemo(() => {
@@ -176,10 +176,10 @@ function TabGroup({
     return selectedTabIds.length > 0 && selectedTabIds.length < tabList.length;
   }, [tabList, selectedTabIds]);
   // 全选
-  const handleSelectAll: CheckboxProps['onChange'] = (e) => {
+  const handleSelectAll: CheckboxProps['onChange'] = e => {
     const checked = e.target.checked;
     if (checked) {
-      setSelectedTabIds(tabList.map((tab) => tab.tabId));
+      setSelectedTabIds(tabList.map(tab => tab.tabId));
     } else {
       setSelectedTabIds([]);
     }
@@ -258,13 +258,13 @@ function TabGroup({
         action: 'handleTabItemRemove',
         params: [group.groupId, tabs],
         callback: () => {
-          setSelectedTabIds((selectedTabIds) =>
-            selectedTabIds.filter((id) => !tabs.some((tab) => tab.tabId === id))
+          setSelectedTabIds(selectedTabIds =>
+            selectedTabIds.filter(id => !tabs.some(tab => tab.tabId === id)),
           );
         },
       });
     },
-    [group.groupId]
+    [group.groupId],
   );
   // 删除确认
   const handleTabRemoveConfirm = useCallback(async () => {
@@ -304,10 +304,13 @@ function TabGroup({
   }, []);
 
   const getGroupActionOptions: () => ActionOptionItem[] = useCallback(() => {
-    const actionMap = groupActionOptions.reduce((result, option) => {
-      result[option.actionName] = option;
-      return result;
-    }, {} as Record<GroupActionName, ActionOption>);
+    const actionMap = groupActionOptions.reduce(
+      (result, option) => {
+        result[option.actionName] = option;
+        return result;
+      },
+      {} as Record<GroupActionName, ActionOption>,
+    );
 
     const btns: ActionOptionItem[] = [
       {
@@ -328,7 +331,7 @@ function TabGroup({
       {
         key: 'lock',
         label: $fmt(
-          isLocked ? 'home.tabGroup.unlock' : 'home.tabGroup.lock'
+          isLocked ? 'home.tabGroup.unlock' : 'home.tabGroup.lock',
         ) as LocaleKeys,
         disabled: tagLocked,
         icon: isLocked ? <UnlockOutlined /> : <LockOutlined />,
@@ -337,7 +340,7 @@ function TabGroup({
       {
         key: 'star',
         label: $fmt(
-          isStarred ? 'home.tabGroup.unstar' : 'home.tabGroup.star'
+          isStarred ? 'home.tabGroup.unstar' : 'home.tabGroup.star',
         ) as LocaleKeys,
         disabled: tagLocked,
         icon: <StarOutlined />,
@@ -386,7 +389,7 @@ function TabGroup({
       },
     ];
 
-    return btns.filter((item) => {
+    return btns.filter(item => {
       const isAllowed = allowGroupActions.includes(item.key);
       const isValid = item.validator?.() ?? true;
       return isAllowed && isValid;
@@ -394,6 +397,7 @@ function TabGroup({
   }, [
     $fmt,
     allowGroupActions,
+    tagLocked,
     groupId,
     isLocked,
     isStarred,
@@ -413,7 +417,7 @@ function TabGroup({
 
     const groupActionBtnOptions = getGroupActionOptions();
 
-    groupActionBtnOptions.forEach((item) => {
+    groupActionBtnOptions.forEach(item => {
       if (settings[GROUP_ACTION_BTNS_COMMONLY_USED]?.includes(item.key)) {
         outerList.push(item);
       } else {
@@ -425,10 +429,13 @@ function TabGroup({
   }, [getGroupActionOptions]);
 
   const selectedTabsActions: ActionOptionItem[] = useMemo(() => {
-    const actionMap = tabsActionOptions.reduce((result, option) => {
-      result[option.actionName] = option;
-      return result;
-    }, {} as Record<TabActionName, ActionOption<'tab'>>);
+    const actionMap = tabsActionOptions.reduce(
+      (result, option) => {
+        result[option.actionName] = option;
+        return result;
+      },
+      {} as Record<TabActionName, ActionOption<'tab'>>,
+    );
 
     return [
       {
@@ -465,9 +472,12 @@ function TabGroup({
         disabled: tagLocked || isLocked,
         onClick: handleSelectedTabsCopy,
       },
-    ].filter((item) => allowTabActions.includes(item.key));
+    ].filter(item => allowTabActions.includes(item.key));
   }, [
     $fmt,
+    allowTabActions,
+    tagLocked,
+    isLocked,
     groupId,
     selectedTabs,
     handleTabsOpen,
@@ -498,7 +508,7 @@ function TabGroup({
       return;
     }
     timerRef.current.timer = setTimeout(() => {
-      setBlockIndex((index) => index + 1);
+      setBlockIndex(index => index + 1);
       recursion(index + 1);
     }, 30);
   };
@@ -543,9 +553,7 @@ function TabGroup({
                 maxWidth={240}
                 fontSize={20}
                 iconSize={16}
-                onValueChange={(value) =>
-                  onChange?.({ groupName: value || UNNAMED_GROUP })
-                }
+                onValueChange={value => onChange?.({ groupName: value || UNNAMED_GROUP })}
               ></EditInput>
             </div>
             <div className="group-info">
@@ -700,7 +708,7 @@ function TabGroup({
           visible={moveToModalVisible}
           listData={treeDataHook.tagList}
           moveData={moveData}
-          onOk={(targetData) => {
+          onOk={targetData => {
             onMoveToConfirm(() => {
               onMoveTo?.({ moveData, targetData, selected: !!selected });
               setSelectedTabIds([]);

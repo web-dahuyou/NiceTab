@@ -20,6 +20,7 @@ const enUS: Record<LocaleKey, string> = {
   'importExport.importContent': 'Content to Import:',
   'importExport.importFromText': 'Import from Text',
   'importExport.importFromFile': 'Import from File',
+  'importExport.importFromHTML': 'Import from HTML',
   'importExport.importSuccess': 'Import Successful',
   'importExport.importFailed': 'Import Failed! Please check whether the format is correct',
 
@@ -27,9 +28,10 @@ const enUS: Record<LocaleKey, string> = {
   'importExport.getContent': 'Get Content',
   'importExport.copy': 'Copy to Clipboard',
   'importExport.exportToFile': 'Export to Local File',
+  'importExport.saveAsHtml': 'Save as HTML',
   'importExport.CopySuccess': 'Copy Successful',
   'importExport.CopyFailed': 'Copy Failed',
   'importExport.settingsModuleTitle': `Import/Export Settings`,
-}
+};
 
 export default enUS;

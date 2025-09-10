@@ -94,6 +94,7 @@ Comprehensive user guide | <a href="./GUIDE-zh.md">NiceTab 用户指南</a> (Eng
 - Configurable **Exclude domains for sending tabs** (regex supported) so certain sites or pages are never sent to NiceTab.
 - Option to **Open tab group in a new window when opening**.
 - Option to **Remove tabs when opening tabs or tab group**.
+- Option to **Automatically hibernate tabs when opening multiple tabs?**.
 - Option to **Restore the unnamed group as a browser tab group**.
 - Configurable **Modifier key for opening a tab silently (in background)**.
 - Configurable **Modifier key for opening a tab in foreground**.

@@ -23,6 +23,7 @@ const zhCN = {
   'importExport.importContent': '填写导入内容：',
   'importExport.importFromText': '从文本导入',
   'importExport.importFromFile': '从文件导入',
+  'importExport.importFromHTML': '从HTML导入',
   'importExport.importSuccess': '导入成功',
   'importExport.importFailed': '导入失败，请检查格式是否正确',
   'importExport.settingsModuleTitle': `偏好设置导入导出`,
@@ -31,9 +32,10 @@ const zhCN = {
   'importExport.getContent': '生成内容',
   'importExport.copy': '复制到剪贴板',
   'importExport.exportToFile': '导出到本地',
+  'importExport.saveAsHtml': '保存为HTML',
   'importExport.CopySuccess': '复制成功',
   'importExport.CopyFailed': '复制失败',
-}
+};
 
 export type LocaleKey = keyof typeof zhCN;
 

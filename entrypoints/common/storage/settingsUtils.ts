@@ -37,6 +37,7 @@ const {
   /* 打开标签页配置 */
   RESTORE_IN_NEW_WINDOW,
   DELETE_AFTER_RESTORE,
+  DISCARD_WHEN_OPEN_TABS,
   SILENT_OPEN_TAB_MODIFIER_KEY,
   OPEN_TAB_MODIFIER_KEY,
   UNNAMED_GROUP_RESTORE_AS_GROUP,
@@ -87,6 +88,7 @@ export default class SettingsUtils {
     /* 打开标签页配置 */
     [RESTORE_IN_NEW_WINDOW]: false, // 是否在新窗口打开标签组
     [DELETE_AFTER_RESTORE]: false, // 恢复标签页/标签组时是否从列表中删除
+    [DISCARD_WHEN_OPEN_TABS]: true, // 是否以休眠方式打开标签页
     [SILENT_OPEN_TAB_MODIFIER_KEY]: 'alt', // 静默打开标签页的修饰键
     [OPEN_TAB_MODIFIER_KEY]: '', // 前台打开标签页的修饰键
     [UNNAMED_GROUP_RESTORE_AS_GROUP]: import.meta.env.FIREFOX ? false : true, // 是否以标签组形式恢复未命名标签组

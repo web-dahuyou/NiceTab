@@ -12,12 +12,13 @@ const {
   OPEN_TAB_MODIFIER_KEY,
   UNNAMED_GROUP_RESTORE_AS_GROUP,
   NAMED_GROUP_RESTORE_AS_GROUP,
+  DISCARD_WHEN_OPEN_TABS,
 } = ENUM_SETTINGS_PROPS;
 
 const modifierKeyLabels = getKeysByOS();
 
 export default function FormModuleOpen(
-  props: FormItemProps & { form: FormInstance<SettingsProps> }
+  props: FormItemProps & { form: FormInstance<SettingsProps> },
 ) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
@@ -50,6 +51,19 @@ export default function FormModuleOpen(
         <Radio.Group>
           <Radio value={false}>{$fmt(`settings.${DELETE_AFTER_RESTORE}.no`)}</Radio>
           <Radio value={true}>{$fmt(`settings.${DELETE_AFTER_RESTORE}.yes`)}</Radio>
+        </Radio.Group>
+      </Form.Item>
+      {/* 是否以休眠方式打开标签页 */}
+      <Form.Item<SettingsProps>
+        label={$fmt({
+          id: `settings.${DISCARD_WHEN_OPEN_TABS}`,
+          values: { mark: '：' },
+        })}
+        name={DISCARD_WHEN_OPEN_TABS}
+      >
+        <Radio.Group>
+          <Radio value={true}>{$fmt(`common.yes`)}</Radio>
+          <Radio value={false}>{$fmt(`common.no`)}</Radio>
         </Radio.Group>
       </Form.Item>
       {/* 静默打开标签页修饰键 */}

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>用户指南</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./css/github-markdown.css" />
+  <style>
+    body { display: flex; justify-content: center; padding: 20px; background-color: #fff; }
+    .markdown-body { box-sizing: border-box; min-width: 200px; max-width: 980px; width: 100%; padding: 45px; }
+    @media (max-width: 767px) { .markdown-body { padding: 15px; } }
+  </style>
+</head>
+<body>
+  <article class="markdown-body"><h1 id="nicetab">NiceTab</h1>
+<p><img src="https://github.com/user-attachments/assets/6099f21e-fc0a-4bb5-8280-e497be3fb0ae" alt="NiceTab"></p>
+<p>
+  English | <a href="./README-zh.html">中文</a>
+</p>
+
+<h2 id="overview">Overview</h2>
+<ul>
+<li>NiceTab is an <code>open source</code> browser extension that makes managing your browser tabs quick and convenient.</li>
+<li>Named <code>NiceTab</code> with the hope that it would be a &quot;nice&quot; tab management tool.</li>
+<li>Similar to other tab management extensions like <code>OneTab</code>, <code>Toby</code>, <code>SessionBuddy</code>, <code>N-Tab</code> and <code>KepTab</code>. it supports browsers such as Chrome, Firefox, Microsoft Edge, and any Chromium based browser.</li>
+<li>Developed using <code>React</code> and based on the <a href="https://wxt.dev/"><code>wxt framework</code></a>, which provides built-in templates for <code>Vanilla</code>, <code>Vue</code>, <code>React</code>, <code>Svelte</code>, and <code>Solid</code>.</li>
+<li>The UI is powered by the popular <a href="https://ant-design.antgroup.com/"><code>Ant Design</code></a> library.</li>
+</ul>
+<h2 id="motivation">Motivation</h2>
+<p>I personally get anxious when there are too many tabs open, and switching to a specific tab among them is a hassle. After using OneTab, managing tabs became much easier, improving efficiency and saving memory, so I used it for a long time.</p>
+<p>However, I felt a few aspects weren&#39;t quite smooth:</p>
+<ul>
+<li>Group names are lost after exporting and re-importing tabs.</li>
+<li>Because renaming group names isn&#39;t persisted, I gave up on renaming them. Once many groups accumulate, locating a specific group is difficult.</li>
+<li>The right-click menu on the extension icon often shows several duplicate menu groups, but only one group of menus actually works, you have to try each to find out.</li>
+<li>Sometimes I just want to bookmark some tabs without closing them, but OneTab lacks an option for that (a personal preference).</li>
+<li>There&#39;s no straightforward way to create a new group within OneTab directly and move tabs from an existing group into that new group.</li>
+<li>And a few more smaller issues...</li>
+</ul>
+<p>Additionally, the <code>N-Tab</code> extension is open-source, but after reviewing it, I found the tech stack a bit outdated, making it difficult to contribute effectively.</p>
+<p>Based on the above reasons, I decided to develop the <code>NiceTab</code> extension. incorporate additional features upon some features from <code>OneTab</code>, <code>N-Tab</code>, to enhance the experience.</p>
+<h2 id="extension-installation">Extension Installation</h2>
+<ul>
+<li>Google Chrome Web Store: <a href="https://chromewebstore.google.com/detail/fonflmjnjbkigocpoommgmhljdpljain">Chrome Web Store</a></li>
+<li>Microsoft Edge Add-ons: <a href="https://microsoftedge.microsoft.com/addons/detail/ompjiaelpibiggcnanhbdblkhfdmkgnl">Microsoft Edge Addons</a>
+(Note that due to longer review times, the Edge store release may lag behind the Chrome version.)</li>
+<li>Firefox Browser Add-ons: <a href="https://addons.mozilla.org/firefox/addon/nice-tab-manager">Firefox Browser Addons</a></li>
+</ul>
+<h3 id="notes">Notes</h3>
+<p>For security reasons, Firefox may not allow privileged URLs such as:</p>
+<ul>
+<li>chrome: URLs</li>
+<li>javascript: URLs</li>
+<li>data: URLs</li>
+<li>file: URLs</li>
+<li>Firefox&#39;s privileged about: URLs (e.g., <code>about:config</code>, <code>about:addons</code>, <code>about:debugging</code>). Non-privileged URLs (e.g., <code>about:blank</code>) are allowed.</li>
+</ul>
+<p>If a page URL matches any of the above cases, opening tab may not work. Please manually copy the URL to open it.</p>
+<h2 id="features">Features</h2>
+<p>Comprehensive user guide | <a href="./GUIDE-zh.html">NiceTab 用户指南</a> (English version is coming soon...)</p>
+<h3 id="general-features">General Features</h3>
+<ul>
+<li>Supports sending all tabs, current tabs, other tabs, left-side tabs, and right-side tabs in just one click.</li>
+<li>Supports sending native browser tab groups into NiceTab, and re-open them as native tab groups in your browser.</li>
+<li>Supports browser command shortcuts (open the NiceTab-Admin-Page, send all tabs, send the current tab, etc.).</li>
+<li>Preferences support.</li>
+<li>Offers <strong>import</strong> in multiple formats, with local file saving supported. Currently supports for <code>NiceTab</code>, <code>OneTab</code>, <code>Toby</code>, <code>SessionBuddy</code> and <code>KepTab</code>. More formats can be added later as needed.</li>
+<li><strong>Remote sync</strong>.</li>
+<li>Supports manual switch for <strong>Light/Dark</strong> themes.</li>
+<li>Supports <strong>Theme color switch</strong>, currently with several preset theme colors(More can be added later as needed).</li>
+<li><strong>Multilingual support</strong>, currently Chinese and English (contributions for more natural English or additional languages are welcome).</li>
+<li>Supports <strong>Recycle Bin</strong> feature: deleted tabs, tab groups, and categories go to a recycle bin where you can restore or permanently delete them.</li>
+<li>Supports manually hibernate inactive tabs from memory. Hibernated tabs are still visible on the tab strip and will automatically reload when activated.</li>
+</ul>
+<h3 id="list-management">List Management</h3>
+<ul>
+<li>Manage categories, tab groups, and tabs. Includes easy saving, restoring, starring (favorites), locking, adding, deleting, editing, searching, and drag-and-drop reordering, etc.</li>
+<li>Supports global search for tab and URL, and jump straight to the result.</li>
+<li>Supports category locking, preventing accidental operations.</li>
+<li>Categories support expand/collapse, creation of categories and tab groups, making it easy to move other tab groups/tabs to new categories/groups.</li>
+<li>Supports keyboard shortcuts for certain operations, such as reordering categories or tab groups.</li>
+<li>Supports sorting tab groups by group name or creation time.</li>
+<li>Supports one-click copying of all links in a tab group, with a customizable link template.</li>
+<li>Supports manual deduplication of tabs.</li>
+<li>Supports multi-select tabs, move or copy tabs across tab groups.</li>
+<li>Tabs support custom editing of title and URL.</li>
+</ul>
+<h3 id="preferences">Preferences</h3>
+<ul>
+<li>Option to <strong>Open NiceTab Admin Page after launching the browser</strong>.</li>
+<li>Option to <strong>Pin the NiceTab Admin Page</strong>.</li>
+<li>Option to <strong>Send pinned tabs to NiceTab when sending tabs</strong>.</li>
+<li>Option to <strong>Open NiceTab Admin Page when sending tabs</strong>.</li>
+<li>Option to <strong>Automatically close tabs when sending tabs</strong>.</li>
+<li>Option to <strong>Retain duplicate groups when sending tabs</strong>.</li>
+<li>Option to <strong>Retain duplicate tabs when sending tabs</strong>.</li>
+<li>&quot;<strong>Staging Area</strong>&quot; category is fixed at the top; tabs/tab groups sent will be automatically save to the category.</li>
+<li>Option to <strong>Show &quot;Send To&quot; modal when sending tabs</strong>. You can send tabs to a specified category or tab group.</li>
+<li>Configurable <strong>Exclude domains for sending tabs</strong> (regex supported) so certain sites or pages are never sent to NiceTab.</li>
+<li>Option to <strong>Open tab group in a new window when opening</strong>.</li>
+<li>Option to <strong>Remove tabs when opening tabs or tab group</strong>.</li>
+<li>Option to <strong>Automatically hibernate tabs when opening multiple tabs?</strong>.</li>
+<li>Option to <strong>Restore the unnamed group as a browser tab group</strong>.</li>
+<li>Configurable <strong>Modifier key for opening a tab silently (in background)</strong>.</li>
+<li>Configurable <strong>Modifier key for opening a tab in foreground</strong>.</li>
+<li>Option to <strong>Remove empty groups when clearing tabs</strong>.</li>
+<li>Option to <strong>Confirm before removing tabs</strong>.</li>
+<li>Configurable <strong>Copy links format template for tab groups</strong>.</li>
+<li>Option to <strong>Display the number of open tabs on the extension icon</strong>.</li>
+<li>Option to <strong>Display ContextMenu on your webpage</strong>.</li>
+<li>Configurable <strong>popup panel modules</strong>: you can configure which modules to display in the popup. If none are selected, clicking the extension icon sends all tabs to NiceTab by default.</li>
+<li>Option to <strong>Automatically expand the tree list on Home Page</strong>.</li>
+<li>...More settings can be found in extension <code>NiceTab Admin Page &gt; Settings</code>.</li>
+</ul>
+<h3 id="remote-sync">Remote Sync</h3>
+<ul>
+<li>Supports both <code>Gists</code> and <code>WebDAV</code> sync.<ul>
+<li>Gists Sync: You can sync your data to GitHub or Gitee by configuring your personal access token (note, token permissions only check <code>gists</code> scope). Potentially more platforms may be supported in the future.</li>
+<li>WebDAV Sync: You can sync your data to a WebDAV service by configuring the WebDAV URL, username, and password (supports multiple WebDAV accounts).</li>
+</ul>
+</li>
+<li>Supports remote sync for both tab list and preferences.</li>
+<li>Auto Sync: Automatic synchronization is supported; you can enable/disable it and set syncing frequency and method.</li>
+</ul>
+<p><strong>Note</strong>: note that merging push do not perform a diff-comparison delete; it merges remote and local, then pushes to remote. To sync deletions, remove them locally and then manually overwrite the remote.</p>
+<h2 id="screenshots-of-features">Screenshots of Features</h2>
+<h3 id="extension-icon-popup">Extension Icon (Popup)</h3>
+<ul>
+<li>By default, clicking the <code>NiceTab</code> extension icon opens a popup panel where you can quickly access the  list page, settings page, import/export page, sync page and recycle bin page.</li>
+<li>You can quickly switch theme colors or view/close the current open tab.</li>
+<li>If none popup modules are configured in preferences, clicking the extension icon will sends all tabs to NiceTab by default.</li>
+</ul>
+<p>Screenshots of other actions are not yet updated.</p>
+<p><img src="https://github.com/user-attachments/assets/cf65a363-3a2b-465a-936c-8fc8274856dc" alt="NiceTab-extension-icon-1"></p>
+<p><img src="https://github.com/user-attachments/assets/899bfd01-c426-4c5b-af5e-0beb52882edf" alt="NiceTab-extension-icon-2"></p>
+<h3 id="right-click-menu">Right-Click Menu</h3>
+<ul>
+<li>Right-clicking the extension icon reveals a quick-access context menu, you can open the <code>NiceTab Admin Page</code> (aka <code>Dashboard</code>) or try one-click actions to send all tabs, the current tab, other tabs, left-side tabs, or right-side tabs.</li>
+</ul>
+<p><img src="https://github.com/user-attachments/assets/2fe82628-9dde-4cba-b336-6ca59b2ec5eb" alt="NiceTab-right-click-menu"></p>
+<h3 id="tab-list">Tab List</h3>
+<ul>
+<li>Manage sent tabs in categories and groups.</li>
+<li>The left panel supports drag-and-drop reordering and shortcuts sorting. The right panel displays all tab groups and tabs for the current category, and allows corresponding operations.</li>
+<li>You can easily delete tab groups or move them to other categories. Multiple tabs can also be selected and moved or deleted in bulk.</li>
+</ul>
+<p><img src="https://github.com/user-attachments/assets/03a534d0-c034-4b9a-98fd-2d8d084ebcd3" alt="NiceTab-list-page"></p>
+<h3 id="preferences-1">Preferences</h3>
+<ul>
+<li>Customize various preference settings according to your own preferences.</li>
+</ul>
+<p><img src="https://github.com/user-attachments/assets/90e19998-206b-42de-9329-410e553955a4" alt="NiceTab-preferences"></p>
+<h3 id="importexport">Import/Export</h3>
+<ul>
+<li>Currently supports import for <code>NiceTab</code>, <code>OneTab</code>, <code>Toby</code>, <code>SessionBuddy</code> and <code>KepTab</code> formats.</li>
+<li>You can import <code>OneTab</code>, <code>Toby</code> <code>SessionBuddy</code> or <code>KepTab</code> data, and parsed into <code>NiceTab</code> format.</li>
+<li>You can export <code>NiceTab</code> data to local file.</li>
+</ul>
+<p>Screenshots are not yet updated.</p>
+<p><img src="https://github.com/user-attachments/assets/e2ea4b00-3531-4819-b67a-e45f09b4e948" alt="NiceTab-import-export"></p>
+<h3 id="remote-sync-1">Remote Sync</h3>
+<p>Supports syncing via Gitee Gists, GitHub Gists, and WebDAV:</p>
+<ul>
+<li>Gists Sync: You can sync your data to your Github and Gitee accounts as needed, just configure your access token.</li>
+<li>WebDAV Sync: You can sync your data to a WebDAV service by configuring the WebDAV URL, username, and password (supports multiple WebDAV accounts).</li>
+</ul>
+<p><strong>Note</strong>:</p>
+<ul>
+<li>For gists, token permissions only check <code>gists</code> scope.</li>
+<li>Merging push sync does not perform a diff-comparison delete. It merges remote and local data, then pushes to remote, so tabs increase cumulatively. To sync deletions, remove them locally and then manually overwrite the remote.</li>
+</ul>
+<p>Screenshots of WebDAV sync are not yet updated.</p>
+<p><img src="https://github.com/user-attachments/assets/1d082c8f-4660-4f8e-9ac9-7cf468178ee1" alt="NiceTab-remote-sync"></p>
+<h3 id="theme-color-switching">Theme Color Switching</h3>
+<p>You can easily switch theme colors in the management dashboard or the popup panel.</p>
+<p><img src="https://github.com/user-attachments/assets/9e6dce98-8b6e-4fe7-846d-d5a00f410e6d" alt="NiceTab-theme-color-switch"></p>
+<h3 id="lightdark-mode">Light/Dark Mode</h3>
+<p>Light and dark themes are available, which can be toggled in the management dashboard.</p>
+<p><img src="https://github.com/user-attachments/assets/8d7a6f02-9feb-4289-b9f8-f066ab02f32e" alt="NiceTab-light-dark-switch"></p>
+<h3 id="language-switching">Language Switching</h3>
+<p>Switch between Chinese and English in the management dashboard.</p>
+<p><img src="https://github.com/user-attachments/assets/2d6b2348-a666-4996-bdd9-8653dfabf1d4" alt="NiceTab-language-switch"></p>
+<h3 id="recycle-bin">Recycle Bin</h3>
+<ul>
+<li>Deleted categories, tab groups, or tabs go into the recycle bin.</li>
+<li>You can restore them back to the tab list or permanently delete them.</li>
+</ul>
+<p><img src="https://github.com/user-attachments/assets/016cb266-fe12-4063-b786-c979288f01fb" alt="NiceTab-recycle-bin"></p>
+<h2 id="usage">Usage</h2>
+<ul>
+<li>Click the extension icon to open the popup panel displaying the currently open tabs. From there, you can access the Admin Page or quickly switch themes, etc.</li>
+<li>Right-click the extension icon to display context menu items for sending tabs to NiceTab.</li>
+<li>In the Dashboard (Admin Page), you can switch languages and themes, or toggle light/dark mode.</li>
+<li>In <code>Dashboard &gt; List</code> page, view all sent tabs organized by category and group.</li>
+<li>In <code>Dashboard &gt; Settings</code> page, manage the extension&#39;s preferences.</li>
+<li>In <code>Dashboard &gt; Import &amp; Export</code> page, import or export tabs in NiceTab, OneTab, SessionBuddy, Toby or KepTab formats.</li>
+<li>In <code>Dashboard &gt; Sync</code> page, sync tabs to your Github and Gitee accounts as needed, just configure your access token (note, token permissions only check <code>gists</code> scope).</li>
+<li>In <code>Dashboard &gt; Recycle Bin</code> page, view and manage any deleted categories, tab groups, or tabs. You can restore or permanently delete them.</li>
+</ul>
+<h3 id="notes-1">Notes</h3>
+<p>For security reasons, Firefox may not allow privileged URLs such as:</p>
+<ul>
+<li>chrome: URLs</li>
+<li>javascript: URLs</li>
+<li>data: URLs</li>
+<li>file: URLs</li>
+<li>Firefox&#39;s privileged about: URLs (e.g., <code>about:config</code>, <code>about:addons</code>, <code>about:debugging</code>). Non-privileged URLs (e.g., <code>about:blank</code>) are allowed.</li>
+</ul>
+<p>If a page URL matches any of the above cases, opening tab may not work. Please manually copy the URL to open it.</p>
+<h2 id="community--feedback">Community &amp; Feedback</h2>
+<p>Feel free to join our QQ group: 924270240</p>
+<img width="300" alt="NiceTab Community" src="https://github.com/user-attachments/assets/f773c96e-8f4f-4e53-9ffa-20c11690675a">
+
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://developer.chrome.com/docs/extensions/reference/api?hl=zh-cn">Chrome for Developers - Extensions API Docs</a></li>
+<li><a href="https://wxt.dev/">WXT Official Site</a></li>
+<li><a href="https://ant-design.antgroup.com/">Ant Design</a></li>
+<li><a href="https://reactrouter.com/">React Router</a></li>
+<li><a href="https://styled-components.com/">styled-components</a></li>
+<li><a href="https://formatjs.io/docs/react-intl">react-intl</a></li>
+<li><a href="https://atlassian.design/components/pragmatic-drag-and-drop/about">pragmatic-drag-and-drop</a></li>
+<li><a href="https://www.cnblogs.com/liuxianan/p/chrome-plugin-develop.html">&quot;Complete Guide to Developing Chrome Extensions&quot; (Chinese)</a></li>
+</ul>
+<h2 id="extension-development">Extension Development</h2>
+<p>See <a href="./CONTRIBUTING.html">NiceTab Contributing Guide</a></p>
+</article>
+</body>
+</html>

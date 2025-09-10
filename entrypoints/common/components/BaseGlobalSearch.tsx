@@ -41,7 +41,7 @@ import { tabListUtils } from '../storage';
 import ActionIconBtn from './ActionIconBtn.tsx';
 import { eventEmitter as homeEventEmitter } from '~/entrypoints/options/home/hooks/homeCustomEvent';
 
-const { GLOBAL_SEARCH_DELETE_AFTER_OPEN } = ENUM_SETTINGS_PROPS;
+const { GLOBAL_SEARCH_DELETE_AFTER_OPEN, DISCARD_WHEN_OPEN_TABS } = ENUM_SETTINGS_PROPS;
 
 export type SearchListItemProps = Pick<TagItem, 'tagId' | 'tagName' | 'static'> &
   Pick<GroupItem, 'groupId' | 'groupName' | 'isLocked'> &
@@ -52,12 +52,12 @@ export type BatchActionType = 'remove' | 'open';
 
 export type ActionCallbackFn = (
   type: 'tag' | 'tabGroup' | 'tab' | 'open' | 'select',
-  option?: SearchListItemProps
+  option?: SearchListItemProps,
 ) => void;
 
 export type BatchActionCallbackFn = (
   type: BatchActionType,
-  selectedItems?: SearchListItemProps[]
+  selectedItems?: SearchListItemProps[],
 ) => void;
 
 export const StyledListItem = styled.div`
@@ -113,7 +113,7 @@ export const StyledListItem = styled.div`
   }
   .tab-url {
     width: 100%;
-    color: ${(props) => props.theme.colorTextTertiary || '#999'};
+    color: ${props => props.theme.colorTextTertiary || '#999'};
     ${StyledEllipsis};
   }
 `;
@@ -141,7 +141,7 @@ export function SearchListItem({
       e.stopPropagation();
       onAction?.('open', option);
     },
-    [onAction, option]
+    [onAction, option],
   );
 
   return (
@@ -220,19 +220,19 @@ export function useSearchAction({
   const [selectedItems, setSelectedItems] = useState<SearchListItemProps[]>([]);
 
   const selectedTabIds = useMemo(() => {
-    return selectedItems.map((v) => v.tabId);
+    return selectedItems.map(v => v.tabId);
   }, [selectedItems]);
 
   const handleSelectChange = useCallback(
     (option: SearchListItemProps) => {
-      const index = selectedItems.findIndex((v) => v.tabId === option.tabId);
+      const index = selectedItems.findIndex(v => v.tabId === option.tabId);
       if (index >= 0) {
-        setSelectedItems(selectedItems.filter((item) => item.tabId !== option.tabId));
+        setSelectedItems(selectedItems.filter(item => item.tabId !== option.tabId));
       } else {
         setSelectedItems([...selectedItems, option]);
       }
     },
-    [selectedItems]
+    [selectedItems],
   );
 
   const handleAction: ActionCallbackFn = useCallback(
@@ -243,11 +243,11 @@ export function useSearchAction({
       }
       onAction?.(type, option);
     },
-    [handleSelectChange, onAction]
+    [handleSelectChange, onAction],
   );
 
   const options = useMemo(() => {
-    return filterList.map((item) => ({
+    return filterList.map(item => ({
       ...item,
       value: item.tabId,
       label: (
@@ -283,7 +283,7 @@ export function useSearchAction({
       }
       return result;
     },
-    [tagList]
+    [tagList],
   );
 
   const debounceSearch = useMemo(
@@ -293,14 +293,14 @@ export function useSearchAction({
         const filterList = getFilterList(text);
         setFilterList(filterList || []);
       }, 600),
-    [getFilterList]
+    [getFilterList],
   );
 
   const handleSearch = useCallback(
     (value: string) => {
       debounceSearch(value);
     },
-    [debounceSearch]
+    [debounceSearch],
   );
 
   const onChange = useCallback(
@@ -315,14 +315,14 @@ export function useSearchAction({
       setValue(value || '');
       // setSearchValue(value);
     },
-    [actionMode, handleAction]
+    [actionMode, handleAction],
   );
   const onSearch = useCallback(
     (value: string) => {
       setSearchValue(value);
       handleSearch(value);
     },
-    [handleSearch]
+    [handleSearch],
   );
 
   const onSearchTextChange = useCallback(
@@ -330,7 +330,7 @@ export function useSearchAction({
       setSearchValue(e.target?.value);
       handleSearch?.(e.target?.value);
     },
-    [handleSearch]
+    [handleSearch],
   );
 
   useEffect(() => {
@@ -477,7 +477,7 @@ export const GlobalSearchBox = forwardRef(
       onAction?: ActionCallbackFn;
       onBatchAction?: BatchActionCallbackFn;
     },
-    ref
+    ref,
   ) => {
     const { $fmt } = useIntlUtls();
     const selectRef = useRef<RefSelectProps>(null);
@@ -506,7 +506,7 @@ export const GlobalSearchBox = forwardRef(
             if (!items[0]?.isLocked) {
               await tabListUtils.removeTabs(
                 groupId,
-                items.map((item) => pick(item, ['tabId', 'title', 'url']))
+                items.map(item => pick(item, ['tabId', 'title', 'url'])),
               );
             }
           }
@@ -515,15 +515,17 @@ export const GlobalSearchBox = forwardRef(
         } else if (batchActionType === 'open') {
           const settings = await settingsUtils.getSettings();
           const autoDelete = settings?.[GLOBAL_SEARCH_DELETE_AFTER_OPEN];
+          const discard = settings?.[DISCARD_WHEN_OPEN_TABS];
           const groupByList = groupBy(selectedItems, 'groupId');
           for (const [groupId, items] of Object.entries(groupByList)) {
-            items.forEach((item) => {
-              item.url && openNewTab(item.url);
+            items.forEach(item => {
+              item.url && openNewTab(item.url, { discard });
             });
+
             if (autoDelete && !items[0]?.isLocked) {
               await tabListUtils.removeTabs(
                 groupId,
-                items.map((item) => pick(item, ['tabId', 'title', 'url']))
+                items.map(item => pick(item, ['tabId', 'title', 'url'])),
               );
               setSelectedItems([]);
               await refreshData();
@@ -533,7 +535,7 @@ export const GlobalSearchBox = forwardRef(
 
         onBatchAction?.(batchActionType);
       },
-      [selectedItems, setSelectedItems, refreshData, onBatchAction]
+      [selectedItems, setSelectedItems, refreshData, onBatchAction],
     );
 
     useImperativeHandle(ref, () => ({
@@ -618,14 +620,14 @@ export const GlobalSearchBox = forwardRef(
         </StyledSearchList>
       </>
     );
-  }
+  },
 );
 
 /* 全局搜索面板 */
 const StyledGlobalSearchBox = styled.div<{ height: number }>`
   position: relative;
   width: 100%;
-  height: ${(props) => props.height}px;
+  height: ${props => props.height}px;
 `;
 
 const modalStyles = {
@@ -649,7 +651,7 @@ export const GlobalSearchPanel = forwardRef(
       tagList?: TagItem[];
       onAction?: ActionCallbackFn;
     },
-    ref
+    ref,
   ) => {
     const { $fmt } = useIntlUtls();
     const contentContext = useContext(ContentGlobalContext);
@@ -699,11 +701,11 @@ export const GlobalSearchPanel = forwardRef(
           });
         }, 200);
       },
-      [onAction]
+      [onAction],
     );
 
     const handleBatchAction: BatchActionCallbackFn = useCallback(
-      async (type) => {
+      async type => {
         if (pageContext === 'optionsPage') {
           homeEventEmitter.emit('home:treeDataHook', {
             action: 'init',
@@ -721,7 +723,7 @@ export const GlobalSearchPanel = forwardRef(
           setVisible(false);
         }
       },
-      [pageContext]
+      [pageContext],
     );
 
     const handleClose = useCallback(() => {
@@ -733,7 +735,7 @@ export const GlobalSearchPanel = forwardRef(
         debounce(() => {
           setListHeight(window.innerHeight * 0.5);
         }, 300),
-      []
+      [],
     );
 
     const handleResize = useCallback(() => {
@@ -753,7 +755,7 @@ export const GlobalSearchPanel = forwardRef(
           }
         }
       },
-      [visible]
+      [visible],
     );
 
     const eventEmitterListener = useCallback(async () => {
@@ -815,7 +817,7 @@ export const GlobalSearchPanel = forwardRef(
         </StyledGlobalSearchBox>
       </Modal>
     );
-  }
+  },
 );
 
 export default GlobalSearchPanel;

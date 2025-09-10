@@ -57,7 +57,7 @@ export const THEME_COLOR_NAMES: ThemeColors[] = [
 ];
 // 主色
 export const PRIMARY_COLOR = ENUM_COLORS.blue;
-export const THEME_COLORS: ColorItem[] = THEME_COLOR_NAMES.map((name) => {
+export const THEME_COLORS: ColorItem[] = THEME_COLOR_NAMES.map(name => {
   return {
     key: name,
     color: ENUM_COLORS?.[name],
@@ -128,6 +128,7 @@ export enum ENUM_SETTINGS_PROPS {
   /* 打开标签页配置 */
   RESTORE_IN_NEW_WINDOW = 'restoreInNewWindow', // 是否在新窗口打开标签组
   DELETE_AFTER_RESTORE = 'deleteAfterRestore', // 恢复标签页/标签组时是否从列表中删除
+  DISCARD_WHEN_OPEN_TABS = 'discardWhenOpenTabs', // 是否以休眠方式打开标签页
   SILENT_OPEN_TAB_MODIFIER_KEY = 'silentOpenTabModifierKey', // 静默打开标签页的修饰键
   OPEN_TAB_MODIFIER_KEY = 'openTabModifierKey', // 前台打开标签页的修饰键
   UNNAMED_GROUP_RESTORE_AS_GROUP = 'unnamedGroupRestoreAsGroup', // 是否以标签组形式恢复未命名标签组
@@ -240,7 +241,7 @@ export const syncExcludedSettingsProps = [
   ENUM_SETTINGS_PROPS.AUTO_SYNC_INTERVAL,
   ENUM_SETTINGS_PROPS.AUTO_SYNC_TIME_RANGES,
   ENUM_SETTINGS_PROPS.AUTO_SYNC_TYPE,
-]
+];
 
 // 页面上下文类型枚举
 export const pageContextTypes: PageContextType[] = [
@@ -248,6 +249,12 @@ export const pageContextTypes: PageContextType[] = [
   'popupPage',
   'contentScriptPage',
 ];
+
+// 用户指南页面链接
+export const USER_GUIDE_URL_MAP: Record<LanguageTypes, string> = {
+  'zh-CN': '/docs/GUIDE-zh.html',
+  'en-US': '/docs/GUIDE.html',
+};
 
 export default {
   ENUM_COLORS,
@@ -262,4 +269,5 @@ export default {
   defaultAutoSyncType,
   UNNAMED_TAG,
   UNNAMED_GROUP,
+  USER_GUIDE_URL_MAP,
 };
