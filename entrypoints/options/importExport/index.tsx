@@ -11,6 +11,7 @@ import {
   extContentImporter,
   extContentExporter,
   sendRuntimeMessage,
+  html2niceTab,
   niceTab2html,
 } from '~/entrypoints/common/utils';
 import { reloadOtherAdminPage } from '~/entrypoints/common/tabs';
@@ -72,6 +73,34 @@ export default function ImportExport() {
     reader.onload = () => {
       const content = reader.result as string;
       handleImport(content);
+    };
+    reader.readAsText(file);
+    return false;
+  };
+
+  // 导入html文件
+  const handleImportHtml = async (importContent: string) => {
+    setImportLoading(true);
+    setTimeout(async () => {
+      try {
+        const tagList = html2niceTab(importContent);
+        await tabListUtils.importTags(tagList, importMode);
+
+        messageApi.success(
+          $fmt({ id: 'common.actionSuccess', values: { action: $fmt('common.import') } }),
+        );
+      } catch {
+        messageApi.error($fmt('importExport.importFailed'));
+      }
+      setImportLoading(false);
+    }, 500);
+  };
+  // 选择文件导入
+  const handleSelectHtmlFile: UploadProps['beforeUpload'] = file => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const content = reader.result as string;
+      handleImportHtml(content);
     };
     reader.readAsText(file);
     return false;
@@ -224,6 +253,15 @@ export default function ImportExport() {
               >
                 <Button type="primary" loading={importLoading}>
                   {$fmt('importExport.importFromFile')}
+                </Button>
+              </Upload>
+              <Upload
+                accept=".html"
+                showUploadList={false}
+                beforeUpload={handleSelectHtmlFile}
+              >
+                <Button type="primary" loading={importLoading}>
+                  {$fmt('importExport.importFromHTML')}
                 </Button>
               </Upload>
             </Space>

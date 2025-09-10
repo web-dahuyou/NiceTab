@@ -286,8 +286,270 @@ export const extContentExporter: ExtContentExporterProps = {
 
 // 将 legacy Netscape HTML 转化为 tagList 格式
 export function html2niceTab(html: string): TagItem[] {
+  const createTime = newCreateTime();
 
-  return [];
+  function unescapeHtml(text: string | undefined | null): string {
+    if (!text) return '';
+    return String(text)
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&amp;/g, '&');
+  }
+
+  function parseHref(attrs: string): string {
+    const m = attrs.match(/\bHREF\s*=\s*"([^"]*)"/i);
+    return m ? unescapeHtml(m[1]) : '';
+  }
+
+  function parseAddDateToCreateTime(attrs: string): string {
+    const m = attrs.match(/\bADD_DATE\s*=\s*"(\d+)"/i);
+    if (m) {
+      const ts = Number(m[1]) * (m[1].length < 13 ? 1000 : 1);
+      return newCreateTime(ts);
+    }
+    return createTime;
+  }
+
+  function hasPersonalToolbarFlag(attrs: string): boolean {
+    return /\bPERSONAL_TOOLBAR_FOLDER\s*=\s*"true"/i.test(attrs);
+  }
+
+  // 解析 Netscape 书签为一个中间树结构，保留顺序及重名
+  type Node = {
+    type: 'folder' | 'link';
+    title?: string;
+    attrs?: string;
+    children?: Node[];
+  };
+  function tokenize(input: string): string[] {
+    // 仅保留有意义的标签行，分割为行级 token，避免复杂 HTML 解析
+    const lines = input
+      .replace(/\r\n?|\n/g, '\n')
+      .split('\n')
+      .map(l => l.trim())
+      .filter(Boolean);
+    return lines;
+  }
+
+  function parseTree(input: string): Node {
+    const root: Node = { type: 'folder', title: 'ROOT', children: [] };
+    const stack: Array<{ node: Node; isInsideDL: boolean }> = [
+      { node: root, isInsideDL: true },
+    ];
+    const lines = tokenize(input);
+
+    for (const line of lines) {
+      if (/^<DL\b[^>]*>/i.test(line)) {
+        // 进入一个层级目录
+        stack.push({
+          node: { type: 'folder', title: undefined, children: [] },
+          isInsideDL: true,
+        });
+        continue;
+      }
+      if (/^<\/DL>/i.test(line)) {
+        // 关闭当前 DL，将其 children 合并到上一个命名文件夹或根
+        if (stack.length > 1) {
+          const folderBlock = stack.pop()!.node;
+          const parent = stack[stack.length - 1].node;
+          // 如果上一个语义标签是 H3 则其对应一个命名的文件夹，children 应挂到它
+          // 在遇到 <H3> 时已将命名 folder 节点压入 parent.children，
+          // 这里需要把临时匿名 children 移动到最近的命名 folder（若存在）
+          const lastChild = parent.children?.[parent.children.length - 1];
+          if (lastChild && lastChild.type === 'folder' && lastChild.title) {
+            lastChild.children = [
+              ...(lastChild.children || []),
+              ...(folderBlock.children || []),
+            ];
+          } else {
+            parent.children = [
+              ...(parent.children || []),
+              ...(folderBlock.children || []),
+            ];
+          }
+        }
+        continue;
+      }
+
+      // <DT><H3 ...>Folder</H3>
+      const h3Match = line.match(/^<DT>\s*<H3([^>]*)>(.*?)<\/H3>/i);
+      if (h3Match) {
+        const attrs = h3Match[1] || '';
+        const title = unescapeHtml(h3Match[2] || '');
+        const folderNode: Node = { type: 'folder', title, attrs, children: [] };
+        const parent = stack[stack.length - 1].node;
+        parent.children = parent.children || [];
+        parent.children.push(folderNode);
+        continue;
+      }
+
+      // <DT><A HREF="..." ...>Title</A>
+      const aMatch = line.match(/^<DT>\s*<A([^>]*)>(.*?)<\/A>/i);
+      if (aMatch) {
+        const attrs = aMatch[1] || '';
+        const title = unescapeHtml(aMatch[2] || '');
+        const linkNode: Node = { type: 'link', title, attrs };
+        const parent = stack[stack.length - 1].node;
+        parent.children = parent.children || [];
+        parent.children.push(linkNode);
+        continue;
+      }
+    }
+
+    return root;
+  }
+
+  function flattenBelowSecondLevel(node: Node): Node {
+    // 第二层以下的所有链接，扁平到第二层的对应文件夹
+    if (!node.children) return node;
+    const result: Node = { ...node, children: [] };
+    for (const child of node.children) {
+      if (child.type === 'folder') {
+        const childCopy: Node = { ...child, children: [] };
+        const links: Node[] = [];
+        const collectLinks = (n: Node) => {
+          if (!n.children) return;
+          for (const c of n.children) {
+            if (c.type === 'link') links.push(c);
+            if (c.type === 'folder') collectLinks(c);
+          }
+        };
+        collectLinks(child);
+        childCopy.children = links; // 保留顺序
+        result.children!.push(childCopy);
+      } else {
+        result.children!.push(child);
+      }
+    }
+    return result;
+  }
+
+  // 构建 nicetab 结构
+  const tree = parseTree(html);
+
+  // 处理根层：若有 PERSONAL_TOOLBAR_FOLDER="true" 的 H3，则忽略这一层
+  // 在树的第一层 children 查找该标记
+  const firstLevel = tree.children || [];
+  let startNodes: Node[] = [];
+
+  // 首先处理 PERSONAL_TOOLBAR_FOLDER="true" 的文件夹的子节点
+  const toolbarNodes = firstLevel.filter(
+    n => n.type === 'folder' && hasPersonalToolbarFlag(n.attrs || ''),
+  );
+
+  // 将工具栏层的下级添加到起始节点
+  for (const toolbarNode of toolbarNodes) {
+    startNodes.push(...(toolbarNode.children || []));
+  }
+
+  // 然后添加其他非工具栏的顶层节点
+  const otherTopLevelNodes = firstLevel.filter(
+    n => !(n.type === 'folder' && hasPersonalToolbarFlag(n.attrs || '')),
+  );
+  startNodes.push(...otherTopLevelNodes);
+
+  // 根层中既可能有文件夹也可能有直连链接。直连链接需要归到一个默认分类下。
+  // 先将第二层以下扁平化
+  const flattenedStart: Node[] = startNodes.map(n =>
+    n.type === 'folder' ? flattenBelowSecondLevel(n) : n,
+  );
+
+  const tagList: TagItem[] = [];
+  const rootLooseLinks: Node[] = [];
+
+  for (const node of flattenedStart) {
+    if (node.type === 'folder') {
+      const tagCreateTime = parseAddDateToCreateTime(node.attrs || '');
+      const tagItem: TagItem = {
+        tagId: getRandomId(),
+        tagName: node.title || UNNAMED_TAG,
+        createTime: tagCreateTime || createTime,
+        groupList: [],
+      };
+
+      // 二级目录为 group
+      for (const child of node.children || []) {
+        if (child.type === 'folder') {
+          const groupCreateTime = parseAddDateToCreateTime(child.attrs || '');
+          const groupItem: GroupItem = {
+            ...tabListUtils.getInitialTabGroup(),
+            groupName: child.title || UNNAMED_GROUP,
+            createTime: groupCreateTime || createTime,
+            tabList: [],
+          };
+
+          for (const link of child.children || []) {
+            if (link.type !== 'link') continue;
+            const href = parseHref(link.attrs || '');
+            if (!href) continue;
+            groupItem.tabList.push({
+              tabId: getRandomId(),
+              title: link.title || href,
+              url: href,
+            });
+          }
+
+          tagItem.groupList.push(groupItem);
+        } else if (child.type === 'link') {
+          // 若第二层是直连链接，将其放到默认分组里
+          const href = parseHref(child.attrs || '');
+          if (!href) continue;
+          let defaultGroup = tagItem.groupList[tagItem.groupList.length - 1];
+          if (!defaultGroup || defaultGroup.groupName !== UNNAMED_GROUP) {
+            defaultGroup = {
+              ...tabListUtils.getInitialTabGroup(),
+              groupName: UNNAMED_GROUP,
+              createTime: tagItem.createTime,
+              tabList: [],
+            };
+            tagItem.groupList.push(defaultGroup);
+          }
+          defaultGroup.tabList.push({
+            tabId: getRandomId(),
+            title: child.title || href,
+            url: href,
+          });
+        }
+      }
+
+      tagList.push(tagItem);
+    } else if (node.type === 'link') {
+      rootLooseLinks.push(node);
+    }
+  }
+
+  // 根层若存在直连链接，需创建一个默认分类聚合这些链接
+  if (rootLooseLinks.length) {
+    const tagItem: TagItem = {
+      ...tabListUtils.getInitialTag(),
+      tagName: UNNAMED_TAG,
+      createTime,
+      groupList: [],
+    };
+    const groupItem: GroupItem = {
+      ...tabListUtils.getInitialTabGroup(),
+      groupName: UNNAMED_GROUP,
+      createTime,
+      tabList: [],
+    };
+    for (const link of rootLooseLinks) {
+      const href = parseHref(link.attrs || '');
+      if (!href) continue;
+      groupItem.tabList.push({
+        tabId: getRandomId(),
+        title: link.title || href,
+        url: href,
+      });
+    }
+    if (groupItem.tabList.length) {
+      tagItem.groupList.push(groupItem);
+      tagList.unshift(tagItem); // 放前面以便可见
+    }
+  }
+
+  return tagList;
 }
 
 // 将 tagList 转化为 legacy Netscape HTML 书签格式
@@ -362,5 +624,6 @@ export function niceTab2html(tagList: Partial<TagItem>[]): string {
 export default {
   extContentImporter,
   extContentExporter,
+  html2niceTab,
   niceTab2html,
 };

@@ -23,6 +23,7 @@ const zhCN = {
   'importExport.importContent': '填写导入内容：',
   'importExport.importFromText': '从文本导入',
   'importExport.importFromFile': '从文件导入',
+  'importExport.importFromHTML': '从HTML导入',
   'importExport.importSuccess': '导入成功',
   'importExport.importFailed': '导入失败，请检查格式是否正确',
   'importExport.settingsModuleTitle': `偏好设置导入导出`,
