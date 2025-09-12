@@ -51,7 +51,7 @@ const enUS: Record<LocaleKey, string> = {
   'settings.deleteAfterRestore': 'Remove tabs from the NiceTab list after opening tabs or tab group?',
   'settings.deleteAfterRestore.yes': 'Remove (locked tabs remain)',
   'settings.deleteAfterRestore.no': 'Keep all (recommended)',
-  'settings.discardWhenOpenTabs': 'Automatically hibernate tabs when opening multiple tabs?',
+  'settings.discardWhenOpenTabs': 'Auto-hibernate when opening multiple tabs?',
   'settings.silentOpenTabModifierKey': 'Modifier key for opening a tab silently (in background):',
   'settings.openTabModifierKey': 'Modifier key for opening a tab in the foreground:',
   'settings.openTabModifierKey.tooltip': 'Foreground opening takes precedence over background opening. When the modifier keys for both types of opening are the same, the foreground opening action will be triggered.',
