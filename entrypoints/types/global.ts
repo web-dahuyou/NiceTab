@@ -126,6 +126,12 @@ export type PageWidthTypes = 'fixed' | 'responsive';
 
 export type ActionBtnStyle = 'icon' | 'text';
 
+export type ContextMenuConfigItem = {
+  menuId: string;
+  display?: boolean;
+  name?: string;
+};
+
 export type InsertPositions = 'top' | 'bottom';
 
 export type TimeRange = [string, string];
@@ -168,6 +174,7 @@ export type SettingsProps = {
   groupActionBtnsCommonlyUsed?: string[]; // 常用的标签组操作按钮
   showOpenedTabCount?: boolean; // 扩展图标上是否显示打开的标签页数量
   showPageContextMenus?: boolean; // 网页中是否显示NiceTab右键菜单
+  contextMenuConfig?: ContextMenuConfigItem[], // 右键菜单配置
   popupModuleDisplays?: PopupModuleNames[]; // popup面板中需要展示的模块
   autoExpandHomeTree?: boolean; // 进入列表页时，是否自动展开全部节点
   pageWidthType?: PageWidthTypes; // 主内容区宽度设置

@@ -21,8 +21,8 @@ export const defaultGroupActions = [
 
 export const defaultTabActions = ['open', 'remove', 'clone', 'copyLinks', 'moveTo'];
 
-export type GroupActionName = typeof defaultGroupActions[number];
-export type TabActionName = typeof defaultTabActions[number];
+export type GroupActionName = (typeof defaultGroupActions)[number];
+export type TabActionName = (typeof defaultTabActions)[number];
 
 export interface ActionOption<T extends 'group' | 'tab' = 'group'> {
   actionName: T extends 'group' ? GroupActionName : TabActionName;

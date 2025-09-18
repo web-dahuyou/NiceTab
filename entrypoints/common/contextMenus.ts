@@ -4,6 +4,7 @@ import {
   ENUM_SETTINGS_PROPS,
   TAB_EVENTS,
   defaultLanguage,
+  defaultContextmenuConfigList,
   syncTypeMap,
 } from './constants';
 import tabUtils from '~/entrypoints/common/tabs';
@@ -23,10 +24,15 @@ const {
   EXCLUDE_DOMAINS_FOR_SENDING,
   SHOW_PAGE_CONTEXT_MENUS,
   SHOW_SEND_TARGET_MODAL,
+  CONTEXT_MENU_CONFIG,
 } = ENUM_SETTINGS_PROPS;
+
+// 是否创建右键菜单中
+let isCreating = false;
 
 export type ContextMenuHotKeys = Record<string, string>;
 type CreateMenuPropertiesType = Menus.CreateCreatePropertiesType & {
+  id: string;
   // 用来给popup等地方复用menus时进行过滤使用，browser.contextMenus.create 时需要去掉这个属性
   tag: 'common' | 'sendTabs' | 'menuGroup';
 };
@@ -38,29 +44,21 @@ export const getMenuHotkeys = async () => {
   const customMessages = getCustomLocaleMessages(language);
   const noneKey = customMessages['common.none'] || 'None';
 
-  return [
-    ENUM_ACTION_NAME.OPEN_ADMIN_TAB,
-    ENUM_ACTION_NAME.GLOBAL_SEARCH,
-    ENUM_ACTION_NAME.SEND_ALL_TABS,
-    ENUM_ACTION_NAME.SEND_CURRENT_TAB,
-    ENUM_ACTION_NAME.SEND_OTHER_TABS,
-    ENUM_ACTION_NAME.SEND_LEFT_TABS,
-    ENUM_ACTION_NAME.SEND_RIGHT_TABS,
-    ENUM_ACTION_NAME.START_SYNC,
-  ].reduce<ContextMenuHotKeys>((result, id) => {
+  return Object.values(ENUM_ACTION_NAME).reduce<ContextMenuHotKeys>((result, id) => {
     const hotkey = commandsHotkeysMap.get(id) || noneKey;
     return { ...result, [id]: hotkey };
   }, {});
 };
 
-export const getMenus = async (): Promise<CreateMenuPropertiesType[]> => {
+// 获取基础菜单项（平铺结构）
+export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
   const settings = await settingsUtils.getSettings();
   const language = settings[LANGUAGE] || defaultLanguage;
   const customMessages = getCustomLocaleMessages(language);
 
   const tabs = await browser.tabs.query({ currentWindow: true });
   const { tab: adminTab } = await tabUtils.getAdminTabInfo();
-  const currTab = tabs?.find((tab) => tab.highlighted);
+  const currTab = tabs?.find(tab => tab.highlighted);
   const filteredTabs = await tabUtils.getFilteredTabs(tabs, settings);
   const excludeDomainsString = settings[EXCLUDE_DOMAINS_FOR_SENDING] || '';
   const isCurrTabMatched = isUrlMatched(currTab?.url, excludeDomainsString);
@@ -122,20 +120,11 @@ export const getMenus = async (): Promise<CreateMenuPropertiesType[]> => {
     enabled: !!currTab?.id && filteredTabs?.length > 1,
   };
 
-  // 后面的menu全都折叠收到 menuGroup:more
-  const _moreMenus: CreateMenuPropertiesType = {
-    tag: 'menuGroup',
-    id: 'menuGroup:more',
-    title: customMessages['common.more'],
-    contexts,
-    enabled: true,
-  };
-
   async function hasFilteredLeftTabs() {
     if (!currTab?.id || currTab?.index <= 0) return false;
     const filteredRightTabs = await tabUtils.getFilteredTabs(
       tabs.slice(0, currTab?.index || 0),
-      settings
+      settings,
     );
     return filteredRightTabs?.length > 0;
   }
@@ -143,7 +132,6 @@ export const getMenus = async (): Promise<CreateMenuPropertiesType[]> => {
   const _sendLeftTabs: CreateMenuPropertiesType = {
     tag: 'sendTabs',
     id: ENUM_ACTION_NAME.SEND_LEFT_TABS,
-    parentId: 'menuGroup:more',
     title:
       customMessages['common.sendLeftTabs'] +
       ` (${hotkeysMap?.[ENUM_ACTION_NAME.SEND_LEFT_TABS]})`,
@@ -155,7 +143,7 @@ export const getMenus = async (): Promise<CreateMenuPropertiesType[]> => {
     if (!currTab?.id || currTab?.index >= tabs.length - 1) return false;
     const filteredRightTabs = await tabUtils.getFilteredTabs(
       tabs.slice((currTab?.index || 0) + 1),
-      settings
+      settings,
     );
     return filteredRightTabs?.length > 0;
   }
@@ -163,7 +151,6 @@ export const getMenus = async (): Promise<CreateMenuPropertiesType[]> => {
   const _sendRightTabs: CreateMenuPropertiesType = {
     tag: 'sendTabs',
     id: ENUM_ACTION_NAME.SEND_RIGHT_TABS,
-    parentId: 'menuGroup:more',
     title:
       customMessages['common.sendRightTabs'] +
       ` (${hotkeysMap?.[ENUM_ACTION_NAME.SEND_RIGHT_TABS]})`,
@@ -174,7 +161,6 @@ export const getMenus = async (): Promise<CreateMenuPropertiesType[]> => {
   const _startSyncMenu: CreateMenuPropertiesType = {
     tag: 'common',
     id: ENUM_ACTION_NAME.START_SYNC,
-    parentId: 'menuGroup:more',
     title:
       customMessages['common.startSync'] +
       ` (${hotkeysMap?.[ENUM_ACTION_NAME.START_SYNC]})`,
@@ -187,29 +173,86 @@ export const getMenus = async (): Promise<CreateMenuPropertiesType[]> => {
     _sendAllTabs,
     _sendCurrentTab,
     _sendOtherTabs,
-    _moreMenus,
     _sendLeftTabs,
     _sendRightTabs,
     _startSyncMenu,
   ];
 };
 
+export const getBaseMenuMap = async () => {
+  const menus = await getBaseMenus();
+  return menus.reduce<Record<string, CreateMenuPropertiesType>>((result, menu) => {
+    result[menu.id] = menu;
+    return result;
+  }, {});
+};
+
+// 根据用户配置获取最终菜单项
+export const getMenus = async (): Promise<CreateMenuPropertiesType[]> => {
+  const settings = await settingsUtils.getSettings();
+  // 基础菜单map
+  const baseMenuMap = await getBaseMenuMap();
+  // 获取用户配置的菜单项，如果没有配置则默认全部显示
+  const menuConfig = settings[CONTEXT_MENU_CONFIG] || defaultContextmenuConfigList;
+
+  // 根据配置对菜单进行排序和过滤
+  const finalMenus = menuConfig
+    .filter(item => item.display && item.menuId)
+    .map(item => baseMenuMap[item.menuId]);
+
+  const moreThanSix = finalMenus.length > 6;
+  // 前6个直接显示，其余放入"更多"菜单组
+  const rootMenus = moreThanSix ? finalMenus.slice(0, 5) : finalMenus;
+  const groupedMenus = moreThanSix ? finalMenus.slice(5) : [];
+
+  // 如果有需要分组的菜单，添加"更多"菜单组
+  if (groupedMenus.length > 0) {
+    const language = settings[LANGUAGE] || defaultLanguage;
+    const customMessages = getCustomLocaleMessages(language);
+    const contexts: Menus.ContextType[] = settings[SHOW_PAGE_CONTEXT_MENUS]
+      ? ['all']
+      : ['action'];
+
+    const moreMenu: CreateMenuPropertiesType = {
+      tag: 'menuGroup',
+      id: 'menuGroup:more',
+      title: customMessages['common.more'],
+      contexts,
+      enabled: true,
+    };
+
+    // 为分组菜单设置父级
+    const menusWithParent = groupedMenus.map(menu => ({
+      ...menu,
+      parentId: 'menuGroup:more',
+    }));
+
+    return [...rootMenus, moreMenu, ...menusWithParent];
+  }
+
+  return rootMenus;
+};
+
 // 创建 contextMenus
 async function createContextMenus(callback?: () => void) {
+  if (isCreating) return;
+
+  isCreating = true;
   const menus = await getMenus();
+  await browser.contextMenus.removeAll();
+
   for (let menu of menus) {
     await browser.contextMenus.create(omit(menu, ['tag']));
   }
+  isCreating = false;
   callback?.();
 }
 
 // 根据标签页状态更新 contextMenus
 async function handleContextMenusUpdate() {
-  const menus = await getMenus();
-  for (let menu of menus) {
-    if (menu.id)
-      browser.contextMenus.update(menu.id, pick(menu, ['title', 'enabled', 'contexts']));
-  }
+  setTimeout(() => {
+    createContextMenus();
+  }, 500);
 }
 
 export async function actionHandler(actionName: string, targetData?: SendTargetProps) {
@@ -254,7 +297,7 @@ export async function actionHandler(actionName: string, targetData?: SendTargetP
 // 最终要执行的发送标签页操作
 export async function handleSendTabsAction(
   actionName: string,
-  targetData?: SendTargetProps
+  targetData?: SendTargetProps,
 ) {
   try {
     await actionHandler(actionName, targetData);
@@ -295,7 +338,7 @@ export async function strategyHandler(actionName: string) {
       },
       () => {
         tabUtils.openAdminRoutePage({ path: '/home', query: { action: 'globalSearch' } });
-      }
+      },
     );
     return;
   }
@@ -313,21 +356,19 @@ export async function strategyHandler(actionName: string) {
       },
       () => {
         actionHandler(actionName);
-      }
+      },
     );
   }
 }
 
 // 注册 contextMenus
 export default async function contextMenusRegister() {
-  await browser.contextMenus.removeAll();
   createContextMenus(() => {
-    TAB_EVENTS.forEach((event) => {
+    TAB_EVENTS.forEach(event => {
       browser.tabs[event]?.addListener(handleContextMenusUpdate);
+      initSettingsStorageListener(handleContextMenusUpdate);
     });
   });
-
-  initSettingsStorageListener(handleContextMenusUpdate);
 
   // 点击右键菜单
   browser.contextMenus.onClicked.addListener(async (info, tab) => {
