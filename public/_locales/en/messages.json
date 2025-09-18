@@ -21,6 +21,6 @@
     "message": "Global Search"
   },
   "action_startSync": {
-		"message": "Start Sync"
-	}
+    "message": "Start Sync"
+  }
 }

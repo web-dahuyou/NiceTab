@@ -12,6 +12,7 @@ import {
   defaultLanguage,
   defaultThemeType,
   DEFAULT_EXCLUDE_DOMAINS,
+  defaultContextmenuConfigList,
   defaultAutoSyncType,
   defaultAutoSyncTimeUnit,
   defaultAutoSyncRelation,
@@ -56,6 +57,7 @@ const {
   GROUP_ACTION_BTNS_COMMONLY_USED,
   SHOW_OPENED_TAB_COUNT,
   SHOW_PAGE_CONTEXT_MENUS,
+  CONTEXT_MENU_CONFIG,
   POPUP_MODULE_DISPLAYS,
   AUTO_EXPAND_HOME_TREE,
   MAIN_CONTENT_WIDTH_TYPE,
@@ -107,6 +109,7 @@ export default class SettingsUtils {
     [GROUP_ACTION_BTNS_COMMONLY_USED]: defaultGroupActions, // 常用的标签组操作按钮
     [SHOW_OPENED_TAB_COUNT]: true, // 扩展图标上是否显示打开的标签页数量
     [SHOW_PAGE_CONTEXT_MENUS]: true, // 网页中是否显示NiceTab右键菜单
+    [CONTEXT_MENU_CONFIG]: defaultContextmenuConfigList, // 右键菜单配置
     [POPUP_MODULE_DISPLAYS]: POPUP_MODULE_NAMES, // popup面板中需要展示的模块
     [AUTO_EXPAND_HOME_TREE]: false, // 进入列表页时，是否自动展开全部节点
     [MAIN_CONTENT_WIDTH_TYPE]: 'fixed' as PageWidthTypes, // 主内容区域宽度类型

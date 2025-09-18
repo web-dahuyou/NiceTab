@@ -100,15 +100,21 @@ export const POPUP_MODULE_NAMES: PopupModuleNames[] = [
 
 // action 名称枚举
 export enum ENUM_ACTION_NAME {
+  OPEN_ADMIN_TAB = 'action:openAdminTab', // 打开管理后台
   SEND_ALL_TABS = 'action:sendAllTabs', // 发送全部标签页
   SEND_CURRENT_TAB = 'action:sendCurrentTab', // 发送当前标签页
   SEND_OTHER_TABS = 'action:sendOtherTabs', // 发送其他标签页
   SEND_LEFT_TABS = 'action:sendLeftTabs', // 发送左侧标签页
   SEND_RIGHT_TABS = 'action:sendRightTabs', // 发送右侧标签页
-  OPEN_ADMIN_TAB = 'action:openAdminTab', // 打开管理后台
   GLOBAL_SEARCH = 'action:globalSearch', // 全局搜索
   START_SYNC = 'action:startSync', // 开始同步
 }
+
+// 右键菜单配置列表-默认
+export const defaultContextmenuConfigList = Object.values(ENUM_ACTION_NAME).map(name => {
+  return { menuId: name, display: true };
+});
+
 // 设置项枚举
 export enum ENUM_SETTINGS_PROPS {
   LANGUAGE = 'language', // 语言
@@ -147,6 +153,7 @@ export enum ENUM_SETTINGS_PROPS {
   GROUP_ACTION_BTNS_COMMONLY_USED = 'groupActionBtnsCommonlyUsed', // 常用的标签组操作按钮
   SHOW_OPENED_TAB_COUNT = 'showOpenedTabCount', // 扩展图标上是否显示打开的标签页数量
   SHOW_PAGE_CONTEXT_MENUS = 'showPageContextMenus', // 网页中是否显示NiceTab右键菜单
+  CONTEXT_MENU_CONFIG = 'contextMenuConfig', // 右键菜单配置
   POPUP_MODULE_DISPLAYS = 'popupModuleDisplays', // popup弹窗中需要展示的模块
   AUTO_EXPAND_HOME_TREE = 'autoExpandHomeTree', // 进入列表页时，是否自动展开全部节点
   MAIN_CONTENT_WIDTH_TYPE = 'pageWidthType', // 主内容区域宽度类型
