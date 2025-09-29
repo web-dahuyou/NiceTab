@@ -40,12 +40,12 @@ type CreateMenuPropertiesType = Menus.CreateCreatePropertiesType & {
 export const getMenuHotkeys = async () => {
   const commandsHotkeysMap = await getCommandsHotkeys();
   const settings = await settingsUtils.getSettings();
-  const language = settings[LANGUAGE] || defaultLanguage;
-  const customMessages = getCustomLocaleMessages(language);
-  const noneKey = customMessages['common.none'] || 'None';
+  // const language = settings[LANGUAGE] || defaultLanguage;
+  // const customMessages = getCustomLocaleMessages(language);
+  // const noneKey = customMessages['common.none'] || 'None';
 
   return Object.values(ENUM_ACTION_NAME).reduce<ContextMenuHotKeys>((result, id) => {
-    const hotkey = commandsHotkeysMap.get(id) || noneKey;
+    const hotkey = commandsHotkeysMap.get(id) || '';
     return { ...result, [id]: hotkey };
   }, {});
 };
@@ -68,30 +68,36 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
     ? ['all']
     : ['action'];
 
+  // 获取标题
+  const getTitle = (title: string, id: string) => {
+    const hotkey = hotkeysMap?.[id];
+    return hotkey ? title + ` (${hotkey})` : title;
+  };
+
   const _openAdminTab: CreateMenuPropertiesType = {
     tag: 'common',
     id: ENUM_ACTION_NAME.OPEN_ADMIN_TAB,
-    title:
-      customMessages['common.openAdminTab'] +
-      ` (${hotkeysMap?.[ENUM_ACTION_NAME.OPEN_ADMIN_TAB]})`,
+    title: getTitle(
+      customMessages['common.openAdminTab'],
+      ENUM_ACTION_NAME.OPEN_ADMIN_TAB,
+    ),
     contexts,
   };
 
   const _openGlobalSearch: CreateMenuPropertiesType = {
     tag: 'common',
     id: ENUM_ACTION_NAME.GLOBAL_SEARCH,
-    title:
-      customMessages['common.globalSearch'] +
-      ` (${hotkeysMap?.[ENUM_ACTION_NAME.GLOBAL_SEARCH]})`,
+    title: getTitle(
+      customMessages['common.globalSearch'],
+      ENUM_ACTION_NAME.GLOBAL_SEARCH,
+    ),
     contexts,
   };
 
   const _sendAllTabs: CreateMenuPropertiesType = {
     tag: 'sendTabs',
     id: ENUM_ACTION_NAME.SEND_ALL_TABS,
-    title:
-      customMessages['common.sendAllTabs'] +
-      ` (${hotkeysMap?.[ENUM_ACTION_NAME.SEND_ALL_TABS]})`,
+    title: getTitle(customMessages['common.sendAllTabs'], ENUM_ACTION_NAME.SEND_ALL_TABS),
     contexts,
     enabled: filteredTabs?.length > 0,
   };
@@ -99,9 +105,10 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
   const _sendCurrentTab: CreateMenuPropertiesType = {
     tag: 'sendTabs',
     id: ENUM_ACTION_NAME.SEND_CURRENT_TAB,
-    title:
-      customMessages['common.sendCurrentTab'] +
-      ` (${hotkeysMap?.[ENUM_ACTION_NAME.SEND_CURRENT_TAB]})`,
+    title: getTitle(
+      customMessages['common.sendCurrentTab'],
+      ENUM_ACTION_NAME.SEND_CURRENT_TAB,
+    ),
     contexts,
     enabled:
       !!currTab?.id &&
@@ -113,9 +120,10 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
   const _sendOtherTabs: CreateMenuPropertiesType = {
     tag: 'sendTabs',
     id: ENUM_ACTION_NAME.SEND_OTHER_TABS,
-    title:
-      customMessages['common.sendOtherTabs'] +
-      ` (${hotkeysMap?.[ENUM_ACTION_NAME.SEND_OTHER_TABS]})`,
+    title: getTitle(
+      customMessages['common.sendOtherTabs'],
+      ENUM_ACTION_NAME.SEND_OTHER_TABS,
+    ),
     contexts,
     enabled: !!currTab?.id && filteredTabs?.length > 1,
   };
@@ -132,9 +140,10 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
   const _sendLeftTabs: CreateMenuPropertiesType = {
     tag: 'sendTabs',
     id: ENUM_ACTION_NAME.SEND_LEFT_TABS,
-    title:
-      customMessages['common.sendLeftTabs'] +
-      ` (${hotkeysMap?.[ENUM_ACTION_NAME.SEND_LEFT_TABS]})`,
+    title: getTitle(
+      customMessages['common.sendLeftTabs'],
+      ENUM_ACTION_NAME.SEND_LEFT_TABS,
+    ),
     contexts,
     enabled: _hasFilteredLeftTabs,
   };
@@ -151,9 +160,10 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
   const _sendRightTabs: CreateMenuPropertiesType = {
     tag: 'sendTabs',
     id: ENUM_ACTION_NAME.SEND_RIGHT_TABS,
-    title:
-      customMessages['common.sendRightTabs'] +
-      ` (${hotkeysMap?.[ENUM_ACTION_NAME.SEND_RIGHT_TABS]})`,
+    title: getTitle(
+      customMessages['common.sendRightTabs'],
+      ENUM_ACTION_NAME.SEND_RIGHT_TABS,
+    ),
     contexts,
     enabled: _hasFilteredRightTabs,
   };
@@ -161,9 +171,7 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
   const _startSyncMenu: CreateMenuPropertiesType = {
     tag: 'common',
     id: ENUM_ACTION_NAME.START_SYNC,
-    title:
-      customMessages['common.startSync'] +
-      ` (${hotkeysMap?.[ENUM_ACTION_NAME.START_SYNC]})`,
+    title: getTitle(customMessages['common.startSync'], ENUM_ACTION_NAME.START_SYNC),
     contexts,
   };
 
