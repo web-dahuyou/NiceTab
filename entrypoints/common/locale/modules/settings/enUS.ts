@@ -51,7 +51,7 @@ const enUS: Record<LocaleKey, string> = {
   'settings.deleteAfterRestore': 'Remove tabs from the NiceTab list after opening tabs or tab group?',
   'settings.deleteAfterRestore.yes': 'Remove (locked tabs remain)',
   'settings.deleteAfterRestore.no': 'Keep all (recommended)',
-  'settings.discardWhenOpenTabs': 'Automatically hibernate tabs when opening multiple tabs?',
+  'settings.discardWhenOpenTabs': 'Auto-hibernate when opening multiple tabs?',
   'settings.silentOpenTabModifierKey': 'Modifier key for opening a tab silently (in background):',
   'settings.openTabModifierKey': 'Modifier key for opening a tab in the foreground:',
   'settings.openTabModifierKey.tooltip': 'Foreground opening takes precedence over background opening. When the modifier keys for both types of opening are the same, the foreground opening action will be triggered.',
@@ -84,6 +84,8 @@ const enUS: Record<LocaleKey, string> = {
   'settings.groupActionBtnsCommonlyUsed.tooltip': 'Selected buttons will be displayed prominently, while unselected ones will be collapsed into the "More" menu.',
   'settings.showOpenedTabCount': 'Display the number of open tabs on the extension icon?',
   'settings.showPageContextMenus': 'Display ContextMenu on your webpage?',
+  'settings.contextMenuConfig': 'Configure ContextMenu items:',
+  'settings.contextMenuConfig.tooltip': 'Select which ContextMenu items to display and drag to reorder. The first 5 menu items will be displayed prominently; the others will be collapsed into the "More" menu.',
   'settings.popupModuleDisplays': 'Choose the modules to be displayed in the "Popup Panel"',
   'settings.popupModuleDisplays.tooltip': 'If any panel module is selected, the Popup Panel will display when clicking the extension icon. Otherwise, the "Send All Tabs" action will be triggered directly.',
   'settings.autoExpandHomeTree': 'Automatically expand the tree list on Home Page?',
@@ -110,6 +112,6 @@ const enUS: Record<LocaleKey, string> = {
   'settings.syncType.manualPullForce': 'Manual Pull (Force): Force to overwrite local data.',
   'settings.syncType.manualPushMerge': 'Manual Push (Merge): Merge to local data and then push to remote (recommended).',
   'settings.syncType.manualPushForce': 'Manual Push (Force): Force to overwrite remote data.',
-}
+};
 
 export default enUS;

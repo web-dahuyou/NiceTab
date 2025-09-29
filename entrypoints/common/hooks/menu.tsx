@@ -7,29 +7,31 @@ type MenuItemType = Required<MenuProps>['items'][number] & {
   tip?: React.ReactNode;
 };
 
-typeof Menu
-
 export default function useMenus() {
   const { token } = theme.useToken();
-  const createMenus = useCallback((items: MenuItemType[]) => {
-    return items?.map((item) => ({
-      ...item,
-      label: item.tip ? (
-        <div>
-          {item.label}
-          <Tooltip
-            color={token.colorBgContainer}
-            title={<Typography.Text>{item.tip}</Typography.Text>}
-            styles={{ root: { maxWidth: '300px', width: '300px' } }}
-          >
-            <QuestionCircleOutlined style={{ marginLeft: '4px' }} />
-          </Tooltip>
-        </div>
-      ) : (
-        item.label
-      ),
-    }));
-  }, []);
+
+  const createMenus = useCallback(
+    (items: MenuItemType[]) => {
+      return items?.map(item => ({
+        ...item,
+        label: item.tip ? (
+          <div>
+            {item.label}
+            <Tooltip
+              color={token.colorBgContainer}
+              title={<Typography.Text>{item.tip}</Typography.Text>}
+              styles={{ root: { maxWidth: '300px', width: '300px' } }}
+            >
+              <QuestionCircleOutlined style={{ marginLeft: '4px' }} />
+            </Tooltip>
+          </div>
+        ) : (
+          item.label
+        ),
+      }));
+    },
+    [token.colorBgContainer],
+  );
 
   return {
     createMenus,

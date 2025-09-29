@@ -742,6 +742,17 @@ export const GlobalSearchPanel = forwardRef(
       debounceResize();
     }, [debounceResize]);
 
+    // 按ESC键关闭搜索面板
+    const handleKeyDown = useCallback(
+      (event: KeyboardEvent) => {
+        if (event.key === 'Escape' && visible) {
+          event.stopPropagation(); // 阻止事件冒泡
+          handleClose();
+        }
+      },
+      [visible, handleClose],
+    );
+
     const messageListener = useCallback(
       async (msg: unknown) => {
         // console.log('browser.runtime.onMessage--globalSearch', msg);
@@ -768,6 +779,18 @@ export const GlobalSearchPanel = forwardRef(
         browser.runtime.onMessage.removeListener(messageListener);
       };
     }, [messageListener]);
+
+    // 监听按键
+    useEffect(() => {
+      if (visible) {
+        window.addEventListener('keydown', handleKeyDown, true); // 使用 capture 模式
+      } else {
+        window.removeEventListener('keydown', handleKeyDown, true); // 移除 capture 模式监听器
+      }
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown, true); // 移除 capture 模式监听器
+      };
+    }, [visible, handleKeyDown]);
 
     useEffect(() => {
       window.addEventListener('resize', handleResize);

@@ -5,12 +5,14 @@ import type { SettingsProps } from '~/entrypoints/types';
 import { POPUP_MODULE_NAMES, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { groupActionOptions } from '~/entrypoints/options/home/constants';
+import ContextMenuConfig from './ContextMenuConfig';
 
 const {
   GROUP_ACTION_BTN_STYLE,
   GROUP_ACTION_BTNS_COMMONLY_USED,
   SHOW_OPENED_TAB_COUNT,
   SHOW_PAGE_CONTEXT_MENUS,
+  CONTEXT_MENU_CONFIG,
   POPUP_MODULE_DISPLAYS,
   AUTO_EXPAND_HOME_TREE,
   MAIN_CONTENT_WIDTH_TYPE,
@@ -18,7 +20,7 @@ const {
 } = ENUM_SETTINGS_PROPS;
 
 export default function FormModuleDisplay(
-  props: FormItemProps & { form: FormInstance<SettingsProps> }
+  props: FormItemProps & { form: FormInstance<SettingsProps> },
 ) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
@@ -26,7 +28,7 @@ export default function FormModuleDisplay(
 
   // popup面板显示模块选项
   const popupModuleDisplayOptions = useMemo(() => {
-    return POPUP_MODULE_NAMES.map((moduleName) => {
+    return POPUP_MODULE_NAMES.map(moduleName => {
       return {
         label: $fmt({ id: `common.${moduleName}` }),
         value: moduleName,
@@ -36,7 +38,7 @@ export default function FormModuleDisplay(
 
   // 标签组按钮选项
   const groupActionBtnOptions = useMemo(() => {
-    return groupActionOptions.map((option) => {
+    return groupActionOptions.map(option => {
       return {
         label: $fmt(option.labelKey),
         value: option.actionName,
@@ -97,6 +99,23 @@ export default function FormModuleDisplay(
           <Radio value={true}>{$fmt('common.yes')}</Radio>
           <Radio value={false}>{$fmt('common.no')}</Radio>
         </Radio.Group>
+      </Form.Item>
+
+      {/* 右键菜单配置（可选择并排序） */}
+      <Form.Item<SettingsProps>
+        label={$fmt(`settings.${CONTEXT_MENU_CONFIG}`)}
+        name={CONTEXT_MENU_CONFIG}
+        tooltip={{
+          color: token.colorBgElevated,
+          title: (
+            <Typography.Text>
+              {$fmt(`settings.${CONTEXT_MENU_CONFIG}.tooltip`)}
+            </Typography.Text>
+          ),
+          styles: { root: { maxWidth: '320px', width: '320px' } },
+        }}
+      >
+        <ContextMenuConfig form={form} />
       </Form.Item>
 
       {/* popup面板中模块设置 */}

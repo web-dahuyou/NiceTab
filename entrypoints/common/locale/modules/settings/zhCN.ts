@@ -79,9 +79,11 @@ const zhCN = {
   /* 展示配置 */
   'settings.groupActionBtnStyle': '标签组和标签页操作按钮样式：',
   'settings.groupActionBtnsCommonlyUsed': '常用的标签组操作按钮配置：',
-  'settings.groupActionBtnsCommonlyUsed.tooltip': '选中的按钮在外层展示，未选中的按钮将折叠到更多菜单中',
+  'settings.groupActionBtnsCommonlyUsed.tooltip': '选中的按钮在外层展示，未选中的按钮将折叠到“更多”菜单中',
   'settings.showOpenedTabCount': '是否在扩展图标上显示打开的标签页数量：',
   'settings.showPageContextMenus': '是否在网页中显示NiceTab右键菜单：',
+  'settings.contextMenuConfig': '右键菜单配置：',
+  'settings.contextMenuConfig.tooltip': '选择要展示的右键菜单项，可拖拽排序。选中的前5项在外层展示，剩下的折叠到“更多”菜单组中。',
   'settings.popupModuleDisplays': 'Popup面板模块展示设置：',
   'settings.popupModuleDisplays.tooltip': '只要选择了任意面板模块，则点击扩展图标时将展示 Popup 面板，否则将直接发送所有标签页。',
   'settings.autoExpandHomeTree': '进入列表页时-是否自动展开全部节点：',
@@ -108,7 +110,7 @@ const zhCN = {
   'settings.syncType.manualPullForce': '手动拉取-覆盖本地数据',
   'settings.syncType.manualPushMerge': '手动同步-合并推送（推荐）',
   'settings.syncType.manualPushForce': '手动同步-覆盖推送',
-}
+};
 
 export type LocaleKey = keyof typeof zhCN;
 
