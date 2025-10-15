@@ -125,7 +125,11 @@
 <li>分类支持创建标签组、一键移动分类下的标签组到其他分类。</li>
 <li>分类/标签组支持重命名、删除、可跨分类拖拽移动。</li>
 <li>点击分类和标签组，会选中对应的分类或标签组，同时右侧面板会展示该分类下的所有标签组及标签组中的标签页列表。</li>
-<li>选中的分类/标签组，支持快捷键操作上下移动（这里的快捷键只适用于目录树，暂不支持修改）。</li>
+<li>选中的分类/标签组，支持快捷键操作上下移动（这里的快捷键只适用于目录树，暂不支持修改）。<ul>
+<li>上移：macOS (⌥ + ⇧ + ↑) windows (Alt + Shift + ↑)</li>
+<li>下移：macOS (⌥ + ⇧ + ↓) windows (Alt + Shift + ↓)</li>
+</ul>
+</li>
 </ul>
 <h3 id="右侧面板">右侧面板</h3>
 <p>右侧面板展示当前选中的分类中的所有标签组以及标签组中的所有标签页，采用虚拟列表渲染。</p>
@@ -144,8 +148,13 @@
 <li>按标签名称升序：点击“标签名称升序”按钮，则会将当前标签组中的标签页按照标签名称升序排列。</li>
 <li>按标签名称降序：点击“标签名称降序”按钮，则会将当前标签组中的标签页按照标签名称降序排列。</li>
 </ul>
-<p><strong>补充说明</strong>
-另外，右侧面板<strong>支持鼠标框选的方式快速多选标签页</strong>，方便快捷。</p>
+<p>标签页列表：</p>
+<ul>
+<li>单个标签页支持删除、编辑、复制、展示二维码等操作。</li>
+<li>标签组内的标签页支持多选、拖拽排序（<strong>支持鼠标框选的方式快速多选标签页</strong>）。</li>
+<li>多选标签页后，支持批量删除、打开、移动到、批量拖拽移动、复制链接、克隆等操作。</li>
+<li><strong>温馨提示</strong>：您还可以拖拽标签页到左侧目录树的标签组实现快捷移动。</li>
+</ul>
 <h2 id="管理后台-偏好设置">管理后台-偏好设置</h2>
 <p>偏好设置直接关系到整个插件的交互行为和处理逻辑，NiceTab的默认配置是根据我个人的使用习惯设置的，您可以根据自己喜好进行调整。</p>
 <p>偏好设置分为下面几个配置模块：</p>
@@ -559,24 +568,24 @@
 </thead>
 <tbody><tr>
 <td>打开NiceTab管理后台</td>
-<td>macos (⌥ + ⇧ + M) <br /> windows (Alt + Shift + M)</td>
+<td>macOS (⌥ + ⇧ + M) <br /> windows (Alt + Shift + M)</td>
 <td>其中字母 <code>M</code> 是 <code>manager</code> 的首字母</td>
 </tr>
 <tr>
 <td>发送所有标签页</td>
-<td>macos (⌥ + ⇧ + A) <br /> windows (Alt + Shift + A)</td>
+<td>macOS (⌥ + ⇧ + A) <br /> windows (Alt + Shift + A)</td>
 <td>其中字母 <code>A</code> 是 <code>all</code> 的首字母</td>
 </tr>
 <tr>
 <td>发送当前标签页</td>
-<td>macos (⌥ + ⇧ + C) <br /> windows (Alt + Shift + C)</td>
+<td>macOS (⌥ + ⇧ + C) <br /> windows (Alt + Shift + C)</td>
 <td>其中字母 <code>C</code> 是 <code>current</code> 的首字母</td>
 </tr>
 </tbody></table>
-<!-- | 全局搜索 | macos (⌥ + ⇧ + G) <br /> windows (Alt + Shift + G) | 其中字母 `G` 是 `global` 的首字母 |
-| 发送左侧标签页 | macos (⌥ + ⇧ + L) <br /> windows (Alt + Shift + L) | 其中字母 `L` 是 `left` 的首字母 |
-| 发送右侧标签页 | macos (⌥ + ⇧ + R) <br /> windows (Alt + Shift + R) | 其中字母 `R` 是 `right` 的首字母 |
-| 发送其他标签页 | macos (⌥ + ⇧ + O) <br /> windows (Alt + Shift + O) | 其中字母 `O` 是 `other` 的首字母 | -->
+<!-- | 全局搜索 | macOS (⌥ + ⇧ + G) <br /> windows (Alt + Shift + G) | 其中字母 `G` 是 `global` 的首字母 |
+| 发送左侧标签页 | macOS (⌥ + ⇧ + L) <br /> windows (Alt + Shift + L) | 其中字母 `L` 是 `left` 的首字母 |
+| 发送右侧标签页 | macOS (⌥ + ⇧ + R) <br /> windows (Alt + Shift + R) | 其中字母 `R` 是 `right` 的首字母 |
+| 发送其他标签页 | macOS (⌥ + ⇧ + O) <br /> windows (Alt + Shift + O) | 其中字母 `O` 是 `other` 的首字母 | -->
 
 
 <p>其他操作的快捷键可自行前往浏览器自带的绑定页面进行绑定。</p>
