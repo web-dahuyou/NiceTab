@@ -52,6 +52,7 @@ const zhCN = {
   'home.tab.count': '{count}个标签页',
   'home.tab.name': '名称',
   'home.tab.url': '网址',
+  'home.tab.selectedCount': '{count} 个标签页',
   'home.tab.removeSelected': `您确定要删除{count, plural,
     =0 {标签页}
     =1 {这个标签页}
