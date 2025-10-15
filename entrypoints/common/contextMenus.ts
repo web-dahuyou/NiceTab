@@ -39,7 +39,7 @@ type CreateMenuPropertiesType = Menus.CreateCreatePropertiesType & {
 
 export const getMenuHotkeys = async () => {
   const commandsHotkeysMap = await getCommandsHotkeys();
-  const settings = await settingsUtils.getSettings();
+  // const settings = await settingsUtils.getSettings();
   // const language = settings[LANGUAGE] || defaultLanguage;
   // const customMessages = getCustomLocaleMessages(language);
   // const noneKey = customMessages['common.none'] || 'None';
@@ -175,6 +175,16 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
     contexts,
   };
 
+  const _hibernateTabs: CreateMenuPropertiesType = {
+    tag: 'common',
+    id: ENUM_ACTION_NAME.HIBERNATE_TABS,
+    title: getTitle(
+      customMessages['common.hibernateTabs'],
+      ENUM_ACTION_NAME.HIBERNATE_TABS,
+    ),
+    contexts,
+  };
+
   return [
     _openAdminTab,
     _openGlobalSearch,
@@ -184,6 +194,7 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
     _sendLeftTabs,
     _sendRightTabs,
     _startSyncMenu,
+    _hibernateTabs,
   ];
 };
 
@@ -283,6 +294,9 @@ export async function actionHandler(actionName: string, targetData?: SendTargetP
     case ENUM_ACTION_NAME.OPEN_ADMIN_TAB:
       await tabUtils.openAdminRoutePage({ path: '/home' });
       break;
+    case ENUM_ACTION_NAME.HIBERNATE_TABS:
+      tabUtils.discardOtherTabs();
+      break;
     case ENUM_ACTION_NAME.START_SYNC:
       tabUtils.openAdminRoutePage({ path: '/sync' });
       setTimeout(() => {
@@ -327,12 +341,13 @@ export async function strategyHandler(actionName: string) {
   //   return;
   // };
 
-  if (actionName === ENUM_ACTION_NAME.OPEN_ADMIN_TAB) {
-    actionHandler(actionName);
-    return;
-  }
-
-  if (actionName === ENUM_ACTION_NAME.START_SYNC) {
+  if (
+    [
+      ENUM_ACTION_NAME.OPEN_ADMIN_TAB,
+      ENUM_ACTION_NAME.START_SYNC,
+      ENUM_ACTION_NAME.HIBERNATE_TABS,
+    ].includes(actionName as ENUM_ACTION_NAME)
+  ) {
     actionHandler(actionName);
     return;
   }

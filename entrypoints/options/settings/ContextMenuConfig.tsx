@@ -6,6 +6,7 @@ import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/clo
 import { reorderWithEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/util/reorder-with-edge';
 import {
   ENUM_SETTINGS_PROPS,
+  ENUM_ACTION_NAME,
   defaultContextmenuConfigList,
 } from '~/entrypoints/common/constants';
 import { getBaseMenuMap } from '~/entrypoints/common/contextMenus';
@@ -62,10 +63,22 @@ export default function ContextMenuConfig({ form }: Props) {
   const getNamedList = useCallback(async () => {
     // 基础菜单map
     const baseMenuMap = await getBaseMenuMap();
-    const _list = (contextMenuConfig || defaultContextmenuConfigList).map(item => {
+    const contextMenuConfigMap = (contextMenuConfig || []).reduce<
+      Partial<Record<ENUM_ACTION_NAME, ContextMenuConfigItem>>
+    >(
+      (acc, item) => ({
+        ...acc,
+        [item.menuId]: item,
+      }),
+      {},
+    );
+
+    const _list = defaultContextmenuConfigList.map(item => {
       const baseMenu = baseMenuMap[item.menuId];
+      const savedConfigItem = contextMenuConfigMap[item.menuId];
+      const configItem = savedConfigItem || { ...item, display: false };
       return {
-        ...item,
+        ...configItem,
         name: baseMenu.title,
       };
     });
@@ -121,10 +134,11 @@ export default function ContextMenuConfig({ form }: Props) {
         onChange={handleSelectedChange}
       >
         {list.map((item, index) => (
-          <DndComponent
+          <DndComponent<DndMenuItemProps>
             key={item.menuId}
             dndKey={dndKey}
             canDrag={true}
+            mainField="menuId"
             data={{ index, menuId: item.menuId, dndKey }}
             onDrop={handleMenuItemDrop}
           >

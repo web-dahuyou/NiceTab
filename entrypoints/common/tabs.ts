@@ -566,6 +566,7 @@ export default {
   sendLeftTabs,
   sendRightTabs,
   openNewTab,
+  discardOtherTabs,
   saveOpenedTabsAsSnapshot,
   restoreOpenedTabsSnapshot,
 };

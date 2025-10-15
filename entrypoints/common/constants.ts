@@ -108,6 +108,7 @@ export enum ENUM_ACTION_NAME {
   SEND_RIGHT_TABS = 'action:sendRightTabs', // 发送右侧标签页
   GLOBAL_SEARCH = 'action:globalSearch', // 全局搜索
   START_SYNC = 'action:startSync', // 开始同步
+  HIBERNATE_TABS = 'action:hibernateTabs', // 休眠其他标签页
 }
 
 // 右键菜单配置列表-默认

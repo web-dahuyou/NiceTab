@@ -90,7 +90,7 @@ export default class SettingsUtils {
     /* 打开标签页配置 */
     [RESTORE_IN_NEW_WINDOW]: false, // 是否在新窗口打开标签组
     [DELETE_AFTER_RESTORE]: false, // 恢复标签页/标签组时是否从列表中删除
-    [DISCARD_WHEN_OPEN_TABS]: true, // 是否以休眠方式打开标签页
+    [DISCARD_WHEN_OPEN_TABS]: false, // 是否以休眠方式打开标签页
     [SILENT_OPEN_TAB_MODIFIER_KEY]: 'alt', // 静默打开标签页的修饰键
     [OPEN_TAB_MODIFIER_KEY]: '', // 前台打开标签页的修饰键
     [UNNAMED_GROUP_RESTORE_AS_GROUP]: import.meta.env.FIREFOX ? false : true, // 是否以标签组形式恢复未命名标签组
@@ -105,7 +105,7 @@ export default class SettingsUtils {
     [GROUP_INSERT_POSITION]: 'top' as InsertPositions, // 标签组插入位置：在分类的标签组列表顶部还是底部
     [TAB_INSERT_POSITION]: 'bottom' as InsertPositions, // 标签页插入位置：在标签组的标签页列表顶部还是底部
     /* 展示配置 */
-    [GROUP_ACTION_BTN_STYLE]: 'text' as ActionBtnStyle, // 操作按钮样式
+    [GROUP_ACTION_BTN_STYLE]: 'icon' as ActionBtnStyle, // 操作按钮样式
     [GROUP_ACTION_BTNS_COMMONLY_USED]: defaultGroupActions, // 常用的标签组操作按钮
     [SHOW_OPENED_TAB_COUNT]: true, // 扩展图标上是否显示打开的标签页数量
     [SHOW_PAGE_CONTEXT_MENUS]: true, // 网页中是否显示NiceTab右键菜单

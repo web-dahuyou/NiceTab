@@ -70,6 +70,9 @@ export default defineConfig({
       'action:startSync': {
         description: '__MSG_action_startSync__',
       },
+      'action:hibernateTabs': {
+        description: '__MSG_action_hibernateTabs__',
+      },
       // 激活option面板
       _execute_action: {
         suggested_key: {
