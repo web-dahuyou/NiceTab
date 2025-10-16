@@ -43,6 +43,32 @@ async function setBadge() {
   browser[BROWSER_ACTION_API_NAME].setBadgeBackgroundColor({
     color: themeData?.colorPrimary || PRIMARY_COLOR,
   });
+}
+
+// 页面创建后设置页面标题
+async function setPageTitleOnCreated(tab: Tabs.Tab) {
+  if (tab.status === 'complete') {
+    tabUtils.setPageTitle({ windowId: tab.windowId, tabId: tab.id });
+  }
+}
+// 页面更新时设置页面标题
+async function setPageTitleOnUpdated(
+  tabId: number,
+  changeInfo: Tabs.OnUpdatedChangeInfoType,
+  tab: Tabs.Tab,
+) {
+  if (changeInfo.status === 'complete' || tab.status === 'complete') {
+    tabUtils.setPageTitle({ windowId: tab.windowId, tabId: tab.id });
+  }
+}
+
+async function initTabEventListener() {
+  function handler() {
+    setBadge();
+    tabUtils.setPageTitle();
+  }
+
+  handler();
 
   browser.tabs.onCreated.removeListener(setBadge);
   browser.tabs.onRemoved.removeListener(setBadge);
@@ -52,7 +78,12 @@ async function setBadge() {
   browser.tabs.onRemoved.addListener(setBadge);
   browser.tabs.onActivated.addListener(setBadge);
   browser.runtime.onInstalled.addListener(setBadge);
-  // TAB_EVENTS.forEach((event) => browser.tabs[event]?.addListener(setBadge));
+  // TAB_EVENTS.forEach((event) => browser.tabs[event]?.addListener(handler));
+
+  browser.tabs.onCreated.removeListener(setPageTitleOnCreated);
+  browser.tabs.onCreated.addListener(setPageTitleOnCreated);
+  browser.tabs.onUpdated.removeListener(setPageTitleOnUpdated);
+  browser.tabs.onUpdated.addListener(setPageTitleOnUpdated);
 }
 
 // 初始化 popup 交互
@@ -97,12 +128,12 @@ async function initTabsUpdateListener() {
 export default defineBackground(() => {
   // console.log('Hello background!', { id: browser.runtime.id });
   initTabsUpdateListener();
-  // 设置插件图标徽标
-  setBadge();
+  // 初始化tab事件
+  initTabEventListener();
   // 初始化 popup 交互
   initPopup();
   initSettingsStorageListener(async (settings, oldSettings) => {
-    setBadge();
+    initTabEventListener();
     initPopup();
     autoSyncAlarm.checkReset(settings, oldSettings);
   });

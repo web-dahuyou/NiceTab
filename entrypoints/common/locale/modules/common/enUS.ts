@@ -88,7 +88,8 @@ const enUS: Record<LocaleKey, string> = {
   'common.adminPage': 'Admin Page',
   'common.shortcuts': 'Shortcuts',
   'common.bindShortcuts': 'Bind Shortcuts',
-  'common.bindShortcuts.tip': 'For Firefox: Go to about:addons page, switch to the "Extensions" tab, click the "Settings(Tools for all add-ons)" button in the top-right corner to open the dropdown menu, then select "Manage Extension Shortcuts" to bind shortcuts.',
+  'common.bindShortcuts.tip':
+    'For Firefox: Go to about:addons page, switch to the "Extensions" tab, click the "Settings(Tools for all add-ons)" button in the top-right corner to open the dropdown menu, then select "Manage Extension Shortcuts" to bind shortcuts.',
   'common.sendTo': 'Send To',
   'common.search': 'Search',
   'common.reload': 'Reload',
@@ -112,6 +113,11 @@ const enUS: Record<LocaleKey, string> = {
   'common.aborted': 'Request Aborted',
   'common.networkError': 'Network Connection Error',
   'common.userGuide': 'User Guide',
+  'common.itemCount': `{count, plural,
+    =0 {No Items}
+    =1 {# Item}
+    other {# Items}
+  }`,
 };
 
 export default enUS;

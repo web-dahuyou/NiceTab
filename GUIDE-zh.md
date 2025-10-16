@@ -256,6 +256,7 @@ NiceTab 插件的管理后台页面（也叫options页面），目前包括**列
 | 进入列表页时-是否自动展开全部节点 | 进入列表页时，是否自动展开列表中的分类和标签组 | 否 | ★★ |
 | 页面内容区宽度设置 | 管理后台主内容区域的宽度展示方式，默认“固定宽度”（大概1200像素，居中展示），设置为“自适应宽度”后，将以网页宽度进行自适应展示，效果上类似于居左展示 | 固定宽度 | ★★ |
 | 标签页hover时是否展示tooltip | 该配置项只是暂时保留历史交互，不推荐开启tooltip展示。 | 否 | ★ |
+| 网页标题自定义 | 自定义网页标题，该配置项可以改写网页的标题。 | 无 | ★★★★ |
 
 
 ### 自动同步配置
@@ -354,10 +355,12 @@ v2.7.7 版本支持将 NiceTab 数据保存为 html 书签文件，导出的书�
 | 打开NiceTab管理后台 | macOS (⌥ + ⇧ + M) <br /> windows (Alt + Shift + M) | 其中字母 `M` 是 `manager` 的首字母 |
 | 发送所有标签页 | macOS (⌥ + ⇧ + A) <br /> windows (Alt + Shift + A) | 其中字母 `A` 是 `all` 的首字母 |
 | 发送当前标签页 | macOS (⌥ + ⇧ + C) <br /> windows (Alt + Shift + C) | 其中字母 `C` 是 `current` 的首字母 |
-<!-- | 全局搜索 | macOS (⌥ + ⇧ + G) <br /> windows (Alt + Shift + G) | 其中字母 `G` 是 `global` 的首字母 |
+<!-- 
+| 全局搜索 | macOS (⌥ + ⇧ + G) <br /> windows (Alt + Shift + G) | 其中字母 `G` 是 `global` 的首字母 |
 | 发送左侧标签页 | macOS (⌥ + ⇧ + L) <br /> windows (Alt + Shift + L) | 其中字母 `L` 是 `left` 的首字母 |
 | 发送右侧标签页 | macOS (⌥ + ⇧ + R) <br /> windows (Alt + Shift + R) | 其中字母 `R` 是 `right` 的首字母 |
-| 发送其他标签页 | macOS (⌥ + ⇧ + O) <br /> windows (Alt + Shift + O) | 其中字母 `O` 是 `other` 的首字母 | -->
+| 发送其他标签页 | macOS (⌥ + ⇧ + O) <br /> windows (Alt + Shift + O) | 其中字母 `O` 是 `other` 的首字母 | 
+-->
 
 
 其他操作的快捷键可自行前往浏览器自带的绑定页面进行绑定。

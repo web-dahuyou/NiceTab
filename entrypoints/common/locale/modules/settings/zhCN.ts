@@ -91,6 +91,8 @@ const zhCN = {
   'settings.pageWidthType.fixed': '固定宽度',
   'settings.pageWidthType.responsive': '自适应宽度',
   'settings.showTabTitleTooltip': '标签页hover时是否展示tooltip：',
+  'settings.pageTitleConfig': '网页标题自定义：',
+  'settings.pageTitleConfig.drawerTitle': '网页标题配置',
 
   /* 自动同步配置 */
   'settings.autoSync': '是否开启自动同步：',

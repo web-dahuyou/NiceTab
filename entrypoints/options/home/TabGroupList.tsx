@@ -75,7 +75,7 @@ const ListItem = memo(
         // refreshKey={
         //   !virtual && tabGroup.key === selectedTabGroupKey ? refreshKey : undefined
         // }
-        {...tabGroup.originData}
+        {...tabGroup?.originData}
         actionBtnStyle={settings.groupActionBtnStyle || 'text'}
         onChange={data => handleTabGroupChange(tabGroup, data)}
         onRemove={() => handleTabGroupRemove(tabGroup)}
@@ -97,8 +97,8 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
   const virtuosoRef = useRef<VirtuosoHandle>(null);
 
   const counts = useMemo(() => {
-    return getSelectedCounts(selectedTag.originData);
-  }, [selectedTag.originData]);
+    return getSelectedCounts(selectedTag?.originData);
+  }, [selectedTag?.originData]);
 
   const initialConfig = useMemo(() => {
     const index =

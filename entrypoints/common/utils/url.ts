@@ -1,7 +1,7 @@
 // 拼接url
 export function handleUrlWidthParams(
   url: string,
-  params: Record<string, any> = {}
+  params: Record<string, any> = {},
 ): string {
   const urlObject = new URL(url);
   const searchParams = new URLSearchParams(urlObject.search);
@@ -87,14 +87,14 @@ export function getBaseDomain(url: string): string {
 }
 
 /**
- * @description: url是否匹配，排除某些域名
+ * @description: 该域名的链接是否符合要求，排除指定域名
  * @param {string} url 链接
  * @param {string} excludeString 排除的域名列表字符串（可通过空格和换行分隔）
- * @return {boolean} 是否匹配（不在排除列表中）
+ * @return {boolean} 是否符合要求（不在排除列表中）
  */
-export function isUrlMatched(
+export function isDomainAllowed(
   url: string | undefined,
-  excludeString: string | undefined
+  excludeString: string | undefined,
 ): boolean {
   if (url && excludeString) {
     const excludeDomainList = excludeString
@@ -114,10 +114,61 @@ export function isUrlMatched(
   return true;
 }
 
+/**
+ * @description: 判断两个url是否相同（参数相同，顺序可不同）
+ * @param {string} url1 链接1
+ * @param {string} url2 链接2
+ * @return {boolean} 是否相同
+ */
+export function isSameUrl(url1: string, url2: string): boolean {
+  if (url1 === url2) return true;
+
+  try {
+    // 对于非标准协议的 URL，直接比较
+    if (!url1?.includes('://') || !url2?.includes('://')) {
+      return url1 === url2;
+    }
+
+    const url1Obj = new URL(url1);
+    const url2Obj = new URL(url2);
+
+    // 比较协议、主机名和路径
+    if (
+      // url1Obj.protocol !== url2Obj.protocol ||
+      url1Obj.hostname !== url2Obj.hostname ||
+      url1Obj.pathname !== url2Obj.pathname
+    ) {
+      return false;
+    }
+
+    // 获取查询参数
+    const params1 = url1Obj.searchParams;
+    const params2 = url2Obj.searchParams;
+
+    // 比较参数数量
+    if (params1.size !== params2.size) {
+      return false;
+    }
+
+    // 比较每个参数的键值对
+    for (const [key, value] of params1) {
+      if (!params2.has(key) || params2.get(key) !== value) {
+        return false;
+      }
+    }
+
+    return true;
+  } catch (e) {
+    // 如果 URL 解析失败，则直接比较字符串
+    return url1 === url2;
+  }
+}
+
 export default {
   handleUrlWidthParams,
   getUrlParams,
   objectToUrlParams,
   getOrigin,
-  getBaseDomain
+  getBaseDomain,
+  isSameUrl,
 };

@@ -21,7 +21,7 @@ const {
 } = ENUM_SETTINGS_PROPS;
 
 export default function FormModuleSend(
-  props: FormItemProps & { form: FormInstance<SettingsProps> }
+  props: FormItemProps & { form: FormInstance<SettingsProps> },
 ) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
@@ -29,7 +29,7 @@ export default function FormModuleSend(
 
   // 发送标签页自动关闭标签页的操作选项
   const actionAutoCloseFlagOptions = useMemo(() => {
-    return SEND_TAB_ACTION_NAMES.map((actionName) => {
+    return SEND_TAB_ACTION_NAMES.map(actionName => {
       return {
         label: $fmt({ id: `common.${actionName}` as LocaleKeys }),
         value: actionName,

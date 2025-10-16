@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
-import { Form, Checkbox, Radio, Typography, theme } from 'antd';
+import { Form, Checkbox, Radio, Button, Typography, theme } from 'antd';
 import type { FormItemProps, FormInstance } from 'antd';
 import type { SettingsProps } from '~/entrypoints/types';
 import { POPUP_MODULE_NAMES, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { groupActionOptions } from '~/entrypoints/options/home/constants';
-import ContextMenuConfig from './ContextMenuConfig';
+import ContextMenuConfig from './components/ContextMenuConfig';
+import PageTitleConfig from './components/PageTitleConfig';
 
 const {
   GROUP_ACTION_BTN_STYLE,
@@ -17,6 +18,7 @@ const {
   AUTO_EXPAND_HOME_TREE,
   MAIN_CONTENT_WIDTH_TYPE,
   SHOW_TAB_TITLE_TOOLTIP,
+  PAGE_TITLE_CONFIG,
 } = ENUM_SETTINGS_PROPS;
 
 export default function FormModuleDisplay(
@@ -168,6 +170,14 @@ export default function FormModuleDisplay(
           <Radio value={true}>{$fmt('common.yes')}</Radio>
           <Radio value={false}>{$fmt('common.no')}</Radio>
         </Radio.Group>
+      </Form.Item>
+
+      {/* 页面标题覆盖配置 */}
+      <Form.Item<SettingsProps>
+        label={$fmt(`settings.${PAGE_TITLE_CONFIG}`)}
+        name={PAGE_TITLE_CONFIG}
+      >
+        <PageTitleConfig form={form}></PageTitleConfig>
       </Form.Item>
     </Form.Item>
   );

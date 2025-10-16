@@ -17,7 +17,7 @@ import initSettingsStorageListener, {
   syncWebDAVUtils,
 } from './storage';
 import { getCommandsHotkeys } from './commands';
-import { pick, omit, isUrlMatched, sendRuntimeMessage } from './utils';
+import { pick, omit, isDomainAllowed, sendRuntimeMessage } from './utils';
 
 const {
   LANGUAGE,
@@ -70,7 +70,7 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
   const currTab = tabs?.find(tab => tab.highlighted);
   const filteredTabs = await tabUtils.getFilteredTabs(tabs, settings);
   const excludeDomainsString = settings[EXCLUDE_DOMAINS_FOR_SENDING] || '';
-  const isCurrTabMatched = isUrlMatched(currTab?.url, excludeDomainsString);
+  const isCurrTabAllowed = isDomainAllowed(currTab?.url, excludeDomainsString);
 
   const hotkeysMap = await getMenuHotkeys();
   const contexts: Menus.ContextType[] = getContexts(settings);
@@ -121,7 +121,7 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
       !!currTab?.id &&
       currTab?.id != adminTab?.id &&
       !(currTab?.pinned && !settings[ALLOW_SEND_PINNED_TABS]) &&
-      isCurrTabMatched,
+      isCurrTabAllowed,
   };
 
   const _sendOtherTabs: CreateMenuPropertiesType = {

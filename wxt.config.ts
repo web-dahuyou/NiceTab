@@ -21,6 +21,7 @@ export default defineConfig({
       'contextMenus',
       'unlimitedStorage',
       'alarms',
+      'scripting',
       ...(isFirefox ? [] : ['tabGroups', 'commands', 'favicon']),
     ],
     homepage_url: 'https://github.com/web-dahuyou/NiceTab',

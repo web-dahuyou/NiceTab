@@ -93,6 +93,8 @@ const enUS: Record<LocaleKey, string> = {
   'settings.pageWidthType.fixed': 'Fixed',
   'settings.pageWidthType.responsive': 'Responsive',
   'settings.showTabTitleTooltip': 'Show a tooltip when hovering over a tab?',
+  'settings.pageTitleConfig': 'Page title overwrite:',
+  'settings.pageTitleConfig.drawerTitle': 'Page Title Overwrite',
 
   /* 自动同步配置 */
   'settings.autoSync': 'Enable Auto Sync?',

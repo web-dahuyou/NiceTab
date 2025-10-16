@@ -106,6 +106,7 @@ const zhCN = {
   'common.aborted': '请求取消',
   'common.networkError': '网络连接异常',
   'common.userGuide': '用户指南',
+  'common.itemCount': `{count}项`,
 };
 
 export type LocaleKey = keyof typeof zhCN;
