@@ -27,6 +27,7 @@ import type {
 } from '~/entrypoints/types';
 export * from './envVars';
 
+export const MANIFEST_VERSION = import.meta.env.MANIFEST_VERSION;
 export const GITHUB_URL = 'https://github.com/web-dahuyou/NiceTab';
 
 // 主题列表（供切换选择）

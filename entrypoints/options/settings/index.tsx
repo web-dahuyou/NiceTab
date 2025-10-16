@@ -36,7 +36,7 @@ const { LANGUAGE, AUTO_SYNC_TIME_RANGES } = ENUM_SETTINGS_PROPS;
 type MenuItem = Required<MenuProps>['items'][number];
 
 function handleTimeRanges(timeRanges?: TimeRange[]): TimeRange[] {
-  return (timeRanges || []).map((range) => [
+  return (timeRanges || []).map(range => [
     range?.[0] || defaultTimeRange[0],
     range?.[1] || defaultTimeRange[1],
   ]);
@@ -91,7 +91,7 @@ export default function Settings() {
     ];
   }, [$fmt]);
 
-  const onModuleChange: MenuProps['onClick'] = (e) => {
+  const onModuleChange: MenuProps['onClick'] = e => {
     setCurrModule(e.key || 'common');
   };
 
@@ -108,7 +108,7 @@ export default function Settings() {
     return false;
   });
 
-  const onFinish: FormProps<SettingsProps>['onFinish'] = async (values) => {
+  const onFinish: FormProps<SettingsProps>['onFinish'] = async values => {
     const settings = await settingsUtils.getSettings();
     const newSettings = {
       ...settingsUtils.initialSettings,
@@ -125,10 +125,10 @@ export default function Settings() {
     reloadOtherAdminPage();
 
     const customMessages = getCustomLocaleMessages(
-      newSettings.language || defaultLanguage
+      newSettings.language || defaultLanguage,
     );
     messageApi.success(customMessages['common.saveSuccess']);
-    setInitialFormValues((values) => ({
+    setInitialFormValues(values => ({
       ...values,
       ...newSettings,
     }));
@@ -144,14 +144,14 @@ export default function Settings() {
 
   const { urlParams } = useUrlParams();
   useEffect(() => {
-    settingsUtils.getSettings().then((settings) => {
+    settingsUtils.getSettings().then(settings => {
       setInitialFormValues(settings);
       form?.setFieldsValue(settings);
       NiceGlobalContext.setSettings(settings);
     });
   }, [urlParams]);
   useEffect(() => {
-    settingsUtils.getSettings().then((settings) => {
+    settingsUtils.getSettings().then(settings => {
       setInitialFormValues(settings);
       form?.setFieldsValue(settings);
     });

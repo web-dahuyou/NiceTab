@@ -1,5 +1,6 @@
 import { Menus } from 'wxt/browser';
 import {
+  MANIFEST_VERSION,
   ENUM_ACTION_NAME,
   ENUM_SETTINGS_PROPS,
   TAB_EVENTS,
@@ -9,7 +10,7 @@ import {
 } from './constants';
 import tabUtils from '~/entrypoints/common/tabs';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
-import type { SendTargetProps } from '~/entrypoints/types';
+import type { SendTargetProps, SettingsProps } from '~/entrypoints/types';
 import initSettingsStorageListener, {
   settingsUtils,
   syncUtils,
@@ -50,6 +51,14 @@ export const getMenuHotkeys = async () => {
   }, {});
 };
 
+export const getContexts = (settings: SettingsProps): Menus.ContextType[] => {
+  return (
+    settings[SHOW_PAGE_CONTEXT_MENUS]
+      ? ['all']
+      : [MANIFEST_VERSION == 2 ? 'browser_action' : 'action']
+  ) as Menus.ContextType[];
+};
+
 // 获取基础菜单项（平铺结构）
 export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
   const settings = await settingsUtils.getSettings();
@@ -64,9 +73,7 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
   const isCurrTabMatched = isUrlMatched(currTab?.url, excludeDomainsString);
 
   const hotkeysMap = await getMenuHotkeys();
-  const contexts: Menus.ContextType[] = settings[SHOW_PAGE_CONTEXT_MENUS]
-    ? ['all']
-    : ['action'];
+  const contexts: Menus.ContextType[] = getContexts(settings);
 
   // 获取标题
   const getTitle = (title: string, id: string) => {
@@ -228,9 +235,7 @@ export const getMenus = async (): Promise<CreateMenuPropertiesType[]> => {
   if (groupedMenus.length > 0) {
     const language = settings[LANGUAGE] || defaultLanguage;
     const customMessages = getCustomLocaleMessages(language);
-    const contexts: Menus.ContextType[] = settings[SHOW_PAGE_CONTEXT_MENUS]
-      ? ['all']
-      : ['action'];
+    const contexts: Menus.ContextType[] = getContexts(settings);
 
     const moreMenu: CreateMenuPropertiesType = {
       tag: 'menuGroup',

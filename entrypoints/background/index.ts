@@ -74,7 +74,7 @@ async function initTabsUpdateListener() {
   async function adminPageLimitControl(
     tabId: number,
     changeInfo: Tabs.OnUpdatedChangeInfoType,
-    tab: Tabs.Tab
+    tab: Tabs.Tab,
   ) {
     const adminTabUrl = browser.runtime.getURL('/options.html');
     const tabs = await browser.tabs.query({
@@ -128,7 +128,7 @@ export default defineBackground(() => {
 
   // 左键点击图标 (如果有 popup 是不会触发的，可以执行 browser[BROWSER_ACTION_API_NAME].setPopup({ popup: '' }) 来监听事件)
   // Fired when an action icon is clicked. This event will not fire if the action has a popup.
-  browser[BROWSER_ACTION_API_NAME].onClicked.addListener(async (tab) => {
+  browser[BROWSER_ACTION_API_NAME].onClicked.addListener(async tab => {
     const settings = await settingsUtils.getSettings();
     const modules = settings[POPUP_MODULE_DISPLAYS] || POPUP_MODULE_NAMES;
     if (!modules.length) {
@@ -158,7 +158,7 @@ export default defineBackground(() => {
     }
   });
 
-  browser.windows.onRemoved.addListener(async (windowId) => {
+  browser.windows.onRemoved.addListener(async windowId => {
     console.log('browser.windows.onRemoved--windowId', windowId);
     stateUtils.clearSelectedKeysOfInvalidWindows();
   });
