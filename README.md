@@ -8,6 +8,8 @@
 
 ## Overview
 
+**Note** The extension is actively developed with ongoing updates. The screenshots below reflect history versions only. We encourage you to install the latest release for the most up-to-date experience.
+
 - NiceTab is an `open source` browser extension that makes managing your browser tabs quick and convenient.
 - Named `NiceTab` with the hope that it would be a "nice" tab management tool.
 - Similar to other tab management extensions like `OneTab`, `Toby`, `SessionBuddy`, `N-Tab` and `KepTab`. it supports browsers such as Chrome, Firefox, Microsoft Edge, and any Chromium based browser.
