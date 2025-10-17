@@ -118,6 +118,12 @@ const enUS: Record<LocaleKey, string> = {
     =1 {# Item}
     other {# Items}
   }`,
+  'common.matchMode': 'Match Mode',
+  'common.equal': 'Equal',
+  'common.startsWith': 'Starts With',
+  'common.endsWith': 'Ends With',
+  'common.contains': 'Contains',
+  'common.regex': 'Regex',
 };
 
 export default enUS;

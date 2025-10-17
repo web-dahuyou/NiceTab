@@ -171,14 +171,6 @@ export default function FormModuleDisplay(
           <Radio value={false}>{$fmt('common.no')}</Radio>
         </Radio.Group>
       </Form.Item>
-
-      {/* 页面标题覆盖配置 */}
-      <Form.Item<SettingsProps>
-        label={$fmt(`settings.${PAGE_TITLE_CONFIG}`)}
-        name={PAGE_TITLE_CONFIG}
-      >
-        <PageTitleConfig form={form}></PageTitleConfig>
-      </Form.Item>
     </Form.Item>
   );
 }

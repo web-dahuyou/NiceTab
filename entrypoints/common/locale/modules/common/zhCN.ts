@@ -107,6 +107,12 @@ const zhCN = {
   'common.networkError': '网络连接异常',
   'common.userGuide': '用户指南',
   'common.itemCount': `{count}项`,
+  'common.matchMode': '匹配模式',
+  'common.equal': '相同',
+  'common.startsWith': '开始于',
+  'common.endsWith': '结束于',
+  'common.contains': '包含',
+  'common.regex': '正则',
 };
 
 export type LocaleKey = keyof typeof zhCN;

@@ -2,6 +2,7 @@ const zhCN = {
   'settings.block.common': '通用配置',
   'settings.block.sendTabs': '发送标签页配置',
   'settings.block.openTabs': '打开标签页配置',
+  'settings.block.pageTitleConfig': '网页标题配置',
   'settings.block.globalSearch': '全局搜索配置',
   'settings.block.otherActions': '其他操作配置',
   'settings.block.display': '展示配置',
@@ -56,6 +57,10 @@ const zhCN = {
   'settings.unnamedGroupRestoreAsGroup': '恢复未命名标签组时-是否以标签组形式打开到浏览器：',
   'settings.namedGroupRestoreAsGroup': '恢复已命名标签组时-是否以标签组形式打开到浏览器：',
 
+  /* 页面标题配置 */
+  'settings.pageTitleConfig': '网页标题自定义：',
+  'settings.pageTitleConfig.drawerTitle': '网页标题配置',
+
   /* 全局搜索配置 */
   'settings.globalSearchDeleteAfterOpen': '打开标签页后是否从列表中删除：',
   'settings.globalSearchDeleteAfterOpen.yes': '从NiceTab列表中删除（仍保留锁定的标签页）',
@@ -91,8 +96,6 @@ const zhCN = {
   'settings.pageWidthType.fixed': '固定宽度',
   'settings.pageWidthType.responsive': '自适应宽度',
   'settings.showTabTitleTooltip': '标签页hover时是否展示tooltip：',
-  'settings.pageTitleConfig': '网页标题自定义：',
-  'settings.pageTitleConfig.drawerTitle': '网页标题配置',
 
   /* 自动同步配置 */
   'settings.autoSync': '是否开启自动同步：',

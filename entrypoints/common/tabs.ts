@@ -14,7 +14,7 @@ import {
   getRandomId,
   isGroupSupported,
   isDomainAllowed,
-  isSameUrl,
+  isContentMatched,
   sendRuntimeMessage,
 } from '~/entrypoints/common/utils';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
@@ -561,6 +561,7 @@ export const setPageTitle = async ({
     try {
       // 获取标签页信息
       const tab = await browser.tabs.get(tabId);
+
       // 检查标签页是否包含必要的信息
       if (!tab?.url || tab.status !== 'complete') return;
 
@@ -573,19 +574,9 @@ export const setPageTitle = async ({
       for (const config of pageTitleConfig) {
         if (!config.url || !config.title) continue;
 
-        // 创建正则表达式匹配URL
-        try {
-          if (isSameUrl(config.url, tab.url)) {
-            newTitle = config.title;
-            break;
-          }
-          const regex = new RegExp(config.url);
-          if (regex.test(tab.url)) {
-            newTitle = config.title;
-            break;
-          }
-        } catch (e) {
-          console.warn('Invalid regex pattern in pageTitleConfig:', config.url);
+        if (isContentMatched(tab.url, config.url, config.mode)) {
+          newTitle = config.title;
+          break;
         }
       }
 

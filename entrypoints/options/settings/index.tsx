@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect, useMemo } from 'react';
 import { Menu, Form, Button, Modal, message } from 'antd';
 import type { MenuProps, FormProps } from 'antd';
-import { SettingOutlined } from '@ant-design/icons';
+import { SaveOutlined, SettingOutlined } from '@ant-design/icons';
 import { isEqual } from 'lodash-es';
 import { useBlocker } from 'react-router-dom';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
@@ -18,9 +18,13 @@ import { sendRuntimeMessage, classNames } from '~/entrypoints/common/utils';
 import { reloadOtherAdminPage } from '~/entrypoints/common/tabs';
 // import StickyFooter from '~/entrypoints/common/components/StickyFooter';
 
+import SidebarBaseBtn from '~/entrypoints/options/components/SidebarBaseBtn';
+import ToggleSidebarBtn from '../components/ToggleSidebarBtn';
+
 import FormModuleCommon from './FormModuleCommon';
 import FormModuleSend from './FormModuleSend';
 import FormModuleOpen from './FormModuleOpen';
+import FormModulePageTitle from './FormModulePageTitleConfig';
 import FormModuleGlobalSearch from './FormModuleGlobalSearch';
 import FormModuleOtherActions from './FormModuleOtherActions';
 import FormModuleDisplay from './FormModuleDisplay';
@@ -48,6 +52,10 @@ export default function Settings() {
   const [messageApi, msgContextHolder] = message.useMessage();
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
 
+  const onCollapseChange = (status: boolean) => {
+    setSidebarCollapsed(status);
+  };
+
   const [form] = Form.useForm();
 
   const [currModule, setCurrModule] = useState<string>('common');
@@ -66,6 +74,11 @@ export default function Settings() {
       {
         key: 'openTabs',
         label: $fmt('settings.block.openTabs'),
+        icon: <SettingOutlined />,
+      },
+      {
+        key: 'pageTitleConfig',
+        label: $fmt('settings.block.pageTitleConfig'),
         icon: <SettingOutlined />,
       },
       {
@@ -182,6 +195,17 @@ export default function Settings() {
           <div
             className={classNames('sidebar-inner-box', sidebarCollapsed && 'collapsed')}
           >
+            <div className="sidebar-action-box">
+              <ToggleSidebarBtn
+                collapsed={sidebarCollapsed}
+                onCollapseChange={onCollapseChange}
+              />
+              <SidebarBaseBtn
+                title={$fmt('common.save')}
+                icon={<SaveOutlined />}
+                onClick={handleSave}
+              />
+            </div>
             <div className="sidebar-inner-content">
               <Menu
                 selectedKeys={[currModule]}
@@ -189,12 +213,6 @@ export default function Settings() {
                 items={blockModuleOptions}
                 onClick={onModuleChange}
               />
-            </div>
-            <div className="sidebar-inner-footer">
-              {/* ******************* 保存 ******************* */}
-              <Button type="primary" onClick={handleSave}>
-                {$fmt('common.save')}
-              </Button>
             </div>
           </div>
         </StyledSidebarWrapper>
@@ -214,6 +232,9 @@ export default function Settings() {
 
             {/* ******************* 打开标签页相关设置 ******************* */}
             <FormModuleOpen hidden={currModule !== 'openTabs'} form={form} />
+
+            {/* ******************* 网页标题相关设置 ******************* */}
+            <FormModulePageTitle hidden={currModule !== 'pageTitleConfig'} form={form} />
 
             {/* ******************* 全局搜索相关设置 ******************* */}
             <FormModuleGlobalSearch hidden={currModule !== 'globalSearch'} form={form} />

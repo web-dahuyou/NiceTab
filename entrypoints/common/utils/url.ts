@@ -1,3 +1,5 @@
+import type { ContentMatchMode } from '~/entrypoints/types';
+
 // 拼接url
 export function handleUrlWidthParams(
   url: string,
@@ -161,6 +163,37 @@ export function isSameUrl(url1: string, url2: string): boolean {
   } catch (e) {
     // 如果 URL 解析失败，则直接比较字符串
     return url1 === url2;
+  }
+}
+
+/**
+ * @description: 判断url在指定模式下是否匹配
+ * @param {string} url 链接
+ * @param {string} des 描述内容
+ * @param {ContentMatchMode} mode 匹配模式
+ * @return {boolean} 是否匹配
+ */
+export function isContentMatched(
+  url: string,
+  des: string,
+  mode: ContentMatchMode = 'equal',
+): boolean {
+  try {
+    if (mode === 'equal') {
+      return isSameUrl(url, des);
+    } else if (mode === 'startsWith') {
+      return url.startsWith(des);
+    } else if (mode === 'endsWith') {
+      return url.endsWith(des);
+    } else if (mode === 'contains') {
+      return url.includes(des);
+    } else if (mode === 'regex') {
+      return new RegExp(des).test(url);
+    } else {
+      return false;
+    }
+  } catch (e) {
+    return false;
   }
 }
 

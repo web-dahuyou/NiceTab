@@ -134,10 +134,14 @@ export type ContextMenuConfigItem = {
 
 export type InsertPositions = 'top' | 'bottom';
 
+// 内容匹配模式
+export type ContentMatchMode = 'equal' | 'startsWith' | 'endsWith' | 'contains' | 'regex';
+
 // 页面标题配置Item
 export type PageTitleConfigItem = {
   url: string;
   title: string;
+  mode?: ContentMatchMode;
 };
 
 export type TimeRange = [string, string];
@@ -166,6 +170,8 @@ export type SettingsProps = {
   openTabModifierKey?: string; // 前台打开标签页的修饰键
   unnamedGroupRestoreAsGroup?: boolean; // 是否以标签组形式恢复未命名标签组
   namedGroupRestoreAsGroup?: boolean; // 是否以标签组形式恢复已命名标签组
+  /* 页面标题配置 */
+  pageTitleConfig?: PageTitleConfigItem[]; // 页面标题配置
   /* 全局搜索配置 */
   globalSearchDeleteAfterOpen?: boolean; // 全局搜索打开标签页后是否从列表中删除
   /* 其他操作配置 */
@@ -185,7 +191,6 @@ export type SettingsProps = {
   autoExpandHomeTree?: boolean; // 进入列表页时，是否自动展开全部节点
   pageWidthType?: PageWidthTypes; // 主内容区宽度设置
   showTabTitleTooltip?: boolean; // 是否显示标签页标题的tooltip
-  pageTitleConfig?: PageTitleConfigItem[]; // 页面标题配置
   /* 自动同步配置 */
   autoSync?: boolean; // 是否开启自动同步
   autoSyncTimeUnit?: AutoSyncTimeUnits; // 自动同步时间单位

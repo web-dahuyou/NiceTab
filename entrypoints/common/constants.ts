@@ -141,6 +141,8 @@ export enum ENUM_SETTINGS_PROPS {
   OPEN_TAB_MODIFIER_KEY = 'openTabModifierKey', // 前台打开标签页的修饰键
   UNNAMED_GROUP_RESTORE_AS_GROUP = 'unnamedGroupRestoreAsGroup', // 是否以标签组形式恢复未命名标签组
   NAMED_GROUP_RESTORE_AS_GROUP = 'namedGroupRestoreAsGroup', // 是否以标签组形式恢复已命名标签组
+  /* 页面标题配置 */
+  PAGE_TITLE_CONFIG = 'pageTitleConfig', // 页面标题配置
   /* 全局搜索配置 */
   GLOBAL_SEARCH_DELETE_AFTER_OPEN = 'globalSearchDeleteAfterOpen', // 全局搜索打开标签页后是否从列表中删除
   /* 其他操作配置 */
@@ -160,7 +162,6 @@ export enum ENUM_SETTINGS_PROPS {
   AUTO_EXPAND_HOME_TREE = 'autoExpandHomeTree', // 进入列表页时，是否自动展开全部节点
   MAIN_CONTENT_WIDTH_TYPE = 'pageWidthType', // 主内容区域宽度类型
   SHOW_TAB_TITLE_TOOLTIP = 'showTabTitleTooltip', // 是否显示标签页标题的tooltip
-  PAGE_TITLE_CONFIG = 'pageTitleConfig', // 页面标题配置
   /* 自动同步配置 */
   AUTO_SYNC = 'autoSync', // 是否开启自动同步
   AUTO_SYNC_TIME_UNIT = 'autoSyncTimeUnit', // 自动时间单位
