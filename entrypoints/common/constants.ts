@@ -27,6 +27,7 @@ import type {
 } from '~/entrypoints/types';
 export * from './envVars';
 
+export const MANIFEST_VERSION = import.meta.env.MANIFEST_VERSION;
 export const GITHUB_URL = 'https://github.com/web-dahuyou/NiceTab';
 
 // 主题列表（供切换选择）
@@ -108,6 +109,7 @@ export enum ENUM_ACTION_NAME {
   SEND_RIGHT_TABS = 'action:sendRightTabs', // 发送右侧标签页
   GLOBAL_SEARCH = 'action:globalSearch', // 全局搜索
   START_SYNC = 'action:startSync', // 开始同步
+  HIBERNATE_TABS = 'action:hibernateTabs', // 休眠其他标签页
 }
 
 // 右键菜单配置列表-默认
@@ -139,6 +141,8 @@ export enum ENUM_SETTINGS_PROPS {
   OPEN_TAB_MODIFIER_KEY = 'openTabModifierKey', // 前台打开标签页的修饰键
   UNNAMED_GROUP_RESTORE_AS_GROUP = 'unnamedGroupRestoreAsGroup', // 是否以标签组形式恢复未命名标签组
   NAMED_GROUP_RESTORE_AS_GROUP = 'namedGroupRestoreAsGroup', // 是否以标签组形式恢复已命名标签组
+  /* 页面标题配置 */
+  PAGE_TITLE_CONFIG = 'pageTitleConfig', // 页面标题配置
   /* 全局搜索配置 */
   GLOBAL_SEARCH_DELETE_AFTER_OPEN = 'globalSearchDeleteAfterOpen', // 全局搜索打开标签页后是否从列表中删除
   /* 其他操作配置 */

@@ -1,5 +1,6 @@
 import type { TreeDataNode } from 'antd';
 import { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
+import type { DragData } from '~/entrypoints/common/components/DndComponent';
 
 export type TreeDataNodeTabGroup = TreeDataNode & {
   type: 'tabGroup';
@@ -68,12 +69,13 @@ export type CascaderOption = {
 } & Record<string, any>;
 
 // 拖拽tab数据
-export type DndTabItemProps = TabItem & {
-  groupId: string;
-  index: number;
-  dndKey: symbol;
-  isEmpty?: boolean; // 空标签组，默认设置一个空标签，便于拖拽
-};
+export type DndTabItemProps = TabItem &
+  DragData & {
+    groupId: string;
+    index: number;
+    dndKey: symbol;
+    isEmpty?: boolean; // 空标签组，默认设置一个空标签，便于拖拽
+  };
 export type DndTabItemOnDropCallback = ({
   sourceData,
   targetData,
@@ -82,8 +84,8 @@ export type DndTabItemOnDropCallback = ({
   actionType,
   targetTabListLength,
 }: {
-  sourceData: Pick<DndTabItemProps, 'groupId' | 'index'>;
-  targetData: Pick<DndTabItemProps, 'groupId' | 'index'>;
+  sourceData: Pick<DndTabItemProps, 'groupId' | 'index'> & DragData;
+  targetData: Pick<DndTabItemProps, 'groupId' | 'index'> & DragData;
   sourceIndex: number;
   targetIndex: number;
   actionType?: 'tab2tab' | 'tab2group';

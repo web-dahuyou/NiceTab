@@ -134,6 +134,16 @@ export type ContextMenuConfigItem = {
 
 export type InsertPositions = 'top' | 'bottom';
 
+// 内容匹配模式
+export type ContentMatchMode = 'equal' | 'startsWith' | 'endsWith' | 'contains' | 'regex';
+
+// 页面标题配置Item
+export type PageTitleConfigItem = {
+  url: string;
+  title: string;
+  mode?: ContentMatchMode;
+};
+
 export type TimeRange = [string, string];
 
 // 管理后台-设置信息
@@ -160,6 +170,8 @@ export type SettingsProps = {
   openTabModifierKey?: string; // 前台打开标签页的修饰键
   unnamedGroupRestoreAsGroup?: boolean; // 是否以标签组形式恢复未命名标签组
   namedGroupRestoreAsGroup?: boolean; // 是否以标签组形式恢复已命名标签组
+  /* 页面标题配置 */
+  pageTitleConfig?: PageTitleConfigItem[]; // 页面标题配置
   /* 全局搜索配置 */
   globalSearchDeleteAfterOpen?: boolean; // 全局搜索打开标签页后是否从列表中删除
   /* 其他操作配置 */
@@ -174,7 +186,7 @@ export type SettingsProps = {
   groupActionBtnsCommonlyUsed?: string[]; // 常用的标签组操作按钮
   showOpenedTabCount?: boolean; // 扩展图标上是否显示打开的标签页数量
   showPageContextMenus?: boolean; // 网页中是否显示NiceTab右键菜单
-  contextMenuConfig?: ContextMenuConfigItem[], // 右键菜单配置
+  contextMenuConfig?: ContextMenuConfigItem[]; // 右键菜单配置
   popupModuleDisplays?: PopupModuleNames[]; // popup面板中需要展示的模块
   autoExpandHomeTree?: boolean; // 进入列表页时，是否自动展开全部节点
   pageWidthType?: PageWidthTypes; // 主内容区宽度设置

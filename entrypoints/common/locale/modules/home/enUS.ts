@@ -60,6 +60,11 @@ const enUS: Record<LocaleKey, string> = {
     one {# Tab}
     other {# Tabs}
   }`,
+  'home.tab.selectedCount': `{count, plural,
+    =0 {No Tabs}
+    one {# Tab}
+    other {# Tabs}
+  } Selected`,
   'home.tab.name': 'Name',
   'home.tab.url': 'URL',
   'home.tab.removeSelected': `Are you sure you want to remove {count, plural,

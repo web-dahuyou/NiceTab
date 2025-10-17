@@ -1,5 +1,6 @@
 import { Menus } from 'wxt/browser';
 import {
+  MANIFEST_VERSION,
   ENUM_ACTION_NAME,
   ENUM_SETTINGS_PROPS,
   TAB_EVENTS,
@@ -9,14 +10,14 @@ import {
 } from './constants';
 import tabUtils from '~/entrypoints/common/tabs';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
-import type { SendTargetProps } from '~/entrypoints/types';
+import type { SendTargetProps, SettingsProps } from '~/entrypoints/types';
 import initSettingsStorageListener, {
   settingsUtils,
   syncUtils,
   syncWebDAVUtils,
 } from './storage';
 import { getCommandsHotkeys } from './commands';
-import { pick, omit, isUrlMatched, sendRuntimeMessage } from './utils';
+import { pick, omit, isDomainAllowed, sendRuntimeMessage } from './utils';
 
 const {
   LANGUAGE,
@@ -39,7 +40,7 @@ type CreateMenuPropertiesType = Menus.CreateCreatePropertiesType & {
 
 export const getMenuHotkeys = async () => {
   const commandsHotkeysMap = await getCommandsHotkeys();
-  const settings = await settingsUtils.getSettings();
+  // const settings = await settingsUtils.getSettings();
   // const language = settings[LANGUAGE] || defaultLanguage;
   // const customMessages = getCustomLocaleMessages(language);
   // const noneKey = customMessages['common.none'] || 'None';
@@ -48,6 +49,14 @@ export const getMenuHotkeys = async () => {
     const hotkey = commandsHotkeysMap.get(id) || '';
     return { ...result, [id]: hotkey };
   }, {});
+};
+
+export const getContexts = (settings: SettingsProps): Menus.ContextType[] => {
+  return (
+    settings[SHOW_PAGE_CONTEXT_MENUS]
+      ? ['all']
+      : [MANIFEST_VERSION == 2 ? 'browser_action' : 'action']
+  ) as Menus.ContextType[];
 };
 
 // 获取基础菜单项（平铺结构）
@@ -61,12 +70,10 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
   const currTab = tabs?.find(tab => tab.highlighted);
   const filteredTabs = await tabUtils.getFilteredTabs(tabs, settings);
   const excludeDomainsString = settings[EXCLUDE_DOMAINS_FOR_SENDING] || '';
-  const isCurrTabMatched = isUrlMatched(currTab?.url, excludeDomainsString);
+  const isCurrTabAllowed = isDomainAllowed(currTab?.url, excludeDomainsString);
 
   const hotkeysMap = await getMenuHotkeys();
-  const contexts: Menus.ContextType[] = settings[SHOW_PAGE_CONTEXT_MENUS]
-    ? ['all']
-    : ['action'];
+  const contexts: Menus.ContextType[] = getContexts(settings);
 
   // 获取标题
   const getTitle = (title: string, id: string) => {
@@ -114,7 +121,7 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
       !!currTab?.id &&
       currTab?.id != adminTab?.id &&
       !(currTab?.pinned && !settings[ALLOW_SEND_PINNED_TABS]) &&
-      isCurrTabMatched,
+      isCurrTabAllowed,
   };
 
   const _sendOtherTabs: CreateMenuPropertiesType = {
@@ -175,6 +182,16 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
     contexts,
   };
 
+  const _hibernateTabs: CreateMenuPropertiesType = {
+    tag: 'common',
+    id: ENUM_ACTION_NAME.HIBERNATE_TABS,
+    title: getTitle(
+      customMessages['common.hibernateTabs'],
+      ENUM_ACTION_NAME.HIBERNATE_TABS,
+    ),
+    contexts,
+  };
+
   return [
     _openAdminTab,
     _openGlobalSearch,
@@ -184,6 +201,7 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
     _sendLeftTabs,
     _sendRightTabs,
     _startSyncMenu,
+    _hibernateTabs,
   ];
 };
 
@@ -217,9 +235,7 @@ export const getMenus = async (): Promise<CreateMenuPropertiesType[]> => {
   if (groupedMenus.length > 0) {
     const language = settings[LANGUAGE] || defaultLanguage;
     const customMessages = getCustomLocaleMessages(language);
-    const contexts: Menus.ContextType[] = settings[SHOW_PAGE_CONTEXT_MENUS]
-      ? ['all']
-      : ['action'];
+    const contexts: Menus.ContextType[] = getContexts(settings);
 
     const moreMenu: CreateMenuPropertiesType = {
       tag: 'menuGroup',
@@ -283,6 +299,9 @@ export async function actionHandler(actionName: string, targetData?: SendTargetP
     case ENUM_ACTION_NAME.OPEN_ADMIN_TAB:
       await tabUtils.openAdminRoutePage({ path: '/home' });
       break;
+    case ENUM_ACTION_NAME.HIBERNATE_TABS:
+      tabUtils.discardOtherTabs();
+      break;
     case ENUM_ACTION_NAME.START_SYNC:
       tabUtils.openAdminRoutePage({ path: '/sync' });
       setTimeout(() => {
@@ -327,12 +346,13 @@ export async function strategyHandler(actionName: string) {
   //   return;
   // };
 
-  if (actionName === ENUM_ACTION_NAME.OPEN_ADMIN_TAB) {
-    actionHandler(actionName);
-    return;
-  }
-
-  if (actionName === ENUM_ACTION_NAME.START_SYNC) {
+  if (
+    [
+      ENUM_ACTION_NAME.OPEN_ADMIN_TAB,
+      ENUM_ACTION_NAME.START_SYNC,
+      ENUM_ACTION_NAME.HIBERNATE_TABS,
+    ].includes(actionName as ENUM_ACTION_NAME)
+  ) {
     actionHandler(actionName);
     return;
   }

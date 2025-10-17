@@ -3,7 +3,7 @@ import type { FormItemProps, FormInstance } from 'antd';
 import type { SettingsProps } from '~/entrypoints/types';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
-import QuickActions from './QuickActions';
+import QuickActions from './components/QuickActions';
 
 const {
   DELETE_UNLOCKED_EMPTY_GROUP,
@@ -17,7 +17,7 @@ const {
 const defaultTemplate = String.raw`{{url}} | {{title}}`;
 
 export default function FormModuleOtherActions(
-  props: FormItemProps & { form: FormInstance<SettingsProps> }
+  props: FormItemProps & { form: FormInstance<SettingsProps> },
 ) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
@@ -28,7 +28,7 @@ export default function FormModuleOtherActions(
       // console.log('val', val);
       form.setFieldsValue({ [LINK_TEMPLATE]: val });
     },
-    [form]
+    [form],
   );
 
   return (
@@ -108,7 +108,7 @@ export default function FormModuleOtherActions(
             <Input
               style={{ width: '300px' }}
               placeholder={`${$fmt(
-                `settings.${LINK_TEMPLATE}.placeholder`
+                `settings.${LINK_TEMPLATE}.placeholder`,
               )}: ${defaultTemplate}`}
             />
           </Form.Item>
