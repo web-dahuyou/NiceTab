@@ -7,6 +7,7 @@ const zhCN = {
   'settings.block.otherActions': '其他操作配置',
   'settings.block.display': '展示配置',
   'settings.block.autoSync': '自动同步配置',
+  'settings.block.sync': '同步配置',
   'settings.confirmTipContent': '您有未保存的更改，确定离开？',
   'settings.language': '语言{mark}',
   // 'settings.language.ChineseSimplified': '简体中文',
@@ -97,7 +98,8 @@ const zhCN = {
   'settings.pageWidthType.responsive': '自适应宽度',
   'settings.showTabTitleTooltip': '标签页hover时是否展示tooltip：',
 
-  /* 自动同步配置 */
+  /* 同步配置 */
+  'settings.remoteSyncWithSettings': '同步列表数据时，偏好设置是否一起同步：',
   'settings.autoSync': '是否开启自动同步：',
   'settings.autoSyncTimeUnit': '间隔时间单位：',
   'settings.autoSyncTimeUnit.m': '分钟',

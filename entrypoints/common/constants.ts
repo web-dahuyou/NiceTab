@@ -162,7 +162,8 @@ export enum ENUM_SETTINGS_PROPS {
   AUTO_EXPAND_HOME_TREE = 'autoExpandHomeTree', // 进入列表页时，是否自动展开全部节点
   MAIN_CONTENT_WIDTH_TYPE = 'pageWidthType', // 主内容区域宽度类型
   SHOW_TAB_TITLE_TOOLTIP = 'showTabTitleTooltip', // 是否显示标签页标题的tooltip
-  /* 自动同步配置 */
+  /* 同步配置 */
+  REMOTE_SYNC_WITH_SETTINGS = 'remoteSyncWithSettings', // 远程同步时，偏好设置是否一起同步
   AUTO_SYNC = 'autoSync', // 是否开启自动同步
   AUTO_SYNC_TIME_UNIT = 'autoSyncTimeUnit', // 自动时间单位
   AUTO_SYNC_INTERVAL = 'autoSyncInterval', // 自动同步间隔时间
@@ -247,6 +248,7 @@ export const defaultAutoSyncRelation: Record<AutoSyncTimeUnits, number> = {
 export const defaultTimeRange = ['00:00', '23:59'] as TimeRange;
 // 远程同步相关的设置项不要被远程覆盖
 export const syncExcludedSettingsProps = [
+  ENUM_SETTINGS_PROPS.REMOTE_SYNC_WITH_SETTINGS,
   ENUM_SETTINGS_PROPS.AUTO_SYNC,
   ENUM_SETTINGS_PROPS.AUTO_SYNC_TIME_UNIT,
   ENUM_SETTINGS_PROPS.AUTO_SYNC_INTERVAL,

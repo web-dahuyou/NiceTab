@@ -13,6 +13,7 @@ import { settingsUtils } from '~/entrypoints/common/storage';
 import { useSyncType } from '../sync/hooks/syncType';
 
 const {
+  REMOTE_SYNC_WITH_SETTINGS,
   AUTO_SYNC,
   AUTO_SYNC_INTERVAL,
   AUTO_SYNC_TIME_UNIT,
@@ -116,6 +117,16 @@ export default function FormModuleSync(
 
   return (
     <Form.Item noStyle {...formItemProps}>
+      {/* 远程同步时，偏好设置是否一起同步 */}
+      <Form.Item<SettingsProps>
+        label={$fmt(`settings.${REMOTE_SYNC_WITH_SETTINGS}`)}
+        name={REMOTE_SYNC_WITH_SETTINGS}
+      >
+        <Radio.Group>
+          <Radio value={true}>{$fmt('common.yes')}</Radio>
+          <Radio value={false}>{$fmt('common.no')}</Radio>
+        </Radio.Group>
+      </Form.Item>
       {/* 是否开启自动同步 */}
       <Form.Item<SettingsProps> label={$fmt(`settings.${AUTO_SYNC}`)} name={AUTO_SYNC}>
         <Radio.Group>

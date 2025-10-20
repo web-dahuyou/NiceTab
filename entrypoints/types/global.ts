@@ -191,7 +191,8 @@ export type SettingsProps = {
   autoExpandHomeTree?: boolean; // 进入列表页时，是否自动展开全部节点
   pageWidthType?: PageWidthTypes; // 主内容区宽度设置
   showTabTitleTooltip?: boolean; // 是否显示标签页标题的tooltip
-  /* 自动同步配置 */
+  /* 同步配置 */
+  remoteSyncWithSettings?: boolean; // 偏好设置是否与列表一起同步
   autoSync?: boolean; // 是否开启自动同步
   autoSyncTimeUnit?: AutoSyncTimeUnits; // 自动同步时间单位
   autoSyncInterval?: number; // 自动同步间隔时间

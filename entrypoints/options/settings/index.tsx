@@ -97,8 +97,8 @@ export default function Settings() {
         icon: <SettingOutlined />,
       },
       {
-        key: 'autoSync',
-        label: $fmt('settings.block.autoSync'),
+        key: 'sync',
+        label: $fmt('settings.block.sync'),
         icon: <SettingOutlined />,
       },
     ];
@@ -246,7 +246,7 @@ export default function Settings() {
             <FormModuleDisplay hidden={currModule !== 'display'} form={form} />
 
             {/* ******************* 远程同步相关设置 ******************* */}
-            <FormModuleSync hidden={currModule !== 'autoSync'} form={form} />
+            <FormModuleSync hidden={currModule !== 'sync'} form={form} />
           </Form>
         </div>
       </StyledMainWrapper>
