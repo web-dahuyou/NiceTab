@@ -37,18 +37,18 @@ const StyledCascaderWrapper = styled.div`
 
     &::-webkit-scrollbar-track {
       border-radius: 4px;
-      background: ${(props) => props.theme.colorBgContainer || '#fff'};
+      background: ${props => props.theme.colorBgContainer || '#fff'};
     }
 
     &::-webkit-scrollbar-thumb {
       border-radius: 4px;
-      background: ${(props) =>
+      background: ${props =>
         `${props.theme.type === 'light' ? '#d9d9d9' : '#555'} !important`};
       box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.3);
     }
 
     &::-webkit-scrollbar-thumb:hover {
-      background: ${(props) =>
+      background: ${props =>
         `${props.theme.type === 'light' ? '#bfbfbf' : '#888'} !important`};
     }
   }
@@ -105,7 +105,7 @@ export default function SendTargetModal({
     setTargetValue(selectedTargetValue);
     const selectedOptions = [];
     const selectedTagInfo = cascaderData.find(
-      (item) => item.value === selectedTargetValue[0]
+      item => item.value === selectedTargetValue[0],
     );
     if (!selectedTagInfo) {
       selectedTargetValue = ['0'];
@@ -115,7 +115,7 @@ export default function SendTargetModal({
     selectedOptions.push(selectedTagInfo);
     if (selectedTargetValue[1] != null) {
       const selectedGroupInfo = selectedTagInfo.children?.find(
-        (item) => item.value === selectedTargetValue[1]
+        item => item.value === selectedTargetValue[1],
       );
       if (selectedGroupInfo) {
         selectedOptions.push(selectedGroupInfo);

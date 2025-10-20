@@ -9,12 +9,7 @@ export default function Footer() {
       className="footer-wrapper"
       // $paddingLeft={sidebarCollapsed ? 0 : 280}
     >
-      <Alert
-        className="tip"
-        type="info"
-        showIcon
-        message={$fmt('sync.tip.supportTip')}
-      />
+      <Alert className="tip" type="info" showIcon message={$fmt('sync.tip.supportTip')} />
     </StyledFooterWrapper>
-  )
+  );
 }

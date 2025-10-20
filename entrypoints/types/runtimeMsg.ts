@@ -97,26 +97,26 @@ export type SendRuntimeMessageBaseProps<T extends RuntimeMsgType> =
   T extends 'setPrimaryColor'
     ? RuntimeMsgSetPrimaryColor
     : T extends 'setThemeData'
-    ? RuntimeMsgSetThemeData
-    : T extends 'setThemeType'
-    ? RuntimeMsgSetThemeType
-    : T extends 'setLocale'
-    ? RuntimeMsgSetLocale
-    : T extends 'openAdminRoutePage'
-    ? RuntimeMsgOpenAdminRoutePage
-    : T extends 'reloadAllAdminPage'
-    ? RuntimeMsgReloadAllAdminPage
-    : T extends 'reloadOtherAdminPage'
-    ? RuntimeMsgReloadOtherAdminPage
-    : T extends 'sync:sync-status-change--gist'
-    ? RuntimeMsgSyncStatusChangeGist
-    : T extends 'sync:sync-status-change--webdav'
-    ? RuntimeMsgSyncStatusChangeWebdav
-    : T extends 'sendTabsActionStart'
-    ? RuntimeMsgSendTabsActionStart
-    : T extends 'sendTabsActionConfirm'
-    ? RuntimeMsgSendTabsActionConfirm
-    : never;
+      ? RuntimeMsgSetThemeData
+      : T extends 'setThemeType'
+        ? RuntimeMsgSetThemeType
+        : T extends 'setLocale'
+          ? RuntimeMsgSetLocale
+          : T extends 'openAdminRoutePage'
+            ? RuntimeMsgOpenAdminRoutePage
+            : T extends 'reloadAllAdminPage'
+              ? RuntimeMsgReloadAllAdminPage
+              : T extends 'reloadOtherAdminPage'
+                ? RuntimeMsgReloadOtherAdminPage
+                : T extends 'sync:sync-status-change--gist'
+                  ? RuntimeMsgSyncStatusChangeGist
+                  : T extends 'sync:sync-status-change--webdav'
+                    ? RuntimeMsgSyncStatusChangeWebdav
+                    : T extends 'sendTabsActionStart'
+                      ? RuntimeMsgSendTabsActionStart
+                      : T extends 'sendTabsActionConfirm'
+                        ? RuntimeMsgSendTabsActionConfirm
+                        : never;
 
 // sendRuntimeMessage params
 export type SendRuntimeMessageParams<T extends RuntimeMsgType = any> =

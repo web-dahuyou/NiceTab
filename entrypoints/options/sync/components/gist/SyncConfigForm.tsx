@@ -16,7 +16,7 @@ export default function SyncConfigFormGist({ onChange }: SyncConfigFormProps) {
   const { $fmt } = useIntlUtls();
   const [form] = Form.useForm();
 
-  const onFinish: FormProps<SyncConfigProps>['onFinish'] = async (values) => {
+  const onFinish: FormProps<SyncConfigProps>['onFinish'] = async values => {
     console.log('Save Success:', values);
     const newConfig = { ...syncUtils.initialConfig, ...values };
 
@@ -25,7 +25,7 @@ export default function SyncConfigFormGist({ onChange }: SyncConfigFormProps) {
   };
 
   useEffect(() => {
-    syncUtils.getConfig().then((config) => {
+    syncUtils.getConfig().then(config => {
       console.log('sync config:', config);
       form?.setFieldsValue(config);
     });

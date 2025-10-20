@@ -57,7 +57,7 @@ function TabGroup({
 
   const group = useMemo(
     () => ({ groupId, groupName, createTime, isLocked, isStarred, selected }),
-    [groupId, groupName, createTime, isLocked, isStarred, selected]
+    [groupId, groupName, createTime, isLocked, isStarred, selected],
   );
 
   const tabListHeight = useMemo(() => {
@@ -76,7 +76,7 @@ function TabGroup({
 
   // 已选择的tabItem数组
   const selectedTabs = useMemo(() => {
-    return tabList.filter((tab) => selectedTabIds.includes(tab.tabId));
+    return tabList.filter(tab => selectedTabIds.includes(tab.tabId));
   }, [selectedTabIds]);
   // 是否全选
   const isAllChecked = useMemo(() => {
@@ -88,10 +88,10 @@ function TabGroup({
     return selectedTabIds.length > 0 && selectedTabIds.length < tabList.length;
   }, [tabList, selectedTabIds]);
   // 全选
-  const handleSelectAll: CheckboxProps['onChange'] = (e) => {
+  const handleSelectAll: CheckboxProps['onChange'] = e => {
     const checked = e.target.checked;
     if (checked) {
-      setSelectedTabIds(tabList.map((tab) => tab.tabId));
+      setSelectedTabIds(tabList.map(tab => tab.tabId));
     } else {
       setSelectedTabIds([]);
     }
@@ -118,8 +118,8 @@ function TabGroup({
   }, [selectedTabs]);
 
   const handleTabRemove = useCallback((tabs: TabItem[]) => {
-    setSelectedTabIds((selectedTabIds) =>
-      selectedTabIds.filter((id) => !tabs.some((tab) => tab.tabId === id))
+    setSelectedTabIds(selectedTabIds =>
+      selectedTabIds.filter(id => !tabs.some(tab => tab.tabId === id)),
     );
     if (onTabRemove) {
       // 给回收站使用

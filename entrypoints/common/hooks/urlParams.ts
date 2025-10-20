@@ -14,5 +14,5 @@ export default function useUrlParams() {
   return {
     urlParams,
     setSearchParams,
-  }
+  };
 }

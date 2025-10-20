@@ -26,7 +26,7 @@ export default class StateUtils {
   }
   async setStateByModule<K extends keyof StateProps = 'global'>(
     moduleName: K,
-    moduleState: StateModuleProps<K>
+    moduleState: StateModuleProps<K>,
   ) {
     await this.getState();
     const currState = { ...this.initialState[moduleName], ...this.state[moduleName] };
@@ -39,7 +39,7 @@ export default class StateUtils {
   async getState<K extends keyof StateProps>(moduleName: K): Promise<StateModuleProps<K>>;
   // 逻辑实现
   async getState<K extends keyof StateProps = 'global'>(
-    moduleName?: K
+    moduleName?: K,
   ): Promise<StateProps | StateModuleProps<K>> {
     const state = await storage.getItem<StateProps>(this.storageKey);
     this.state = { ...this.initialState, ...state };
@@ -58,7 +58,7 @@ export default class StateUtils {
     const currWindow = await browser.windows.getCurrent();
     const homeState = await this.getState('home');
     const currItem = homeState.selectedKeysStore?.find(
-      (item) => item.windowId === currWindow.id
+      item => item.windowId === currWindow.id,
     );
     if (!allWindows || !currWindow || allWindows.length === 1) {
       return currItem || homeState.selectedKeysStore?.[0] || {};
@@ -74,7 +74,7 @@ export default class StateUtils {
       selectedTagKey?: string;
       selectedTabGroupKey?: string;
     },
-    callback?: () => void
+    callback?: () => void,
   ) {
     const currWindow = await browser.windows.getCurrent();
     const selectedKeysInfo = {
@@ -87,7 +87,7 @@ export default class StateUtils {
       homeState.selectedKeysStore = [];
     }
     const savedInfoIdx = homeState.selectedKeysStore.findIndex(
-      (item) => item.windowId === currWindow.id
+      item => item.windowId === currWindow.id,
     );
     if (~savedInfoIdx) {
       homeState.selectedKeysStore[savedInfoIdx] = selectedKeysInfo;
@@ -100,9 +100,9 @@ export default class StateUtils {
   }
   async clearSelectedKeysOfInvalidWindows() {
     const allWindows = await browser.windows.getAll();
-    const windowIds = new Set(allWindows.map((item) => item.id));
+    const windowIds = new Set(allWindows.map(item => item.id));
     const homeState = await this.getState('home');
-    homeState.selectedKeysStore = homeState.selectedKeysStore?.filter((item) => {
+    homeState.selectedKeysStore = homeState.selectedKeysStore?.filter(item => {
       return windowIds.has(item.windowId);
     });
     this.setStateByModule('home', homeState);

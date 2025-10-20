@@ -37,7 +37,7 @@ export default forwardRef((_, ref) => {
       });
       handleClose();
     },
-    [actionName, handleClose]
+    [actionName, handleClose],
   );
 
   const messageListener = async (msg: unknown) => {
@@ -58,11 +58,14 @@ export default forwardRef((_, ref) => {
     browser.runtime.onMessage.addListener(messageListener);
   }, []);
 
-  useImperativeHandle(ref, (): SendTargetActionHolderProps => ({
-    show: (data) => {
-      handleOpen(data);
-    }
-  }));
+  useImperativeHandle(
+    ref,
+    (): SendTargetActionHolderProps => ({
+      show: data => {
+        handleOpen(data);
+      },
+    }),
+  );
 
   return (
     <>

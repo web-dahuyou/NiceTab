@@ -2,7 +2,7 @@
   "name": "nice-tab",
   "description": "开源的标签页管理器，OneTab、Toby、SessionBuddy 等扩展的升级替代品，功能丰富易用 | A nice, convenient, powerful tab manager (open source)",
   "private": true,
-  "version": "2.8.0",
+  "version": "2.8.1",
   "type": "module",
   "scripts": {
     "dev": "pnpm convert:guide && wxt",
@@ -14,7 +14,8 @@
     "compile": "tsc --noEmit",
     "convert:guide": "node scripts/md2html.js GUIDE-zh.md",
     "postinstall": "wxt prepare",
-    "lint": "eslint 'entrypoints/**/*.{js,jsx,ts,tsx}' --fix=false"
+    "lint:no-fox": "eslint entrypoints --fix=false",
+    "lint": "eslint entrypoints --fix=true"
   },
   "dependencies": {
     "@ant-design/colors": "^7.0.2",

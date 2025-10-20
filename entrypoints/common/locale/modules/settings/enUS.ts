@@ -9,6 +9,7 @@ const enUS: Record<LocaleKey, string> = {
   'settings.block.otherActions': 'Other Actions',
   'settings.block.display': 'Displays',
   'settings.block.autoSync': 'Auto Sync',
+  'settings.block.sync': 'Sync',
   'settings.confirmTipContent': 'You have unsaved changes. Are you sure you want to leave?',
   'settings.language': 'Language{mark}',
   // 'settings.language.ChineseSimplified': 'Chinese Simplified',
@@ -100,6 +101,7 @@ const enUS: Record<LocaleKey, string> = {
   'settings.showTabTitleTooltip': 'Show a tooltip when hovering over a tab?',
 
   /* 自动同步配置 */
+  'settings.remoteSyncWithSettings': 'Allow settings sync with list data?',
   'settings.autoSync': 'Enable Auto Sync?',
   'settings.autoSyncTimeUnit': 'Auto-sync interval unit:',
   'settings.autoSyncTimeUnit.m': 'Minutes',

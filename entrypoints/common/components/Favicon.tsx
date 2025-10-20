@@ -8,7 +8,7 @@ const StyledTabItemFavicon = styled.i<{ $bgUrl?: string }>`
   width: 16px;
   height: 16px;
   margin-right: 8px;
-  background: url(${(props) => props.$bgUrl}) no-repeat center / 100% 100%;
+  background: url(${props => props.$bgUrl}) no-repeat center / 100% 100%;
 `;
 
 export default function Favicon({
@@ -21,12 +21,12 @@ export default function Favicon({
   const [renderUrl, setRenderUrl] = useState(faviconDefaultImage);
 
   const handleError = () => {
-    console.log('handleError')
+    console.log('handleError');
     setRenderUrl(faviconDefaultImage);
   };
 
   const init = async () => {
-    const url = favIconUrl || await getFaviconUrl(pageUrl);
+    const url = favIconUrl || (await getFaviconUrl(pageUrl));
     setTimeout(() => {
       setRenderUrl(url);
     }, 100);

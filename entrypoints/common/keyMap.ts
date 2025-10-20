@@ -1,18 +1,18 @@
 export type KeyCodeEvent = {
-  key: string
-  keyCode: number
-  which: number
-  code?: string
-  location?: number
-  description?: string
-  unicode?: string
-  altKey?: boolean
-  ctrlKey?: boolean
-  metaKey?: boolean
-  shiftKey?: boolean
-  repeat?: boolean
-  path?: string
-}
+  key: string;
+  keyCode: number;
+  which: number;
+  code?: string;
+  location?: number;
+  description?: string;
+  unicode?: string;
+  altKey?: boolean;
+  ctrlKey?: boolean;
+  metaKey?: boolean;
+  shiftKey?: boolean;
+  repeat?: boolean;
+  path?: string;
+};
 
 export const eventKeys: KeyCodeEvent[] = [
   {
@@ -1885,4 +1885,4 @@ export const eventKeys: KeyCodeEvent[] = [
     description: 'WakeUp',
     path: '/wake-up',
   },
-]
+];

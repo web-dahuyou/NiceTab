@@ -19,6 +19,7 @@ import {
 } from '~/entrypoints/common/utils';
 import { reloadOtherAdminPage } from '~/entrypoints/common/tabs';
 import {
+  ENUM_SETTINGS_PROPS,
   fetchErrorMessageOptions,
   SUCCESS_KEY,
   FAILED_KEY,
@@ -47,6 +48,8 @@ type GistResponseItemProps = {
   updated_at: string;
   truncated: boolean;
 };
+
+const { REMOTE_SYNC_WITH_SETTINGS } = ENUM_SETTINGS_PROPS;
 
 export default class SyncUtils {
   storageConfigKey: `local:${string}` = 'local:syncConfig';
@@ -184,20 +187,24 @@ export default class SyncUtils {
   }
   // 获取同步的gist参数
   async getApiParams() {
+    const localSettings = await Store.settingsUtils.getSettings();
     let contentResult = await this.getSyncContent();
     // 需要注意，如果title中包含emoji字符，提交gist接口会报错，所以将emoji标签给过滤掉
     const tabListContent = sanitizeContent(contentResult?.tabList) || '[]';
 
+    const files = {
+      [this.gistFileNameConfig.tabList]: {
+        content: tabListContent,
+      },
+    };
+    if (localSettings[REMOTE_SYNC_WITH_SETTINGS]) {
+      files[this.gistFileNameConfig.settings] = {
+        content: contentResult.settings,
+      };
+    }
     return {
       description: this.gistDescKey,
-      files: {
-        [this.gistFileNameConfig.tabList]: {
-          content: tabListContent,
-        },
-        [this.gistFileNameConfig.settings]: {
-          content: contentResult.settings,
-        },
-      },
+      files,
     };
   }
   async getGistsList(remoteType: SyncRemoteType): Promise<GistResponseItemProps[]> {
@@ -211,7 +218,7 @@ export default class SyncUtils {
         headers: {
           Authorization: `token ${accessToken}`,
         },
-      }
+      },
     );
 
     return (data as GistResponseItemProps[]) || [];
@@ -228,7 +235,7 @@ export default class SyncUtils {
         headers: {
           Authorization: `token ${accessToken}`,
         },
-      }
+      },
     );
 
     return (data as GistResponseItemProps) || {};
@@ -263,7 +270,7 @@ export default class SyncUtils {
         headers: {
           Authorization: `token ${accessToken}`,
         },
-      }
+      },
     );
 
     return (data as GistResponseItemProps) || {};
@@ -273,7 +280,7 @@ export default class SyncUtils {
   async handleBySyncType(
     remoteType: SyncRemoteType,
     syncType: SyncType,
-    gistData: GistResponseItemProps
+    gistData: GistResponseItemProps,
   ) {
     // 如果没有gist数据，则直接输出失败结果
     if (!gistData?.id) {
@@ -287,22 +294,23 @@ export default class SyncUtils {
     ) {
       result = await this.updateGist(remoteType);
     } else {
+      const localSettings = await Store.settingsUtils.getSettings();
       const { files } = gistData || {};
       let fileContent = '';
       const settingsFileInfo = files?.[this.gistFileNameConfig.settings];
       const fileInfo = files?.[this.gistFileNameConfig.tabList];
+
       // https://docs.github.com/en/rest/gists/gists#truncation
       // 通过 raw_url 获取的文件内容小于 10M
       if (fileInfo?.truncated && fileInfo?.raw_url) {
         // 如果内容大小超过 10M，则取消合并到本地
         if (fileInfo.size && fileInfo.size > 10 * 1024 * 1024) {
-          const settings = await Store.settingsUtils.getSettings();
-          const createdIntl = getCreatedIntl(settings.language || defaultLanguage);
+          const createdIntl = getCreatedIntl(localSettings.language || defaultLanguage);
           await this.handleSyncResult(
             remoteType,
             syncType,
             result,
-            createdIntl.formatMessage({ id: 'sync.reason.contentTooLarge' })
+            createdIntl.formatMessage({ id: 'sync.reason.contentTooLarge' }),
           );
           return;
         }
@@ -320,7 +328,7 @@ export default class SyncUtils {
         await Store.tabListUtils.clearAll();
       }
 
-      if (!!settingsFileInfo?.content) {
+      if (!!settingsFileInfo?.content && localSettings[REMOTE_SYNC_WITH_SETTINGS]) {
         try {
           let settings = JSON.parse(settingsFileInfo?.content || '{}');
           if (
@@ -363,7 +371,7 @@ export default class SyncUtils {
     remoteType: SyncRemoteType,
     syncType: SyncType,
     result: GistResponseItemProps,
-    reason?: string
+    reason?: string,
   ) {
     // gitee 请求接口返回的 updated_at 时间有时候不更新，还是使用本地时间吧
     // const syncTime = dayjs(result?.updated_at || result?.created_at).format('YYYY-MM-DD HH:mm:ss');
@@ -378,7 +386,7 @@ export default class SyncUtils {
 
   // 格式化错误信息
   formatErrorMsg(errorMsg: string, createdIntl: ReturnType<typeof getCreatedIntl>) {
-    const messageItem = fetchErrorMessageOptions.find((item) => errorMsg === item.type);
+    const messageItem = fetchErrorMessageOptions.find(item => errorMsg === item.type);
     if (messageItem?.messageId) {
       return createdIntl.formatMessage({ id: messageItem.messageId });
     }
@@ -386,7 +394,7 @@ export default class SyncUtils {
       errorMsg ||
       createdIntl.formatMessage(
         { id: `common.actionFailed` },
-        { action: createdIntl.formatMessage({ id: 'common.sync' }) }
+        { action: createdIntl.formatMessage({ id: 'common.sync' }) },
       )
     );
   }
@@ -404,7 +412,7 @@ export default class SyncUtils {
         await this.handleBySyncType(remoteType, syncType, gistData);
       } else {
         const allGists = await this.getGistsList(remoteType);
-        const gistData = allGists.find((gist) => gist.description === this.gistDescKey);
+        const gistData = allGists.find(gist => gist.description === this.gistDescKey);
         const isExist = gistData && gistData.id;
 
         if (isExist) {
@@ -426,7 +434,7 @@ export default class SyncUtils {
         remoteType,
         syncType,
         {} as GistResponseItemProps,
-        this.formatErrorMsg(error.message, createdIntl)
+        this.formatErrorMsg(error.message, createdIntl),
       );
     }
 

@@ -55,7 +55,6 @@ export const StyledSidebarWrapper = styled(StyledBaseSidebarWrapper)<{
   }
 `;
 
-
 export const StyledTreeNodeItem = styled.div`
   display: flex;
   align-items: center;

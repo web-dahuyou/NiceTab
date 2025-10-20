@@ -11,14 +11,14 @@ const StyledStickyInner = styled.div<{
 }>`
   position: relative;
   width: 100%;
-  background: ${(props) => props.$bgColor || props?.theme?.colorBgContainer || '#fff'};
+  background: ${props => props.$bgColor || props?.theme?.colorBgContainer || '#fff'};
   &.fixed {
     position: fixed;
-    width: ${(props) => props.$width ? `${props.$width}px` : '100%'};
-    top: ${(props) => `${props.$top || 0}px`};
-    left: ${(props) => `${props.$left || 0}px`};
-    padding: ${(props) => `0 ${props.$paddingX || 0}px`};
-    box-shadow: ${(props) => props.theme.boxShadow || '0 2px 12px 3px rgba(0, 0, 0, 0.1)'};
+    width: ${props => (props.$width ? `${props.$width}px` : '100%')};
+    top: ${props => `${props.$top || 0}px`};
+    left: ${props => `${props.$left || 0}px`};
+    padding: ${props => `0 ${props.$paddingX || 0}px`};
+    box-shadow: ${props => props.theme.boxShadow || '0 2px 12px 3px rgba(0, 0, 0, 0.1)'};
     z-index: 10;
   }
 `;
@@ -31,7 +31,13 @@ interface StickyBoxProps {
   paddingX?: number;
 }
 
-export function StickyBox({ children, topGap = 0, fullWidth = false, bgColor = '#fff', paddingX = 0 }: StickyBoxProps) {
+export function StickyBox({
+  children,
+  topGap = 0,
+  fullWidth = false,
+  bgColor = '#fff',
+  paddingX = 0,
+}: StickyBoxProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const [wrapperBounds, setWrapperBounds] = useState({

@@ -115,7 +115,7 @@ export default function useCustomEventListener(treeDataHook: TreeDataHookProps) 
       await (treeDataHook?.[action] as any)?.(...params);
       callback?.();
     },
-    []
+    [],
   );
   const addCustomEventListener = useCallback(() => {
     eventEmitter.on('home:treeDataHook', handleCustomEvent);

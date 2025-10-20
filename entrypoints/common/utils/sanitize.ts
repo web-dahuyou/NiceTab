@@ -32,7 +32,10 @@ export function filter4ByteChars(content: string, replacement: string = ''): str
  * @param replacement 替换字符，默认为空字符串
  * @returns 过滤后的字符串
  */
-export function filterMySQLSpecialChars(content: string, replacement: string = ''): string {
+export function filterMySQLSpecialChars(
+  content: string,
+  replacement: string = '',
+): string {
   if (!content) return content;
   // 过滤MySQL中可能导致问题的特殊字符，如NULL字节、控制字符等
   return content.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, replacement);
@@ -52,7 +55,6 @@ export function sanitizeContent(content: string, replacement: string = ''): stri
 
   return result;
 }
-
 
 export default {
   filterEmoji,

@@ -97,11 +97,11 @@ export default function MoveToModal({
     }
   }, [validInfo, $fmt]);
 
-  const onCheckboxChange: CheckboxProps['onChange'] = (e) => {
+  const onCheckboxChange: CheckboxProps['onChange'] = e => {
     // console.log('checked = ', e.target.checked);
     setAutoMerge(e.target.checked);
   };
-  const onCopyCheckboxChange: CheckboxProps['onChange'] = (e) => {
+  const onCopyCheckboxChange: CheckboxProps['onChange'] = e => {
     // console.log('checked = ', e.target.checked);
     setIsCopy(e.target.checked);
   };

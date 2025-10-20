@@ -174,10 +174,13 @@ export default function DndComponent<IncomeData extends DragData>({
           // setIsDragging(false);
           handleDragStateChange(idleState);
           const target = location.current.dropTargets[0];
-          onSourceDrop?.({
-            sourceData: source.data as IncomeData,
-            targetData: target.data as IncomeData,
-          });
+
+          if (source && target) {
+            onSourceDrop?.({
+              sourceData: source?.data as IncomeData,
+              targetData: target?.data as IncomeData,
+            });
+          }
           eventEmitter.emit('home:is-dragging', false);
         },
       }),
@@ -202,7 +205,7 @@ export default function DndComponent<IncomeData extends DragData>({
             return;
           }
 
-          const closestEdge = extractClosestEdge(self.data);
+          const closestEdge = extractClosestEdge(self?.data);
           // console.log('dropTargetForElements--self', self.data)
           // console.log('dropTargetForElements--source', source.data)
           // console.log('dropTargetForElements--closestEdge', closestEdge)
@@ -239,7 +242,7 @@ export default function DndComponent<IncomeData extends DragData>({
           setClosestEdge(null);
 
           const target = location.current.dropTargets[0];
-          if (!target) {
+          if (!source || !target) {
             return;
           }
           // console.log('dropTargetForElements--location', location);

@@ -32,7 +32,7 @@ export default function useGlobalSearch() {
         callback: () => selectedKeyChange(params),
       });
     },
-    [selectedKeyChange]
+    [selectedKeyChange],
   );
 
   return {

@@ -21,13 +21,19 @@ export default function QuickActions({ onChange }: { onChange: (type: string) =>
     <Space>
       <Typography.Text mark>{$fmt('common.quickAction')}</Typography.Text>
       <StyledButton type="link" onClick={() => onChange(templateMap[1])}>
-        <Typography.Text code>{$fmt('common.url')} | {$fmt('common.title')}</Typography.Text>
+        <Typography.Text code>
+          {$fmt('common.url')} | {$fmt('common.title')}
+        </Typography.Text>
       </StyledButton>
       <StyledButton type="link" onClick={() => onChange(templateMap[2])}>
-        <Typography.Text code>{$fmt('common.title')}: {$fmt('common.url')}</Typography.Text>
+        <Typography.Text code>
+          {$fmt('common.title')}: {$fmt('common.url')}
+        </Typography.Text>
       </StyledButton>
       <StyledButton type="link" onClick={() => onChange(templateMap[3])}>
-        <Typography.Text code>[{$fmt('common.title')}]({$fmt('common.url')})</Typography.Text>
+        <Typography.Text code>
+          [{$fmt('common.title')}]({$fmt('common.url')})
+        </Typography.Text>
       </StyledButton>
     </Space>
   );

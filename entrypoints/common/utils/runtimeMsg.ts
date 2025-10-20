@@ -11,10 +11,10 @@ export async function sendRuntimeMessage<T extends RuntimeMsgType>({
     ? targetPageContexts || []
     : pageContextTypes;
 
-  _targetPageContexts = _targetPageContexts.filter((ctx) => ctx !== 'background');
+  _targetPageContexts = _targetPageContexts.filter(ctx => ctx !== 'background');
 
   browser.runtime.sendMessage({ msgType, data, targetPageContext: 'background' });
-  _targetPageContexts.forEach((targetPageContext) => {
+  _targetPageContexts.forEach(targetPageContext => {
     browser.runtime.sendMessage({ msgType, data, targetPageContext });
   });
 }

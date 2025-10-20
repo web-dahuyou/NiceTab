@@ -27,14 +27,14 @@ export default function SyncResultList({ resultList }: SyncResultListProps) {
   return (
     <Flex vertical gap={12}>
       <Space align="center">
-        <Typography.Title level={5} style={{ margin: 0 }}>{$fmt('sync.syncHistory')}</Typography.Title>
+        <Typography.Title level={5} style={{ margin: 0 }}>
+          {$fmt('sync.syncHistory')}
+        </Typography.Title>
         <Tooltip
           color={token.colorBgElevated}
           placement="bottom"
           destroyTooltipOnHide
-          title={
-            <Typography.Text>{ $fmt('sync.tip.syncHistory') }</Typography.Text>
-          }
+          title={<Typography.Text>{$fmt('sync.tip.syncHistory')}</Typography.Text>}
         >
           <QuestionCircleOutlined />
         </Tooltip>
