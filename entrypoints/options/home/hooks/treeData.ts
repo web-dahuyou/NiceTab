@@ -452,12 +452,17 @@ export function useTreeData() {
       const settings = await settingsUtils.getSettings();
       _targetIndex = settings[TAB_INSERT_POSITION] === 'bottom' ? targetTabListLength : 0;
     }
-    await tabListUtils.onTabDrop(
-      sourceData.groupId,
-      targetData.groupId,
-      sourceIndex,
-      _targetIndex,
-    );
+
+    if (sourceData.isMultiSelect) {
+      await tabListUtils.onTabsDrop(sourceData, targetData, sourceIndex, _targetIndex);
+    } else {
+      await tabListUtils.onTabDrop(
+        sourceData.groupId,
+        targetData.groupId,
+        sourceIndex,
+        _targetIndex,
+      );
+    }
     refreshTreeData();
   };
 

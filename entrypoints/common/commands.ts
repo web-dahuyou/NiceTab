@@ -29,7 +29,7 @@ export default async function commandsRegister() {
   //   }
   // });
 
-  browser.commands.onCommand.addListener(async (command) => {
+  browser.commands.onCommand.addListener(async command => {
     console.log(`Command "${command}" triggered`);
     strategyHandler(command);
   });
@@ -40,7 +40,7 @@ export async function getCommandsHotkeys() {
   const commands = await browser.commands.getAll();
 
   const hotkeysMap = new Map<Commands.Command['name'], string | undefined>();
-  commands.forEach((command) => {
+  commands.forEach(command => {
     if (command.name) {
       hotkeysMap.set(command.name, command.shortcut);
     }

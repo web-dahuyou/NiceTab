@@ -28,7 +28,11 @@ import {
 import { classNames } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { tabListUtils, settingsUtils } from '~/entrypoints/common/storage';
-import DndComponent from '~/entrypoints/common/components/DndComponent';
+import DndComponent, {
+  idleState,
+  type OnSourceDropCallback,
+  type DraggableStateItem,
+} from '~/entrypoints/common/components/DndComponent';
 import DropComponent from '~/entrypoints/common/components/DropComponent';
 
 import { HomeContext } from './hooks/treeData';
@@ -125,6 +129,8 @@ function TabGroup({
   const [modalVisible, setModalVisible] = useState(false);
   const [dedupModalVisible, setDedupModalVisible] = useState(false);
   const [recoverModalVisible, setRecoverModalVisible] = useState(false);
+  const [draggableState, setDraggableState] = useState<DraggableStateItem>(idleState);
+  const [draggingTabItem, setDraggingTabItem] = useState<TabItem | null>(null);
 
   const {
     modalVisible: moveToModalVisible,
@@ -289,12 +295,36 @@ function TabGroup({
     }
   }, [$fmt, selectedTabs]);
 
+  const handleDragStateChange = useCallback(
+    (value: DraggableStateItem, tabItem: TabItem) => {
+      setDraggableState(value);
+      setDraggingTabItem(tabItem);
+    },
+    [setDraggableState, setDraggingTabItem],
+  );
+  // 拖放到目标元素时触发 (targetData.groupId = 当前的groupId)
   const handleTabItemDrop: DndTabItemOnDropCallback = useCallback((...params) => {
     eventEmitter.emit('home:treeDataHook', {
       action: 'handleTabItemDrop',
       params,
     });
   }, []);
+
+  // 拖拽的元素drop时触发 (sourceData.groupId = 当前的groupId)
+  const handleSourceTabItemDrop: OnSourceDropCallback<DndTabItemProps> = useCallback(
+    ({ sourceData, targetData }) => {
+      if (
+        sourceData?.groupId !== targetData?.groupId &&
+        draggingTabItem?.tabId &&
+        sourceData?.selectedValues?.includes?.(draggingTabItem.tabId)
+      ) {
+        setSelectedTabIds(ids => {
+          return ids.filter(id => !sourceData?.selectedValues?.includes(id));
+        });
+      }
+    },
+    [draggingTabItem, selectedTabIds, setSelectedTabIds],
+  );
 
   const handleTabsSort = useCallback((sortType: string) => {
     eventEmitter.emit('home:treeDataHook', {
@@ -626,13 +656,24 @@ function TabGroup({
                 >
                   {tabListLocal.map((tab, index) => (
                     <DndComponent<DndTabItemProps>
-                      canDrag={
-                        canDrag && !tagLocked && !isLocked && selectedTabIds.length === 0
-                      }
+                      canDrag={canDrag && !tagLocked && !isLocked}
                       key={tab.tabId || index}
-                      data={{ ...tab, index, groupId, dndKey }}
+                      data={{
+                        ...tab,
+                        index,
+                        groupId,
+                        dndKey,
+                        selectedValues: selectedTabIds,
+                        isDragging:
+                          draggableState.type !== idleState.type &&
+                          selectedTabIds.includes(tab.tabId) &&
+                          selectedTabIds.includes(draggingTabItem?.tabId!),
+                      }}
                       dndKey={dndKey}
+                      mainField="tabId"
+                      onDragStateChange={handleDragStateChange}
                       onDrop={handleTabItemDrop}
+                      onSourceDrop={handleSourceTabItemDrop}
                     >
                       <TabListItem
                         key={tab.tabId || index}

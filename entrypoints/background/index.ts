@@ -43,6 +43,32 @@ async function setBadge() {
   browser[BROWSER_ACTION_API_NAME].setBadgeBackgroundColor({
     color: themeData?.colorPrimary || PRIMARY_COLOR,
   });
+}
+
+// 页面创建后设置页面标题
+async function setPageTitleOnCreated(tab: Tabs.Tab) {
+  if (tab.status === 'complete') {
+    tabUtils.setPageTitle({ windowId: tab.windowId, tabId: tab.id });
+  }
+}
+// 页面更新时设置页面标题
+async function setPageTitleOnUpdated(
+  tabId: number,
+  changeInfo: Tabs.OnUpdatedChangeInfoType,
+  tab: Tabs.Tab,
+) {
+  if (changeInfo.status === 'complete' || tab.status === 'complete') {
+    tabUtils.setPageTitle({ windowId: tab.windowId, tabId: tab.id });
+  }
+}
+
+async function initTabEventListener() {
+  function handler() {
+    setBadge();
+    tabUtils.setPageTitle();
+  }
+
+  handler();
 
   browser.tabs.onCreated.removeListener(setBadge);
   browser.tabs.onRemoved.removeListener(setBadge);
@@ -52,7 +78,12 @@ async function setBadge() {
   browser.tabs.onRemoved.addListener(setBadge);
   browser.tabs.onActivated.addListener(setBadge);
   browser.runtime.onInstalled.addListener(setBadge);
-  // TAB_EVENTS.forEach((event) => browser.tabs[event]?.addListener(setBadge));
+  // TAB_EVENTS.forEach((event) => browser.tabs[event]?.addListener(handler));
+
+  browser.tabs.onCreated.removeListener(setPageTitleOnCreated);
+  browser.tabs.onCreated.addListener(setPageTitleOnCreated);
+  browser.tabs.onUpdated.removeListener(setPageTitleOnUpdated);
+  browser.tabs.onUpdated.addListener(setPageTitleOnUpdated);
 }
 
 // 初始化 popup 交互
@@ -74,7 +105,7 @@ async function initTabsUpdateListener() {
   async function adminPageLimitControl(
     tabId: number,
     changeInfo: Tabs.OnUpdatedChangeInfoType,
-    tab: Tabs.Tab
+    tab: Tabs.Tab,
   ) {
     const adminTabUrl = browser.runtime.getURL('/options.html');
     const tabs = await browser.tabs.query({
@@ -97,12 +128,12 @@ async function initTabsUpdateListener() {
 export default defineBackground(() => {
   // console.log('Hello background!', { id: browser.runtime.id });
   initTabsUpdateListener();
-  // 设置插件图标徽标
-  setBadge();
+  // 初始化tab事件
+  initTabEventListener();
   // 初始化 popup 交互
   initPopup();
   initSettingsStorageListener(async (settings, oldSettings) => {
-    setBadge();
+    initTabEventListener();
     initPopup();
     autoSyncAlarm.checkReset(settings, oldSettings);
   });
@@ -128,7 +159,7 @@ export default defineBackground(() => {
 
   // 左键点击图标 (如果有 popup 是不会触发的，可以执行 browser[BROWSER_ACTION_API_NAME].setPopup({ popup: '' }) 来监听事件)
   // Fired when an action icon is clicked. This event will not fire if the action has a popup.
-  browser[BROWSER_ACTION_API_NAME].onClicked.addListener(async (tab) => {
+  browser[BROWSER_ACTION_API_NAME].onClicked.addListener(async tab => {
     const settings = await settingsUtils.getSettings();
     const modules = settings[POPUP_MODULE_DISPLAYS] || POPUP_MODULE_NAMES;
     if (!modules.length) {
@@ -158,7 +189,7 @@ export default defineBackground(() => {
     }
   });
 
-  browser.windows.onRemoved.addListener(async (windowId) => {
+  browser.windows.onRemoved.addListener(async windowId => {
     console.log('browser.windows.onRemoved--windowId', windowId);
     stateUtils.clearSelectedKeysOfInvalidWindows();
   });

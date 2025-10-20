@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import {
   draggable,
@@ -12,23 +13,48 @@ import {
   extractClosestEdge,
 } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
 import { DropIndicator } from '@atlaskit/pragmatic-drag-and-drop-react-drop-indicator/box';
-import { PRIMARY_COLOR } from '~/entrypoints/common/constants';
-import { eventEmitter } from '~/entrypoints/common/hooks/global';
+import { pointerOutsideOfPreview } from '@atlaskit/pragmatic-drag-and-drop/element/pointer-outside-of-preview';
+import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
+import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { classNames } from '~/entrypoints/common/utils';
+import { ENUM_COLORS } from '~/entrypoints/common/constants';
 
 const StyledDndWrapper = styled.div`
   position: relative;
   opacity: 1;
-  --ds-border-selected: ${PRIMARY_COLOR};
+  // --ds-border-selected: ${props => props.theme.colorBgContainer};
+  // transition: all 0.15s ease-in-out;
+
   &.dragging {
     opacity: 0.4;
   }
 `;
 
+const StyledPreviewBox = styled.div`
+  padding: 6px 12px;
+  border-radius: 6px;
+  // background: ${props => props.theme.colorBgElevated};
+  // background: ${ENUM_COLORS.purple};
+  background: ${props => props.theme.colorPrimary};
+  pointer-events: none;
+  color: #fff;
+`;
+
+export type DraggableStateType = 'idle' | 'preview' | 'dragging';
+
+export type DraggableStateItem =
+  | { type: 'idle' }
+  | { type: 'preview'; container: HTMLElement }
+  | { type: 'dragging' };
+
 // 拖拽数据类型
-type DragData = Record<string | symbol, any> & {
+export type DragData = Record<string | symbol, any> & {
   index: number;
   dndKey?: symbol;
   groupId?: string;
+  selectedValues?: string[];
+  isDragging?: boolean;
+  draggableState?: DraggableStateItem;
 };
 
 type OnDropCallback<T extends DragData> = ({
@@ -43,26 +69,67 @@ type OnDropCallback<T extends DragData> = ({
   targetIndex: number;
 }) => void;
 
+export type OnSourceDropCallback<T extends DragData> = ({
+  sourceData,
+  targetData,
+}: {
+  sourceData: T;
+  targetData: T;
+}) => void;
+
+export const idleState: DraggableStateItem = { type: 'idle' };
+export const draggingState: DraggableStateItem = { type: 'dragging' };
+
 export default function DndComponent<IncomeData extends DragData>({
   dndKey,
   canDrag,
   data,
-  onDrop,
+  mainField, // 区分拖拽元素的唯一标识字段
+  onDragStateChange,
+  onDrop, // 目标drop元素会触发
+  onSourceDrop, // drag的元素会触发
   children,
 }: {
   dndKey: symbol;
   canDrag: boolean;
   data: IncomeData;
+  mainField: keyof IncomeData;
+  onDragStateChange?: (state: DraggableStateItem, data: IncomeData) => void;
   onDrop?: OnDropCallback<IncomeData>;
+  onSourceDrop?: OnSourceDropCallback<IncomeData>;
   children: JSX.Element;
 }) {
+  const { $fmt } = useIntlUtls();
   const ref = useRef<HTMLDivElement | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
+  const [draggableState, setDraggableState] = useState<DraggableStateItem>(idleState);
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
 
-  const getDragData = useCallback(() => {
-    return { ...data };
+  // 拖拽的元素是否选中状态
+  const isDragItemSelected = useMemo(() => {
+    return data.selectedValues?.includes(data[mainField]);
+  }, [data, mainField]);
+
+  // 是否协同拖拽状态（比如选中了a,b,c三个元素，那么拖拽a,b,c中任意一个，其他几个元素也认为是拖拽状态）
+  const isMultiSelect = useMemo(() => {
+    return isDragItemSelected ? (data.selectedValues || []).length > 1 : false;
   }, [data]);
+
+  // 拖拽状态变化
+  const handleDragStateChange = useCallback(
+    (value: DraggableStateItem) => {
+      onDragStateChange?.(value, data);
+      setDraggableState(value);
+    },
+    [data, onDragStateChange, setDraggableState],
+  );
+
+  const getDragData = useCallback(() => {
+    return {
+      ...data,
+      // 多选拖拽时标记为多选操作
+      isMultiSelect,
+    };
+  }, [data, isMultiSelect]);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -78,14 +145,39 @@ export default function DndComponent<IncomeData extends DragData>({
         getInitialData(): IncomeData {
           return getDragData();
         },
+        onGenerateDragPreview({ nativeSetDragImage }) {
+          if (!isMultiSelect || !isDragItemSelected) {
+            return () => handleDragStateChange(draggingState);
+          }
+          setCustomNativeDragPreview({
+            nativeSetDragImage,
+            getOffset: pointerOutsideOfPreview({
+              x: '16px',
+              y: '8px',
+            }),
+            render({ container }) {
+              handleDragStateChange({ type: 'preview', container });
+
+              return () => handleDragStateChange(draggingState);
+            },
+          });
+        },
         onDragStart() {
-          // console.log('--------------draggable--onDragStart');
-          setIsDragging(true);
+          // console.log('--------------draggable--onDragStart', data);
+
+          // setIsDragging(true);
+          handleDragStateChange(draggingState);
           eventEmitter.emit('home:is-dragging', true);
         },
-        onDrop() {
+        onDrop({ location, source }) {
           // console.log('--------------draggable--onDrop');
-          setIsDragging(false);
+          // setIsDragging(false);
+          handleDragStateChange(idleState);
+          const target = location.current.dropTargets[0];
+          onSourceDrop?.({
+            sourceData: source.data as IncomeData,
+            targetData: target.data as IncomeData,
+          });
           eventEmitter.emit('home:is-dragging', false);
         },
       }),
@@ -170,14 +262,28 @@ export default function DndComponent<IncomeData extends DragData>({
 
           onDrop && onDrop({ sourceData, targetData, sourceIndex, targetIndex });
         },
-      })
+      }),
     );
-  }, [data, dndKey]);
+  }, [data, dndKey, isMultiSelect, handleDragStateChange]);
 
   return (
-    <StyledDndWrapper ref={ref} className={isDragging ? 'dragging' : ''}>
+    <StyledDndWrapper
+      ref={ref}
+      className={classNames(draggableState.type, data.isDragging && draggingState.type)}
+    >
       {children}
       {closestEdge && <DropIndicator edge={closestEdge} gap="0px" />}
+      {(data?.selectedValues || [])?.length > 1 &&
+        draggableState.type === 'preview' &&
+        ReactDOM.createPortal(
+          <StyledPreviewBox>
+            {$fmt({
+              id: 'home.tab.selectedCount',
+              values: { count: data?.selectedValues?.length || 0 },
+            })}
+          </StyledPreviewBox>,
+          draggableState.container,
+        )}
     </StyledDndWrapper>
   );
 }

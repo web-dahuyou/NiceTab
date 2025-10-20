@@ -73,14 +73,21 @@ export default function ContextMenuConfig({ form }: Props) {
       {},
     );
 
-    const _list = defaultContextmenuConfigList.map(item => {
-      const baseMenu = baseMenuMap[item.menuId];
-      const savedConfigItem = contextMenuConfigMap[item.menuId];
-      const configItem = savedConfigItem || { ...item, display: false };
+    // 由于新版本迭代可能会新增菜单项，不在历史偏好设置中，需要判断差异并添加到配置项
+    const _list: ContextMenuConfigItem[] = (contextMenuConfig || []).map(item => {
+      const baseMenu = baseMenuMap[item.menuId] || {};
       return {
-        ...configItem,
+        ...item,
         name: baseMenu.title,
       };
+    });
+
+    defaultContextmenuConfigList.forEach(item => {
+      const baseMenu = baseMenuMap[item.menuId] || {};
+      const savedConfigItem = contextMenuConfigMap[item.menuId];
+      if (!savedConfigItem) {
+        _list.push({ ...item, display: false, name: baseMenu.title });
+      }
     });
 
     setList(_list);
@@ -112,7 +119,7 @@ export default function ContextMenuConfig({ form }: Props) {
         axis: 'vertical',
         closestEdgeOfTarget: extractClosestEdge(targetData),
       });
-
+      console.log('_list', _list);
       setList(_list);
 
       form.setFieldsValue({

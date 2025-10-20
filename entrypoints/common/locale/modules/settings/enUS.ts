@@ -1,13 +1,14 @@
 import { LocaleKey } from './zhCN';
 
 const enUS: Record<LocaleKey, string> = {
-  'settings.block.common': 'Settings: Common',
-  'settings.block.sendTabs': 'Settings: Sending Tabs',
-  'settings.block.openTabs': 'Settings: Opening Tabs',
-  'settings.block.globalSearch': 'Settings: Global Search',
-  'settings.block.otherActions': 'Settings: Other Actions',
-  'settings.block.display': 'Settings: Displays',
-  'settings.block.autoSync': 'Settings: Auto Sync',
+  'settings.block.common': 'Common',
+  'settings.block.sendTabs': 'Sending Tabs',
+  'settings.block.openTabs': 'Opening Tabs',
+  'settings.block.pageTitleConfig': 'Page Title Overwrite',
+  'settings.block.globalSearch': 'Global Search',
+  'settings.block.otherActions': 'Other Actions',
+  'settings.block.display': 'Displays',
+  'settings.block.autoSync': 'Auto Sync',
   'settings.confirmTipContent': 'You have unsaved changes. Are you sure you want to leave?',
   'settings.language': 'Language{mark}',
   // 'settings.language.ChineseSimplified': 'Chinese Simplified',
@@ -57,6 +58,10 @@ const enUS: Record<LocaleKey, string> = {
   'settings.openTabModifierKey.tooltip': 'Foreground opening takes precedence over background opening. When the modifier keys for both types of opening are the same, the foreground opening action will be triggered.',
   'settings.unnamedGroupRestoreAsGroup': 'Restore the unnamed group as a browser tab group?',
   'settings.namedGroupRestoreAsGroup': 'Restore the named group as a browser tab group?',
+
+  /* 页面标题配置 */
+  'settings.pageTitleConfig': 'Page title overwrite:',
+  'settings.pageTitleConfig.drawerTitle': 'Page Title Overwrite',
 
   /* 全局搜索配置 */
   'settings.globalSearchDeleteAfterOpen': 'Remove tabs from the NiceTab list after opening them?',

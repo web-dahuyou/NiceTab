@@ -2,6 +2,7 @@ const zhCN = {
   'settings.block.common': '通用配置',
   'settings.block.sendTabs': '发送标签页配置',
   'settings.block.openTabs': '打开标签页配置',
+  'settings.block.pageTitleConfig': '网页标题配置',
   'settings.block.globalSearch': '全局搜索配置',
   'settings.block.otherActions': '其他操作配置',
   'settings.block.display': '展示配置',
@@ -55,6 +56,10 @@ const zhCN = {
   'settings.openTabModifierKey.tooltip': '前台打开方式优先级高于后台打开方式，意味着如果后台打开和前台打开的修饰键相同，则触发前台打开',
   'settings.unnamedGroupRestoreAsGroup': '恢复未命名标签组时-是否以标签组形式打开到浏览器：',
   'settings.namedGroupRestoreAsGroup': '恢复已命名标签组时-是否以标签组形式打开到浏览器：',
+
+  /* 页面标题配置 */
+  'settings.pageTitleConfig': '网页标题自定义：',
+  'settings.pageTitleConfig.drawerTitle': '网页标题配置',
 
   /* 全局搜索配置 */
   'settings.globalSearchDeleteAfterOpen': '打开标签页后是否从列表中删除：',

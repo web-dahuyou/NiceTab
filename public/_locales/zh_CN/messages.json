@@ -22,5 +22,8 @@
   },
   "action_startSync": {
     "message": "开始同步"
+  },
+  "action_hibernateTabs": {
+    "message": "休眠其他标签页"
   }
 }
