@@ -15,10 +15,10 @@ const StyledWrapper = styled.div<{
 }>`
   display: flex;
   align-items: center;
-  max-width: ${(props) => (props.$maxWidth ? `${props.$maxWidth}px` : '100%')};
+  max-width: ${props => (props.$maxWidth ? `${props.$maxWidth}px` : '100%')};
   gap: 4px;
   .text-readonly {
-    font-size: ${(props) => props.$fontSize || 14}px;
+    font-size: ${props => props.$fontSize || 14}px;
     ${StyledEllipsis}
   }
   input {

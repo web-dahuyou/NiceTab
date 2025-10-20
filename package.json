@@ -14,7 +14,8 @@
     "compile": "tsc --noEmit",
     "convert:guide": "node scripts/md2html.js GUIDE-zh.md",
     "postinstall": "wxt prepare",
-    "lint": "eslint 'entrypoints/**/*.{js,jsx,ts,tsx}' --fix=false"
+    "lint:no-fox": "eslint entrypoints --fix=false",
+    "lint": "eslint entrypoints --fix=true"
   },
   "dependencies": {
     "@ant-design/colors": "^7.0.2",

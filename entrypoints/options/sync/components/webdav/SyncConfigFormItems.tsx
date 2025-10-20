@@ -21,7 +21,7 @@ const StyledConfigItem = styled.div`
     flex: 1;
     padding: 12px 8px;
     border-radius: 8px;
-    border: 1px solid ${(props) => props.theme.colorBorder};
+    border: 1px solid ${props => props.theme.colorBorder};
   }
   .config-item-action-box {
     flex: 0 0 auto;
@@ -55,7 +55,7 @@ export default function SyncConfigFormItem({ form }: SyncConfigFormItemProps) {
         <Form.List name="configList">
           {(fields, { add, remove }, { errors }) => (
             <>
-              {fields.map((field) => (
+              {fields.map(field => (
                 <StyledConfigItem key={field.key}>
                   <div className="config-item-form-box">
                     <Form.Item style={{ marginBottom: 0 }}>

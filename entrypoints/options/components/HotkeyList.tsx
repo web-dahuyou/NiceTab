@@ -18,14 +18,29 @@ export default function HotkeyList({ list }: { list: HotkeyItem[] }) {
 
   return (
     <StyledTableWrapper>
-      <Table className="hotkey-table" dataSource={list} size="middle" bordered pagination={false}>
-        <Column title={$fmt('hotkeys.keyName')} dataIndex="combo" key="combo" render={(combo: string[]) => (
-          <Flex gap={8}>
-            {combo.map((keyString: string) => <span className="hotkey-key" key={keyString}>{keyString}</span>)}
-          </Flex>
-        )}></Column>
+      <Table
+        className="hotkey-table"
+        dataSource={list}
+        size="middle"
+        bordered
+        pagination={false}
+      >
+        <Column
+          title={$fmt('hotkeys.keyName')}
+          dataIndex="combo"
+          key="combo"
+          render={(combo: string[]) => (
+            <Flex gap={8}>
+              {combo.map((keyString: string) => (
+                <span className="hotkey-key" key={keyString}>
+                  {keyString}
+                </span>
+              ))}
+            </Flex>
+          )}
+        ></Column>
         <Column title={$fmt('hotkeys.desc')} dataIndex="label" key="label"></Column>
       </Table>
     </StyledTableWrapper>
-  )
+  );
 }

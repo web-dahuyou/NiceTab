@@ -53,7 +53,7 @@ export default function DropComponent<IncomeData extends DropTargetData>({
   onDrop?: OnDropCallback<IncomeData>;
   children: JSX.Element;
 }) {
-  const ref = useRef<HTMLDivElement | null>(null);;
+  const ref = useRef<HTMLDivElement | null>(null);
   const [instruction, setInstruction] = useState<Instruction | null>(null);
 
   useEffect(() => {
@@ -70,15 +70,16 @@ export default function DropComponent<IncomeData extends DropTargetData>({
             element,
             currentLevel: 0,
             indentPerLevel: 10,
-            mode: "expanded",
-            block: ['reorder-above', 'reorder-below', 'reparent']
+            mode: 'expanded',
+            block: ['reorder-above', 'reorder-below', 'reparent'],
           });
         },
         canDrop({ source }) {
           return canDrop && data?.allowKeys.includes(source?.data?.dndKey as Symbol);
         },
         onDrag({ self, source }) {
-          const isSource = source.element === element || source?.data?.groupId === data.groupId;
+          const isSource =
+            source.element === element || source?.data?.groupId === data.groupId;
           if (isSource || !data?.allowKeys?.includes(source?.data?.dndKey as Symbol)) {
             setInstruction(null);
             return;
@@ -109,9 +110,10 @@ export default function DropComponent<IncomeData extends DropTargetData>({
 
           const sourceIndex = +(sourceData?.index || 0);
 
-          onDrop && onDrop({ sourceData, targetData, sourceIndex, targetIndex: data.index || 0 });
+          onDrop &&
+            onDrop({ sourceData, targetData, sourceIndex, targetIndex: data.index || 0 });
         },
-      })
+      }),
     );
   }, [data]);
 

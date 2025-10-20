@@ -3,10 +3,7 @@ import { Modal } from 'antd';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import MoveToModal from './MoveToModal';
 import useMoveTo from './hooks/moveTo';
-import type {
-  RenderTreeNodeActionProps,
-  MoveToCallbackProps,
-} from './types';
+import type { RenderTreeNodeActionProps, MoveToCallbackProps } from './types';
 
 export interface ModalViewProps {
   open: boolean;
@@ -29,7 +26,7 @@ export function useTreeNodeAction(actionFn?: (props: RenderTreeNodeActionProps) 
         actionFn?.(props);
       }
     },
-    [actionFn]
+    [actionFn],
   );
 
   const closeModal = useCallback((type: RenderTreeNodeActionProps['actionName']) => {
@@ -123,7 +120,7 @@ export function MoveToActionModal({
     <MoveToModal
       visible={modalVisible}
       moveData={moveData}
-      onOk={(targetData) => {
+      onOk={targetData => {
         onConfirm(() => {
           onOk?.({ targetData });
         });

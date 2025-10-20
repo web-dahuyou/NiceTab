@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import type { MoveDataProps } from '../types';
 
 export default function useMoveTo() {
@@ -13,7 +13,7 @@ export default function useMoveTo() {
   const onConfirm = (callback?: () => void) => {
     setModalVisible(false);
     callback?.();
-  }
+  };
   // 关闭移动到弹窗
   const onClose = () => {
     setModalVisible(false);
@@ -25,6 +25,6 @@ export default function useMoveTo() {
     openModal,
     onConfirm,
     onClose,
-    moveData
+    moveData,
   };
 }

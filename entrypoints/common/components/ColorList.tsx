@@ -21,12 +21,12 @@ export default function ColorList({
     (item: ColorItem) => {
       return token?.[`${item.key}6`] === token?.colorPrimary;
     },
-    [token]
+    [token],
   );
 
   return (
     <Flex className="color-list" wrap="wrap" gap={gap} style={props.style}>
-      {colors.map((item) => (
+      {colors.map(item => (
         <StyledColorItem
           className={classNames('color-item', isActive(item) && 'active')}
           key={item.key}

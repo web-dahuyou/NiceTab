@@ -40,7 +40,7 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
       e.stopPropagation();
       onAction?.({ actionType: node.type, node, actionName: 'moveTo' });
     },
-    [onAction]
+    [onAction],
   );
 
   const onRemoveClick = useCallback(
@@ -48,7 +48,7 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
       e.stopPropagation();
       onAction?.({ actionType: node.type, node, actionName: 'remove' });
     },
-    [onAction]
+    [onAction],
   );
 
   const handleGroupCreate = useCallback(
@@ -57,7 +57,7 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
       node.type === 'tag' &&
         onAction?.({ actionType: 'tabGroup', node, actionName: 'create' });
     },
-    [onAction]
+    [onAction],
   );
 
   const handleRenameChange = useCallback(
@@ -70,13 +70,14 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
         data: { [fieldKey]: value || unnamedNodeName },
       });
     },
-    [onAction]
+    [onAction],
   );
 
   // 这个 onTabItemDrop 只是为了方便右侧面板的标签页拖拽到左侧树的标签组，左侧树中的 分类和标签组的拖拽由 antd 的 Tree 组件自带实现
   const onTabItemDrop: TreeDataHookProps['handleTabItemDrop'] = useCallback(
-    (params) => {
-      const targetTabListLength = (node as TreeDataNodeTabGroup)?.originData?.tabList?.length || 0;
+    params => {
+      const targetTabListLength =
+        (node as TreeDataNodeTabGroup)?.originData?.tabList?.length || 0;
       homeEventEmitter.emit('home:treeDataHook', {
         action: 'handleTabItemDrop',
         params: [
@@ -88,14 +89,14 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
         ],
       });
     },
-    [node]
+    [node],
   );
 
   // 编辑状态禁止node节点拖拽
   const handleEditingStatusChange = useCallback((status: boolean) => {
     // console.log('handleEditingStatusChange', status);
     const draggableTreeNode = nodeRef.current?.closest(
-      '.nicetab-tree-treenode-draggable'
+      '.nicetab-tree-treenode-draggable',
     );
     draggableTreeNode?.setAttribute('draggable', status ? 'false' : 'true');
     eventEmitter.emit('home:set-editing-status', status);

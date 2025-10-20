@@ -38,11 +38,11 @@ export default defineContentScript({
                 </ContentGlobalContext.Provider>
               </StyleSheetManager>
             </Root>
-          </StyleProvider>
+          </StyleProvider>,
         );
         return { root, wrapper };
       },
-      onRemove: (elements) => {
+      onRemove: elements => {
         elements?.root.unmount();
         elements?.wrapper.remove();
       },

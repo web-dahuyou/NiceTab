@@ -32,7 +32,7 @@ export default function SearchList() {
         callback: () => selectedKeyChange(params),
       });
     },
-    [selectedKeyChange]
+    [selectedKeyChange],
   );
 
   return (

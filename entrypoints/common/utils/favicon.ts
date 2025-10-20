@@ -26,7 +26,7 @@ export async function initFaviconApiData() {
 
 // 获取图片链接对应的base64值
 export async function getBase64Value(imageUrl: string): Promise<string> {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const image = new Image();
     image.onload = () => {
       let canvas = document.createElement('canvas');

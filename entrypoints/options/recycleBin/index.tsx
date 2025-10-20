@@ -31,7 +31,7 @@ export default function RecycleBin() {
       await recycleUtils.removeTabGroup(tag.tagId, group.groupId);
       getRecycleBinData();
     },
-    [getRecycleBinData]
+    [getRecycleBinData],
   );
 
   // 恢复标签组 (从回收站恢复到列表页)
@@ -40,7 +40,7 @@ export default function RecycleBin() {
       await recycleUtils.recoverTabGroups(tag, [group]);
       getRecycleBinData();
     },
-    [getRecycleBinData]
+    [getRecycleBinData],
   );
   // 删除标签页
   const handleTabItemRemove = useCallback(
@@ -48,7 +48,7 @@ export default function RecycleBin() {
       await recycleUtils.removeTabs(groupId, tabs, true);
       getRecycleBinData();
     },
-    [getRecycleBinData]
+    [getRecycleBinData],
   );
   // 修改标签页
   const handleTabItemChange = useCallback(
@@ -60,7 +60,7 @@ export default function RecycleBin() {
       });
       getRecycleBinData();
     },
-    [getRecycleBinData]
+    [getRecycleBinData],
   );
 
   // 还原所有
@@ -84,7 +84,7 @@ export default function RecycleBin() {
 
   useEffect(() => {
     getRecycleBinData();
-    return initRecycleStorageListener(async (tabList) => {
+    return initRecycleStorageListener(async tabList => {
       const currWindow = await browser.windows.getCurrent();
       if (!currWindow.focused) {
         updateAdminPageUrlDebounced();
@@ -168,7 +168,7 @@ export default function RecycleBin() {
           overscan={12}
           increaseViewportBy={{ top: 1000, bottom: 1000 }}
           data={totalGroupList}
-          itemContent={(index) => <ListItemMarkup index={index} />}
+          itemContent={index => <ListItemMarkup index={index} />}
         />
       ) : (
         <StyledEmptyBox className="no-data">

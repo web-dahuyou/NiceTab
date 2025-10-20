@@ -71,7 +71,7 @@ function TreeBox() {
         if (text) toggleExpand(true);
       }, 30);
     },
-    [setSearchTextValue, toggleExpand]
+    [setSearchTextValue, toggleExpand],
   );
 
   const onSearchTextChange = useCallback(
@@ -82,7 +82,7 @@ function TreeBox() {
         onSearch?.(text);
       }
     },
-    [onSearch]
+    [onSearch],
   );
 
   // 搜索过滤后的 treeData
@@ -129,7 +129,7 @@ function TreeBox() {
       if (isEditing) return false;
       return true;
     },
-    [isEditing]
+    [isEditing],
   );
 
   const draggableConfig = useMemo(() => {
@@ -140,12 +140,12 @@ function TreeBox() {
     (node: TreeDataNodeUnion) => (
       <RenderTreeNode node={node} onAction={handleTreeNodeAction} />
     ),
-    [handleTreeNodeAction]
+    [handleTreeNodeAction],
   );
 
   // 移动所有标签组
   const handleAllTabGroupsMoveTo = async ({ targetData }: MoveToCallbackProps) => {
-    refreshTreeData((treeData) => {
+    refreshTreeData(treeData => {
       const { targetTagId } = targetData || {};
       for (let tag of treeData) {
         if (tag.key == targetTagId) {
@@ -164,7 +164,7 @@ function TreeBox() {
       // console.log('onRightClick--node', node)
       // TODO 添加右键菜单
     },
-    []
+    [],
   );
 
   // treeNode 拖拽
@@ -175,7 +175,7 @@ function TreeBox() {
         params,
       });
     },
-    []
+    [],
   );
 
   const debounceResize = useMemo(
@@ -184,7 +184,7 @@ function TreeBox() {
         const listHeight = listRef.current?.offsetHeight || 400;
         setTreeBoxHeight(listHeight);
       }, 300),
-    []
+    [],
   );
 
   const handleResize = useCallback(() => {
@@ -198,7 +198,7 @@ function TreeBox() {
         callback?.();
       }, 100);
     },
-    [setSearchTextValue]
+    [setSearchTextValue],
   );
 
   useEffect(() => {

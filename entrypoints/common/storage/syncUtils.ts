@@ -211,7 +211,7 @@ export default class SyncUtils {
         headers: {
           Authorization: `token ${accessToken}`,
         },
-      }
+      },
     );
 
     return (data as GistResponseItemProps[]) || [];
@@ -228,7 +228,7 @@ export default class SyncUtils {
         headers: {
           Authorization: `token ${accessToken}`,
         },
-      }
+      },
     );
 
     return (data as GistResponseItemProps) || {};
@@ -263,7 +263,7 @@ export default class SyncUtils {
         headers: {
           Authorization: `token ${accessToken}`,
         },
-      }
+      },
     );
 
     return (data as GistResponseItemProps) || {};
@@ -273,7 +273,7 @@ export default class SyncUtils {
   async handleBySyncType(
     remoteType: SyncRemoteType,
     syncType: SyncType,
-    gistData: GistResponseItemProps
+    gistData: GistResponseItemProps,
   ) {
     // 如果没有gist数据，则直接输出失败结果
     if (!gistData?.id) {
@@ -302,7 +302,7 @@ export default class SyncUtils {
             remoteType,
             syncType,
             result,
-            createdIntl.formatMessage({ id: 'sync.reason.contentTooLarge' })
+            createdIntl.formatMessage({ id: 'sync.reason.contentTooLarge' }),
           );
           return;
         }
@@ -363,7 +363,7 @@ export default class SyncUtils {
     remoteType: SyncRemoteType,
     syncType: SyncType,
     result: GistResponseItemProps,
-    reason?: string
+    reason?: string,
   ) {
     // gitee 请求接口返回的 updated_at 时间有时候不更新，还是使用本地时间吧
     // const syncTime = dayjs(result?.updated_at || result?.created_at).format('YYYY-MM-DD HH:mm:ss');
@@ -378,7 +378,7 @@ export default class SyncUtils {
 
   // 格式化错误信息
   formatErrorMsg(errorMsg: string, createdIntl: ReturnType<typeof getCreatedIntl>) {
-    const messageItem = fetchErrorMessageOptions.find((item) => errorMsg === item.type);
+    const messageItem = fetchErrorMessageOptions.find(item => errorMsg === item.type);
     if (messageItem?.messageId) {
       return createdIntl.formatMessage({ id: messageItem.messageId });
     }
@@ -386,7 +386,7 @@ export default class SyncUtils {
       errorMsg ||
       createdIntl.formatMessage(
         { id: `common.actionFailed` },
-        { action: createdIntl.formatMessage({ id: 'common.sync' }) }
+        { action: createdIntl.formatMessage({ id: 'common.sync' }) },
       )
     );
   }
@@ -404,7 +404,7 @@ export default class SyncUtils {
         await this.handleBySyncType(remoteType, syncType, gistData);
       } else {
         const allGists = await this.getGistsList(remoteType);
-        const gistData = allGists.find((gist) => gist.description === this.gistDescKey);
+        const gistData = allGists.find(gist => gist.description === this.gistDescKey);
         const isExist = gistData && gistData.id;
 
         if (isExist) {
@@ -426,7 +426,7 @@ export default class SyncUtils {
         remoteType,
         syncType,
         {} as GistResponseItemProps,
-        this.formatErrorMsg(error.message, createdIntl)
+        this.formatErrorMsg(error.message, createdIntl),
       );
     }
 

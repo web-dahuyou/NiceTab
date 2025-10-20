@@ -36,5 +36,3 @@ export default class CommonAlarm {
     await this.createAlarm(createInfo);
   }
 }
-
-

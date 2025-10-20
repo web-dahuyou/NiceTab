@@ -10,14 +10,16 @@ const StyledStickyInner = styled.div<{
 }>`
   position: relative;
   width: 100%;
-  padding: 0 ${(props) => props.$paddingX || 0}px;
-  background: ${(props) => props.$bgColor || props?.theme?.colorBgContainer || '#fff'};
+  padding: 0 ${props => props.$paddingX || 0}px;
+  background: ${props => props.$bgColor || props?.theme?.colorBgContainer || '#fff'};
   &.fixed {
     position: fixed;
-    width: ${(props) => (props.$width ? `${props.$width}px` : '100%')};
-    left: ${(props) => `${props.$left || 0}px`};
-    bottom: ${(props) => `${props.$bottom || 0}px`};
-    box-shadow: 0 -3px 12px 3px ${(props) => (props?.theme?.type === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(0, 0, 0, 0.3)')};
+    width: ${props => (props.$width ? `${props.$width}px` : '100%')};
+    left: ${props => `${props.$left || 0}px`};
+    bottom: ${props => `${props.$bottom || 0}px`};
+    box-shadow: 0 -3px 12px 3px
+      ${props =>
+        props?.theme?.type === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(0, 0, 0, 0.3)'};
     z-index: 10;
   }
 `;

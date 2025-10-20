@@ -53,7 +53,7 @@ export default function DropComponent<IncomeData extends DropTargetData>({
   onDrop?: OnDropCallback<IncomeData>;
   children: JSX.Element;
 }) {
-  const ref = useRef<HTMLDivElement | null>(null);;
+  const ref = useRef<HTMLDivElement | null>(null);
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
 
   useEffect(() => {
@@ -78,7 +78,8 @@ export default function DropComponent<IncomeData extends DropTargetData>({
           // console.log('onDrag-allowKeys', data?.allowKeys);
           // console.log('onDrag-self', self);
           // console.log('onDrag-source', source);
-          const isSource = source.element === element || source?.data?.groupId === data.groupId;
+          const isSource =
+            source.element === element || source?.data?.groupId === data.groupId;
           if (isSource || !data?.allowKeys?.includes(source?.data?.dndKey as Symbol)) {
             setClosestEdge(null);
             return;
@@ -106,7 +107,7 @@ export default function DropComponent<IncomeData extends DropTargetData>({
 
           onDrop && onDrop({ sourceData, targetData, sourceIndex, targetIndex: 0 });
         },
-      })
+      }),
     );
   }, [data]);
 

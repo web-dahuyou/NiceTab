@@ -4,7 +4,7 @@ import type { StyledThemeProps } from '~/entrypoints/types';
 export type { StyledThemeProps } from '~/entrypoints/types';
 
 export const StyleBtnDisabled = css`
-  color: ${(props) => props.theme.colorTextDisabled || 'rgba(0,0,0,0.25)'};
+  color: ${props => props.theme.colorTextDisabled || 'rgba(0,0,0,0.25)'};
   cursor: not-allowed;
 `;
 
@@ -21,7 +21,7 @@ export const StyledEllipsisLines = css<{ $lines?: number }>`
   word-break: break-all;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: ${(props) => props.$lines || 2};
+  -webkit-line-clamp: ${props => props.$lines || 2};
 `;
 
 // action icon btn
@@ -36,12 +36,14 @@ export const StyledActionIconBtn = styled.i<{
   display: flex;
   align-items: center;
   justify-content: center;
-  width: ${(props) => `${+(props.$size || 16) + 2}px`};
-  height: ${(props) => `${+(props.$size || 16) + 2}px`};
-  font-size: ${(props) => `${props.$size || 14}px`};
-  transition: transform 0.2s, color 0.2s;
+  width: ${props => `${+(props.$size || 16) + 2}px`};
+  height: ${props => `${+(props.$size || 16) + 2}px`};
+  font-size: ${props => `${props.$size || 14}px`};
+  transition:
+    transform 0.2s,
+    color 0.2s;
   cursor: pointer;
-  ${(props) =>
+  ${props =>
     props.disabled
       ? `
         transform: scale(1);
@@ -70,10 +72,10 @@ export const StyledActionTextBtn = styled.span<{
 }>`
   display: flex;
   align-items: center;
-  color: ${(props) => props.theme.colorTextSecondary || '#333'};
+  color: ${props => props.theme.colorTextSecondary || '#333'};
   cursor: pointer;
   &:hover {
-    color: ${(props) => props.$hoverColor || props.theme.colorPrimary || '#666'};
+    color: ${props => props.$hoverColor || props.theme.colorPrimary || '#666'};
   }
   &.disabled {
     ${StyleBtnDisabled}
@@ -104,16 +106,16 @@ export const StyledColorItem = styled.div`
 
 export const GlobalStyle = createGlobalStyle`
   :root {
-    --bg-color: ${(props) => props.theme.colorBgContainer || '#fff'};
-    --link-color: ${(props) =>
+    --bg-color: ${props => props.theme.colorBgContainer || '#fff'};
+    --link-color: ${props =>
       props.theme.type === 'light' ? props.theme.colorLink : '#8AB4F8'};
-    --link-color-hover: ${(props) =>
+    --link-color-hover: ${props =>
       props.theme.type === 'light' ? props.theme.colorLinkHover : '#8AB4F8b6'};
   }
   html, body {
-    --bg-color: ${(props) => props.theme.colorBgContainer || '#fff'};
-    --text-color: ${(props) => props.theme.colorText || 'rgba(0, 0, 0, 0.88)'};
-    color: ${(props) => props.theme.colorText || 'rgba(0, 0, 0, 0.88)'};
+    --bg-color: ${props => props.theme.colorBgContainer || '#fff'};
+    --text-color: ${props => props.theme.colorText || 'rgba(0, 0, 0, 0.88)'};
+    color: ${props => props.theme.colorText || 'rgba(0, 0, 0, 0.88)'};
   }
 
   .ellipsis {
@@ -143,7 +145,7 @@ export const GlobalStyle = createGlobalStyle`
   .nicetab-tree-list-scrollbar-thumb,
   .rc-virtual-list-scrollbar-thumb {
     border-radius: 4px;
-    background: ${(props) =>
+    background: ${props =>
       `${props.theme.type === 'light' ? '#d9d9d9' : '#555'} !important`};
     box-shadow:inset 0 0 4px rgba(0, 0, 0, .3);
   }
@@ -151,7 +153,7 @@ export const GlobalStyle = createGlobalStyle`
   ::-webkit-scrollbar-thumb:hover,
   .nicetab-tree-list-scrollbar-thumb:hover,
   .rc-virtual-list-scrollbar-thumb:hover {
-    background: ${(props) =>
+    background: ${props =>
       `${props.theme.type === 'light' ? '#bfbfbf' : '#888'} !important`};
   }
 `;

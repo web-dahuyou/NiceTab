@@ -7,7 +7,7 @@ import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 const { GLOBAL_SEARCH_DELETE_AFTER_OPEN } = ENUM_SETTINGS_PROPS;
 
 export default function FormModuleGlobalSearch(
-  props: FormItemProps & { form: FormInstance<SettingsProps> }
+  props: FormItemProps & { form: FormInstance<SettingsProps> },
 ) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();

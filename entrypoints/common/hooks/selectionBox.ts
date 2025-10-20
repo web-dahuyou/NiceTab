@@ -7,8 +7,8 @@ const osInfo = getOSInfo();
 // 框选样式组件
 export const StyledSelectionBox = styled.div`
   position: absolute;
-  border: 1px dashed ${(props) => props.theme.colorPrimary || '#1890ff'};
-  background-color: ${(props) =>
+  border: 1px dashed ${props => props.theme.colorPrimary || '#1890ff'};
+  background-color: ${props =>
     props.theme.type === 'light'
       ? 'rgba(24, 144, 255, 0.1)'
       : 'rgba(255, 255, 255, 0.3)'};
@@ -26,7 +26,7 @@ export interface SelectionBoxDataProps extends React.CSSProperties {
 
 export function checkIsIntersecting(
   selectionBoxData: SelectionBoxDataProps,
-  target: HTMLElement
+  target: HTMLElement,
 ) {
   if (!target) return false;
   const { left, top, width, height } = target.getBoundingClientRect();
@@ -112,7 +112,7 @@ export default function useGlobalSelectionBox({
       const isPressingMetaKey = !!e?.[`${metaKey}Key`];
       setActionType(isPressingMetaKey ? 'meta' : 'default');
     },
-    [container, isAllowed]
+    [container, isAllowed],
   );
 
   const handleMouseMove = useCallback(
@@ -134,7 +134,7 @@ export default function useGlobalSelectionBox({
       setSelectionBoxData({ left, top, width, height, display: 'block' });
       setIsSelectMoving(true);
     },
-    [isSelecting, selectionStartData]
+    [isSelecting, selectionStartData],
   );
 
   const handleMouseUp = useCallback(() => {
