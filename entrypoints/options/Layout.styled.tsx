@@ -9,12 +9,12 @@ export const StyledBaseSidebarWrapper = styled.div<{
   position: relative;
 
   .sidebar-inner-box {
-    width: ${(props) => props.$sidebarWidth || 280}px;
+    width: ${props => props.$sidebarWidth || 280}px;
     height: calc(100vh - 180px);
     position: fixed;
     top: 100px;
     transition: transform 0.2s ease-in-out;
-    border-right: 1px solid ${(props) => props.theme.colorBorder || 'rgba(5, 5, 5, 0.06)'};
+    border-right: 1px solid ${props => props.theme.colorBorder || 'rgba(5, 5, 5, 0.06)'};
 
     &.collapsed {
       .sidebar-inner-content {
@@ -22,7 +22,7 @@ export const StyledBaseSidebarWrapper = styled.div<{
         visibility: hidden;
         opacity: 0;
       }
-      transform: translateX(-${(props) => props.$sidebarWidth || 280}px);
+      transform: translateX(-${props => props.$sidebarWidth || 280}px);
     }
 
     .sidebar-action-box {
@@ -58,7 +58,7 @@ export const StyledBaseMainWrapper = styled.div<{
   width: 100%;
   min-height: 400px;
   display: grid;
-  grid-template-columns: ${(props) =>
+  grid-template-columns: ${props =>
     props.$collapsed ? '0px auto' : `${props.$sidebarWidth || 280}px auto`};
   transition: grid-template-columns 0.2s ease-in-out;
 

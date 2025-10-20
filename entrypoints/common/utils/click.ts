@@ -30,7 +30,7 @@ export default function clickDecorator(
     event: React.MouseEvent;
     isMatched: boolean;
   }) => void,
-  options: ClickOptions = {}
+  options: ClickOptions = {},
 ) {
   const { stop = false, exact = false, allowMissMatch = false } = options;
 
@@ -40,7 +40,7 @@ export default function clickDecorator(
     let optionKeyFlag = 0,
       eventKeyFlag = 0;
     const modifierKeys: ModifierKeys[] = ['alt', 'ctrl', 'meta', 'shift'];
-    modifierKeys.forEach((key) => {
+    modifierKeys.forEach(key => {
       optionKeyFlag |= options?.[key] ? FUNCTION_KEY_FLAGS[key] : 0;
       eventKeyFlag |= event?.[`${key}Key`] ? FUNCTION_KEY_FLAGS[key] : 0;
     });

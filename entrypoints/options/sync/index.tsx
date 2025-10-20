@@ -46,7 +46,7 @@ export default function SyncPage() {
   const [selectedKey, setSelectedKey] = useState<string>('github');
   const [syncResult, setSyncResult] = useState<SyncResultProps>(syncUtils.syncResult);
   const [configWevDAV, setConfigWevDAV] = useState<SyncConfigWebDAVProps>(
-    syncWebDAVUtils.config || {}
+    syncWebDAVUtils.config || {},
   );
 
   const resultList = useMemo(() => {
@@ -187,7 +187,7 @@ export default function SyncPage() {
                   ref={gistRef}
                   targetType={selectedTargetType}
                   selectedKey={selectedKey}
-                  onSelect={(key) => onSelect('gist', key)}
+                  onSelect={key => onSelect('gist', key)}
                   onAction={({ key }) => onAction?.('gist', key)}
                 />
 
@@ -195,7 +195,7 @@ export default function SyncPage() {
                   ref={webDAVRef}
                   targetType={selectedTargetType}
                   selectedKey={selectedKey}
-                  onSelect={(key) => onSelect('webdav', key)}
+                  onSelect={key => onSelect('webdav', key)}
                   onAction={({ key }) => onAction?.('webdav', key)}
                 />
               </Flex>

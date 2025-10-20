@@ -17,9 +17,9 @@ export const StyledSidebarWrapper = styled(StyledBaseSidebarWrapper)<{
 
 export const StyledCard = styled.div`
   .card-item {
-    border-color: ${(props) => props.theme.colorBorder};
+    border-color: ${props => props.theme.colorBorder};
     &.active {
-      border-color: ${(props) => props.theme.colorPrimary};
+      border-color: ${props => props.theme.colorPrimary};
     }
     .icon-btn-wrapper {
       padding: 4px;

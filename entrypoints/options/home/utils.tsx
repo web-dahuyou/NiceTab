@@ -11,7 +11,7 @@ import type { TreeDataNodeUnion, MoveDataProps, CascaderOption } from './types';
 
 // 生成treeData
 export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
-  return tagList.map((tag) => ({
+  return tagList.map(tag => ({
     type: 'tag',
     key: tag.tagId,
     title: tag.tagName,
@@ -24,7 +24,7 @@ export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
       <TagOutlined />
     ),
     originData: { ...tag },
-    children: tag?.groupList?.map((group) => {
+    children: tag?.groupList?.map(group => {
       return {
         type: 'tabGroup',
         parentKey: tag.tagId,
@@ -43,7 +43,7 @@ export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
 export const getSelectedCounts = (tag: TagItem) => {
   const groupCount = tag?.groupList?.length || 0;
   let tabCount = 0;
-  tag?.groupList?.forEach((group) => {
+  tag?.groupList?.forEach(group => {
     tabCount += group.tabList?.length || 0;
   });
   return { groupCount, tabCount };
@@ -80,7 +80,7 @@ export const checkAllowDrop: TreeProps<TreeDataNodeUnion>['allowDrop'] = ({
 // 生成Cascader级联数据
 export const getCascaderData = async (
   tagList: TagItem[],
-  moveData?: MoveDataProps
+  moveData?: MoveDataProps,
 ): Promise<CascaderOption[]> => {
   const localeMessage = await getLocaleMessages();
   const { tagId, groupId, tabs } = moveData || {};
@@ -89,13 +89,13 @@ export const getCascaderData = async (
     if (moveType === 'tag') {
       return tag.tagId === tagId;
     } else if (moveType === 'tabGroup') {
-      return tag?.groupList.some((g) => g.groupId === groupId);
+      return tag?.groupList.some(g => g.groupId === groupId);
     } else {
       return tag?.groupList?.length === 0;
     }
   };
 
-  return tagList.map((tag) => ({
+  return tagList.map(tag => ({
     type: 'tag',
     value: tag.tagId,
     label: (
@@ -109,7 +109,7 @@ export const getCascaderData = async (
     disabled: tagDisabled(tag),
     // isLeaf: false,
     originData: { ...tag },
-    children: tag?.groupList?.map((group) => {
+    children: tag?.groupList?.map(group => {
       return {
         type: 'tabGroup',
         value: group.groupId,
@@ -130,11 +130,11 @@ export const getCascaderData = async (
 
 // 生成全量的Cascader级联数据，发送标签页时选择指定分类或者标签组
 export const getTotalCascaderData = async (
-  tagList: TagItem[]
+  tagList: TagItem[],
 ): Promise<CascaderOption[]> => {
   const localeMessage = await getLocaleMessages();
 
-  return tagList.map((tag) => ({
+  return tagList.map(tag => ({
     type: 'tag',
     value: tag.tagId,
     label: (
@@ -147,7 +147,7 @@ export const getTotalCascaderData = async (
     ),
     // isLeaf: false,
     originData: { ...tag },
-    children: tag?.groupList?.map((group) => {
+    children: tag?.groupList?.map(group => {
       return {
         type: 'tabGroup',
         value: group.groupId,

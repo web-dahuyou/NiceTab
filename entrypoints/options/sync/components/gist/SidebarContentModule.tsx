@@ -55,7 +55,7 @@ function CardTitle({
 export default forwardRef(
   (
     { targetType, selectedKey, onSelect, onConfigChange, onAction }: SideBarContentProps,
-    ref
+    ref,
   ) => {
     const { $fmt } = useIntlUtls();
     const [messageApi, contextHolder] = message.useMessage();
@@ -64,11 +64,11 @@ export default forwardRef(
     const [syncStatus, setSyncStatus] = useState<SyncStatusProps>(syncUtils.syncStatus);
     const [syncResult, setSyncResult] = useState<SyncResultProps>(syncUtils.syncResult);
     const [actionTime, setActionTime] = useState<string>(
-      dayjs().format('YYYY-MM-DD_HH:mm:ss')
+      dayjs().format('YYYY-MM-DD_HH:mm:ss'),
     );
 
     const configList = useMemo(() => {
-      return remoteOptions?.filter((item) => syncConfig?.[item.key]?.accessToken);
+      return remoteOptions?.filter(item => syncConfig?.[item.key]?.accessToken);
     }, [syncConfig]);
 
     const validator = useCallback(
@@ -83,7 +83,7 @@ export default forwardRef(
         }
         return true;
       },
-      []
+      [],
     );
 
     const onSyncConfigChange = (config: SyncConfigProps) => {
@@ -91,7 +91,7 @@ export default forwardRef(
       setSyncConfig(config);
       onConfigChange?.(config);
       messageApi.success(
-        $fmt({ id: 'common.actionSuccess', values: { action: $fmt('common.save') } })
+        $fmt({ id: 'common.actionSuccess', values: { action: $fmt('common.save') } }),
       );
     };
 
@@ -110,14 +110,14 @@ export default forwardRef(
           onAction?.(option, actionType);
         }
       },
-      []
+      [],
     );
 
     // 一键推送到所有远程存储
     const pushToAllRemotes = async () => {
       const config = await syncUtils.getConfig();
-      const configList = remoteOptions?.filter((item) => config?.[item.key]?.accessToken);
-      configList.forEach((option) => {
+      const configList = remoteOptions?.filter(item => config?.[item.key]?.accessToken);
+      configList.forEach(option => {
         handleAction(option, syncTypeMap.MANUAL_PUSH_FORCE);
       });
     };
@@ -140,7 +140,7 @@ export default forwardRef(
       await getSyncInfo();
       setActionTime(dayjs().format('YYYY-MM-DD_HH:mm:ss'));
       const { type } = data || {};
-      const option = remoteOptions.find((item) => item.key === type);
+      const option = remoteOptions.find(item => item.key === type);
       option && onAction?.(option);
     };
 
@@ -164,15 +164,11 @@ export default forwardRef(
       };
     }, []);
 
-    useImperativeHandle(
-      ref,
-      () => {
-        return {
-          getSyncInfo,
-        };
-      },
-      []
-    );
+    useImperativeHandle(ref, () => {
+      return {
+        getSyncInfo,
+      };
+    }, []);
 
     return (
       <>
@@ -182,7 +178,7 @@ export default forwardRef(
             <Typography.Text strong>Gists</Typography.Text>
           </Divider>
           <Flex vertical gap={12}>
-            {configList.map((option) => (
+            {configList.map(option => (
               <StyledCard key={`${option.key}_${actionTime}`}>
                 <SidebarBaseCardItem
                   option={option}
@@ -229,5 +225,5 @@ export default forwardRef(
         )}
       </>
     );
-  }
+  },
 );

@@ -38,13 +38,13 @@ export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
     &.quick-actions {
       .action-btn {
         display: inline-flex;
-        color: ${(props) => props.theme.colorTextSecondary || '#333'};
+        color: ${props => props.theme.colorTextSecondary || '#333'};
         cursor: pointer;
         &:not(.disabled):hover {
-          color: ${(props) => props.theme.colorPrimary};
+          color: ${props => props.theme.colorPrimary};
         }
         &.disabled {
-          color: ${(props) => props.theme.colorTextQuaternary || 'rgba(0, 0, 0, 0.25)'};
+          color: ${props => props.theme.colorTextQuaternary || 'rgba(0, 0, 0, 0.25)'};
           cursor: not-allowed;
         }
       }
@@ -63,7 +63,6 @@ export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
     padding-bottom: 12px;
   }
 `;
-
 
 export const StyledGroupWrapper = styled.div<{ $color?: string }>`
   margin: 4px 0;
@@ -92,7 +91,7 @@ export const StyledGroupWrapper = styled.div<{ $color?: string }>`
       flex: 1;
       overflow: hidden;
       font-size: 12px;
-      color: ${(props) => props.theme.colorText || '#000'};
+      color: ${props => props.theme.colorText || '#000'};
       ${StyledEllipsis}
     }
   }
@@ -109,7 +108,7 @@ export const StyledGroupWrapper = styled.div<{ $color?: string }>`
         left: 16px;
         top: 50%;
         transform: translateY(-50%);
-        background-color: ${(props) => props.$color || 'transparent'};
+        background-color: ${props => props.$color || 'transparent'};
       }
     }
   }
@@ -128,7 +127,7 @@ export const StyledTabItem = styled.div`
   cursor: pointer;
   &:hover,
   &.active {
-    background: ${(props) => props.theme.colorPrimaryBg || 'rgba(0, 0, 0, 0.1)'};
+    background: ${props => props.theme.colorPrimaryBg || 'rgba(0, 0, 0, 0.1)'};
   }
   // &.active:before {
   //   content: '';
@@ -137,13 +136,13 @@ export const StyledTabItem = styled.div`
   //   top: 0;
   //   width: 3px;
   //   height: 100%;
-  //   background: ${(props) => props.theme.colorPrimary};
+  //   background: ${props => props.theme.colorPrimary};
   // }
   .tab-item-title {
     flex: 1;
     overflow: hidden;
     font-size: 12px;
-    color: ${(props) => props.theme.colorText || '#000'};
+    color: ${props => props.theme.colorText || '#000'};
     ${StyledEllipsis}
   }
   .action-icon-btn {
@@ -153,7 +152,7 @@ export const StyledTabItem = styled.div`
   &.discarded {
     .tab-item-title,
     .btn-discarded {
-      color: ${(props) => props.theme.colorTextQuaternary || 'rgba(0, 0, 0, 0.25)'};
+      color: ${props => props.theme.colorTextQuaternary || 'rgba(0, 0, 0, 0.25)'};
     }
   }
 `;
@@ -163,7 +162,7 @@ export const StyledFavIcon = styled.i<{ $icon?: string }>`
   width: 16px;
   height: 16px;
   margin-right: 8px;
-  background: url(${(props) => props.$icon}) center / 100% 100% no-repeat;
+  background: url(${props => props.$icon}) center / 100% 100% no-repeat;
 `;
 
 export default {

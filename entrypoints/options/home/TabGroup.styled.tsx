@@ -8,7 +8,7 @@ export const StyledGroupWrapper = styled.div<{ $bgColor?: string }>`
   width: 100%;
   padding: 16px 8px;
   border-radius: 8px;
-  background: ${(props) => props.$bgColor || '#fff'};
+  background: ${props => props.$bgColor || '#fff'};
 `;
 export const StyledGroupHeader = styled.div<{ theme: StyledThemeProps }>`
   padding: 0 8px;
@@ -33,7 +33,7 @@ export const StyledGroupHeader = styled.div<{ theme: StyledThemeProps }>`
         margin-right: 8px;
       }
       .group-create-time {
-        color: ${(props) => props.theme.colorTextTertiary || '#999'};
+        color: ${props => props.theme.colorTextTertiary || '#999'};
       }
     }
   }
@@ -57,10 +57,10 @@ export const StyledGroupHeaderRecycle = styled(StyledGroupHeader)`
     .action-btn {
       display: flex;
       align-items: center;
-      color: ${(props) => props.theme.colorTextSecondary || '#333'};
+      color: ${props => props.theme.colorTextSecondary || '#333'};
       cursor: pointer;
       &:hover {
-        color: ${(props) => props.theme.colorPrimary || PRIMARY_COLOR};
+        color: ${props => props.theme.colorPrimary || PRIMARY_COLOR};
       }
       &.disabled {
         ${StyleBtnDisabled}
@@ -89,10 +89,10 @@ export const StyledTabActions = styled.div<{ theme: StyledThemeProps }>`
     .action-btn {
       display: flex;
       align-items: center;
-      color: ${(props) => props.theme.colorTextSecondary || '#333'};
+      color: ${props => props.theme.colorTextSecondary || '#333'};
       cursor: pointer;
       &:hover {
-        color: ${(props) => props.theme.colorPrimary || PRIMARY_COLOR};
+        color: ${props => props.theme.colorPrimary || PRIMARY_COLOR};
       }
     }
   }
@@ -112,7 +112,7 @@ export const StyledTabListWrapper = styled.div`
     align-items: center;
     margin-top: 12px;
     cursor: pointer;
-    color: ${(props) => props.theme.colorTextSecondary || '#666'};
+    color: ${props => props.theme.colorTextSecondary || '#666'};
   }
 `;
 

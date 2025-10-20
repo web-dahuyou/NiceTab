@@ -28,7 +28,7 @@ export const toCamelCase = (str: string) => {
  * @return 要输出的字符串
  */
 export function getRandomId(digit: number = 8, isPlainNumber: boolean = false) {
-  return 'x'.repeat(digit).replace(/[x]/g, (c) => {
+  return 'x'.repeat(digit).replace(/[x]/g, c => {
     const radix = isPlainNumber ? 10 : 16;
     return ((Math.random() * radix) | 0).toString(radix);
   });
@@ -41,13 +41,16 @@ export function getRandomId(digit: number = 8, isPlainNumber: boolean = false) {
  * @return 返回过滤后的对象
  */
 export function pick<T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> {
-  return keys.reduce((result, key) => {
-    if (key in obj) {
-      return { ...result, [key]: obj[key] };
-    } else {
-      return result;
-    }
-  }, {} as Pick<T, K>);
+  return keys.reduce(
+    (result, key) => {
+      if (key in obj) {
+        return { ...result, [key]: obj[key] };
+      } else {
+        return result;
+      }
+    },
+    {} as Pick<T, K>,
+  );
 }
 /**
  * @description: 从对象中过滤掉指定的keys
@@ -57,15 +60,18 @@ export function pick<T extends object, K extends keyof T>(obj: T, keys: K[]): Pi
  */
 export function omit<T extends Record<string, any>, K extends keyof T>(
   obj: T,
-  keys: K[]
+  keys: K[],
 ): Omit<T, K> {
-  return Object.keys(obj).reduce((result, key) => {
-    if (keys.includes(key as K)) {
-      return result;
-    } else {
-      return { ...result, [key]: obj[key] };
-    }
-  }, {} as Omit<T, K>);
+  return Object.keys(obj).reduce(
+    (result, key) => {
+      if (keys.includes(key as K)) {
+        return result;
+      } else {
+        return { ...result, [key]: obj[key] };
+      }
+    },
+    {} as Omit<T, K>,
+  );
 }
 
 // 将数组按照size进行分组
@@ -112,7 +118,7 @@ export function getUniqueList<T>(list: T[], key: keyof T): T[] {
 export function getMergedList<T, K extends keyof T>(
   list: T[],
   key: K,
-  handler: (previousValue: T, currentValue: T) => T
+  handler: (previousValue: T, currentValue: T) => T,
 ): T[] {
   const resultMap = new Map<T[K], T>();
 
@@ -134,7 +140,7 @@ export async function withTimeout<T>(promise: Promise<T>, timeout = 5000): Promi
   return Promise.race([
     promise,
     new Promise<T>((_, reject) =>
-      setTimeout(() => reject(new Error(FETCH_ERROR.TIMEOUT)), timeout)
+      setTimeout(() => reject(new Error(FETCH_ERROR.TIMEOUT)), timeout),
     ),
   ]);
 }
@@ -144,7 +150,7 @@ export const fetchApi = (
   url: string,
   params: Record<string, any> = {},
   options?: RequestInit & { timeout?: number },
-  responseType: XMLHttpRequestResponseType = 'json'
+  responseType: XMLHttpRequestResponseType = 'json',
 ) => {
   const timeout = options?.timeout ?? 10000; // 默认超时时间 10 秒
   const controller = new AbortController();
@@ -175,7 +181,7 @@ export const fetchApi = (
     }, timeout);
 
     fetch(_url, _options)
-      .then(async (res) => {
+      .then(async res => {
         clearTimeout(timeoutId);
         if (res.ok) {
           if (responseType === 'json') {
@@ -186,7 +192,7 @@ export const fetchApi = (
         }
         reject(await res.json());
       })
-      .catch((err) => {
+      .catch(err => {
         clearTimeout(timeoutId);
         // console.log('fetch-err', err);
         if (err?.name === 'AbortError') {

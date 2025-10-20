@@ -25,7 +25,7 @@ export const StyledTagNode = styled.div<{ theme: StyledThemeProps }>`
   .tag-name {
     flex-shrink: 0;
     font-size: 20px;
-    color: ${(props) => props.theme.colorText || '#333'};
+    color: ${props => props.theme.colorText || '#333'};
   }
   .count {
     margin-right: 8px;
@@ -33,20 +33,20 @@ export const StyledTagNode = styled.div<{ theme: StyledThemeProps }>`
   }
   .tag-create-time {
     font-size: 14px;
-    color: ${(props) => props.theme.colorTextTertiary || '#999'};
+    color: ${props => props.theme.colorTextTertiary || '#999'};
   }
   .action-btns {
     padding: 0 8px;
     border-radius: 4px;
-    background: ${(props) => props.theme.colorBgContainer || '#fff'};
+    background: ${props => props.theme.colorBgContainer || '#fff'};
     .action-btn {
       display: flex;
       align-items: center;
       font-size: 14px;
-      color: ${(props) => props.theme.colorTextSecondary || '#333'};
+      color: ${props => props.theme.colorTextSecondary || '#333'};
       cursor: pointer;
       &:hover {
-        color: ${(props) => props.theme.colorPrimary || PRIMARY_COLOR};
+        color: ${props => props.theme.colorPrimary || PRIMARY_COLOR};
       }
     }
   }
@@ -54,4 +54,4 @@ export const StyledTagNode = styled.div<{ theme: StyledThemeProps }>`
 
 export default {
   name: 'option-recycle-bin-styled',
-}
+};

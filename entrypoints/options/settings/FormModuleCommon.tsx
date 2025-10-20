@@ -12,7 +12,7 @@ const {
 } = ENUM_SETTINGS_PROPS;
 
 export default function FormModuleCommon(
-  props: FormItemProps & { form: FormInstance<SettingsProps> }
+  props: FormItemProps & { form: FormInstance<SettingsProps> },
 ) {
   const { $fmt } = useIntlUtls();
   const { form, ...formItemProps } = props;

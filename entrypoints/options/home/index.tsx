@@ -127,7 +127,7 @@ export default function Home() {
         icon: <ClearOutlined />,
       },
     ],
-    [$fmt]
+    [$fmt],
   );
 
   // 确认清空全部
@@ -149,7 +149,7 @@ export default function Home() {
       await tabListUtils.groupListSortbyName(sortType, selectedTagKey);
       refreshTreeData();
     },
-    [selectedTagKey]
+    [selectedTagKey],
   );
 
   // 按创建时间排序
@@ -159,7 +159,7 @@ export default function Home() {
       await tabListUtils.groupListSortbyCreateTime(sortType, selectedTagKey);
       refreshTreeData();
     },
-    [selectedTagKey]
+    [selectedTagKey],
   );
 
   const onCollapseChange = (status: boolean) => {
@@ -182,7 +182,7 @@ export default function Home() {
   useEffect(() => {
     recycleUtils.checkAndClear();
 
-    return initTabListStorageListener(async (tabList) => {
+    return initTabListStorageListener(async tabList => {
       const currWindow = await browser.windows.getCurrent();
       setTimeout(() => {
         if (!currWindow.focused) {
@@ -381,7 +381,7 @@ export default function Home() {
                   color={token.colorBgContainer}
                   title={
                     <Flex vertical>
-                      {['chrome', 'edge', 'firefox'].map((type) => (
+                      {['chrome', 'edge', 'firefox'].map(type => (
                         <Typography.Text key={type}>
                           <strong>{type}: </strong>
                           {shortcutsPageUrlMap[type as BrowserType]}

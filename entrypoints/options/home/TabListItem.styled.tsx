@@ -11,7 +11,7 @@ export const StyledTabItemWrapper = styled.div<{ $bgColor?: string }>`
   width: 100%;
   height: 28px;
   padding-left: 4px;
-  background: ${(props) => props.$bgColor || ''};
+  background: ${props => props.$bgColor || ''};
   .checkbox-item {
     margin-right: 12px;
   }
@@ -35,7 +35,7 @@ export const StyledTabItemFavicon = styled.i<{ $bgUrl?: string }>`
   width: 16px;
   height: 16px;
   margin-right: 8px;
-  background: url(${(props) => props.$bgUrl}) no-repeat center / 100% 100%;
+  background: url(${props => props.$bgUrl}) no-repeat center / 100% 100%;
 `;
 
 export const StyledTabTitle = styled.span`
@@ -52,12 +52,12 @@ export const StyledTabItemTooltip = styled.div<{ theme: StyledThemeProps }>`
     display: flex;
     gap: 8px;
     font-size: 14px;
-    color: ${(props) => props.theme.colorTextSecondary || '#666'};
+    color: ${props => props.theme.colorTextSecondary || '#666'};
 
     .label {
       flex-shrink: 0;
       flex-grow: 0;
-      color: ${(props) => props.theme.colorTextSecondary || '#333'};
+      color: ${props => props.theme.colorTextSecondary || '#333'};
       font-weight: bold;
     }
     .name,

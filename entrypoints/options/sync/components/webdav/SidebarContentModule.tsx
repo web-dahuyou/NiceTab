@@ -28,20 +28,20 @@ type SideBarContentProps = {
 export default forwardRef(
   (
     { targetType, selectedKey, onSelect, onConfigChange, onAction }: SideBarContentProps,
-    ref
+    ref,
   ) => {
     const { $fmt } = useIntlUtls();
     const [messageApi, contextHolder] = message.useMessage();
     const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
     const [syncConfig, setSyncConfig] = useState<SyncConfigWebDAVProps>(
-      syncWebDAVUtils.config
+      syncWebDAVUtils.config,
     );
     const [actionTime, setActionTime] = useState<string>(
-      dayjs().format('YYYY-MM-DD_HH:mm:ss')
+      dayjs().format('YYYY-MM-DD_HH:mm:ss'),
     );
 
     const configList = useMemo(() => {
-      return syncConfig.configList?.filter((item) => !!item.webdavConnectionUrl);
+      return syncConfig.configList?.filter(item => !!item.webdavConnectionUrl);
     }, [syncConfig]);
 
     const getSyncInfo = async () => {
@@ -60,7 +60,7 @@ export default forwardRef(
         }
         return true;
       },
-      []
+      [],
     );
 
     const onSyncConfigChange = (config: SyncConfigWebDAVProps) => {
@@ -68,7 +68,7 @@ export default forwardRef(
       setSyncConfig(config);
       onConfigChange?.(config);
       messageApi.success(
-        $fmt({ id: 'common.actionSuccess', values: { action: $fmt('common.save') } })
+        $fmt({ id: 'common.actionSuccess', values: { action: $fmt('common.save') } }),
       );
     };
 
@@ -87,14 +87,14 @@ export default forwardRef(
           onAction?.(option, actionType);
         }
       },
-      []
+      [],
     );
 
     // 一键推送到所有远程存储
     const pushToAllRemotes = async () => {
       const config = await syncWebDAVUtils.getConfig();
-      const configList = config.configList?.filter((item) => !!item.webdavConnectionUrl);
-      configList.forEach((option) => {
+      const configList = config.configList?.filter(item => !!item.webdavConnectionUrl);
+      configList.forEach(option => {
         handleAction(option, syncTypeMap.MANUAL_PUSH_FORCE);
       });
     };
@@ -104,7 +104,7 @@ export default forwardRef(
       setActionTime(dayjs().format('YYYY-MM-DD_HH:mm:ss'));
       const { key } = data || {};
       const config = await syncWebDAVUtils.getConfig();
-      const option = config.configList?.find((item) => item.key === key);
+      const option = config.configList?.find(item => item.key === key);
       option && onAction?.(option);
     };
 
@@ -128,15 +128,11 @@ export default forwardRef(
       };
     }, []);
 
-    useImperativeHandle(
-      ref,
-      () => {
-        return {
-          getSyncInfo,
-        };
-      },
-      []
-    );
+    useImperativeHandle(ref, () => {
+      return {
+        getSyncInfo,
+      };
+    }, []);
 
     return (
       <>
@@ -146,7 +142,7 @@ export default forwardRef(
             <Typography.Text strong>WebDAV</Typography.Text>
           </Divider>
           <Flex vertical gap={12}>
-            {configList?.map((option) => (
+            {configList?.map(option => (
               <StyledCard key={`${option.key}_${actionTime}`}>
                 <SidebarBaseCardItem<SyncConfigItemWebDAVProps>
                   option={option}
@@ -182,5 +178,5 @@ export default forwardRef(
         )}
       </>
     );
-  }
+  },
 );

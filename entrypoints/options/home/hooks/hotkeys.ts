@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useMemo } from "react";
+import { useEffect, useCallback, useMemo } from 'react';
 import hotkeys from 'hotkeys-js';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { getOSInfo, getKeysByOS } from '~/entrypoints/common/utils';
@@ -12,15 +12,19 @@ const hotkeyOptions = [
   { macKey: 'shift+option+down', winKey: 'shift+alt+down', action: 'moveDown' },
 ] as const;
 
-type HotkeyAction = typeof hotkeyOptions[number]['action'];
+type HotkeyAction = (typeof hotkeyOptions)[number]['action'];
 
 const getSymbols = (option: HotkeyOption, splitKey: string = '+') => {
   const key = osInfo.isMac ? option.macKey : option.winKey;
   const splitKeys = key.split(splitKey);
   return splitKeys.map(key => keyMap?.[key]?.symbol || key);
-}
+};
 
-export default function useListHotkeys ({ onAction }: { onAction?: (params: { action: string }) => void }) {
+export default function useListHotkeys({
+  onAction,
+}: {
+  onAction?: (params: { action: string }) => void;
+}) {
   const { $fmt } = useIntlUtls();
 
   const getHotkeyLabelByAction = (action: HotkeyAction) => {
@@ -32,24 +36,24 @@ export default function useListHotkeys ({ onAction }: { onAction?: (params: { ac
       default:
         return '';
     }
-  }
+  };
 
   const hotkeyList = useMemo(() => {
-    return hotkeyOptions.map((item) => {
+    return hotkeyOptions.map(item => {
       return {
         ...item,
         key: osInfo.isMac ? item.macKey : item.winKey,
         combo: getSymbols(item),
         label: getHotkeyLabelByAction(item.action),
-      }
-    })
+      };
+    });
   }, [getHotkeyLabelByAction]);
 
   const hotkeyRegister = useCallback(() => {
     // console.log('hotkeyList', hotkeyList);
-    hotkeyList.forEach((item) => {
+    hotkeyList.forEach(item => {
       hotkeys.unbind(item.key, 'tagList');
-      hotkeys(item.key, {scope: 'tagList'}, (event, handler) => {
+      hotkeys(item.key, { scope: 'tagList' }, (event, handler) => {
         // console.log('hotkeys--event', event)
         // console.log('hotkeys--handler', handler)
         onAction?.({ action: item.action });
@@ -65,11 +69,11 @@ export default function useListHotkeys ({ onAction }: { onAction?: (params: { ac
   useEffect(() => {
     return () => {
       hotkeys.unbind();
-    }
+    };
   }, []);
 
   return {
     hotkeyList,
-    hotkeyRegister
+    hotkeyRegister,
   };
 }

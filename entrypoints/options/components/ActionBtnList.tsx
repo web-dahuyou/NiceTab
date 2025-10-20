@@ -38,7 +38,7 @@ export default function ActionBtnList({
         ) : null
       }
     >
-      {outerList.map((item) => (
+      {outerList.map(item => (
         <ActionIconBtn
           className="action-btn"
           key={item.key}

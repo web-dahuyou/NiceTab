@@ -61,7 +61,13 @@ export default function TabItemEditModal({
       onOk={handleModalConfirm}
       onCancel={handleModalCancel}
     >
-      <Form form={form} name="edit-tab-form" initialValues={data} autoComplete="off" onFinish={handleModalConfirm}>
+      <Form
+        form={form}
+        name="edit-tab-form"
+        initialValues={data}
+        autoComplete="off"
+        onFinish={handleModalConfirm}
+      >
         <Form.Item<EditTabFormProps>
           label={$fmt('common.name')}
           name={'title'}

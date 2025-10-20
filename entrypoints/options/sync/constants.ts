@@ -4,7 +4,7 @@ import type { RemoteOptionProps } from './types';
 // 个人账号 access token 设置页面
 export const tokenSettingsPageUrls: Record<SyncRemoteType, string> = {
   github: 'https://github.com/settings/tokens',
-  gitee: 'https://gitee.com/profile/personal_access_tokens'
+  gitee: 'https://gitee.com/profile/personal_access_tokens',
 };
 
 // 远程同步选项

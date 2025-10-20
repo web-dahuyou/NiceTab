@@ -6,7 +6,8 @@ import eslintPluginPrettier from 'eslint-plugin-prettier';
 
 export default [
   {
-    files: ['**/*.{js,jsx,ts,tsx}'],
+    files: ['entrypoints/**/*.{js,jsx,ts,tsx}'],
+    ignores: ['entrypoints/common/locale/**/*'],
     languageOptions: {
       parser: tsESLint,
       parserOptions: {

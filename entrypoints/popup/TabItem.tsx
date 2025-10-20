@@ -23,7 +23,7 @@ export default function TabItem({ tab, onAction }: TabItemProps) {
       }
       onAction(action, tab);
     },
-    [tab]
+    [tab],
   );
 
   useEffect(() => {
@@ -41,10 +41,10 @@ export default function TabItem({ tab, onAction }: TabItemProps) {
       className={classNames(
         'tab-item',
         tab.active && 'active',
-        tab.discarded && 'discarded'
+        tab.discarded && 'discarded',
       )}
       title={tab.title}
-      onClick={(event) => handleAction(event, 'active')}
+      onClick={event => handleAction(event, 'active')}
     >
       <Favicon pageUrl={tab.url!} favIconUrl={tab.favIconUrl}></Favicon>
       <span className="tab-item-title">{tab.title}</span>
@@ -54,7 +54,7 @@ export default function TabItem({ tab, onAction }: TabItemProps) {
           className={classNames('action-icon-btn', tab.discarded && 'btn-discarded')}
           $size={16}
           title={$fmt(tab.discarded ? 'common.hibernated' : 'common.hibernate')}
-          onClick={(event) => handleAction(event, 'discard')}
+          onClick={event => handleAction(event, 'discard')}
         >
           <CoffeeOutlined />
         </StyledActionIconBtn>
@@ -65,7 +65,7 @@ export default function TabItem({ tab, onAction }: TabItemProps) {
         $size={16}
         $hoverColor="red"
         title={$fmt('common.remove')}
-        onClick={(event) => handleAction(event, 'remove')}
+        onClick={event => handleAction(event, 'remove')}
       >
         <CloseOutlined />
       </StyledActionIconBtn>

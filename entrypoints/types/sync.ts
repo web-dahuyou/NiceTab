@@ -16,8 +16,16 @@ export type SyncConfigProps = {
   github: SyncConfigItemProps;
 };
 
-export type AutoSyncType = 'auto-pull-merge' | 'auto-pull-force' | 'auto-push-merge' | 'auto-push-force';
-export type ManualSyncType = 'manual-pull-merge' | 'manual-pull-force' | 'manual-push-merge' | 'manual-push-force';
+export type AutoSyncType =
+  | 'auto-pull-merge'
+  | 'auto-pull-force'
+  | 'auto-push-merge'
+  | 'auto-push-force';
+export type ManualSyncType =
+  | 'manual-pull-merge'
+  | 'manual-pull-force'
+  | 'manual-push-merge'
+  | 'manual-push-force';
 // 同步类型
 export type SyncType = AutoSyncType | ManualSyncType;
 // 单次同步结果类型
@@ -72,9 +80,8 @@ export type SyncStatusChangeEventProps<T extends SyncTargetType = 'gist'> =
   T extends 'gist'
     ? SyncStatusChangeGistEvent
     : T extends 'webdav'
-    ? SyncStatusChangeWebDAVEvent
-    : never;
-
+      ? SyncStatusChangeWebDAVEvent
+      : never;
 
 // 开始同步事件参数
 export type SyncStartEventProps = {

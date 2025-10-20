@@ -1,17 +1,22 @@
 import { Popconfirm } from 'antd';
 
 type ConfirmProps = {
-  title: string,
-  description: string,
-  okText?: string,
-  cancelText?: string,
-  onConfirm?: () => void,
-  onCancel?: () => void,
-  children?: React.ReactNode
-}
+  title: string;
+  description: string;
+  okText?: string;
+  cancelText?: string;
+  onConfirm?: () => void;
+  onCancel?: () => void;
+  children?: React.ReactNode;
+};
 export default function Confirm({
-  title, description, okText, cancelText, onConfirm, onCancel,
-  children
+  title,
+  description,
+  okText,
+  cancelText,
+  onConfirm,
+  onCancel,
+  children,
 }: ConfirmProps) {
   return (
     <Popconfirm
@@ -24,5 +29,5 @@ export default function Confirm({
     >
       {children}
     </Popconfirm>
-  )
+  );
 }

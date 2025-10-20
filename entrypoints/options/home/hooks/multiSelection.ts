@@ -8,7 +8,7 @@ import { HomeContext } from './treeData';
 // 框选样式组件
 export const StyledSelectionBox = styled.div`
   position: absolute;
-  border: 1px dashed ${(props) => props.theme.colorPrimary || '#1890ff'};
+  border: 1px dashed ${props => props.theme.colorPrimary || '#1890ff'};
   background-color: rgba(24, 144, 255, 0.1);
   z-index: 10;
   pointer-events: none;
@@ -102,9 +102,9 @@ export default function useTabsSelection({
           }
         },
         30,
-        { leading: true, trailing: true }
+        { leading: true, trailing: true },
       ),
-    [checkSelection, isGroupIntersecting]
+    [checkSelection, isGroupIntersecting],
   );
 
   const checkGroupIntersectingThrottle = useMemo(() => {

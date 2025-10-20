@@ -2,7 +2,9 @@ import { useEffect } from 'react';
 import type { VersionInfo } from '~/entrypoints/types';
 
 export default function useUpdate() {
-  const [updateDetail, setUpdateDetail] = useState<VersionInfo>({ updateAvailable: false });
+  const [updateDetail, setUpdateDetail] = useState<VersionInfo>({
+    updateAvailable: false,
+  });
   // 立即reload
   const updateReload = useCallback(() => {
     browser.runtime.reload();
@@ -13,7 +15,7 @@ export default function useUpdate() {
     // setUpdateDetail({ version: '666.666.666', updateAvailable: true });
 
     // 监听是否可升级
-    browser.runtime.onUpdateAvailable.addListener((details) => {
+    browser.runtime.onUpdateAvailable.addListener(details => {
       console.log('onUpdateAvailable--details', details);
       setUpdateDetail({ ...details, updateAvailable: true });
     });
@@ -21,6 +23,6 @@ export default function useUpdate() {
 
   return {
     updateDetail,
-    updateReload
+    updateReload,
   };
-};
+}

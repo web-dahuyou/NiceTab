@@ -267,7 +267,7 @@ export default memo(function TabListItem({
     <>
       <StyledTabItemWrapper
         className={classNames(
-          'tab-list-item',
+          'tab-list-item select-none',
           (tag?.isLocked || group?.isLocked) && 'locked',
         )}
         ref={tabRef}

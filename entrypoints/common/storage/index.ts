@@ -27,29 +27,29 @@ export const stateUtils = Store.stateUtils;
 
 // 监听settings storage变化
 export default function initSettingsStorageListener(
-  callback: (settings: SettingsProps, oldSettings: SettingsProps) => void
+  callback: (settings: SettingsProps, oldSettings: SettingsProps) => void,
 ) {
   return storage.watch<SettingsProps>(
     settingsUtils.storageKey,
     (settings, oldSettings) => {
       callback(
         settings || settingsUtils.initialSettings,
-        oldSettings || settingsUtils.initialSettings
+        oldSettings || settingsUtils.initialSettings,
       );
-    }
+    },
   );
 }
 
 // 监听tabList storage变化
 export function initTabListStorageListener(callback: (tabList: TagItem[]) => void) {
-  return storage.watch<TagItem[]>(tabListUtils.storageKey, (tabList) => {
+  return storage.watch<TagItem[]>(tabListUtils.storageKey, tabList => {
     callback(tabList || []);
   });
 }
 
 // 监听回收站 storage变化
 export function initRecycleStorageListener(callback: (tabList: TagItem[]) => void) {
-  return storage.watch<TagItem[]>(recycleUtils.storageKey, (tabList) => {
+  return storage.watch<TagItem[]>(recycleUtils.storageKey, tabList => {
     callback(tabList || []);
   });
 }
@@ -88,7 +88,7 @@ export function initSyncStorageListener(callback: () => void) {
   return () => {
     gistsUnwatch();
     webdavUnwatch();
-  }
+  };
 }
 
 // 监听state storage变化

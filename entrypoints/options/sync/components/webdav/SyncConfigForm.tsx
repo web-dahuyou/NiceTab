@@ -20,7 +20,7 @@ export default function SyncConfigForm({ onChange }: SyncConfigFormProps) {
   const { $fmt } = useIntlUtls();
   const [form] = Form.useForm();
 
-  const onFinish: FormProps<SyncConfigWebDAVProps>['onFinish'] = async (values) => {
+  const onFinish: FormProps<SyncConfigWebDAVProps>['onFinish'] = async values => {
     const oldConfigListMap = syncWebDAVUtils?.config?.configList?.reduce<
       Record<string, SyncConfigItemWebDAVProps>
     >((result, item) => {
@@ -28,7 +28,7 @@ export default function SyncConfigForm({ onChange }: SyncConfigFormProps) {
       return result;
     }, {});
 
-    let newConfigList = values?.configList?.map((item) => {
+    let newConfigList = values?.configList?.map(item => {
       const newItem = {
         ...syncWebDAVUtils.createConfigItem(),
         ...(item.key ? item : omit(item, ['key'])),
@@ -51,7 +51,7 @@ export default function SyncConfigForm({ onChange }: SyncConfigFormProps) {
   };
 
   useEffect(() => {
-    syncWebDAVUtils.getConfig().then((config) => {
+    syncWebDAVUtils.getConfig().then(config => {
       form?.setFieldsValue(config);
     });
   }, []);

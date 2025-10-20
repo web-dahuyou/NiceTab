@@ -32,10 +32,10 @@ export const GlobalContext = createContext<GlobalContextProps>({
   setThemeType: async (themeType = defaultThemeType) => {
     settingsUtils.setSettings({ ...settingsUtils.settings, themeType });
   },
-  setThemeData: (themeData) => {
+  setThemeData: themeData => {
     themeUtils.setThemeData(themeData);
   },
-  setSettings: async (settings) => {
+  setSettings: async settings => {
     settingsUtils.setSettings({ ...settingsUtils.settings, ...settings });
   },
   setLocale: async (language = defaultLanguage, callback) => {
@@ -65,7 +65,7 @@ export function useAntdLocale() {
     setLanguage(language);
   };
   useEffect(() => {
-    settingsUtils.getSettings().then((settings) => {
+    settingsUtils.getSettings().then(settings => {
       let language = settings.language || defaultLanguage;
       language = antdMap[language] ? language : defaultLanguage;
       setLanguage(language);
@@ -79,7 +79,7 @@ export function useCustomLocale() {
   const [locale, setLocale] = useState<LanguageTypes>(defaultLanguage);
   const messages = useMemo(
     () => customMap[locale] || customMap[defaultLanguage],
-    [locale]
+    [locale],
   );
 
   const changeLocale = async (language: LanguageTypes = defaultLanguage) => {
@@ -89,7 +89,7 @@ export function useCustomLocale() {
   };
 
   useEffect(() => {
-    settingsUtils.getSettings().then((settings) => {
+    settingsUtils.getSettings().then(settings => {
       setLocale(settings.language || defaultLanguage);
     });
   }, []);
@@ -99,7 +99,7 @@ export function useCustomLocale() {
 // theme type (light | dark)
 export function useThemeTypeConfig() {
   const [themeTypeConfig, setThemeTypeConfig] = useState<ThemeTypeConfig>(
-    THEME_TYPE_CONFIG.light
+    THEME_TYPE_CONFIG.light,
   );
 
   const changeThemeType = async (themeType: ThemeTypes = defaultThemeType) => {
@@ -109,7 +109,7 @@ export function useThemeTypeConfig() {
   };
 
   useEffect(() => {
-    settingsUtils.getSettings().then((settings) => {
+    settingsUtils.getSettings().then(settings => {
       const themeType = settings.themeType || defaultThemeType;
       setThemeTypeConfig({ ...THEME_TYPE_CONFIG[themeType] });
     });
@@ -122,7 +122,7 @@ export function useIntlUtls() {
   const intl = useIntl();
   const $fmt = (
     idOrFormatMsg: LocaleKeys | IntlForamtMessageParams,
-    options?: Record<string, any>
+    options?: Record<string, any>,
   ) => {
     const {
       id,

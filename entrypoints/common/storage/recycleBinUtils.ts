@@ -48,7 +48,7 @@ export default class RecycleBinUtils extends TabListUtils {
   async recoverTag(tag: TagItem) {
     // 从回收站中删除
     const tagList = await this.getTagList();
-    const tagIndex = tagList.findIndex((t) => t.tagId === tag.tagId);
+    const tagIndex = tagList.findIndex(t => t.tagId === tag.tagId);
     if (~tagIndex) {
       tagList.splice(tagIndex, 1);
     }
@@ -59,8 +59,8 @@ export default class RecycleBinUtils extends TabListUtils {
   async recoverTags(tags: TagItem[]) {
     // 从回收站中删除
     let tagList = await this.getTagList();
-    tagList = tagList.filter((t) => {
-      return !tags.some((tag) => tag.tagId === t.tagId);
+    tagList = tagList.filter(t => {
+      return !tags.some(tag => tag.tagId === t.tagId);
     });
     await this.setTagList(tagList);
 
@@ -105,7 +105,7 @@ export default class RecycleBinUtils extends TabListUtils {
     if (!isTagInRecycleBin) {
       tagList.unshift({
         ...tag,
-        groupList: groups.map((group) => ({
+        groupList: groups.map(group => ({
           ...group,
           isLocked: false,
           isStarred: false,
@@ -139,11 +139,11 @@ export default class RecycleBinUtils extends TabListUtils {
             }
           }
           if (!isGroupInListStore) {
-            const unstarredIndex = storeTag.groupList.findIndex((g) => !g.isStarred);
+            const unstarredIndex = storeTag.groupList.findIndex(g => !g.isStarred);
             storeTag.groupList.splice(
               unstarredIndex > -1 ? unstarredIndex : storeTag.groupList.length,
               0,
-              group
+              group,
             );
           }
         }
@@ -163,12 +163,12 @@ export default class RecycleBinUtils extends TabListUtils {
     for (let t of tagList) {
       if (t.tagId === tag.tagId) {
         t.groupList = t.groupList?.filter(
-          (g) => !groups.some((group) => group.groupId === g.groupId)
+          g => !groups.some(group => group.groupId === g.groupId),
         );
         break;
       }
     }
-    tagList = tagList.filter((tag) => tag?.groupList?.length > 0);
+    tagList = tagList.filter(tag => tag?.groupList?.length > 0);
     await this.setTagList(tagList);
 
     // 还原到标签列表（如果标签列表中有相同的标签组，则合并标签组）
@@ -215,7 +215,7 @@ export default class RecycleBinUtils extends TabListUtils {
   // 每天检查并清空回收站
   async checkAndClear() {
     const status = await storage.getItem<{ clearedFlag: boolean; date: string }>(
-      this.clearStatusKey
+      this.clearStatusKey,
     );
     const { clearedFlag, date } = status || {};
     const isToday = dayjs().isSame(dayjs(date), 'day');

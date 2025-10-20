@@ -21,7 +21,7 @@ const {
 } = ENUM_SETTINGS_PROPS;
 
 export default function FormModuleSync(
-  props: FormItemProps & { form: FormInstance<SettingsProps> }
+  props: FormItemProps & { form: FormInstance<SettingsProps> },
 ) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
@@ -37,7 +37,7 @@ export default function FormModuleSync(
   const [hourValue, setHourValue] = useState<number>(defaultAutoSyncRelation.h);
 
   const timeRangesValue = useMemo(() => {
-    return (timeRanges || []).map<[Dayjs | null, Dayjs | null]>((range) => [
+    return (timeRanges || []).map<[Dayjs | null, Dayjs | null]>(range => [
       range?.[0] ? dayjs(range?.[0], 'HH:mm') : null,
       range?.[1] ? dayjs(range?.[1], 'HH:mm') : null,
     ]);
@@ -46,11 +46,11 @@ export default function FormModuleSync(
   const getTimeUnitOption = useCallback(
     (timeUnit: AutoSyncTimeUnits) => {
       const option =
-        autoSyncTimeUnitOptions.find((option) => option.type === timeUnit) ||
+        autoSyncTimeUnitOptions.find(option => option.type === timeUnit) ||
         autoSyncTimeUnitOptions[0];
       return option || {};
     },
-    [autoSyncTimeUnitOptions]
+    [autoSyncTimeUnitOptions],
   );
 
   const timeUnitOption = useMemo(() => {
@@ -79,7 +79,7 @@ export default function FormModuleSync(
         [AUTO_SYNC_INTERVAL]: interval,
       });
     },
-    [form, minuteValue, hourValue]
+    [form, minuteValue, hourValue],
   );
 
   const handleIntervalChange = useCallback(
@@ -91,11 +91,11 @@ export default function FormModuleSync(
         setHourValue(val);
       }
     },
-    [form, minuteValue, hourValue]
+    [form, minuteValue, hourValue],
   );
 
   useEffect(() => {
-    settingsUtils.getSettings().then((settings) => {
+    settingsUtils.getSettings().then(settings => {
       const { autoSyncTimeUnit, autoSyncInterval } = settings || {};
       const option = getTimeUnitOption(autoSyncTimeUnit || 'm');
       let interval =
@@ -129,7 +129,7 @@ export default function FormModuleSync(
         label={$fmt(`settings.${AUTO_SYNC_TIME_UNIT}`)}
       >
         <Radio.Group disabled={!autoSync} onChange={handleTimeUnitChange}>
-          {autoSyncTimeUnitOptions.map((item) => (
+          {autoSyncTimeUnitOptions.map(item => (
             <Radio key={item.type} value={item.type}>
               {item.label}
             </Radio>
@@ -169,7 +169,7 @@ export default function FormModuleSync(
         <Form.List name={AUTO_SYNC_TIME_RANGES}>
           {(fields, { add, remove }, { errors }) => (
             <>
-              {fields.map((field) => (
+              {fields.map(field => (
                 <Space key={field.key} style={{ display: 'flex', marginBottom: 8 }}>
                   <Form.Item validateTrigger={['onBlur']} style={{ marginBottom: 0 }}>
                     <TimePicker.RangePicker
@@ -179,9 +179,9 @@ export default function FormModuleSync(
                       inputReadOnly
                       disabled={!autoSync}
                       onCalendarChange={(dates, dateStrings) => {
-                        const newValue = [...timeRangesValue].map((range) => {
+                        const newValue = [...timeRangesValue].map(range => {
                           return range.map(
-                            (value) => value?.format('HH:mm') || ''
+                            value => value?.format('HH:mm') || '',
                           ) as TimeRange;
                         });
                         newValue.splice(field.name, 1, dateStrings);
@@ -229,7 +229,7 @@ export default function FormModuleSync(
       >
         <Radio.Group disabled={!autoSync}>
           <Space direction="vertical">
-            {autoSyncTypeOptions.map((item) => (
+            {autoSyncTypeOptions.map(item => (
               <Radio key={item.type} value={item.type}>
                 {item.label}
               </Radio>

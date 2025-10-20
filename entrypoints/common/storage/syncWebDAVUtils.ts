@@ -34,7 +34,7 @@ type ModuleType = 'tabList' | 'settings';
 // 通用超时包装方法
 async function withTimeout<T>(
   promise: (signal: AbortSignal) => Promise<T>,
-  timeout = 10000
+  timeout = 10000,
 ): Promise<T> {
   const controller = new AbortController();
 
@@ -73,13 +73,13 @@ export default class syncWebDAVUtils {
     return { ...this.initialConfig, ...config };
   }
   getConfigItem(key: string) {
-    return this.config?.configList?.find((item) => item.key === key);
+    return this.config?.configList?.find(item => item.key === key);
   }
   async setConfig(config: SyncConfigWebDAVProps) {
     this.config = { ...this.initialConfig, ...config };
     return await storage.setItem<SyncConfigWebDAVProps>(
       this.storageConfigKey,
-      this.config
+      this.config,
     );
   }
   createConfigItem(configItem?: SyncConfigItemWebDAVProps) {
@@ -100,7 +100,7 @@ export default class syncWebDAVUtils {
   }
 
   async setSyncStatus(key: string, status: SyncStatus) {
-    const index = this.config.configList?.findIndex((item) => item.key === key);
+    const index = this.config.configList?.findIndex(item => item.key === key);
     if (index < 0) return;
     this.config.configList[index] = {
       ...this.config.configList?.[index],
@@ -142,7 +142,7 @@ export default class syncWebDAVUtils {
     key: string,
     syncType: SyncType,
     result: boolean,
-    reason?: string
+    reason?: string,
   ) {
     const syncTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
     await this.addSyncResult(key, {
@@ -165,7 +165,7 @@ export default class syncWebDAVUtils {
       errorMsg = FETCH_ERROR.NETWORK_ERROR;
     }
 
-    const messageItem = fetchErrorMessageOptions.find((item) => errorMsg === item.type);
+    const messageItem = fetchErrorMessageOptions.find(item => errorMsg === item.type);
     if (messageItem?.messageId) {
       return createdIntl.formatMessage({ id: messageItem.messageId });
     }
@@ -173,7 +173,7 @@ export default class syncWebDAVUtils {
       error.message ||
       createdIntl.formatMessage(
         { id: `common.actionFailed` },
-        { action: createdIntl.formatMessage({ id: 'common.sync' }) }
+        { action: createdIntl.formatMessage({ id: 'common.sync' }) },
       )
     );
   }
@@ -181,7 +181,7 @@ export default class syncWebDAVUtils {
   // 递归处理, webdav 自带的 exists 方法直接判断虽然不影响功能, 但是请求会报错
   async recursiveHandler(
     path: string,
-    handler: (pre: string, curr: string) => Promise<boolean>
+    handler: (pre: string, curr: string) => Promise<boolean>,
   ) {
     const pathList = path.split('/').filter(Boolean);
     let _path = '/';
@@ -221,19 +221,19 @@ export default class syncWebDAVUtils {
     return this.recursiveHandler(dir, async (pre, curr) => {
       try {
         const contentList = (await withTimeout((signal: AbortSignal) =>
-          client.getDirectoryContents(pre, { signal })
+          client.getDirectoryContents(pre, { signal }),
         )) as FileStat[];
         const isDirExists = contentList.some(
-          (item) => item.type === 'directory' && item.basename === curr
+          item => item.type === 'directory' && item.basename === curr,
         );
         if (isDirExists) return true;
         await withTimeout((signal: AbortSignal) =>
-          client.createDirectory(pre + curr, { signal })
+          client.createDirectory(pre + curr, { signal }),
         );
         return true;
       } catch (error) {
         await withTimeout((signal: AbortSignal) =>
-          client.createDirectory(pre + curr, { signal })
+          client.createDirectory(pre + curr, { signal }),
         );
         return true;
       }
@@ -264,7 +264,7 @@ export default class syncWebDAVUtils {
   async handleBySyncType(
     client: WebDAVClient,
     configItem: SyncConfigItemWebDAVProps,
-    syncType: SyncType
+    syncType: SyncType,
   ) {
     const filepath = this.getRemoteFilepath('tabList');
     const settingsFilepath = this.getRemoteFilepath('settings');
@@ -275,14 +275,14 @@ export default class syncWebDAVUtils {
     ) {
       const localContent = await this.getSyncContent();
       const result = await withTimeout((signal: AbortSignal) =>
-        client.putFileContents(filepath, localContent, { signal })
+        client.putFileContents(filepath, localContent, { signal }),
       );
       await this.handleSyncResult(configItem.key, syncType, result);
       // 同步设置信息失败单独catch, 不影响列表的同步
       const localSettings = await Store.settingsUtils.getSettings();
       const settingsContent = JSON.stringify(localSettings);
       await withTimeout((signal: AbortSignal) =>
-        client.putFileContents(settingsFilepath, settingsContent, { signal })
+        client.putFileContents(settingsFilepath, settingsContent, { signal }),
       );
       return;
     }
@@ -294,7 +294,7 @@ export default class syncWebDAVUtils {
         client.getFileContents(filepath, {
           format: 'text',
           signal,
-        })
+        }),
       )) as string;
     }
 
@@ -314,7 +314,7 @@ export default class syncWebDAVUtils {
         client.getFileContents(settingsFilepath, {
           format: 'text',
           signal,
-        })
+        }),
       )) as string;
     }
 
@@ -332,7 +332,9 @@ export default class syncWebDAVUtils {
             ...omit(settings, syncExcludedSettingsProps),
           };
           await withTimeout((signal: AbortSignal) =>
-            client.putFileContents(settingsFilepath, JSON.stringify(settings), { signal })
+            client.putFileContents(settingsFilepath, JSON.stringify(settings), {
+              signal,
+            }),
           );
         }
         await Store.settingsUtils.setSettings(settings);
@@ -350,7 +352,7 @@ export default class syncWebDAVUtils {
     ) {
       const localContent = await this.getSyncContent();
       const result = await withTimeout((signal: AbortSignal) =>
-        client.putFileContents(filepath, localContent, { signal })
+        client.putFileContents(filepath, localContent, { signal }),
       );
       await this.handleSyncResult(configItem.key, syncType, result);
     } else {
@@ -364,7 +366,7 @@ export default class syncWebDAVUtils {
   async syncStart(configItem: SyncConfigItemWebDAVProps, syncType: SyncType) {
     if (!configItem.webdavConnectionUrl) return;
     const syncStatus = this.config.configList?.find(
-      (item) => item.key === configItem.key
+      item => item.key === configItem.key,
     )?.syncStatus;
 
     if (syncStatus === 'syncing') return;
@@ -387,7 +389,7 @@ export default class syncWebDAVUtils {
         configItem.key,
         syncType,
         false,
-        this.formatErrorMsg(error, createdIntl)
+        this.formatErrorMsg(error, createdIntl),
       );
     }
 
@@ -398,7 +400,7 @@ export default class syncWebDAVUtils {
   async autoSyncStart(data: { syncType: SyncType }) {
     const { syncType } = data || {};
     const config = await this.getConfig();
-    const configList = config.configList?.filter((item) => !!item.webdavConnectionUrl);
+    const configList = config.configList?.filter(item => !!item.webdavConnectionUrl);
     for (const option of configList) {
       await this.syncStart(option, syncType);
     }
