@@ -64,7 +64,8 @@ const {
   AUTO_EXPAND_HOME_TREE,
   MAIN_CONTENT_WIDTH_TYPE,
   SHOW_TAB_TITLE_TOOLTIP,
-  /* 自动同步配置 */
+  /* 同步配置 */
+  REMOTE_SYNC_WITH_SETTINGS,
   AUTO_SYNC,
   AUTO_SYNC_TIME_UNIT,
   AUTO_SYNC_INTERVAL,
@@ -118,7 +119,8 @@ export default class SettingsUtils {
     [AUTO_EXPAND_HOME_TREE]: false, // 进入列表页时，是否自动展开全部节点
     [MAIN_CONTENT_WIDTH_TYPE]: 'fixed' as PageWidthTypes, // 主内容区域宽度类型
     [SHOW_TAB_TITLE_TOOLTIP]: false, // 是否显示标签页标题的tooltip
-    /* 自动同步配置 */
+    /* 同步配置 */
+    [REMOTE_SYNC_WITH_SETTINGS]: true, // 远程同步时，偏好设置是否一起同步
     [AUTO_SYNC]: false, // 是否开启自动同步
     [AUTO_SYNC_TIME_UNIT]: defaultAutoSyncTimeUnit, // 自动同步时间单位
     [AUTO_SYNC_INTERVAL]: defaultAutoSyncRelation[defaultAutoSyncTimeUnit], // 自动同步间隔时间

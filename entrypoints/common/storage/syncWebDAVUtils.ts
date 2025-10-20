@@ -18,6 +18,7 @@ import {
 } from '~/entrypoints/common/utils';
 import { reloadOtherAdminPage } from '~/entrypoints/common/tabs';
 import {
+  ENUM_SETTINGS_PROPS,
   FETCH_ERROR,
   fetchErrorMessageOptions,
   SUCCESS_KEY,
@@ -30,6 +31,8 @@ import { getCreatedIntl } from '~/entrypoints/common/locale';
 import Store from './instanceStore';
 
 type ModuleType = 'tabList' | 'settings';
+
+const { REMOTE_SYNC_WITH_SETTINGS } = ENUM_SETTINGS_PROPS;
 
 // 通用超时包装方法
 async function withTimeout<T>(
@@ -266,6 +269,7 @@ export default class syncWebDAVUtils {
     configItem: SyncConfigItemWebDAVProps,
     syncType: SyncType,
   ) {
+    const localSettings = await Store.settingsUtils.getSettings();
     const filepath = this.getRemoteFilepath('tabList');
     const settingsFilepath = this.getRemoteFilepath('settings');
 
@@ -278,12 +282,14 @@ export default class syncWebDAVUtils {
         client.putFileContents(filepath, localContent, { signal }),
       );
       await this.handleSyncResult(configItem.key, syncType, result);
-      // 同步设置信息失败单独catch, 不影响列表的同步
-      const localSettings = await Store.settingsUtils.getSettings();
-      const settingsContent = JSON.stringify(localSettings);
-      await withTimeout((signal: AbortSignal) =>
-        client.putFileContents(settingsFilepath, settingsContent, { signal }),
-      );
+
+      if (localSettings[REMOTE_SYNC_WITH_SETTINGS]) {
+        // 同步设置信息失败单独catch, 不影响列表的同步
+        const settingsContent = JSON.stringify(localSettings);
+        await withTimeout((signal: AbortSignal) =>
+          client.putFileContents(settingsFilepath, settingsContent, { signal }),
+        );
+      }
       return;
     }
 
@@ -308,24 +314,28 @@ export default class syncWebDAVUtils {
 
     // 同步设置信息（重要性比较低）
     let remoteSettingsContent = '';
-    const isSettingsFileExists = await withTimeout(() => client.exists(settingsFilepath));
-    if (isSettingsFileExists) {
-      remoteSettingsContent = (await withTimeout((signal: AbortSignal) =>
-        client.getFileContents(settingsFilepath, {
-          format: 'text',
-          signal,
-        }),
-      )) as string;
+    if (localSettings[REMOTE_SYNC_WITH_SETTINGS]) {
+      const isSettingsFileExists = await withTimeout(() =>
+        client.exists(settingsFilepath),
+      );
+
+      if (isSettingsFileExists) {
+        remoteSettingsContent = (await withTimeout((signal: AbortSignal) =>
+          client.getFileContents(settingsFilepath, {
+            format: 'text',
+            signal,
+          }),
+        )) as string;
+      }
     }
 
-    if (!!remoteSettingsContent) {
+    if (!!remoteSettingsContent && localSettings[REMOTE_SYNC_WITH_SETTINGS]) {
       try {
         let settings = JSON.parse(remoteSettingsContent);
         if (
           syncType === syncTypeMap.MANUAL_PUSH_MERGE ||
           syncType === syncTypeMap.AUTO_PUSH_MERGE
         ) {
-          const localSettings = await Store.settingsUtils.getSettings();
           settings = {
             ...localSettings,
             // 自动同步相关配置，本地优先级高于远程（防止其他设备的设置覆盖本地的配置）
