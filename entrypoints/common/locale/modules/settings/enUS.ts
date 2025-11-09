@@ -101,7 +101,7 @@ const enUS: Record<LocaleKey, string> = {
   'settings.showTabTitleTooltip': 'Show a tooltip when hovering over a tab?',
 
   /* 自动同步配置 */
-  'settings.remoteSyncWithSettings': 'Allow settings sync with list data?',
+  'settings.remoteSyncWithSettings': 'Sync preferences along with list data?',
   'settings.autoSync': 'Enable Auto Sync?',
   'settings.autoSyncTimeUnit': 'Auto-sync interval unit:',
   'settings.autoSyncTimeUnit.m': 'Minutes',
