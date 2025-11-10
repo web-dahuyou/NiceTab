@@ -224,3 +224,7 @@ webdav 方式远程同步截图暂未更新。
 ## 插件开发
 
 见 [NiceTab 贡献指南](./CONTRIBUTING-zh.md)
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=web-dahuyou/NiceTab&type=Date)](https://www.star-history.com/#web-dahuyou/NiceTab&Date)

@@ -243,3 +243,7 @@ Feel free to join our QQ group: 924270240
 ## Extension Development
 
 See [NiceTab Contributing Guide](./CONTRIBUTING.md)
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=web-dahuyou/NiceTab&type=Date)](https://www.star-history.com/#web-dahuyou/NiceTab&Date)
