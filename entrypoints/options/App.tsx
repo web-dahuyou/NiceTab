@@ -47,7 +47,6 @@ import {
   ENUM_ACTION_NAME,
   ENUM_SETTINGS_PROPS,
   SHORTCUTS_PAGE_URL,
-  USER_GUIDE_URL_MAP,
 } from '~/entrypoints/common/constants';
 import { actionHandler } from '../common/contextMenus';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -66,6 +65,7 @@ import {
   discardOtherTabs,
   saveOpenedTabsAsSnapshot,
   restoreOpenedTabsSnapshot,
+  openUserGuide,
 } from '~/entrypoints/common/tabs';
 import {
   StyledActionIconBtn,
@@ -317,13 +317,7 @@ function AppLayout() {
     } else if (key === 'reload') {
       browser.runtime.reload();
     } else if (key === 'userGuide') {
-      // TODO: 等英文版翻译完成后再启用
-      // const docPath = USER_GUIDE_URL_MAP[locale as LanguageTypes];
-      const docPath = USER_GUIDE_URL_MAP['zh-CN'];
-      openNewTab(docPath, {
-        active: true,
-        openToNext: true,
-      });
+      openUserGuide();
     } else if (key === 'bindShortcuts') {
       openNewTab(SHORTCUTS_PAGE_URL, {
         active: true,

@@ -35,6 +35,7 @@ import {
   openNewTab,
   reloadOtherAdminPage,
   updateAdminPageUrlDebounced,
+  openUserGuide,
 } from '~/entrypoints/common/tabs';
 
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
@@ -332,6 +333,20 @@ export default function Home() {
           width={600}
         >
           <StyledHelpInfoBox>
+            {/* 用户指南 */}
+            <p style={{ marginBottom: '8px' }}>
+              {$fmt({
+                id: 'home.help.tip.userGuide',
+                values: {
+                  userGuide: (
+                    <a className="link" onClick={openUserGuide}>
+                      {$fmt('common.userGuide')}
+                    </a>
+                  ),
+                },
+              })}
+            </p>
+
             {import.meta.env.FIREFOX && (
               <>
                 <p style={{ marginBottom: '4px' }}>
