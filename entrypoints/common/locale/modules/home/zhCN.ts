@@ -63,6 +63,7 @@ const zhCN = {
   'home.createSnapshot.tip': '将当前打开的标签页保存为快照',
   'home.restoreSnapshot': '恢复快照',
 
+  'home.help.tip.userGuide': '更多信息请查看{userGuide}。',
   'home.help.reminder.start': '出于安全原因，在 Firefox 中，可能不允许使用特权 URL，例如：',
   'home.help.reminder.list': `
     <li>chrome: URL</li>

@@ -16,6 +16,22 @@ type SyncConfigFormProps = {
   onChange?: (data: SyncConfigWebDAVProps) => void;
 };
 
+function formatConfigItem(item: SyncConfigItemWebDAVProps) {
+  const keys: Array<keyof SyncConfigItemWebDAVProps> = [
+    'webdavConnectionUrl',
+    'username',
+    'password',
+    'directory',
+    'filename_tabList',
+    'filename_settings',
+  ];
+
+  return keys.reduce((result, key) => {
+    result[key] = item[key]?.trim?.() || '';
+    return result;
+  }, item);
+}
+
 export default function SyncConfigForm({ onChange }: SyncConfigFormProps) {
   const { $fmt } = useIntlUtls();
   const [form] = Form.useForm();
@@ -33,10 +49,10 @@ export default function SyncConfigForm({ onChange }: SyncConfigFormProps) {
         ...syncWebDAVUtils.createConfigItem(),
         ...(item.key ? item : omit(item, ['key'])),
       };
-      return {
+      return formatConfigItem({
         ...oldConfigListMap[newItem.key],
         ...newItem,
-      };
+      });
     });
 
     const newConfig = {
@@ -45,8 +61,8 @@ export default function SyncConfigForm({ onChange }: SyncConfigFormProps) {
       configList: newConfigList,
     };
 
+    await syncWebDAVUtils.setConfig(newConfig);
     onChange?.(newConfig);
-    syncWebDAVUtils.setConfig(newConfig);
     console.log('Save Success:', newConfig);
   };
 

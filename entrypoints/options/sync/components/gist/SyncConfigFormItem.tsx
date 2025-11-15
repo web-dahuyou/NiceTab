@@ -72,6 +72,22 @@ export default function SyncConfigFormItem({ form, type }: SyncConfigFormItemPro
             }
           />
         </Form.Item>
+        <Form.Item<SyncConfigProps>
+          name={[type, 'filename']}
+          label={$fmt('common.filename')}
+        >
+          <Input
+            placeholder="__NiceTab_gist_key__"
+            onChange={e =>
+              form?.setFieldsValue({
+                [type]: {
+                  filename: e.target.value?.trim(),
+                },
+              })
+            }
+          />
+        </Form.Item>
+
         {/* <Form.Item<SyncConfigProps>
           label={$fmt('sync.autoSync')}
           name={[type, 'autoSync']}

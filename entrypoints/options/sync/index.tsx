@@ -189,6 +189,7 @@ export default function SyncPage() {
                   selectedKey={selectedKey}
                   onSelect={key => onSelect('gist', key)}
                   onAction={({ key }) => onAction?.('gist', key)}
+                  onConfigChange={getSyncInfo}
                 />
 
                 <SidebarContentModuleWebDAV
@@ -197,6 +198,7 @@ export default function SyncPage() {
                   selectedKey={selectedKey}
                   onSelect={key => onSelect('webdav', key)}
                   onAction={({ key }) => onAction?.('webdav', key)}
+                  onConfigChange={getWebDavConfig}
                 />
               </Flex>
             </div>

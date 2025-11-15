@@ -113,6 +113,8 @@ const zhCN = {
   'common.endsWith': '结束于',
   'common.contains': '包含',
   'common.regex': '正则',
+  'common.directory': '目录',
+  'common.filename': '文件名',
 };
 
 export type LocaleKey = keyof typeof zhCN;

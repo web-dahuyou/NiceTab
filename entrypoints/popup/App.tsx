@@ -8,7 +8,12 @@ import '~/assets/css/reset.css';
 import '~/assets/css/index.css';
 import './App.css';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { getAdminTabInfo, openNewTab, discardOtherTabs } from '~/entrypoints/common/tabs';
+import {
+  getAdminTabInfo,
+  openNewTab,
+  discardOtherTabs,
+  openUserGuide,
+} from '~/entrypoints/common/tabs';
 import { getMenus, actionHandler } from '~/entrypoints/common/contextMenus';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import { TAB_EVENTS, SHORTCUTS_PAGE_URL } from '~/entrypoints/common/constants';
@@ -19,7 +24,6 @@ import {
   ENUM_SETTINGS_PROPS,
   ENUM_ACTION_NAME,
   POPUP_MODULE_NAMES,
-  USER_GUIDE_URL_MAP,
 } from '~/entrypoints/common/constants';
 import ColorList from '~/entrypoints/common/components/ColorList.tsx';
 import { GlobalStyle } from '~/entrypoints/common/style/Common.styled';
@@ -79,13 +83,7 @@ export default function App() {
       path: '/user-guide',
       label: $fmt('common.userGuide'),
       onClick: () => {
-        // TODO: 等英文版翻译完成后再启用
-        // const docPath = USER_GUIDE_URL_MAP[locale as LanguageTypes];
-        const docPath = USER_GUIDE_URL_MAP['zh-CN'];
-        openNewTab(docPath, {
-          active: true,
-          openToNext: true,
-        });
+        openUserGuide();
       },
     },
   ];

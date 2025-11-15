@@ -7,7 +7,11 @@ import type {
   SendTargetProps,
   SendTabMsgEventProps,
 } from '~/entrypoints/types';
-import { ENUM_SETTINGS_PROPS, defaultLanguage } from '~/entrypoints/common/constants';
+import {
+  ENUM_SETTINGS_PROPS,
+  defaultLanguage,
+  USER_GUIDE_URL_MAP,
+} from '~/entrypoints/common/constants';
 import {
   objectToUrlParams,
   setUrlParams,
@@ -616,6 +620,19 @@ export const setPageTitle = async ({
   }
 };
 
+// 打开用户指南
+export const openUserGuide = async () => {
+  // TODO: 等英文版翻译完成后再启用
+  // const settings = await settingsUtils.getSettings();
+  // const language = settings.language || 'en-US';
+  const language = 'zh-CN';
+  const guideUrl = USER_GUIDE_URL_MAP[language];
+  openNewTab(guideUrl, {
+    active: true,
+    openToNext: true,
+  });
+};
+
 export default {
   sendTabMessage,
   executeContentScript,
@@ -638,4 +655,5 @@ export default {
   saveOpenedTabsAsSnapshot,
   restoreOpenedTabsSnapshot,
   setPageTitle,
+  openUserGuide,
 };

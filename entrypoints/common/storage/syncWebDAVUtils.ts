@@ -59,8 +59,8 @@ export default class syncWebDAVUtils {
   };
   config = this.initialConfig;
 
-  webDAVDirectory: string = '/__NiceTab_web_dav__';
-  webDAVFilename: string = '__NiceTab_web_dav__.json';
+  webDAVDirectory: string = '__NiceTab_web_dav__';
+
   fileNameConfig: Record<ModuleType, string> = {
     tabList: '__NiceTab_web_dav__.json',
     settings: '__NiceTab_settings_web_dav__.json',
@@ -85,13 +85,16 @@ export default class syncWebDAVUtils {
       this.config,
     );
   }
-  createConfigItem(configItem?: SyncConfigItemWebDAVProps) {
+  createConfigItem(configItem?: SyncConfigItemWebDAVProps): SyncConfigItemWebDAVProps {
     return {
       key: `webdav_${getRandomId()}`,
       label: '',
       webdavConnectionUrl: '',
       username: '',
       password: '',
+      directory: '',
+      filename_tabList: '',
+      filename_settings: '',
       ...configItem,
       syncStatus: 'idle' as SyncStatus,
       syncResult: [],
@@ -258,9 +261,22 @@ export default class syncWebDAVUtils {
     return content;
   }
 
-  getRemoteFilepath(moduleType: ModuleType) {
-    const fileName = this.fileNameConfig[moduleType];
-    return `${this.webDAVDirectory?.replace(/\/$/, '') || ''}/${fileName}`;
+  // 获取远程文件路径
+  getRemoteFilepath(
+    moduleType: ModuleType,
+    configItem: SyncConfigItemWebDAVProps,
+    options?: { useDefault?: boolean },
+  ) {
+    // 使用用户自定义的目录和文件名，如果没有则使用默认值
+    const directory = configItem.directory || this.webDAVDirectory;
+    let fileName =
+      configItem[`filename_${moduleType}`]?.trim?.() || this.fileNameConfig[moduleType];
+
+    if (options?.useDefault) {
+      fileName = this.fileNameConfig[moduleType];
+    }
+
+    return `${directory?.replace(/\/$/, '') || ''}/${fileName}`;
   }
 
   // 根据syncType执行不同的操作
@@ -270,8 +286,8 @@ export default class syncWebDAVUtils {
     syncType: SyncType,
   ) {
     const localSettings = await Store.settingsUtils.getSettings();
-    const filepath = this.getRemoteFilepath('tabList');
-    const settingsFilepath = this.getRemoteFilepath('settings');
+    const filepath = this.getRemoteFilepath('tabList', configItem);
+    const settingsFilepath = this.getRemoteFilepath('settings', configItem);
 
     if (
       syncType === syncTypeMap.MANUAL_PUSH_FORCE ||
@@ -297,12 +313,22 @@ export default class syncWebDAVUtils {
     const isFileExists = await withTimeout(() => client.exists(filepath));
     if (isFileExists) {
       remoteFileContent = (await withTimeout((signal: AbortSignal) =>
-        client.getFileContents(filepath, {
-          format: 'text',
-          signal,
-        }),
+        client.getFileContents(filepath, { format: 'text', signal }),
       )) as string;
     }
+    // 还是不获取默认文件内容了，自定义的文件如果没有，则直接跳过
+    // else {
+    //   const defaultFilePath = this.getRemoteFilepath('tabList', configItem, {
+    //     useDefault: true,
+    //   });
+
+    //   const isDefaultFileExists = await withTimeout(() => client.exists(defaultFilePath));
+    //   if (isDefaultFileExists) {
+    //     remoteFileContent = (await withTimeout((signal: AbortSignal) =>
+    //       client.getFileContents(defaultFilePath, { format: 'text', signal }),
+    //     )) as string;
+    //   }
+    // }
 
     if (
       !!remoteFileContent &&
@@ -321,12 +347,26 @@ export default class syncWebDAVUtils {
 
       if (isSettingsFileExists) {
         remoteSettingsContent = (await withTimeout((signal: AbortSignal) =>
-          client.getFileContents(settingsFilepath, {
-            format: 'text',
-            signal,
-          }),
+          client.getFileContents(settingsFilepath, { format: 'text', signal }),
         )) as string;
       }
+      // 还是不获取默认文件内容了，自定义的文件如果没有，则直接跳过
+      // else {
+      //   const defaultSettingsFilepath = this.getRemoteFilepath('settings', configItem, {
+      //     useDefault: true,
+      //   });
+      //   const isDefaultSettingsFileExists = await withTimeout(() =>
+      //     client.exists(defaultSettingsFilepath),
+      //   );
+      //   if (isDefaultSettingsFileExists) {
+      //     remoteSettingsContent = (await withTimeout((signal: AbortSignal) => {
+      //       return client.getFileContents(defaultSettingsFilepath, {
+      //         format: 'text',
+      //         signal,
+      //       });
+      //     })) as string;
+      //   }
+      // }
     }
 
     if (!!remoteSettingsContent && localSettings[REMOTE_SYNC_WITH_SETTINGS]) {
@@ -389,8 +429,10 @@ export default class syncWebDAVUtils {
       password,
     });
     try {
+      // 使用配置项中的自定义目录，如果存在的话
+      const directory = configItem.directory || this.webDAVDirectory;
       // client 自带的方法虽然不影响功能, 但会有一次请求报错, 所以自己递归处理
-      await this.createDirectory(client, this.webDAVDirectory);
+      await this.createDirectory(client, directory);
       await this.handleBySyncType(client, configItem, syncType);
     } catch (error: any) {
       const settings = await Store.settingsUtils.getSettings();
