@@ -89,7 +89,7 @@ const enUS: Record<LocaleKey, string> = {
   'common.shortcuts': 'Shortcuts',
   'common.bindShortcuts': 'Bind Shortcuts',
   'common.bindShortcuts.tip':
-    'For Firefox: Go to about:addons page, switch to the "Extensions" tab, click the "Settings(Tools for all add-ons)" button in the top-right corner to open the dropdown menu, then select "Manage Extension Shortcuts" to bind shortcuts.',
+    'For Firefox: Go to the about:addons page, switch to the "Extensions" tab, click the "Settings (Tools for all add-ons)" button in the top-right corner to open the dropdown menu, then select "Manage Extension Shortcuts" to bind shortcuts.',
   'common.sendTo': 'Send To',
   'common.search': 'Search',
   'common.reload': 'Reload',
