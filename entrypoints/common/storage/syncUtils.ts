@@ -59,11 +59,13 @@ export default class SyncUtils {
     gitee: {
       accessToken: '',
       gistId: '',
+      filename: '',
       autoSync: false,
     },
     github: {
       accessToken: '',
       gistId: '',
+      filename: '',
       autoSync: false,
     },
   };
@@ -112,13 +114,19 @@ export default class SyncUtils {
       ...config.gitee,
     };
     // 修改 access token, 则清空 gistId 和 同步记录
-    if (newGithubConfig?.accessToken !== oldGithubConfig?.accessToken) {
+    if (
+      newGithubConfig?.accessToken !== oldGithubConfig?.accessToken ||
+      newGithubConfig?.filename !== oldGithubConfig?.filename
+    ) {
       newGithubConfig.gistId = '';
-      this.clearSyncResult('github');
+      await this.clearSyncResult('github');
     }
-    if (newGiteeConfig?.accessToken !== oldGiteeConfig?.accessToken) {
+    if (
+      newGiteeConfig?.accessToken !== oldGiteeConfig?.accessToken ||
+      newGiteeConfig?.filename !== oldGiteeConfig?.filename
+    ) {
       newGiteeConfig.gistId = '';
-      this.clearSyncResult('gitee');
+      await this.clearSyncResult('gitee');
     }
 
     this.config = { github: newGithubConfig, gitee: newGiteeConfig };
@@ -186,7 +194,7 @@ export default class SyncUtils {
     };
   }
   // 获取同步的gist参数
-  async getApiParams() {
+  async getApiParams(remoteType: SyncRemoteType) {
     const localSettings = await Store.settingsUtils.getSettings();
     let contentResult = await this.getSyncContent();
     // 需要注意，如果title中包含emoji字符，提交gist接口会报错，所以将emoji标签给过滤掉
@@ -203,7 +211,7 @@ export default class SyncUtils {
       };
     }
     return {
-      description: this.gistDescKey,
+      description: this.config[remoteType]?.filename || this.gistDescKey,
       files,
     };
   }
@@ -244,7 +252,7 @@ export default class SyncUtils {
     const { accessToken } = this.config[remoteType] || {};
     if (!accessToken) return {} as GistResponseItemProps;
 
-    const params = await this.getApiParams();
+    const params = await this.getApiParams(remoteType);
 
     const data = await fetchApi(this.apiBaseUrl[remoteType], params, {
       method: 'POST',
@@ -260,7 +268,7 @@ export default class SyncUtils {
     if (!accessToken) return {} as GistResponseItemProps;
 
     const url = `${this.apiBaseUrl[remoteType]}/${gistId}`;
-    const params = await this.getApiParams();
+    const params = await this.getApiParams(remoteType);
 
     const data = await fetchApi(
       url,
@@ -407,12 +415,10 @@ export default class SyncUtils {
     this.setSyncStatus(remoteType, 'syncing');
 
     try {
-      if (gistId) {
-        const gistData = await this.getGistById(remoteType);
-        await this.handleBySyncType(remoteType, syncType, gistData);
-      } else {
+      const handleWholeProcess = async () => {
         const allGists = await this.getGistsList(remoteType);
-        const gistData = allGists.find(gist => gist.description === this.gistDescKey);
+        const gistDescKey = this.config[remoteType]?.filename || this.gistDescKey;
+        const gistData = allGists.find(gist => gist.description === gistDescKey);
         const isExist = gistData && gistData.id;
 
         if (isExist) {
@@ -426,6 +432,17 @@ export default class SyncUtils {
           await this.setConfigByType(remoteType, { gistId: data.id || '' });
           await this.handleSyncResult(remoteType, syncType, data);
         }
+      };
+      if (gistId) {
+        try {
+          const gistData = await this.getGistById(remoteType);
+          await this.handleBySyncType(remoteType, syncType, gistData);
+        } catch (err) {
+          console.log('getGistById-err', err);
+          await handleWholeProcess();
+        }
+      } else {
+        await handleWholeProcess();
       }
     } catch (error: any) {
       const settings = await Store.settingsUtils.getSettings();

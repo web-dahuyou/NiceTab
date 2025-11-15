@@ -20,8 +20,8 @@ export default function SyncConfigFormGist({ onChange }: SyncConfigFormProps) {
     console.log('Save Success:', values);
     const newConfig = { ...syncUtils.initialConfig, ...values };
 
+    await syncUtils.setConfig(values);
     onChange?.(newConfig);
-    syncUtils.setConfig(values);
   };
 
   useEffect(() => {

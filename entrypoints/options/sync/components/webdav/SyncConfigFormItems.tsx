@@ -43,7 +43,11 @@ export default function SyncConfigFormItem({ form }: SyncConfigFormItemProps) {
     title: string;
     icon?: ReactElement;
   }) => ({
-    title: <Typography.Text>{title}</Typography.Text>,
+    title: (
+      <Typography.Text>
+        <div dangerouslySetInnerHTML={{ __html: title }}></div>
+      </Typography.Text>
+    ),
     icon: icon || <InfoCircleOutlined />,
     color: token.colorBgContainer,
   });
@@ -107,6 +111,33 @@ export default function SyncConfigFormItem({ form }: SyncConfigFormItemProps) {
                         label={$fmt('sync.password')}
                       >
                         <Input type="password" placeholder={$fmt('sync.password')} />
+                      </Form.Item>
+                      <Form.Item
+                        name={[field.name, 'directory']}
+                        label={$fmt('common.directory')}
+                        tooltip={getFormTooltipOption({
+                          title: $fmt('sync.tip.directory'),
+                        })}
+                      >
+                        <Input placeholder="__NiceTab_web_dav__" />
+                      </Form.Item>
+                      <Form.Item
+                        name={[field.name, 'filename_tabList']}
+                        label={`${$fmt('common.filename')} - ${$fmt('common.list')}`}
+                        tooltip={getFormTooltipOption({
+                          title: $fmt('sync.tip.filename'),
+                        })}
+                      >
+                        <Input placeholder="__NiceTab_web_dav__.json" />
+                      </Form.Item>
+                      <Form.Item
+                        name={[field.name, 'filename_settings']}
+                        label={`${$fmt('common.filename')} - ${$fmt('common.settings')}`}
+                        tooltip={getFormTooltipOption({
+                          title: $fmt('sync.tip.filename'),
+                        })}
+                      >
+                        <Input placeholder="__NiceTab_settings_web_dav__.json" />
                       </Form.Item>
                       <Form.Item name={[field.name, 'key']} hidden>
                         <Input />

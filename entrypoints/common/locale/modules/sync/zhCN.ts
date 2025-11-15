@@ -54,6 +54,8 @@ const zhCN = {
   'sync.password': 'WebDAV 密码',
   'sync.addConfig': '新增配置',
   'sync.tip.connectionName': '用于区分多个 webDAV 的配置名称',
+  'sync.tip.directory': `WebDAV 目录，可填写多级目录，如 <strong>/dir/subdir</strong>`,
+  'sync.tip.filename': `数据存储文件名，可使用任意后缀名，如 <strong>nicetab-sync.txt</strong>`,
 }
 
 export type LocaleKey = keyof typeof zhCN;
