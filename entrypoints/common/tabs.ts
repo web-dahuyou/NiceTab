@@ -297,7 +297,20 @@ async function sendCurrentTab(targetData: SendTargetProps = {}, tab?: Tabs.Tab) 
 
   if (tab) {
     if (tab.id) {
-      filteredTabs = await getFilteredTabs([tab], settings);
+      // 如果传入了 tab（通常来自右键菜单），检查它是否在当前高亮的标签页中
+      // 如果是，则发送所有高亮的标签页（多选发送）
+      // 如果不是，则只发送该特定标签页
+      const highlightedTabs = await browser.tabs.query({
+        highlighted: true,
+        currentWindow: true,
+      });
+
+      const isHighlighted = highlightedTabs.some(t => t.id === tab.id);
+      if (isHighlighted) {
+        filteredTabs = await getFilteredTabs(highlightedTabs, settings);
+      } else {
+        filteredTabs = await getFilteredTabs([tab], settings);
+      }
     }
   } else {
     const tabs = await browser.tabs.query({
