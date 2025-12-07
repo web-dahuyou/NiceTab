@@ -1,4 +1,5 @@
 import { Form, Radio } from 'antd';
+import { DesktopOutlined, MoonOutlined, SunOutlined } from '@ant-design/icons';
 import type { FormItemProps, FormInstance } from 'antd';
 import type { SettingsProps } from '~/entrypoints/types';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
@@ -26,6 +27,22 @@ export default function FormModuleCommon(
         <Radio.Group>
           <Radio value="zh-CN"> 中文简体 </Radio>
           <Radio value="en-US"> English </Radio>
+        </Radio.Group>
+      </Form.Item>
+      <Form.Item<SettingsProps>
+        label={$fmt({ id: `settings.${ENUM_SETTINGS_PROPS.THEME_TYPE}`, values: { mark: '：' } })}
+        name={ENUM_SETTINGS_PROPS.THEME_TYPE}
+      >
+        <Radio.Group>
+          <Radio value="light">
+            <SunOutlined /> Light
+          </Radio>
+          <Radio value="dark">
+            <MoonOutlined /> Dark
+          </Radio>
+          <Radio value="auto">
+            <DesktopOutlined /> Auto
+          </Radio>
         </Radio.Group>
       </Form.Item>
       {/* 启动浏览器时是否自动打开NiceTab管理后台 */}
