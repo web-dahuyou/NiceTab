@@ -1,24 +1,25 @@
 import React, { useRef, useCallback, useEffect } from 'react';
 import { Tabs } from 'wxt/browser';
-import { CloseOutlined, CoffeeOutlined } from '@ant-design/icons';
+import { CloseOutlined, CoffeeOutlined, ExportOutlined } from '@ant-design/icons';
 import { classNames } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import Favicon from '~/entrypoints/common/components/Favicon';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { StyledTabItem } from './App.styled';
 
-export type TabActions = 'active' | 'discard' | 'remove';
+export type TabActions = 'active' | 'discard' | 'remove' | 'send';
 interface TabItemProps {
   tab: Tabs.Tab;
   onAction: (action: TabActions, tab: Tabs.Tab) => void;
+  checkTabCanSend: (tab: Tabs.Tab) => { canSend: boolean; reason?: string };
 }
 
-export default function TabItem({ tab, onAction }: TabItemProps) {
+export default function TabItem({ tab, onAction, checkTabCanSend }: TabItemProps) {
   const { $fmt } = useIntlUtls();
   const tabRef = useRef<HTMLDivElement>(null);
   const handleAction = useCallback(
     (event: React.MouseEvent<HTMLElement, MouseEvent>, action: TabActions) => {
-      if (action === 'discard' || action === 'remove') {
+      if (action === 'discard' || action === 'remove' || action === 'send') {
         event.stopPropagation();
       }
       onAction(action, tab);
@@ -35,6 +36,8 @@ export default function TabItem({ tab, onAction }: TabItemProps) {
     }
   }, [tab.active]);
 
+  const { canSend, reason } = checkTabCanSend(tab);
+
   return (
     <StyledTabItem
       ref={tabRef}
@@ -48,6 +51,17 @@ export default function TabItem({ tab, onAction }: TabItemProps) {
     >
       <Favicon pageUrl={tab.url!} favIconUrl={tab.favIconUrl}></Favicon>
       <span className="tab-item-title">{tab.title}</span>
+
+      <StyledActionIconBtn
+        className="action-icon-btn"
+        $size={16}
+        disabled={!canSend}
+        title={!canSend ? reason : $fmt('common.sendCurrentTab')}
+        onClick={event => canSend && handleAction(event, 'send')}
+        style={{ opacity: !canSend ? 0.3 : 1, cursor: !canSend ? 'not-allowed' : 'pointer' }}
+      >
+        <ExportOutlined />
+      </StyledActionIconBtn>
 
       {!tab.active && (
         <StyledActionIconBtn
