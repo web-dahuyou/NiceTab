@@ -99,30 +99,28 @@ export default function FormModuleOpen(
           <Radio value="">{$fmt('common.none')}</Radio>
         </Radio.Group>
       </Form.Item>
-      {!import.meta.env.FIREFOX && (
-        <>
-          {/* 是否以标签组形式恢复未命名标签组 */}
-          <Form.Item<SettingsProps>
-            label={$fmt(`settings.${UNNAMED_GROUP_RESTORE_AS_GROUP}`)}
-            name={UNNAMED_GROUP_RESTORE_AS_GROUP}
-          >
-            <Radio.Group>
-              <Radio value={true}>{$fmt('common.yes')}</Radio>
-              <Radio value={false}>{$fmt('common.no')}</Radio>
-            </Radio.Group>
-          </Form.Item>
-          {/* 是否以标签组形式恢复已命名标签组 */}
-          <Form.Item<SettingsProps>
-            label={$fmt(`settings.${NAMED_GROUP_RESTORE_AS_GROUP}`)}
-            name={NAMED_GROUP_RESTORE_AS_GROUP}
-          >
-            <Radio.Group>
-              <Radio value={true}>{$fmt('common.yes')}</Radio>
-              <Radio value={false}>{$fmt('common.no')}</Radio>
-            </Radio.Group>
-          </Form.Item>
-        </>
-      )}
+      <>
+        {/* 是否以标签组形式恢复未命名标签组 */}
+        <Form.Item<SettingsProps>
+          label={$fmt(`settings.${UNNAMED_GROUP_RESTORE_AS_GROUP}`)}
+          name={UNNAMED_GROUP_RESTORE_AS_GROUP}
+        >
+          <Radio.Group>
+            <Radio value={true}>{$fmt('common.yes')}</Radio>
+            <Radio value={false}>{$fmt('common.no')}</Radio>
+          </Radio.Group>
+        </Form.Item>
+        {/* 是否以标签组形式恢复已命名标签组 */}
+        <Form.Item<SettingsProps>
+          label={$fmt(`settings.${NAMED_GROUP_RESTORE_AS_GROUP}`)}
+          name={NAMED_GROUP_RESTORE_AS_GROUP}
+        >
+          <Radio.Group>
+            <Radio value={true}>{$fmt('common.yes')}</Radio>
+            <Radio value={false}>{$fmt('common.no')}</Radio>
+          </Radio.Group>
+        </Form.Item>
+      </>
     </Form.Item>
   );
 }
