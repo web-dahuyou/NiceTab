@@ -1,4 +1,4 @@
-import { Menus, Tabs } from 'wxt/browser';
+import { Menus, type Tabs } from 'wxt/browser';
 import {
   MANIFEST_VERSION,
   ENUM_ACTION_NAME,
