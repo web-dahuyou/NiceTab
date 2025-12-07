@@ -119,9 +119,8 @@ export async function executeContentScript(
       msgType: 'action:callback-message',
       data: {
         type: resultType,
-        content: `${customMessages[`common.${status}`]}: ${
-          customMessages[`common.${_actionName}` as keyof typeof customMessages]
-        }`,
+        content: `${customMessages[`common.${status}`]}: ${customMessages[`common.${_actionName}` as keyof typeof customMessages]
+          }`,
       },
       onlyCurrentTab: true,
     });
@@ -148,9 +147,8 @@ export async function openAdminRoutePage(
   const paramsStr = objectToUrlParams(route?.query || {});
   const settings = await settingsUtils.getSettings();
   const { tab, adminTabUrl } = await getAdminTabInfo();
-  const urlWithParams = `${adminTabUrl}#${route.path || '/home'}${
-    paramsStr ? `?${paramsStr}` : ''
-  }`;
+  const urlWithParams = `${adminTabUrl}#${route.path || '/home'}${paramsStr ? `?${paramsStr}` : ''
+    }`;
 
   // 如果发送标签页后不需要打开管理后台页面
   if (!needOpen) {
@@ -293,15 +291,23 @@ async function sendAllTabs(targetData: SendTargetProps = {}) {
   }
 }
 // 发送当前选中的标签页（支持多选）
-async function sendCurrentTab(targetData: SendTargetProps = {}) {
-  const tabs = await browser.tabs.query({
-    // url: matchUrls,
-    highlighted: true,
-    currentWindow: true,
-  });
-
+async function sendCurrentTab(targetData: SendTargetProps = {}, tab?: Tabs.Tab) {
+  let filteredTabs: Tabs.Tab[] = [];
   const settings = await settingsUtils.getSettings();
-  let filteredTabs = await getFilteredTabs(tabs, settings);
+
+  if (tab) {
+    if (tab.id) {
+      filteredTabs = await getFilteredTabs([tab], settings);
+    }
+  } else {
+    const tabs = await browser.tabs.query({
+      // url: matchUrls,
+      highlighted: true,
+      currentWindow: true,
+    });
+    filteredTabs = await getFilteredTabs(tabs, settings);
+  }
+
   // 发送当前选中的标签页时，选中的标签页成组，不考虑原生标签组（即多选时，选中的非标签组的标签页和标签组中的标签页合并到一个组）
   filteredTabs = filteredTabs.map(tab => ({ ...tab, groupId: -1 }));
   if (!filteredTabs?.length) return;
