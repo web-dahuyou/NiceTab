@@ -12,7 +12,7 @@ import {
   ExportOutlined,
   SearchOutlined,
   RestOutlined,
-  SyncOutlined,
+  CloudSyncOutlined,
   ReloadOutlined,
   GithubOutlined,
 } from '@ant-design/icons';
@@ -298,7 +298,7 @@ export default function App() {
     if (key === 'group-sendTabs') return <ExportOutlined />;
     if (key === 'globalSearch') return <SearchOutlined />;
     if (key === 'hibernateTabs') return <RestOutlined />;
-    if (key === 'startSync') return <SyncOutlined />;
+    if (key === 'startSync') return <CloudSyncOutlined />;
     if (key === 'reload') return <ReloadOutlined />;
     return null;
   };
