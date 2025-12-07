@@ -43,6 +43,7 @@ export default function initSettingsStorageListener(
 // 监听tabList storage变化
 export function initTabListStorageListener(callback: (tabList: TagItem[]) => void) {
   return storage.watch<TagItem[]>(tabListUtils.storageKey, tabList => {
+    tabListUtils.updateCache(tabList || []);
     callback(tabList || []);
   });
 }

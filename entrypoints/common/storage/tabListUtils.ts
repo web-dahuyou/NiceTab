@@ -186,6 +186,7 @@ export default class TabListUtils {
     tabCount: 0,
   };
   storageKey: `local:${string}` = 'local:tabList';
+  private _cache: TagItem[] | null = null;
 
   // 特殊的分类：中转站
   createStagingAreaTag(): TagItem {
@@ -219,6 +220,8 @@ export default class TabListUtils {
     }, []);
   }
   async getTagList() {
+    if (this._cache) return this._cache;
+
     let tagList = await storage.getItem<TagItem[]>(this.storageKey);
     const staticIndex = tagList?.findIndex(tag => tag.static) ?? -1;
     // 必须保证中转站排在第一位
@@ -231,14 +234,21 @@ export default class TabListUtils {
       await this.setTagList(tagList);
     }
 
+    this._cache = tagList;
     this.tagList = tagList;
     this.setCountInfo();
     return this.tagList;
   }
   async setTagList(list?: TagItem[]) {
     this.tagList = list?.length ? list : [this.createStagingAreaTag()];
+    this._cache = this.tagList;
     this.setCountInfo();
     storage.setItem(this.storageKey, this.tagList);
+  }
+  updateCache(list: TagItem[]) {
+    this.tagList = list;
+    this._cache = list;
+    this.setCountInfo();
   }
   setCountInfo() {
     let tagCount = 0,

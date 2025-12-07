@@ -116,7 +116,7 @@ export default function Home() {
     return {
       tree: (countInfo?.groupCount || 0) > 200 || groupCount > 30,
       // tabList: tabCount > (settings?.[TAB_COUNT_THRESHOLD] || 300),
-      tabList: tabCount > 100,
+      tabList: tabCount > 30,
     };
   }, [selectedTag.originData, countInfo?.groupCount]);
 

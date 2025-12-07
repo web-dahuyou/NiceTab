@@ -119,9 +119,8 @@ export async function executeContentScript(
       msgType: 'action:callback-message',
       data: {
         type: resultType,
-        content: `${customMessages[`common.${status}`]}: ${
-          customMessages[`common.${_actionName}` as keyof typeof customMessages]
-        }`,
+        content: `${customMessages[`common.${status}`]}: ${customMessages[`common.${_actionName}` as keyof typeof customMessages]
+          }`,
       },
       onlyCurrentTab: true,
     });
@@ -148,9 +147,8 @@ export async function openAdminRoutePage(
   const paramsStr = objectToUrlParams(route?.query || {});
   const settings = await settingsUtils.getSettings();
   const { tab, adminTabUrl } = await getAdminTabInfo();
-  const urlWithParams = `${adminTabUrl}#${route.path || '/home'}${
-    paramsStr ? `?${paramsStr}` : ''
-  }`;
+  const urlWithParams = `${adminTabUrl}#${route.path || '/home'}${paramsStr ? `?${paramsStr}` : ''
+    }`;
 
   // 如果发送标签页后不需要打开管理后台页面
   if (!needOpen) {
@@ -293,15 +291,36 @@ async function sendAllTabs(targetData: SendTargetProps = {}) {
   }
 }
 // 发送当前选中的标签页（支持多选）
-async function sendCurrentTab(targetData: SendTargetProps = {}) {
-  const tabs = await browser.tabs.query({
-    // url: matchUrls,
-    highlighted: true,
-    currentWindow: true,
-  });
-
+async function sendCurrentTab(targetData: SendTargetProps = {}, tab?: Tabs.Tab) {
+  let filteredTabs: Tabs.Tab[] = [];
   const settings = await settingsUtils.getSettings();
-  let filteredTabs = await getFilteredTabs(tabs, settings);
+
+  if (tab) {
+    if (tab.id) {
+      // 如果传入了 tab（通常来自右键菜单），检查它是否在当前高亮的标签页中
+      // 如果是，则发送所有高亮的标签页（多选发送）
+      // 如果不是，则只发送该特定标签页
+      const highlightedTabs = await browser.tabs.query({
+        highlighted: true,
+        currentWindow: true,
+      });
+
+      const isHighlighted = highlightedTabs.some(t => t.id === tab.id);
+      if (isHighlighted) {
+        filteredTabs = await getFilteredTabs(highlightedTabs, settings);
+      } else {
+        filteredTabs = await getFilteredTabs([tab], settings);
+      }
+    }
+  } else {
+    const tabs = await browser.tabs.query({
+      // url: matchUrls,
+      highlighted: true,
+      currentWindow: true,
+    });
+    filteredTabs = await getFilteredTabs(tabs, settings);
+  }
+
   // 发送当前选中的标签页时，选中的标签页成组，不考虑原生标签组（即多选时，选中的非标签组的标签页和标签组中的标签页合并到一个组）
   filteredTabs = filteredTabs.map(tab => ({ ...tab, groupId: -1 }));
   if (!filteredTabs?.length) return;
@@ -338,6 +357,30 @@ async function sendOtherTabs(targetData: SendTargetProps = {}) {
   }
   // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
   cancelHighlightTabs();
+}
+async function sendGroupTabs(tabs: Tabs.Tab[], targetData: SendTargetProps = {}) {
+  const settings = await settingsUtils.getSettings();
+  const filteredTabs = await getFilteredTabs(tabs, settings);
+
+  if (!filteredTabs?.length) return;
+
+  // 发送标签组时，保留标签组结构（如果有），或者如果 createTabs 内部处理了，就不需要特别处理
+  // tabListUtils.createTabs 会根据 tabs 数组创建 session。
+  // 注意：createTabs 可能会重新归类 unknown group if groupId is -1.
+  // 这里我们传入的 tabs 应该都是同一个 group 的。
+  const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs, targetData);
+
+  await openAdminTab(settings, { tagId, groupId });
+
+  const actionAutoCloseFlags = settings[ACTION_AUTO_CLOSE_FLAGS];
+  if (
+    settings[CLOSE_TABS_AFTER_SEND_TABS] ||
+    actionAutoCloseFlags?.includes('sendGroupTabs')
+  ) {
+    browser.tabs.remove(filteredTabs.map(t => t.id as number).filter(Boolean));
+  } else {
+    cancelHighlightTabs(filteredTabs);
+  }
 }
 async function sendLeftTabs(targetData: SendTargetProps = {}, currTab?: Tabs.Tab) {
   const tabs = await browser.tabs.query({
@@ -650,6 +693,7 @@ export default {
   sendOtherTabs,
   sendLeftTabs,
   sendRightTabs,
+  sendGroupTabs,
   openNewTab,
   discardOtherTabs,
   saveOpenedTabsAsSnapshot,

@@ -77,9 +77,14 @@ export const THEME_TYPE_CONFIG: Record<ThemeTypes, ThemeTypeConfig> = {
     bgColor: '#2f2f2f',
     algorithm: 'darkAlgorithm',
   },
+  auto: {
+    type: 'auto',
+    bgColor: '#fff',
+    algorithm: 'defaultAlgorithm',
+  },
 };
 // 默认主题类型
-export const defaultThemeType: ThemeTypes = 'light';
+export const defaultThemeType: ThemeTypes = 'auto';
 
 // 发送标签页操作名称
 export const SEND_TAB_ACTION_NAMES = [
@@ -107,6 +112,7 @@ export enum ENUM_ACTION_NAME {
   SEND_OTHER_TABS = 'action:sendOtherTabs', // 发送其他标签页
   SEND_LEFT_TABS = 'action:sendLeftTabs', // 发送左侧标签页
   SEND_RIGHT_TABS = 'action:sendRightTabs', // 发送右侧标签页
+  SEND_GROUP_TABS = 'action:sendGroupTabs', // 发送标签组
   GLOBAL_SEARCH = 'action:globalSearch', // 全局搜索
   START_SYNC = 'action:startSync', // 开始同步
   HIBERNATE_TABS = 'action:hibernateTabs', // 休眠其他标签页
@@ -190,9 +196,9 @@ export const LANGUAGE_OPTIONS: Array<{
   locale: LanguageTypes;
   label: string;
 }> = [
-  { key: 'zh-CN', locale: 'zh-CN', label: '简体中文' },
-  { key: 'en-US', locale: 'en-US', label: 'English' },
-];
+    { key: 'zh-CN', locale: 'zh-CN', label: '简体中文' },
+    { key: 'en-US', locale: 'en-US', label: 'English' },
+  ];
 
 export const defaultLanguage: LanguageTypes = 'en-US';
 

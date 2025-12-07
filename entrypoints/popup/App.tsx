@@ -1,9 +1,22 @@
-import { useContext, useCallback, useEffect, useState } from 'react';
+import { useContext, useCallback, useEffect, useState, useRef } from 'react';
 import { browser, Tabs } from 'wxt/browser';
 import { ThemeProvider } from 'styled-components';
-import { theme, Space, Dropdown, Button, type MenuProps } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
-import { sendRuntimeMessage, isGroupSupported } from '~/entrypoints/common/utils';
+import { theme, Space, Dropdown, Button, type MenuProps, Tooltip } from 'antd';
+import {
+  DownOutlined,
+  CompressOutlined,
+  ExpandOutlined,
+  HomeOutlined,
+  KeyOutlined,
+  ReadOutlined,
+  ExportOutlined,
+  SearchOutlined,
+  RestOutlined,
+  CloudSyncOutlined,
+  ReloadOutlined,
+  GithubOutlined,
+} from '@ant-design/icons';
+import { sendRuntimeMessage, isGroupSupported, isDomainAllowed } from '~/entrypoints/common/utils';
 import '~/assets/css/reset.css';
 import '~/assets/css/index.css';
 import './App.css';
@@ -14,7 +27,7 @@ import {
   discardOtherTabs,
   openUserGuide,
 } from '~/entrypoints/common/tabs';
-import { getMenus, actionHandler } from '~/entrypoints/common/contextMenus';
+import { getMenus, actionHandler, strategyHandler } from '~/entrypoints/common/contextMenus';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import { TAB_EVENTS, SHORTCUTS_PAGE_URL } from '~/entrypoints/common/constants';
 import type { PopupModuleNames, LanguageTypes } from '~/entrypoints/types';
@@ -60,6 +73,11 @@ export default function App() {
   const [tabGroupList, setTabGroupList] = useState<GroupListItem[]>([]);
   const [modules, setModules] = useState<PopupModuleNames[]>([]);
   const [actionBtns, setActionBtns] = useState<ActionBtnItem[]>([]);
+  const [isCompact, setIsCompact] = useState(() => localStorage.getItem('popup-compact') === 'true');
+  const [isNormalSticky, setIsNormalSticky] = useState(false);
+  const [adminTabId, setAdminTabId] = useState<number | undefined>();
+  const [settings, setSettings] = useState<any>({});
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // 快捷跳转
   const quickJumpBtns = [
@@ -87,6 +105,27 @@ export default function App() {
       },
     },
   ];
+
+  const checkTabCanSend = useCallback(
+    (tab: Tabs.Tab) => {
+      // 1. admin tab check
+      if (tab.id === adminTabId) return { canSend: false, reason: $fmt('common.adminTab') };
+
+      // 2. pinned tab check
+      if (tab.pinned && !settings[ENUM_SETTINGS_PROPS.ALLOW_SEND_PINNED_TABS]) {
+        return { canSend: false, reason: $fmt('common.pinnedTab') };
+      }
+
+      // 3. domain check
+      const excludeDomainsString = settings[ENUM_SETTINGS_PROPS.EXCLUDE_DOMAINS_FOR_SENDING] || '';
+      if (!isDomainAllowed(tab.url, excludeDomainsString)) {
+        return { canSend: false, reason: $fmt('common.domainExcluded') };
+      }
+
+      return { canSend: true };
+    },
+    [adminTabId, settings, $fmt],
+  );
 
   const handleAction = async (actionType: string, actionName: string) => {
     if (actionType === 'sendTabs') {
@@ -201,6 +240,11 @@ export default function App() {
         handleTabDiscard(tab);
       } else if (action === 'remove') {
         handleTabRemove(tab);
+      } else if (action === 'send') {
+        strategyHandler(ENUM_ACTION_NAME.SEND_CURRENT_TAB, tab);
+      } else if (action === 'sendGroup') {
+        // 注意：tabListUtils.createTabs 可能会重新归类 unknown group if groupId is -1.
+        strategyHandler(ENUM_ACTION_NAME.SEND_GROUP_TABS, tab);
       }
     },
     [tabs],
@@ -248,6 +292,10 @@ export default function App() {
 
   const init = async () => {
     const settings = await settingsUtils.getSettings();
+    const { tab: adminTab } = await getAdminTabInfo();
+    setSettings(settings);
+    setAdminTabId(adminTab?.id);
+
     const modules =
       settings[ENUM_SETTINGS_PROPS.POPUP_MODULE_DISPLAYS] || POPUP_MODULE_NAMES;
     setModules(modules);
@@ -270,99 +318,212 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      if (isNormalSticky && container.scrollTop <= 0) {
+        setIsNormalSticky(false);
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+    }
+  }, [isNormalSticky]);
+
+  const toggleCompact = () => {
+    const nextCompact = !isCompact;
+    setIsCompact(nextCompact);
+    localStorage.setItem('popup-compact', String(nextCompact));
+
+    // 从紧凑模式切换到正常模式时，如果处于滚动状态，则保持sticky
+    if (!nextCompact && containerRef.current && containerRef.current.scrollTop > 0) {
+      setIsNormalSticky(true);
+    } else {
+      setIsNormalSticky(false);
+    }
+  };
+
+  const getActionIcon = (key: string, path?: string) => {
+    if (path === '/home') return <HomeOutlined />;
+    if (path === '/shortcuts') return <KeyOutlined />;
+    if (path === '/user-guide') return <ReadOutlined />;
+
+    if (key === 'group-sendTabs') return <ExportOutlined />;
+    if (key === 'globalSearch') return <SearchOutlined />;
+    if (key === 'hibernateTabs') return <RestOutlined />;
+    if (key === 'startSync') return <CloudSyncOutlined />;
+    if (key === 'reload') return <ReloadOutlined />;
+    return null;
+  };
+
+
   return (
     <ThemeProvider theme={{ ...themeTypeConfig, ...token }}>
-      <StyledContainer className="popup-container select-none">
+      <StyledContainer ref={containerRef} className="popup-container select-none">
         <GlobalStyle />
-        <div className="fixed-top">
-          {/* 该模块不会渲染，目前未配置模块时，单击扩展图标会直接发送所有标签页，不会打开popup面板 */}
-          {!modules.length && (
-            <div className="block quick-actions">
-              <span
-                className="action-btn"
-                onClick={() => openNewTab(GITHUB_URL, { active: true, openToNext: true })}
-              >
-                {$fmt('common.goToGithub')}
-              </span>
-            </div>
-          )}
-          {/* 模块-扩展信息 */}
-          {modules.includes('extensionInfo') && (
-            <div className="block version">
-              <span className="block-title">{$fmt('common.version')}：</span>
-              {version}
-            </div>
-          )}
-          {/* 模块-前往 */}
-          {modules.includes('goto') && (
-            <div className="block quick-actions">
-              <span className="block-title">{$fmt('common.goto')}：</span>
-              <div className="block-content">
-                {quickJumpBtns
+
+        <div className={`fixed-top ${isCompact ? 'compact' : ''} ${(!isCompact && isNormalSticky) ? 'sticky' : ''}`}>
+          <div
+            className="toggle-compact-btn"
+            onClick={toggleCompact}
+            title={$fmt(isCompact ? 'common.expand' : 'common.collapse')}
+          >
+            {isCompact ? <ExpandOutlined /> : <CompressOutlined />}
+          </div>
+
+          {isCompact ? (
+            <div className="compact-toolbar">
+              {/* GitHub */}
+              <Tooltip title={$fmt('common.goToGithub')} placement="bottom">
+                <Button
+                  type="text"
+                  icon={<GithubOutlined />}
+                  onClick={() => openNewTab(GITHUB_URL, { active: true, openToNext: true })}
+                />
+              </Tooltip>
+
+              {/* Goto Actions */}
+              {modules.includes('goto') &&
+                quickJumpBtns
                   .filter(item => !item.disabled)
                   .map(item => (
-                    <Button
-                      size="small"
-                      key={item.path}
-                      disabled={item.disabled}
-                      onClick={item.onClick}
-                    >
-                      {item.label}
-                    </Button>
+                    <Tooltip key={item.path} title={item.label} placement="bottom">
+                      <Button
+                        type="text"
+                        icon={getActionIcon('', item.path)}
+                        onClick={item.onClick}
+                      />
+                    </Tooltip>
                   ))}
-              </div>
-            </div>
-          )}
-          {/* 模块-操作 */}
-          {modules.includes('actions') && (
-            <div className="block quick-actions">
-              <span className="block-title">{$fmt('common.actions')}：</span>
-              <div className="block-content">
-                {actionBtns.map(item => {
+
+              {/* Functional Actions */}
+              {modules.includes('actions') &&
+                actionBtns.map(item => {
                   if (item.type === 'group' && item.children?.length) {
                     return (
                       <Dropdown
                         key={item.key}
-                        className="actions-dropdown-menus"
                         menu={{
                           items: item.children as MenuProps['items'],
                           onClick: item.onClick,
                         }}
                         placement="bottomLeft"
                       >
-                        <Button size="small">
-                          <Space>
-                            {item.label}
-                            <DownOutlined />
-                          </Space>
-                        </Button>
+                        <Tooltip title={item.label} placement="bottom">
+                          <Button type="text" icon={getActionIcon(item.key)} />
+                        </Tooltip>
                       </Dropdown>
                     );
                   } else {
                     return (
-                      <Button
-                        key={item.key}
-                        size="small"
-                        disabled={item.disabled}
-                        onClick={item.onClick}
-                      >
-                        {item.label}
-                      </Button>
+                      <Tooltip key={item.key} title={item.label} placement="bottom">
+                        <Button
+                          type="text"
+                          disabled={item.disabled}
+                          onClick={item.onClick}
+                          icon={getActionIcon(item.key)}
+                        />
+                      </Tooltip>
                     );
                   }
                 })}
-              </div>
             </div>
-          )}
-          {/* 模块-主题切换 */}
-          {modules.includes('theme') && (
-            <div className="block theme-colors">
-              <span className="block-title">{$fmt('common.theme')}：</span>
-              <ColorList colors={THEME_COLORS} onItemClick={handleThemeChange} />
-            </div>
-          )}
-          {modules.includes('openedTabs') && (
-            <div className="tab-list-title">{$fmt('common.openedTabs')}：</div>
+          ) : (
+            <>
+              {/* 该模块不会渲染，目前未配置模块时，单击扩展图标会直接发送所有标签页，不会打开popup面板 */}
+              {!modules.length && (
+                <div className="block quick-actions">
+                  <span
+                    className="action-btn"
+                    onClick={() => openNewTab(GITHUB_URL, { active: true, openToNext: true })}
+                  >
+                    {$fmt('common.goToGithub')}
+                  </span>
+                </div>
+              )}
+              {/* 模块-扩展信息 */}
+              {modules.includes('extensionInfo') && (
+                <div className="block version">
+                  <span className="block-title">{$fmt('common.version')}：</span>
+                  {version}
+                </div>
+              )}
+              {/* 模块-前往 */}
+              {modules.includes('goto') && (
+                <div className="block quick-actions">
+                  <span className="block-title">{$fmt('common.goto')}：</span>
+                  <div className="block-content">
+                    {quickJumpBtns
+                      .filter(item => !item.disabled)
+                      .map(item => (
+                        <Button
+                          size="small"
+                          key={item.path}
+                          disabled={item.disabled}
+                          onClick={item.onClick}
+                        >
+                          {item.label}
+                        </Button>
+                      ))}
+                  </div>
+                </div>
+              )}
+              {/* 模块-操作 */}
+              {modules.includes('actions') && (
+                <div className="block quick-actions">
+                  <span className="block-title">{$fmt('common.actions')}：</span>
+                  <div className="block-content">
+                    {actionBtns.map(item => {
+                      if (item.type === 'group' && item.children?.length) {
+                        return (
+                          <Dropdown
+                            key={item.key}
+                            className="actions-dropdown-menus"
+                            menu={{
+                              items: item.children as MenuProps['items'],
+                              onClick: item.onClick,
+                            }}
+                            placement="bottomLeft"
+                          >
+                            <Button size="small">
+                              <Space>
+                                {item.label}
+                                <DownOutlined />
+                              </Space>
+                            </Button>
+                          </Dropdown>
+                        );
+                      } else {
+                        return (
+                          <Button
+                            key={item.key}
+                            size="small"
+                            disabled={item.disabled}
+                            onClick={item.onClick}
+                          >
+                            {item.label}
+                          </Button>
+                        );
+                      }
+                    })}
+                  </div>
+                </div>
+              )}
+              {/* 模块-主题切换 */}
+              {modules.includes('theme') && (
+                <div className="block theme-colors">
+                  <span className="block-title">{$fmt('common.theme')}：</span>
+                  <ColorList colors={THEME_COLORS} onItemClick={handleThemeChange} />
+                </div>
+              )}
+              {modules.includes('openedTabs') && (
+                <div className="tab-list-title">{$fmt('common.openedTabs')}：</div>
+              )}
+            </>
           )}
         </div>
 
@@ -374,6 +535,7 @@ export default function App() {
                 key={~group.groupId || index}
                 group={group}
                 onAction={handleTabAction}
+                checkTabCanSend={checkTabCanSend}
               ></TabGroupItem>
             ))}
           </div>

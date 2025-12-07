@@ -30,6 +30,7 @@ export interface GlobalContextProps {
   version: string;
   colorPrimary: string;
   themeTypeConfig: ThemeTypeConfig;
+  themeType: ThemeTypes;
   pageWidthType: PageWidthTypes;
   pageContext: PageContextType;
   $message: MessageInstance;
@@ -53,7 +54,7 @@ export type IntlForamtMessageParams = MessageDescriptor & {
 export type StyledThemeProps = ThemeConfig['token'] & ThemeTypeConfig;
 
 // 主题类型
-export type ThemeTypes = 'light' | 'dark';
+export type ThemeTypes = 'light' | 'dark' | 'auto';
 
 export interface ThemeTypeConfig {
   type: ThemeTypes;
@@ -104,7 +105,8 @@ export type ActionNames =
   | 'sendCurrentTab'
   | 'sendOtherTabs'
   | 'sendLeftTabs'
-  | 'sendRightTabs';
+  | 'sendRightTabs'
+  | 'sendGroupTabs';
 
 // 页面模块名称
 export type PageModuleNames =

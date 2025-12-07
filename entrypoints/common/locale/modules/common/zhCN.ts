@@ -11,8 +11,12 @@ const zhCN = {
   'common.sendOtherTabs': '发送其他标签页',
   'common.sendLeftTabs': '发送左侧标签页',
   'common.sendRightTabs': '发送右侧标签页',
+  'common.sendGroup': '发送整个分组',
   'common.sendPinnedTabs': '发送固定标签页',
   'common.openAdminTab': '打开NiceTab管理后台',
+  'common.adminTab': '管理后台标签页',
+  'common.pinnedTab': '固定标签页',
+  'common.domainExcluded': '域名被排除',
   'common.hibernateTabs': '休眠其他标签页',
   'common.hibernate': '使休眠',
   'common.hibernated': '休眠中',
@@ -115,6 +119,8 @@ const zhCN = {
   'common.regex': '正则',
   'common.directory': '目录',
   'common.filename': '文件名',
+  'common.expand': '展开',
+  'common.collapse': '收起',
 };
 
 export type LocaleKey = keyof typeof zhCN;

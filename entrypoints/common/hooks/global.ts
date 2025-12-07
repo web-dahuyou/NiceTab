@@ -26,9 +26,10 @@ export const GlobalContext = createContext<GlobalContextProps>({
   version: '888.888.888',
   colorPrimary: PRIMARY_COLOR,
   themeTypeConfig: THEME_TYPE_CONFIG[defaultThemeType],
+  themeType: defaultThemeType,
   pageWidthType: 'fixed',
   pageContext: 'optionsPage',
-  $message: (() => {}) as any,
+  $message: (() => { }) as any,
   setThemeType: async (themeType = defaultThemeType) => {
     settingsUtils.setSettings({ ...settingsUtils.settings, themeType });
   },
@@ -96,25 +97,57 @@ export function useCustomLocale() {
   return { messages, locale, changeLocale };
 }
 
-// theme type (light | dark)
+// theme type (light | dark | auto)
 export function useThemeTypeConfig() {
+  const [themeType, setThemeType] = useState<ThemeTypes>(defaultThemeType);
   const [themeTypeConfig, setThemeTypeConfig] = useState<ThemeTypeConfig>(
     THEME_TYPE_CONFIG.light,
   );
 
-  const changeThemeType = async (themeType: ThemeTypes = defaultThemeType) => {
+  const getAutoThemeConfig = (): ThemeTypeConfig => {
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return isDark ? THEME_TYPE_CONFIG.dark : THEME_TYPE_CONFIG.light;
+  };
+
+  const updateThemeTypeConfig = (type: ThemeTypes) => {
+    let config: ThemeTypeConfig;
+    if (type === 'auto') {
+      config = getAutoThemeConfig();
+      // 保留 type 为 auto，以便后续逻辑判断
+      config = { ...config, type: 'auto' };
+    } else {
+      config = THEME_TYPE_CONFIG[type];
+    }
+    setThemeTypeConfig({ ...config });
+  };
+
+  const changeThemeType = async (newThemeType: ThemeTypes = defaultThemeType) => {
     const settings = await settingsUtils.getSettings();
-    await settingsUtils.setSettings({ ...settings, themeType });
-    setThemeTypeConfig({ ...THEME_TYPE_CONFIG[themeType] });
+    await settingsUtils.setSettings({ ...settings, themeType: newThemeType });
+    setThemeType(newThemeType);
+    updateThemeTypeConfig(newThemeType);
   };
 
   useEffect(() => {
     settingsUtils.getSettings().then(settings => {
-      const themeType = settings.themeType || defaultThemeType;
-      setThemeTypeConfig({ ...THEME_TYPE_CONFIG[themeType] });
+      const currentThemeType = settings.themeType || defaultThemeType;
+      setThemeType(currentThemeType);
+      updateThemeTypeConfig(currentThemeType);
     });
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = () => {
+      settingsUtils.getSettings().then(settings => {
+        if (settings.themeType === 'auto') {
+          updateThemeTypeConfig('auto');
+        }
+      });
+    };
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
-  return { themeTypeConfig, changeThemeType };
+
+  return { themeTypeConfig, themeType, changeThemeType };
 }
 
 // react-intl message hooks

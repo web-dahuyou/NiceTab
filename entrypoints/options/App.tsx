@@ -25,6 +25,7 @@ import {
   RestOutlined,
   GithubOutlined,
   MoonOutlined,
+  DesktopOutlined,
   SunOutlined,
   SmileOutlined,
   SendOutlined,
@@ -234,10 +235,19 @@ function AppLayout() {
     },
     [navs, navigate],
   );
-  // 切换主题类型
   const handleThemeTypeChange = () => {
-    const currThemeType = themeTypeConfig.type || defaultThemeType;
-    const themeType = currThemeType === 'light' ? 'dark' : 'light';
+    // const currThemeType = themeTypeConfig.type || defaultThemeType;
+    // const themeType = currThemeType === 'light' ? 'dark' : 'light';
+    const currThemeType = NiceGlobalContext.themeType || defaultThemeType;
+    let themeType: ThemeTypes = 'light';
+    if (currThemeType === 'light') {
+      themeType = 'dark';
+    } else if (currThemeType === 'dark') {
+      themeType = 'auto';
+    } else {
+      themeType = 'light';
+    }
+
     NiceGlobalContext.setThemeType(themeType);
     sendRuntimeMessage({ msgType: 'setThemeType', data: { themeType } });
   };
@@ -414,7 +424,9 @@ function AppLayout() {
               title={$fmt('common.toggleThemeType')}
               onClick={handleThemeTypeChange}
             >
-              {themeTypeConfig.type === 'light' ? <SunOutlined /> : <MoonOutlined />}
+              {NiceGlobalContext.themeType === 'light' && <SunOutlined />}
+              {NiceGlobalContext.themeType === 'dark' && <MoonOutlined />}
+              {NiceGlobalContext.themeType === 'auto' && <DesktopOutlined />}
             </StyledActionIconBtn>
             {/* language */}
             <Dropdown
