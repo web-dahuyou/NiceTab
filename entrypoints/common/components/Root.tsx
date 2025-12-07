@@ -143,6 +143,7 @@ export default function Root({
             version,
             colorPrimary: primaryColor,
             themeTypeConfig,
+            themeType: themeTypeConfig.type,
             pageWidthType,
             pageContext,
             $message,

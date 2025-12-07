@@ -77,9 +77,14 @@ export const THEME_TYPE_CONFIG: Record<ThemeTypes, ThemeTypeConfig> = {
     bgColor: '#2f2f2f',
     algorithm: 'darkAlgorithm',
   },
+  auto: {
+    type: 'auto',
+    bgColor: '#fff',
+    algorithm: 'defaultAlgorithm',
+  },
 };
 // 默认主题类型
-export const defaultThemeType: ThemeTypes = 'light';
+export const defaultThemeType: ThemeTypes = 'auto';
 
 // 发送标签页操作名称
 export const SEND_TAB_ACTION_NAMES = [
