@@ -13,6 +13,52 @@ export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
   .fixed-top {
     flex-shrink: 0;
     flex-grow: 0;
+    position: relative;
+    transition: all 0.3s ease;
+
+    &.compact {
+      .block {
+        padding: 4px 10px;
+        min-height: 32px;
+        gap: 4px;
+        .block-title {
+          font-size: 12px;
+        }
+        .action-btn {
+            font-size: 12px;
+        }
+      }
+      }
+
+    .compact-toolbar {
+        display: flex;
+        align-items: center;
+        padding: 4px 10px;
+        min-height: 38px;
+        padding-right: 30px;
+        gap: 2px;
+        button {
+          color: ${props => props.theme.colorTextSecondary || '#333'};
+          border: none;
+          box-shadow: none;
+          &:hover {
+             color: ${props => props.theme.colorPrimary};
+             background: rgba(0,0,0,0.05);
+          }
+        }
+    }
+    .toggle-compact-btn {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      z-index: 10;
+      cursor: pointer;
+      font-size: 14px;
+      color: ${props => props.theme.colorTextQuaternary || 'rgba(0, 0, 0, 0.45)'};
+      &:hover {
+        color: ${props => props.theme.colorPrimary};
+      }
+    }
   }
   .block {
     display: flex;
