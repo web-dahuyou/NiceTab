@@ -16,7 +16,7 @@ import {
   ReloadOutlined,
   GithubOutlined,
 } from '@ant-design/icons';
-import { sendRuntimeMessage, isGroupSupported } from '~/entrypoints/common/utils';
+import { sendRuntimeMessage, isGroupSupported, isDomainAllowed } from '~/entrypoints/common/utils';
 import '~/assets/css/reset.css';
 import '~/assets/css/index.css';
 import './App.css';
@@ -27,7 +27,7 @@ import {
   discardOtherTabs,
   openUserGuide,
 } from '~/entrypoints/common/tabs';
-import { getMenus, actionHandler } from '~/entrypoints/common/contextMenus';
+import { getMenus, actionHandler, strategyHandler } from '~/entrypoints/common/contextMenus';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import { TAB_EVENTS, SHORTCUTS_PAGE_URL } from '~/entrypoints/common/constants';
 import type { PopupModuleNames, LanguageTypes } from '~/entrypoints/types';
@@ -74,6 +74,8 @@ export default function App() {
   const [modules, setModules] = useState<PopupModuleNames[]>([]);
   const [actionBtns, setActionBtns] = useState<ActionBtnItem[]>([]);
   const [isCompact, setIsCompact] = useState(() => localStorage.getItem('popup-compact') === 'true');
+  const [adminTabId, setAdminTabId] = useState<number | undefined>();
+  const [settings, setSettings] = useState<any>({});
 
   // 快捷跳转
   const quickJumpBtns = [
@@ -101,6 +103,27 @@ export default function App() {
       },
     },
   ];
+
+  const checkTabCanSend = useCallback(
+    (tab: Tabs.Tab) => {
+      // 1. admin tab check
+      if (tab.id === adminTabId) return { canSend: false, reason: $fmt('common.adminTab') };
+
+      // 2. pinned tab check
+      if (tab.pinned && !settings[ENUM_SETTINGS_PROPS.ALLOW_SEND_PINNED_TABS]) {
+        return { canSend: false, reason: $fmt('common.pinnedTab') };
+      }
+
+      // 3. domain check
+      const excludeDomainsString = settings[ENUM_SETTINGS_PROPS.EXCLUDE_DOMAINS_FOR_SENDING] || '';
+      if (!isDomainAllowed(tab.url, excludeDomainsString)) {
+        return { canSend: false, reason: $fmt('common.domainExcluded') };
+      }
+
+      return { canSend: true };
+    },
+    [adminTabId, settings, $fmt],
+  );
 
   const handleAction = async (actionType: string, actionName: string) => {
     if (actionType === 'sendTabs') {
@@ -215,6 +238,8 @@ export default function App() {
         handleTabDiscard(tab);
       } else if (action === 'remove') {
         handleTabRemove(tab);
+      } else if (action === 'send') {
+        strategyHandler(ENUM_ACTION_NAME.SEND_CURRENT_TAB, tab);
       }
     },
     [tabs],
@@ -262,6 +287,10 @@ export default function App() {
 
   const init = async () => {
     const settings = await settingsUtils.getSettings();
+    const { tab: adminTab } = await getAdminTabInfo();
+    setSettings(settings);
+    setAdminTabId(adminTab?.id);
+
     const modules =
       settings[ENUM_SETTINGS_PROPS.POPUP_MODULE_DISPLAYS] || POPUP_MODULE_NAMES;
     setModules(modules);
@@ -478,6 +507,7 @@ export default function App() {
                 key={~group.groupId || index}
                 group={group}
                 onAction={handleTabAction}
+                checkTabCanSend={checkTabCanSend}
               ></TabGroupItem>
             ))}
           </div>

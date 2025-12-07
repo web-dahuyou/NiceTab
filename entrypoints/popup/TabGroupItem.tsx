@@ -13,13 +13,14 @@ export interface GroupListItem {
   color?: string;
 }
 
-export type TabActions = 'active' | 'discard' | 'remove';
+export type TabActions = 'active' | 'discard' | 'remove' | 'send';
 export interface GroupItemProps {
   group: GroupListItem;
   onAction: (action: TabActions, tab: Tabs.Tab) => void;
+  checkTabCanSend: (tab: Tabs.Tab) => { canSend: boolean; reason?: string };
 }
 
-export default function TabGroupItem({ group, onAction }: GroupItemProps) {
+export default function TabGroupItem({ group, onAction, checkTabCanSend }: GroupItemProps) {
   const groupRef = useRef<HTMLDivElement>(null);
   const [collapsed, setCollapsed] = useState(group.collapsed);
   const onToggle = useCallback(() => {
@@ -41,7 +42,14 @@ export default function TabGroupItem({ group, onAction }: GroupItemProps) {
   }, []);
 
   if (group.groupId === -1) {
-    return group.tabs?.map(tab => <TabItem key={tab.id} tab={tab} onAction={onAction} />);
+    return group.tabs?.map(tab => (
+      <TabItem
+        key={tab.id}
+        tab={tab}
+        onAction={onAction}
+        checkTabCanSend={checkTabCanSend}
+      />
+    ));
   }
 
   return (
@@ -60,7 +68,7 @@ export default function TabGroupItem({ group, onAction }: GroupItemProps) {
         {group.tabs?.map(tab => (
           <div className="tab-list-item" key={tab.id}>
             <i className="group-color-flag"></i>
-            <TabItem tab={tab} onAction={onAction} />
+            <TabItem tab={tab} onAction={onAction} checkTabCanSend={checkTabCanSend} />
           </div>
         ))}
       </div>
