@@ -116,7 +116,10 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
       customMessages['common.sendCurrentTab'],
       ENUM_ACTION_NAME.SEND_CURRENT_TAB,
     ),
-    contexts: [...contexts, 'tab'],
+    contexts:
+      import.meta.env.BROWSER === 'firefox'
+        ? [...contexts, 'tab']
+        : contexts,
     enabled:
       !!currTab?.id &&
       currTab?.id != adminTab?.id &&
