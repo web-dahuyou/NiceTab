@@ -9,6 +9,8 @@ export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
   max-height: 590px; // 浏览器popup高度最大为600px, 超过这个高度会出现body滚动条
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   .fixed-top {
     flex-shrink: 0;
