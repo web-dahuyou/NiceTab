@@ -144,6 +144,14 @@ export const StyledGroupWrapper = styled.div<{ $color?: string }>`
       font-size: 12px;
       color: ${props => props.theme.colorText || '#000'};
       ${StyledEllipsis}
+      ${StyledEllipsis}
+    }
+    .group-action-btn {
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    &:hover .group-action-btn {
+      opacity: 1;
     }
   }
   .tab-list {

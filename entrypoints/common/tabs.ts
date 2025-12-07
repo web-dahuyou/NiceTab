@@ -358,6 +358,30 @@ async function sendOtherTabs(targetData: SendTargetProps = {}) {
   // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
   cancelHighlightTabs();
 }
+async function sendGroupTabs(tabs: Tabs.Tab[], targetData: SendTargetProps = {}) {
+  const settings = await settingsUtils.getSettings();
+  const filteredTabs = await getFilteredTabs(tabs, settings);
+
+  if (!filteredTabs?.length) return;
+
+  // 发送标签组时，保留标签组结构（如果有），或者如果 createTabs 内部处理了，就不需要特别处理
+  // tabListUtils.createTabs 会根据 tabs 数组创建 session。
+  // 注意：createTabs 可能会重新归类 unknown group if groupId is -1.
+  // 这里我们传入的 tabs 应该都是同一个 group 的。
+  const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs, targetData);
+
+  await openAdminTab(settings, { tagId, groupId });
+
+  const actionAutoCloseFlags = settings[ACTION_AUTO_CLOSE_FLAGS];
+  if (
+    settings[CLOSE_TABS_AFTER_SEND_TABS] ||
+    actionAutoCloseFlags?.includes('sendGroupTabs')
+  ) {
+    browser.tabs.remove(filteredTabs.map(t => t.id as number).filter(Boolean));
+  } else {
+    cancelHighlightTabs(filteredTabs);
+  }
+}
 async function sendLeftTabs(targetData: SendTargetProps = {}, currTab?: Tabs.Tab) {
   const tabs = await browser.tabs.query({
     // url: matchUrls,
@@ -669,6 +693,7 @@ export default {
   sendOtherTabs,
   sendLeftTabs,
   sendRightTabs,
+  sendGroupTabs,
   openNewTab,
   discardOtherTabs,
   saveOpenedTabsAsSnapshot,

@@ -296,6 +296,13 @@ export async function actionHandler(actionName: string, targetData?: SendTargetP
     case ENUM_ACTION_NAME.SEND_RIGHT_TABS:
       await tabUtils.sendRightTabs(targetData, tab);
       break;
+    case ENUM_ACTION_NAME.SEND_GROUP_TABS:
+      if (tab?.groupId && tab.groupId !== -1) {
+        const tabs = await browser.tabs.query({ windowId: tab.windowId });
+        const groupTabs = tabs.filter(t => t.groupId === tab.groupId);
+        await tabUtils.sendGroupTabs(groupTabs, targetData);
+      }
+      break;
     case ENUM_ACTION_NAME.OPEN_ADMIN_TAB:
       await tabUtils.openAdminRoutePage({ path: '/home' });
       break;
