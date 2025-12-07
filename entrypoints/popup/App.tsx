@@ -240,6 +240,9 @@ export default function App() {
         handleTabRemove(tab);
       } else if (action === 'send') {
         strategyHandler(ENUM_ACTION_NAME.SEND_CURRENT_TAB, tab);
+      } else if (action === 'sendGroup') {
+        // 注意：tabListUtils.createTabs 可能会重新归类 unknown group if groupId is -1.
+        strategyHandler(ENUM_ACTION_NAME.SEND_GROUP_TABS, tab);
       }
     },
     [tabs],

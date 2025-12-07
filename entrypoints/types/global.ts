@@ -104,7 +104,8 @@ export type ActionNames =
   | 'sendCurrentTab'
   | 'sendOtherTabs'
   | 'sendLeftTabs'
-  | 'sendRightTabs';
+  | 'sendRightTabs'
+  | 'sendGroupTabs';
 
 // 页面模块名称
 export type PageModuleNames =
