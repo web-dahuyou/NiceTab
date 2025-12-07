@@ -208,6 +208,13 @@ export const StyledTabItem = styled.div`
     flex-shrink: 0;
     margin-left: 8px;
   }
+  .send-btn {
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s, color 0.2s;
+  }
+  &:hover .send-btn {
+    opacity: 1;
+  }
   &.discarded {
     .tab-item-title,
     .btn-discarded {

@@ -53,12 +53,11 @@ export default function TabItem({ tab, onAction, checkTabCanSend }: TabItemProps
       <span className="tab-item-title">{tab.title}</span>
 
       <StyledActionIconBtn
-        className="action-icon-btn"
+        className="action-icon-btn send-btn"
         $size={16}
         disabled={!canSend}
         title={!canSend ? reason : $fmt('common.sendCurrentTab')}
         onClick={event => canSend && handleAction(event, 'send')}
-        style={{ opacity: !canSend ? 0.3 : 1, cursor: !canSend ? 'not-allowed' : 'pointer' }}
       >
         <ExportOutlined />
       </StyledActionIconBtn>
