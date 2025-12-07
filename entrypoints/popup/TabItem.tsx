@@ -7,7 +7,7 @@ import Favicon from '~/entrypoints/common/components/Favicon';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { StyledTabItem } from './App.styled';
 
-export type TabActions = 'active' | 'discard' | 'remove' | 'send';
+export type TabActions = 'active' | 'discard' | 'remove' | 'send' | 'sendGroup';
 interface TabItemProps {
   tab: Tabs.Tab;
   onAction: (action: TabActions, tab: Tabs.Tab) => void;
