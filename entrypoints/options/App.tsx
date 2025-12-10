@@ -53,6 +53,7 @@ import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import useMenus from '@/entrypoints/common/hooks/menu';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import useUpdate from '~/entrypoints/common/hooks/update';
+import getPermission from '~/entrypoints/common/hooks/getPermission';
 import useUrlParams from '~/entrypoints/common/hooks/urlParams';
 import {
   GITHUB_URL,
@@ -215,6 +216,9 @@ function AppLayout() {
   const { urlParams, setSearchParams } = useUrlParams();
   const sendTargetActionRef = useRef<SendTargetActionHolderProps>();
 
+  const { isFirefoxTabGroupSupported, hasTabGroupsPermission, getTabGroupsPermission } =
+    getPermission();
+
   const { version, themeTypeConfig, pageWidthType, $message } = NiceGlobalContext;
   const navs = useMemo(() => {
     return navsTemplate.map(item => {
@@ -370,6 +374,13 @@ function AppLayout() {
             onSelect={onSelect}
           />
 
+          {isFirefoxTabGroupSupported && !hasTabGroupsPermission && (
+            <Space className="header-tip select-none" style={{ margin: '0 12px' }}>
+              <a className="link" onClick={getTabGroupsPermission}>
+                {$fmt('home.getPermission.tabGroups')}
+              </a>
+            </Space>
+          )}
           {updateDetail?.updateAvailable && (
             <Space className="header-tip select-none" style={{ margin: '0 12px' }}>
               <Typography.Text type="warning">

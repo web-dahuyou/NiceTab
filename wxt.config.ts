@@ -1,4 +1,4 @@
-import { defineConfig } from 'wxt';
+import { defineConfig, WxtViteConfig } from 'wxt';
 import svgr from 'vite-plugin-svgr';
 import yargsParser from 'yargs-parser';
 
@@ -23,6 +23,9 @@ export default defineConfig({
       'alarms',
       'scripting',
       ...(isFirefox ? [] : ['tabGroups', 'commands', 'favicon']),
+    ],
+    optional_permissions: [
+      "tabGroups"
     ],
     homepage_url: 'https://github.com/web-dahuyou/NiceTab',
     host_permissions: ['<all_urls>'],
