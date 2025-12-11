@@ -32,10 +32,8 @@ export default function getPermission() {
 
   const getTabGroupsPermission = async () => {
     Modal.confirm({
-      title: '提示',
+      title: $fmt('common.confirm'),
       content: $fmt('home.getPermission.tabGroups.tip'),
-      okText: '允许',
-      cancelText: '取消',
       onOk: async () => {
         try {
           const ok = await browser.permissions.request({ permissions: ['tabGroups'] });
