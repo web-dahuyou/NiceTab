@@ -2,7 +2,7 @@
   "name": "nice-tab",
   "description": "开源的标签页管理器，OneTab、Toby、SessionBuddy 等扩展的升级替代品，功能丰富易用 | A nice, convenient, powerful tab manager (open source)",
   "private": true,
-  "version": "2.8.2",
+  "version": "2.8.3",
   "type": "module",
   "scripts": {
     "dev": "pnpm convert:guide && wxt",
@@ -25,6 +25,7 @@
     "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.0.3",
     "@atlaskit/pragmatic-drag-and-drop-react-drop-indicator": "^1.1.1",
     "antd": "5.23.4",
+    "compare-versions": "^6.1.1",
     "copy-to-clipboard": "^3.3.3",
     "dayjs": "^1.11.11",
     "emoji-regex": "^10.3.0",
@@ -59,7 +60,6 @@
     "marked": "^16.2.1",
     "prettier": "^3.6.2",
     "typescript": "^5.5.4",
-    "vite": ">=6.1.6",
     "wxt": "^0.19.29",
     "yargs-parser": "^21.1.1"
   }

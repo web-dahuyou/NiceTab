@@ -225,28 +225,28 @@ export default function Settings() {
             onFinish={onFinish}
           >
             {/* ******************* 通用设置 ******************* */}
-            <FormModuleCommon hidden={currModule !== 'common'} form={form} />
+            <FormModuleCommon hidden={currModule !== 'common'} form={form} key={urlParams.randomId} />
 
             {/* ******************* 发送标签页相关设置 ******************* */}
-            <FormModuleSend hidden={currModule !== 'sendTabs'} form={form} />
+            <FormModuleSend hidden={currModule !== 'sendTabs'} form={form} key={urlParams.randomId} />
 
             {/* ******************* 打开标签页相关设置 ******************* */}
-            <FormModuleOpen hidden={currModule !== 'openTabs'} form={form} />
+            <FormModuleOpen hidden={currModule !== 'openTabs'} form={form} key={urlParams.randomId} />
 
             {/* ******************* 网页标题相关设置 ******************* */}
-            <FormModulePageTitle hidden={currModule !== 'pageTitleConfig'} form={form} />
+            <FormModulePageTitle hidden={currModule !== 'pageTitleConfig'} form={form} key={urlParams.randomId} />
 
             {/* ******************* 全局搜索相关设置 ******************* */}
-            <FormModuleGlobalSearch hidden={currModule !== 'globalSearch'} form={form} />
+            <FormModuleGlobalSearch hidden={currModule !== 'globalSearch'} form={form} key={urlParams.randomId} />
 
             {/* ******************* 其他操作相关设置 ******************* */}
-            <FormModuleOtherActions hidden={currModule !== 'otherActions'} form={form} />
+            <FormModuleOtherActions hidden={currModule !== 'otherActions'} form={form} key={urlParams.randomId} />
 
             {/* ******************* 展示相关设置 ******************* */}
-            <FormModuleDisplay hidden={currModule !== 'display'} form={form} />
+            <FormModuleDisplay hidden={currModule !== 'display'} form={form} key={urlParams.randomId} />
 
             {/* ******************* 远程同步相关设置 ******************* */}
-            <FormModuleSync hidden={currModule !== 'sync'} form={form} />
+            <FormModuleSync hidden={currModule !== 'sync'} form={form} key={urlParams.randomId} />
           </Form>
         </div>
       </StyledMainWrapper>

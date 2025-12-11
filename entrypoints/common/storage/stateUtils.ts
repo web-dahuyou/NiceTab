@@ -9,6 +9,9 @@ export default class StateUtils {
       selectedKeysStore: [],
     },
     global: {
+      permissionActions: {
+        tabGroups: false,
+      },
       openedTabsManualSave: [],
       openedTabsAutoSave: [],
       lastSelectedTargetValue: ['0'],

@@ -194,7 +194,7 @@ export default defineBackground(() => {
     stateUtils.clearSelectedKeysOfInvalidWindows();
   });
 
-  browser.runtime.onMessage.addListener(async (msg: unknown, msgSender, sendResponse) => {
+  browser.runtime.onMessage.addListener(async (msg: unknown) => {
     // console.log('browser.runtime.onMessage--background--msg', msg);
     const {
       msgType,
