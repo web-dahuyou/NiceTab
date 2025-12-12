@@ -1,4 +1,4 @@
-import { useContext, useCallback, useEffect, useState } from 'react';
+import { useContext, useCallback, useEffect, useState, useRef } from 'react';
 import { browser, Tabs } from 'wxt/browser';
 import { ThemeProvider } from 'styled-components';
 import { theme, Space, Dropdown, Button, type MenuProps, Tooltip } from 'antd';
@@ -74,8 +74,10 @@ export default function App() {
   const [modules, setModules] = useState<PopupModuleNames[]>([]);
   const [actionBtns, setActionBtns] = useState<ActionBtnItem[]>([]);
   const [isCompact, setIsCompact] = useState(() => localStorage.getItem('popup-compact') === 'true');
+  const [isNormalSticky, setIsNormalSticky] = useState(false);
   const [adminTabId, setAdminTabId] = useState<number | undefined>();
   const [settings, setSettings] = useState<any>({});
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // 快捷跳转
   const quickJumpBtns = [
@@ -313,10 +315,33 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      if (isNormalSticky && container.scrollTop <= 0) {
+        setIsNormalSticky(false);
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+    }
+  }, [isNormalSticky]);
+
   const toggleCompact = () => {
-    const newState = !isCompact;
-    setIsCompact(newState);
-    localStorage.setItem('popup-compact', String(newState));
+    const nextCompact = !isCompact;
+    setIsCompact(nextCompact);
+    localStorage.setItem('popup-compact', String(nextCompact));
+
+    // 从紧凑模式切换到正常模式时，如果处于滚动状态，则保持sticky
+    if (!nextCompact && containerRef.current && containerRef.current.scrollTop > 0) {
+      setIsNormalSticky(true);
+    } else {
+      setIsNormalSticky(false);
+    }
   };
 
   const getActionIcon = (key: string, path?: string) => {
@@ -335,10 +360,10 @@ export default function App() {
 
   return (
     <ThemeProvider theme={{ ...themeTypeConfig, ...token }}>
-      <StyledContainer className="popup-container select-none">
+      <StyledContainer ref={containerRef} className="popup-container select-none">
         <GlobalStyle />
 
-        <div className={`fixed-top ${isCompact ? 'compact' : ''}`}>
+        <div className={`fixed-top ${isCompact ? 'compact' : ''} ${(!isCompact && isNormalSticky) ? 'sticky' : ''}`}>
           <div
             className="toggle-compact-btn"
             onClick={toggleCompact}

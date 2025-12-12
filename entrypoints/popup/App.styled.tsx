@@ -18,7 +18,8 @@ export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
     position: relative;
     transition: all 0.3s ease;
 
-    &.compact {
+    &.compact,
+    &.sticky {
         position: sticky;
         top: 0;
         z-index: 100;
