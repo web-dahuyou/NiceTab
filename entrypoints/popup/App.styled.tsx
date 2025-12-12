@@ -9,10 +9,63 @@ export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
   max-height: 590px; // 浏览器popup高度最大为600px, 超过这个高度会出现body滚动条
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   .fixed-top {
     flex-shrink: 0;
     flex-grow: 0;
+    position: relative;
+    transition: all 0.3s ease;
+
+    &.compact {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background-color: ${props => props.theme.colorBgContainer};
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      .block {
+        padding: 4px 10px;
+        min-height: 32px;
+        gap: 4px;
+        .block-title {
+          font-size: 12px;
+        }
+        .action-btn {
+            font-size: 12px;
+        }
+      }
+      }
+
+    .compact-toolbar {
+        display: flex;
+        align-items: center;
+        padding: 4px 10px;
+        min-height: 38px;
+        padding-right: 30px;
+        gap: 2px;
+        button {
+          color: ${props => props.theme.colorTextSecondary || '#333'};
+          border: none;
+          box-shadow: none;
+          &:hover {
+             color: ${props => props.theme.colorPrimary};
+             background: rgba(0,0,0,0.05);
+          }
+        }
+    }
+    .toggle-compact-btn {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      z-index: 10;
+      cursor: pointer;
+      font-size: 14px;
+      color: ${props => props.theme.colorTextQuaternary || 'rgba(0, 0, 0, 0.45)'};
+      &:hover {
+        color: ${props => props.theme.colorPrimary};
+      }
+    }
   }
   .block {
     display: flex;
@@ -93,6 +146,14 @@ export const StyledGroupWrapper = styled.div<{ $color?: string }>`
       font-size: 12px;
       color: ${props => props.theme.colorText || '#000'};
       ${StyledEllipsis}
+      ${StyledEllipsis}
+    }
+    .group-action-btn {
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    &:hover .group-action-btn {
+      opacity: 1;
     }
   }
   .tab-list {
