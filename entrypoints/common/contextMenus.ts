@@ -2,6 +2,7 @@ import { Menus, type Tabs } from 'wxt/browser';
 import {
   MANIFEST_VERSION,
   ENUM_ACTION_NAME,
+  ENUM_ACTION_NAME_FF,
   ENUM_SETTINGS_PROPS,
   TAB_EVENTS,
   defaultLanguage,
@@ -116,10 +117,7 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
       customMessages['common.sendCurrentTab'],
       ENUM_ACTION_NAME.SEND_CURRENT_TAB,
     ),
-    contexts:
-      import.meta.env.BROWSER === 'firefox'
-        ? [...contexts, 'tab']
-        : contexts,
+    contexts,
     enabled:
       !!currTab?.id &&
       currTab?.id != adminTab?.id &&
@@ -208,6 +206,50 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
   ];
 };
 
+// 获取 firefox 标签页菜单项
+export const getBaseMenusFirefoxTab = async (): Promise<CreateMenuPropertiesType[]> => {
+  const settings = await settingsUtils.getSettings();
+  const language = settings[LANGUAGE] || defaultLanguage;
+  const customMessages = getCustomLocaleMessages(language);
+
+  const hotkeysMap = await getMenuHotkeys();
+  const contexts: Menus.ContextType[] = ['tab'];
+
+  // 获取标题
+  const getTitle = (title: string, id: string) => {
+    const hotkey = hotkeysMap?.[id];
+    return hotkey ? title + ` (${hotkey})` : title;
+  };
+
+  // Firefox中，单独创建tab上下文菜单
+  const _sendCurrentTab: CreateMenuPropertiesType = {
+    tag: 'sendTabs',
+    id: ENUM_ACTION_NAME_FF.SEND_CURRENT_TAB,
+    title: getTitle(
+      customMessages['common.sendCurrentTab'],
+      ENUM_ACTION_NAME.SEND_CURRENT_TAB,
+    ),
+    contexts,
+    enabled: true,
+  };
+
+  const _hibernateTabs: CreateMenuPropertiesType = {
+    tag: 'common',
+    id: ENUM_ACTION_NAME_FF.HIBERNATE_TABS,
+    title: getTitle(
+      customMessages['common.hibernateTabs'],
+      ENUM_ACTION_NAME.HIBERNATE_TABS,
+    ),
+    contexts,
+    enabled: true,
+  };
+
+  return [
+    _sendCurrentTab,
+    // _hibernateTabs
+  ];
+};
+
 export const getBaseMenuMap = async () => {
   const menus = await getBaseMenus();
   return menus.reduce<Record<string, CreateMenuPropertiesType>>((result, menu) => {
@@ -271,6 +313,13 @@ async function createContextMenus(callback?: () => void) {
   for (let menu of menus) {
     await browser.contextMenus.create(omit(menu, ['tag']));
   }
+
+  if (import.meta.env.FIREFOX) {
+    const ffTabMenus = await getBaseMenusFirefoxTab();
+    for (let menu of ffTabMenus) {
+      await browser.contextMenus.create(omit(menu, ['tag']));
+    }
+  }
   isCreating = false;
   callback?.();
 }
@@ -282,11 +331,16 @@ async function handleContextMenusUpdate() {
   }, 500);
 }
 
-export async function actionHandler(actionName: string, targetData?: SendTargetProps, tab?: Tabs.Tab) {
+export async function actionHandler(
+  actionName: string,
+  targetData?: SendTargetProps,
+  tab?: Tabs.Tab,
+) {
   switch (actionName) {
     case ENUM_ACTION_NAME.SEND_ALL_TABS:
       await tabUtils.sendAllTabs(targetData);
       break;
+    case ENUM_ACTION_NAME_FF.SEND_CURRENT_TAB:
     case ENUM_ACTION_NAME.SEND_CURRENT_TAB:
       await tabUtils.sendCurrentTab(targetData, tab);
       break;
@@ -302,6 +356,7 @@ export async function actionHandler(actionName: string, targetData?: SendTargetP
     case ENUM_ACTION_NAME.OPEN_ADMIN_TAB:
       await tabUtils.openAdminRoutePage({ path: '/home' });
       break;
+    case ENUM_ACTION_NAME_FF.HIBERNATE_TABS:
     case ENUM_ACTION_NAME.HIBERNATE_TABS:
       tabUtils.discardOtherTabs();
       break;

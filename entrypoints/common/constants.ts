@@ -112,6 +112,12 @@ export enum ENUM_ACTION_NAME {
   HIBERNATE_TABS = 'action:hibernateTabs', // 休眠其他标签页
 }
 
+// action 名称枚举 (firefox)
+export enum ENUM_ACTION_NAME_FF {
+  SEND_CURRENT_TAB = 'action:ff-tab:sendCurrentTab', // 发送当前标签页(firefox标签页)
+  HIBERNATE_TABS = 'action:ff-tab:hibernateTabs', // 休眠其他标签页(firefox标签页)
+}
+
 // 右键菜单配置列表-默认
 export const defaultContextmenuConfigList = Object.values(ENUM_ACTION_NAME).map(name => {
   return { menuId: name, display: true };

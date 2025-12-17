@@ -121,7 +121,7 @@ export async function executeContentScript(
         type: resultType,
         content: `${customMessages[`common.${status}`]}: ${
           customMessages[`common.${_actionName}` as keyof typeof customMessages]
-          }`,
+        }`,
       },
       onlyCurrentTab: true,
     });
@@ -150,7 +150,7 @@ export async function openAdminRoutePage(
   const { tab, adminTabUrl } = await getAdminTabInfo();
   const urlWithParams = `${adminTabUrl}#${route.path || '/home'}${
     paramsStr ? `?${paramsStr}` : ''
-    }`;
+  }`;
 
   // 如果发送标签页后不需要打开管理后台页面
   if (!needOpen) {
