@@ -6,7 +6,7 @@ import { POPUP_MODULE_NAMES, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/co
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { groupActionOptions } from '~/entrypoints/options/home/constants';
 import ContextMenuConfig from './components/ContextMenuConfig';
-import PageTitleConfig from './components/PageTitleConfig';
+import useTooltipOption from '@/entrypoints/common/hooks/tooltipOption';
 
 const {
   GROUP_ACTION_BTN_STYLE,
@@ -18,7 +18,6 @@ const {
   AUTO_EXPAND_HOME_TREE,
   MAIN_CONTENT_WIDTH_TYPE,
   SHOW_TAB_TITLE_TOOLTIP,
-  PAGE_TITLE_CONFIG,
 } = ENUM_SETTINGS_PROPS;
 
 export default function FormModuleDisplay(
@@ -27,6 +26,8 @@ export default function FormModuleDisplay(
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const { form, ...formItemProps } = props;
+
+  const { getFormTooltipOption } = useTooltipOption();
 
   // popup面板显示模块选项
   const popupModuleDisplayOptions = useMemo(() => {
@@ -66,15 +67,9 @@ export default function FormModuleDisplay(
       <Form.Item<SettingsProps>
         label={$fmt(`settings.${GROUP_ACTION_BTNS_COMMONLY_USED}`)}
         name={GROUP_ACTION_BTNS_COMMONLY_USED}
-        tooltip={{
-          color: token.colorBgElevated,
-          title: (
-            <Typography.Text>
-              {$fmt(`settings.${GROUP_ACTION_BTNS_COMMONLY_USED}.tooltip`)}
-            </Typography.Text>
-          ),
-          styles: { root: { maxWidth: '320px', width: '320px' } },
-        }}
+        tooltip={getFormTooltipOption({
+          title: $fmt(`settings.${GROUP_ACTION_BTNS_COMMONLY_USED}.tooltip`),
+        })}
         {...formItemProps}
       >
         <Checkbox.Group options={groupActionBtnOptions}></Checkbox.Group>
@@ -107,15 +102,9 @@ export default function FormModuleDisplay(
       <Form.Item<SettingsProps>
         label={$fmt(`settings.${CONTEXT_MENU_CONFIG}`)}
         name={CONTEXT_MENU_CONFIG}
-        tooltip={{
-          color: token.colorBgElevated,
-          title: (
-            <Typography.Text>
-              {$fmt(`settings.${CONTEXT_MENU_CONFIG}.tooltip`)}
-            </Typography.Text>
-          ),
-          styles: { root: { maxWidth: '320px', width: '320px' } },
-        }}
+        tooltip={getFormTooltipOption({
+          title: $fmt(`settings.${CONTEXT_MENU_CONFIG}.tooltip`),
+        })}
       >
         <ContextMenuConfig form={form} />
       </Form.Item>
@@ -124,15 +113,9 @@ export default function FormModuleDisplay(
       <Form.Item<SettingsProps>
         label={$fmt(`settings.${POPUP_MODULE_DISPLAYS}`)}
         name={POPUP_MODULE_DISPLAYS}
-        tooltip={{
-          color: token.colorBgElevated,
-          title: (
-            <Typography.Text>
-              {$fmt(`settings.${POPUP_MODULE_DISPLAYS}.tooltip`)}
-            </Typography.Text>
-          ),
-          styles: { root: { maxWidth: '320px', width: '320px' } },
-        }}
+        tooltip={getFormTooltipOption({
+          title: $fmt(`settings.${POPUP_MODULE_DISPLAYS}.tooltip`),
+        })}
       >
         <Checkbox.Group options={popupModuleDisplayOptions}></Checkbox.Group>
       </Form.Item>

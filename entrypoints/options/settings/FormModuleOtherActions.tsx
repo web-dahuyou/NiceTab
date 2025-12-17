@@ -3,6 +3,7 @@ import type { FormItemProps, FormInstance } from 'antd';
 import type { SettingsProps } from '~/entrypoints/types';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import useTooltipOption from '@/entrypoints/common/hooks/tooltipOption';
 import QuickActions from './components/QuickActions';
 
 const {
@@ -22,6 +23,7 @@ export default function FormModuleOtherActions(
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const { form, ...formItemProps } = props;
+  const { getFormTooltipOption } = useTooltipOption();
 
   const onQuickActionChange = useCallback(
     (val: string) => {
@@ -72,15 +74,9 @@ export default function FormModuleOtherActions(
           values: { mark: '：' },
         })}
         name={TAB_COUNT_THRESHOLD}
-        tooltip={{
-          color: token.colorBgElevated,
-          title: (
-            <Typography.Text>
-              {$fmt(`settings.${TAB_COUNT_THRESHOLD}.tooltip`)}
-            </Typography.Text>
-          ),
-          styles: { root: { maxWidth: '320px', width: '320px' } },
-        }}
+        tooltip={getFormTooltipOption({
+          title: $fmt(`settings.${TAB_COUNT_THRESHOLD}.tooltip`),
+        })}
       >
         <InputNumber
           min={100}
@@ -95,13 +91,9 @@ export default function FormModuleOtherActions(
       <Form.Item<SettingsProps>
         label={$fmt(`settings.${LINK_TEMPLATE}`)}
         // name={LINK_TEMPLATE} // 注意在嵌套的Form.item中设置了name, 这里不要设置name
-        tooltip={{
-          color: token.colorBgElevated,
-          title: (
-            <Typography.Text>{$fmt(`settings.${LINK_TEMPLATE}.tooltip`)}</Typography.Text>
-          ),
-          styles: { root: { maxWidth: '320px', width: '320px' } },
-        }}
+        tooltip={getFormTooltipOption({
+          title: $fmt(`settings.${LINK_TEMPLATE}.tooltip`),
+        })}
       >
         <Space wrap>
           <Form.Item<SettingsProps> name={LINK_TEMPLATE} noStyle>
@@ -120,15 +112,9 @@ export default function FormModuleOtherActions(
       <Form.Item<SettingsProps>
         label={$fmt(`settings.${GROUP_INSERT_POSITION}`)}
         name={GROUP_INSERT_POSITION}
-        tooltip={{
-          color: token.colorBgElevated,
-          title: (
-            <Typography.Text>
-              {$fmt(`settings.${GROUP_INSERT_POSITION}.tooltip`)}
-            </Typography.Text>
-          ),
-          styles: { root: { maxWidth: '320px', width: '320px' } },
-        }}
+        tooltip={getFormTooltipOption({
+          title: $fmt(`settings.${GROUP_INSERT_POSITION}.tooltip`),
+        })}
       >
         <Radio.Group>
           <Radio value="top">{$fmt('common.top')}</Radio>
@@ -140,15 +126,9 @@ export default function FormModuleOtherActions(
       <Form.Item<SettingsProps>
         label={$fmt(`settings.${TAB_INSERT_POSITION}`)}
         name={TAB_INSERT_POSITION}
-        tooltip={{
-          color: token.colorBgElevated,
-          title: (
-            <Typography.Text>
-              {$fmt(`settings.${TAB_INSERT_POSITION}.tooltip`)}
-            </Typography.Text>
-          ),
-          styles: { root: { maxWidth: '320px', width: '320px' } },
-        }}
+        tooltip={getFormTooltipOption({
+          title: $fmt(`settings.${TAB_INSERT_POSITION}.tooltip`),
+        })}
       >
         <Radio.Group>
           <Radio value="top">{$fmt('common.top')}</Radio>
