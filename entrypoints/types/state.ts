@@ -8,6 +8,7 @@ export interface PermissionActionsProps {
 export interface GlobalStateProps {
   // 授权弹窗是否已交互（不管确认还是取消，只要点击了就算交互，后续不再主动弹窗）
   permissionActions?: PermissionActionsProps;
+  snapshotStatus?: 'on' | 'off';
   openedTabsManualSave?: SnapshotItem[];
   openedTabsAutoSave?: SnapshotItem[];
   lastSelectedTargetValue?: string[];

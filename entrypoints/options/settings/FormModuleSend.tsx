@@ -8,6 +8,7 @@ import {
   ENUM_SETTINGS_PROPS,
 } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import useTooltipOption from '@/entrypoints/common/hooks/tooltipOption';
 
 const {
   OPEN_ADMIN_TAB_AFTER_SEND_TABS,
@@ -26,6 +27,7 @@ export default function FormModuleSend(
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const { form, ...formItemProps } = props;
+  const { getFormTooltipOption } = useTooltipOption();
 
   // 发送标签页自动关闭标签页的操作选项
   const actionAutoCloseFlagOptions = useMemo(() => {
@@ -45,15 +47,9 @@ export default function FormModuleSend(
       <Form.Item<SettingsProps>
         label={$fmt(`settings.${SHOW_SEND_TARGET_MODAL}`)}
         name={SHOW_SEND_TARGET_MODAL}
-        tooltip={{
-          color: token.colorBgElevated,
-          title: (
-            <Typography.Text>
-              {$fmt(`settings.${SHOW_SEND_TARGET_MODAL}.tooltip`)}
-            </Typography.Text>
-          ),
-          styles: { root: { maxWidth: '320px', width: '320px' } },
-        }}
+        tooltip={getFormTooltipOption({
+          title: $fmt(`settings.${SHOW_SEND_TARGET_MODAL}.tooltip`),
+        })}
         {...formItemProps}
       >
         <Radio.Group>
@@ -81,15 +77,9 @@ export default function FormModuleSend(
           values: { mark: '：' },
         })}
         name={EXCLUDE_DOMAINS_FOR_SENDING}
-        tooltip={{
-          color: token.colorBgElevated,
-          title: (
-            <Typography.Text>
-              {$fmt(`settings.${EXCLUDE_DOMAINS_FOR_SENDING}.tooltip`)}
-            </Typography.Text>
-          ),
-          styles: { root: { maxWidth: '320px', width: '320px' } },
-        }}
+        tooltip={getFormTooltipOption({
+          title: $fmt(`settings.${EXCLUDE_DOMAINS_FOR_SENDING}.tooltip`),
+        })}
       >
         <Input.TextArea
           style={{ width: '500px' }}
@@ -135,15 +125,9 @@ export default function FormModuleSend(
       <Form.Item
         label={$fmt(`settings.${ACTION_AUTO_CLOSE_FLAGS}`)}
         name={ACTION_AUTO_CLOSE_FLAGS}
-        tooltip={{
-          color: token.colorBgElevated,
-          title: (
-            <Typography.Text>
-              {$fmt(`settings.${ACTION_AUTO_CLOSE_FLAGS}.tooltip`)}
-            </Typography.Text>
-          ),
-          styles: { root: { maxWidth: '320px', width: '320px' } },
-        }}
+        tooltip={getFormTooltipOption({
+          title: $fmt(`settings.${ACTION_AUTO_CLOSE_FLAGS}.tooltip`),
+        })}
       >
         <Checkbox.Group
           options={actionAutoCloseFlagOptions}

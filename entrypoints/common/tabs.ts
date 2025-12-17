@@ -523,7 +523,9 @@ export async function discardOtherTabs() {
 export const saveOpenedTabsAsSnapshot = async (
   type: 'autoSave' | 'manualSave' = 'autoSave',
 ) => {
-  const tabs = await browser.tabs.query({ currentWindow: true });
+  const tabs = await browser.tabs.query(
+    type === 'autoSave' ? {} : { currentWindow: true },
+  );
   const { tab: adminTab } = await getAdminTabInfo();
   const filteredTabs = tabs.filter(tab => {
     if (!tab?.id) return false;

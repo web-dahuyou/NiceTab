@@ -23,6 +23,8 @@ const enUS: Record<LocaleKey, string> = {
   'settings.autoPinAdminTab': 'Pin NiceTab Admin Page?',
   'settings.autoPinAdminTab.yes': 'Automatically pin (recommended)',
   'settings.autoPinAdminTab.no': 'Do not',
+  'settings.restoreSnapshotAfterBrowserLaunch': 'Restore previously opened tabs after launching the browser?',
+  'settings.autoCreateSnapshotInterval': 'Auto-Create-Snapshot interval (Minutes):',
 
   /* 发送标签页配置 */
   'settings.showSendTargetModal': 'Show "Send To" modal when sending tabs?',

@@ -26,6 +26,8 @@ const {
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
   OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED,
   AUTO_PIN_ADMIN_TAB,
+  RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH,
+  AUTO_CREATE_SNAPSHOT_INTERVAL,
   /* 发送标签页配置 */
   SHOW_SEND_TARGET_MODAL,
   ALLOW_SEND_PINNED_TABS,
@@ -81,6 +83,8 @@ export default class SettingsUtils {
     [OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH]: true, // 启动浏览器时是否自动打开管理后台
     [OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED]: false, // 新开window窗口时是否自动打开管理后台
     [AUTO_PIN_ADMIN_TAB]: true, // 是否固定管理后台
+    [RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH]: false, // 启动浏览器时是否恢复快照
+    [AUTO_CREATE_SNAPSHOT_INTERVAL]: 1, // 自动创建快照时间间隔
     /* 发送标签页配置 */
     [SHOW_SEND_TARGET_MODAL]: false, // 发送标签页时是否显示目标选择弹窗
     [ALLOW_SEND_PINNED_TABS]: false, // 是否发送固定标签页
