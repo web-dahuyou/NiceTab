@@ -14,20 +14,26 @@ export interface GlobalStateProps {
   lastSelectedTargetValue?: string[];
 }
 
-/* 首页状态 */
+/* 首页选中状态 */
 export interface SelectedKeysStoreItem {
   windowId?: number;
   selectedTagKey?: string;
   selectedTabGroupKey?: string;
 }
+/* 首页状态 */
 export interface HomeStateProps {
   sidebarCollapsed?: boolean;
   selectedKeysStore?: SelectedKeysStoreItem[];
+}
+// Popup 面板状态
+export interface PopupStateProps {
+  isCompact?: boolean;
 }
 
 export interface StateProps {
   global: GlobalStateProps;
   home: HomeStateProps;
+  popup: PopupStateProps;
 }
 
 export type StateModuleProps<K extends keyof StateProps = 'global'> = StateProps[K];

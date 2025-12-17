@@ -28,7 +28,7 @@ import {
   openUserGuide,
 } from '~/entrypoints/common/tabs';
 import { getMenus } from '~/entrypoints/common/contextMenus';
-import { settingsUtils } from '~/entrypoints/common/storage';
+import { settingsUtils, stateUtils } from '~/entrypoints/common/storage';
 import { TAB_EVENTS, SHORTCUTS_PAGE_URL } from '~/entrypoints/common/constants';
 import type { PopupModuleNames } from '~/entrypoints/types';
 import {
@@ -73,9 +73,7 @@ export default function App() {
   const [tabGroupList, setTabGroupList] = useState<GroupListItem[]>([]);
   const [modules, setModules] = useState<PopupModuleNames[]>([]);
   const [actionBtns, setActionBtns] = useState<ActionBtnItem[]>([]);
-  const [isCompact, setIsCompact] = useState(
-    () => localStorage.getItem('popup-compact') === 'true',
-  );
+  const [isCompact, setIsCompact] = useState(true);
 
   // 快捷跳转
   const quickJumpBtns = [
@@ -270,6 +268,9 @@ export default function App() {
     const _actionBtns = await getActionBtns();
     setActionBtns(_actionBtns);
 
+    const popupState = await stateUtils.getState('popup');
+    setIsCompact(!!popupState?.isCompact);
+
     if (modules.includes('openedTabs')) {
       browser.tabs.query({ currentWindow: true }).then(async allTabs => {
         const { tab: adminTab } = await getAdminTabInfo();
@@ -289,7 +290,7 @@ export default function App() {
   const toggleCompact = () => {
     const newState = !isCompact;
     setIsCompact(newState);
-    localStorage.setItem('popup-compact', String(newState));
+    stateUtils.setStateByModule('popup', { isCompact: newState });
   };
 
   const getActionIcon = (key: string, path?: string) => {

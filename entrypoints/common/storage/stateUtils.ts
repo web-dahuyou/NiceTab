@@ -17,6 +17,9 @@ export default class StateUtils {
       openedTabsAutoSave: [],
       lastSelectedTargetValue: ['0'],
     },
+    popup: {
+      isCompact: true,
+    }
   };
   state: StateProps = this.initialState;
 
