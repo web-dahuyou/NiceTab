@@ -25,38 +25,40 @@ export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
           font-size: 12px;
         }
         .action-btn {
-            font-size: 12px;
+          font-size: 12px;
         }
       }
-      }
+    }
 
     .compact-toolbar {
-        display: flex;
-        align-items: center;
-        padding: 4px 10px;
-        min-height: 38px;
-        padding-right: 30px;
-        gap: 2px;
-        button {
-          color: ${props => props.theme.colorTextSecondary || '#333'};
-          border: none;
-          box-shadow: none;
-          &:hover {
-             color: ${props => props.theme.colorPrimary};
-             background: rgba(0,0,0,0.05);
-          }
+      display: flex;
+      align-items: center;
+      padding: 4px 42px 4px 6px;
+      min-height: 38px;
+      gap: 2px;
+
+      button {
+        color: ${props => props.theme.colorTextSecondary || '#333'};
+        border: none;
+        box-shadow: none;
+        &:hover {
+          color: ${props => props.theme.colorPrimary};
+          background: rgba(0, 0, 0, 0.05);
         }
+      }
     }
     .toggle-compact-btn {
       position: absolute;
-      top: 10px;
-      right: 12px;
+      top: 4px;
+      right: 6px;
       z-index: 10;
       cursor: pointer;
-      font-size: 14px;
-      color: ${props => props.theme.colorTextQuaternary || 'rgba(0, 0, 0, 0.45)'};
+      color: ${props => props.theme.colorTextSecondary || '#333'};
+      border: none;
+      box-shadow: none;
       &:hover {
         color: ${props => props.theme.colorPrimary};
+        background: rgba(0, 0, 0, 0.05);
       }
     }
   }
@@ -106,7 +108,9 @@ export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
     font-weight: bold;
   }
   .block-opened-tabs {
+    flex: 1;
     padding-bottom: 12px;
+    overflow-y: auto;
   }
 `;
 

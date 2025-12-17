@@ -9,7 +9,7 @@ import {
   HomeOutlined,
   KeyOutlined,
   ReadOutlined,
-  ExportOutlined,
+  SendOutlined,
   SearchOutlined,
   RestOutlined,
   CloudSyncOutlined,
@@ -27,10 +27,10 @@ import {
   discardOtherTabs,
   openUserGuide,
 } from '~/entrypoints/common/tabs';
-import { getMenus, actionHandler } from '~/entrypoints/common/contextMenus';
+import { getMenus } from '~/entrypoints/common/contextMenus';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import { TAB_EVENTS, SHORTCUTS_PAGE_URL } from '~/entrypoints/common/constants';
-import type { PopupModuleNames, LanguageTypes } from '~/entrypoints/types';
+import type { PopupModuleNames } from '~/entrypoints/types';
 import {
   GITHUB_URL,
   THEME_COLORS,
@@ -73,7 +73,9 @@ export default function App() {
   const [tabGroupList, setTabGroupList] = useState<GroupListItem[]>([]);
   const [modules, setModules] = useState<PopupModuleNames[]>([]);
   const [actionBtns, setActionBtns] = useState<ActionBtnItem[]>([]);
-  const [isCompact, setIsCompact] = useState(() => localStorage.getItem('popup-compact') === 'true');
+  const [isCompact, setIsCompact] = useState(
+    () => localStorage.getItem('popup-compact') === 'true',
+  );
 
   // 快捷跳转
   const quickJumpBtns = [
@@ -295,7 +297,7 @@ export default function App() {
     if (path === '/shortcuts') return <KeyOutlined />;
     if (path === '/user-guide') return <ReadOutlined />;
 
-    if (key === 'group-sendTabs') return <ExportOutlined />;
+    if (key === 'group-sendTabs') return <SendOutlined />;
     if (key === 'globalSearch') return <SearchOutlined />;
     if (key === 'hibernateTabs') return <RestOutlined />;
     if (key === 'startSync') return <CloudSyncOutlined />;
@@ -303,21 +305,23 @@ export default function App() {
     return null;
   };
 
-
   return (
     <ThemeProvider theme={{ ...themeTypeConfig, ...token }}>
       <StyledContainer className="popup-container select-none">
         <GlobalStyle />
 
         <div className={`fixed-top ${isCompact ? 'compact' : ''}`}>
-          <div
-            className="toggle-compact-btn"
-            onClick={toggleCompact}
+          <Tooltip
             title={$fmt(isCompact ? 'common.expand' : 'common.collapse')}
+            placement="bottom"
           >
-            {isCompact ? <ExpandOutlined /> : <CompressOutlined />}
-          </div>
-
+            <Button
+              className="toggle-compact-btn"
+              type="text"
+              icon={isCompact ? <ExpandOutlined /> : <CompressOutlined />}
+              onClick={toggleCompact}
+            />
+          </Tooltip>
           {isCompact ? (
             <div className="compact-toolbar">
               {/* GitHub */}
@@ -325,7 +329,9 @@ export default function App() {
                 <Button
                   type="text"
                   icon={<GithubOutlined />}
-                  onClick={() => openNewTab(GITHUB_URL, { active: true, openToNext: true })}
+                  onClick={() =>
+                    openNewTab(GITHUB_URL, { active: true, openToNext: true })
+                  }
                 />
               </Tooltip>
 
@@ -356,9 +362,7 @@ export default function App() {
                         }}
                         placement="bottomLeft"
                       >
-                        <Tooltip title={item.label} placement="bottom">
-                          <Button type="text" icon={getActionIcon(item.key)} />
-                        </Tooltip>
+                        <Button type="text" icon={getActionIcon(item.key)} />
                       </Dropdown>
                     );
                   } else {
@@ -382,7 +386,9 @@ export default function App() {
                 <div className="block quick-actions">
                   <span
                     className="action-btn"
-                    onClick={() => openNewTab(GITHUB_URL, { active: true, openToNext: true })}
+                    onClick={() =>
+                      openNewTab(GITHUB_URL, { active: true, openToNext: true })
+                    }
                   >
                     {$fmt('common.goToGithub')}
                   </span>
