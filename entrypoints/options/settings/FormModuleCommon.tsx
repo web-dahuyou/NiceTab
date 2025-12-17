@@ -1,4 +1,4 @@
-import { Form, Radio } from 'antd';
+import { Form, Radio, Slider } from 'antd';
 import type { FormItemProps, FormInstance } from 'antd';
 import type { SettingsProps } from '~/entrypoints/types';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
@@ -9,6 +9,8 @@ const {
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
   OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED,
   AUTO_PIN_ADMIN_TAB,
+  RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH,
+  AUTO_CREATE_SNAPSHOT_INTERVAL,
 } = ENUM_SETTINGS_PROPS;
 
 export default function FormModuleCommon(
@@ -28,6 +30,7 @@ export default function FormModuleCommon(
           <Radio value="en-US"> English </Radio>
         </Radio.Group>
       </Form.Item>
+
       {/* 启动浏览器时是否自动打开NiceTab管理后台 */}
       <Form.Item<SettingsProps>
         label={$fmt(`settings.${OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH}`)}
@@ -42,6 +45,7 @@ export default function FormModuleCommon(
           </Radio>
         </Radio.Group>
       </Form.Item>
+
       {/* 新开窗口时是否自动打开NiceTab管理后台 */}
       <Form.Item<SettingsProps>
         label={$fmt(`settings.${OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED}`)}
@@ -56,6 +60,7 @@ export default function FormModuleCommon(
           </Radio>
         </Radio.Group>
       </Form.Item>
+
       {/* 是否固定管理后台 */}
       <Form.Item<SettingsProps>
         label={$fmt({
@@ -69,6 +74,35 @@ export default function FormModuleCommon(
           <Radio value={false}>{$fmt(`settings.${AUTO_PIN_ADMIN_TAB}.no`)}</Radio>
         </Radio.Group>
       </Form.Item>
+
+      {/* 启动浏览器时是否自动恢复自动保存的快照 */}
+      <Form.Item<SettingsProps>
+        label={$fmt(`settings.${RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH}`)}
+        name={RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH}
+      >
+        <Radio.Group>
+          <Radio value={true}>{$fmt(`common.yes`)}</Radio>
+          <Radio value={false}>{$fmt(`common.no`)}</Radio>
+        </Radio.Group>
+      </Form.Item>
+
+      {/* 自动保存快照间隔时间 */}
+      {/* <Form.Item<SettingsProps>
+        label={$fmt(`settings.${AUTO_CREATE_SNAPSHOT_INTERVAL}`)}
+      >
+        <Form.Item<SettingsProps> name={AUTO_CREATE_SNAPSHOT_INTERVAL}>
+          <Slider
+            min={0.5}
+            max={120}
+            step={1}
+            tooltip={{
+              open: true,
+              placement: 'bottom',
+              autoAdjustOverflow: false,
+            }}
+          />
+        </Form.Item>
+      </Form.Item> */}
     </Form.Item>
   );
 }

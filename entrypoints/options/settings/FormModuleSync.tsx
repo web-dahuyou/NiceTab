@@ -10,6 +10,7 @@ import {
 } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { settingsUtils } from '~/entrypoints/common/storage';
+import useTooltipOption from '@/entrypoints/common/hooks/tooltipOption';
 import { useSyncType } from '../sync/hooks/syncType';
 
 const {
@@ -26,6 +27,7 @@ export default function FormModuleSync(
 ) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
+  const { getFormTooltipOption } = useTooltipOption();
 
   const { form, ...formItemProps } = props;
   const { autoSyncTimeUnitOptions, autoSyncTypeOptions } = useSyncType();
@@ -228,15 +230,9 @@ export default function FormModuleSync(
       <Form.Item<SettingsProps>
         label={$fmt(`settings.${AUTO_SYNC_TYPE}`)}
         name={AUTO_SYNC_TYPE}
-        tooltip={{
-          color: token.colorBgElevated,
-          title: (
-            <Typography.Text>
-              {$fmt(`settings.${AUTO_SYNC_TYPE}.tooltip`)}
-            </Typography.Text>
-          ),
-          styles: { root: { maxWidth: '320px', width: '320px' } },
-        }}
+        tooltip={getFormTooltipOption({
+          title: $fmt(`settings.${AUTO_SYNC_TYPE}.tooltip`),
+        })}
       >
         <Radio.Group disabled={!autoSync}>
           <Space direction="vertical">

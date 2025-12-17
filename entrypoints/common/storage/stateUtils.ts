@@ -12,6 +12,7 @@ export default class StateUtils {
       permissionActions: {
         tabGroups: false,
       },
+      snapshotStatus: 'on', // on/off
       openedTabsManualSave: [],
       openedTabsAutoSave: [],
       lastSelectedTargetValue: ['0'],
