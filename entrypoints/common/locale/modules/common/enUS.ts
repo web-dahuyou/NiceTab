@@ -126,6 +126,8 @@ const enUS: Record<LocaleKey, string> = {
   'common.regex': 'Regex',
   'common.directory': 'Directory',
   'common.filename': 'Filename',
+  'common.expand': 'Expand',
+  'common.collapse': 'Collapse',
 };
 
 export default enUS;
