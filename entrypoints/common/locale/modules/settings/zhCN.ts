@@ -10,7 +10,7 @@ const zhCN = {
   'settings.block.sync': '同步配置',
   'settings.confirmTipContent': '您有未保存的更改，确定离开？',
   'settings.language': '语言{mark}',
-  'settings.themeType': '主题类型{mark}',
+  'settings.themeType': '主题模式{mark}',
   'settings.openAdminTabAfterBrowserLaunch': '启动浏览器时是否自动打开NiceTab管理后台：',
   'settings.openAdminTabAfterBrowserLaunch.yes': '自动打开NiceTab管理后台（推荐）',
   'settings.openAdminTabAfterBrowserLaunch.no': '不自动打开NiceTab管理后台',

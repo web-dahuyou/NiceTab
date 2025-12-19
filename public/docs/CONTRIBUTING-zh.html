@@ -25,8 +25,10 @@
 <pre><code class="language-bash">git checkout -b dev-your-awesome-code origin/dev
 </code></pre>
 </li>
-<li><p>提交修改（注意 <a href="https://github.com/angular/angular/blob/main/contributing-docs/commit-message-guidelines.html">commit message规范</a>）。</p>
-<pre><code class="language-bash">git commit -m &#39;feat: add a new feature&#39;
+<li><p>提交修改（注意 <a href="https://github.com/angular/angular/blob/main/contributing-docs/commit-message-guidelines.html">commit message规范</a>）。
+  注意：提交之前建议执行 <code>pnpm compile</code> 命令检查下 typescript 类型</p>
+<pre><code class="language-bash">pnpm compile
+git commit -m &#39;feat: add a new feature&#39;
 </code></pre>
 </li>
 <li><p>将你的分支推送到你的远程仓库。</p>
