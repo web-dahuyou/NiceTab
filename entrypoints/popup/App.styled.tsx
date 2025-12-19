@@ -15,6 +15,7 @@ export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
     flex-grow: 0;
     position: relative;
     transition: all 0.3s ease;
+    box-shadow: ${props => props.theme.boxShadow || '0 2px 12px 3px rgba(0, 0, 0, 0.1)'};
 
     &.compact {
       .block {
@@ -109,7 +110,7 @@ export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
   }
   .block-opened-tabs {
     flex: 1;
-    padding-bottom: 12px;
+    padding: 12px 0;
     overflow-y: auto;
   }
 `;
