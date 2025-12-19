@@ -12,8 +12,7 @@ const enUS: Record<LocaleKey, string> = {
   'settings.block.sync': 'Sync',
   'settings.confirmTipContent': 'You have unsaved changes. Are you sure you want to leave?',
   'settings.language': 'Language{mark}',
-  // 'settings.language.ChineseSimplified': 'Chinese Simplified',
-  // 'settings.language.English': 'English',
+  'settings.themeType': 'Theme Mode{mark}',
   'settings.openAdminTabAfterBrowserLaunch': 'Open NiceTab Admin Page after launching the browser?',
   'settings.openAdminTabAfterBrowserLaunch.yes': 'Automatically open (recommended)',
   'settings.openAdminTabAfterBrowserLaunch.no': 'Do not',
@@ -23,6 +22,8 @@ const enUS: Record<LocaleKey, string> = {
   'settings.autoPinAdminTab': 'Pin NiceTab Admin Page?',
   'settings.autoPinAdminTab.yes': 'Automatically pin (recommended)',
   'settings.autoPinAdminTab.no': 'Do not',
+  'settings.restoreSnapshotAfterBrowserLaunch': 'Restore previously opened tabs after launching the browser?',
+  'settings.autoCreateSnapshotInterval': 'Auto-Create-Snapshot interval (Minutes):',
 
   /* 发送标签页配置 */
   'settings.showSendTargetModal': 'Show "Send To" modal when sending tabs?',

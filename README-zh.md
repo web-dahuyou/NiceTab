@@ -96,7 +96,7 @@
 - 支持设置 **是否在网页中显示NiceTab右键菜单**。
 - 支持 **Popup面板模块展示设置**，如果不选择面板模块，则左击扩展图标直接发送所有标签页。
 - 支持设置 **进入列表页时-是否自动展开全部节点**。
-- ...更多设置项可前往插件 `管理后台>偏好设置` 查看。
+- ...更多设置项可前往插件 `管理后台>偏好设置` 查看或查看用户指南。
 
 ### 远程同步功能
 
@@ -224,3 +224,7 @@ webdav 方式远程同步截图暂未更新。
 ## 插件开发
 
 见 [NiceTab 贡献指南](./CONTRIBUTING-zh.md)
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=web-dahuyou/NiceTab&type=Date)](https://www.star-history.com/#web-dahuyou/NiceTab&Date)

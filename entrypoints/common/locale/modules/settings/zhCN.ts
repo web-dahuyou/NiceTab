@@ -10,8 +10,7 @@ const zhCN = {
   'settings.block.sync': '同步配置',
   'settings.confirmTipContent': '您有未保存的更改，确定离开？',
   'settings.language': '语言{mark}',
-  // 'settings.language.ChineseSimplified': '简体中文',
-  // 'settings.language.English': '英文',
+  'settings.themeType': '主题模式{mark}',
   'settings.openAdminTabAfterBrowserLaunch': '启动浏览器时是否自动打开NiceTab管理后台：',
   'settings.openAdminTabAfterBrowserLaunch.yes': '自动打开NiceTab管理后台（推荐）',
   'settings.openAdminTabAfterBrowserLaunch.no': '不自动打开NiceTab管理后台',
@@ -21,6 +20,8 @@ const zhCN = {
   'settings.autoPinAdminTab': '是否固定NiceTab管理后台{mark}',
   'settings.autoPinAdminTab.yes': '自动固定NiceTab管理后台（推荐）',
   'settings.autoPinAdminTab.no': '不自动固定NiceTab管理后台',
+  'settings.restoreSnapshotAfterBrowserLaunch': '启动浏览器时是否自动恢复之前打开的标签页？',
+  'settings.autoCreateSnapshotInterval': '自动创建快照的时间间隔（分钟）：',
 
   /* 发送标签页配置 */
   'settings.showSendTargetModal': '发送标签页时-是否展示指定目录选择框：',

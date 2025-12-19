@@ -1,4 +1,5 @@
 import { Tabs } from 'wxt/browser';
+import { debounce } from 'lodash-es';
 import contextMenusRegister, {
   strategyHandler,
   handleSendTabsAction,
@@ -25,6 +26,7 @@ import type { RuntimeMessageEventProps } from '~/entrypoints/types';
 const {
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
   OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED,
+  RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH,
   SHOW_OPENED_TAB_COUNT,
   POPUP_MODULE_DISPLAYS,
 } = ENUM_SETTINGS_PROPS;
@@ -99,30 +101,42 @@ async function initPopup() {
   }
 }
 
-// 初始化监听 tabs 更新
-async function initTabsUpdateListener() {
-  // 限制最多可固定一个NiceTab管理页面
-  async function adminPageLimitControl(
-    tabId: number,
-    changeInfo: Tabs.OnUpdatedChangeInfoType,
-    tab: Tabs.Tab,
-  ) {
-    const adminTabUrl = browser.runtime.getURL('/options.html');
-    const tabs = await browser.tabs.query({
-      url: `${adminTabUrl}*`,
-      currentWindow: true,
-    });
-    let pinnedAdminPageCount = 0;
-    for (let tab of tabs) {
-      if (tab.pinned) {
-        pinnedAdminPageCount++;
-      }
-      if (pinnedAdminPageCount > 1) {
-        browser.tabs.remove(tabId);
-      }
+// 限制最多可固定一个NiceTab管理页面
+async function adminPageLimitControl(tabId: number) {
+  const adminTabUrl = browser.runtime.getURL('/options.html');
+  const tabs = await browser.tabs.query({
+    url: `${adminTabUrl}*`,
+    currentWindow: true,
+  });
+  let pinnedAdminPageCount = 0;
+  for (let tab of tabs) {
+    if (tab.pinned) {
+      pinnedAdminPageCount++;
+    }
+    if (pinnedAdminPageCount > 1) {
+      browser.tabs.remove(tabId);
     }
   }
+}
+
+// 初始化监听 tabs 更新
+async function initTabsUpdateListener() {
+  browser.tabs.onUpdated.removeListener(adminPageLimitControl);
   browser.tabs.onUpdated.addListener(adminPageLimitControl);
+
+  // 页面更新时自动创建快照
+  const autoCreateSnapshot = debounce(async () => {
+    const globalState = await stateUtils.getState('global');
+    if (globalState.snapshotStatus === 'on') {
+      tabUtils.saveOpenedTabsAsSnapshot();
+    }
+  }, 2000);
+  browser.tabs.onUpdated.removeListener(autoCreateSnapshot);
+  browser.tabs.onUpdated.addListener(autoCreateSnapshot);
+  browser.tabs.onMoved.removeListener(autoCreateSnapshot);
+  browser.tabs.onMoved.addListener(autoCreateSnapshot);
+  browser.tabs.onRemoved.removeListener(autoCreateSnapshot);
+  browser.tabs.onRemoved.addListener(autoCreateSnapshot);
 }
 
 export default defineBackground(() => {
@@ -154,8 +168,14 @@ export default defineBackground(() => {
 
   // 创建自动同步闹钟
   autoSyncAlarm.create();
-  // 创建自动保存已打开标签页的闹钟
-  autoSaveOpenedTabsAlarm.create();
+  // // 创建自动保存已打开标签页的闹钟
+  // autoSaveOpenedTabsAlarm.create();
+  // 清空自动保存快照的闹钟（不使用闹钟，采用tabs.onUpdated事件监听）
+  autoSaveOpenedTabsAlarm.clearAlarm();
+  // setTimeout(() => {
+  //   // 创建自动保存已打开标签页的闹钟
+  //   autoSaveOpenedTabsAlarm.create();
+  // }, 300);
 
   // 左键点击图标 (如果有 popup 是不会触发的，可以执行 browser[BROWSER_ACTION_API_NAME].setPopup({ popup: '' }) 来监听事件)
   // Fired when an action icon is clicked. This event will not fire if the action has a popup.
@@ -173,12 +193,27 @@ export default defineBackground(() => {
       tabUtils.openAdminRoutePage({ path: '/home' });
     }
   }
-  browser.runtime.onInstalled.addListener(() => {
+  browser.runtime.onInstalled.addListener(async () => {
     console.log('browser.runtime.onInstalled');
+    await stateUtils.setStateByModule('global', { snapshotStatus: 'on' });
+
     startup();
   });
-  browser.runtime.onStartup.addListener(() => {
+  browser.runtime.onStartup.addListener(async () => {
     console.log('browser.runtime.onStartup');
+    autoSaveOpenedTabsAlarm.clearAlarm();
+
+    await stateUtils.setStateByModule('global', { snapshotStatus: 'off' });
+
+    const settings = await settingsUtils.getSettings();
+    const restoreSnapshotAfterBrowserLaunch =
+      settings[RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH];
+
+    if (restoreSnapshotAfterBrowserLaunch) {
+      await tabUtils.restoreOpenedTabsSnapshot();
+    }
+    await stateUtils.setStateByModule('global', { snapshotStatus: 'on' });
+
     startup();
   });
   browser.windows.onCreated.addListener(async () => {
@@ -192,6 +227,17 @@ export default defineBackground(() => {
   browser.windows.onRemoved.addListener(async windowId => {
     console.log('browser.windows.onRemoved--windowId', windowId);
     stateUtils.clearSelectedKeysOfInvalidWindows();
+    const windows = await browser.windows.getAll();
+    if (!windows.length) {
+      stateUtils.setStateByModule('global', { snapshotStatus: 'off' });
+    }
+    await tabUtils.saveOpenedTabsAsSnapshot();
+  });
+
+  // 监听浏览器关闭事件
+  browser.runtime.onSuspend.addListener(async () => {
+    console.log('browser.runtime.onSuspend');
+    // autoSaveOpenedTabsAlarm.clearAlarm();
   });
 
   browser.runtime.onMessage.addListener(async (msg: unknown) => {

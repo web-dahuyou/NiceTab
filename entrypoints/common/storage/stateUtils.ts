@@ -12,10 +12,14 @@ export default class StateUtils {
       permissionActions: {
         tabGroups: false,
       },
+      snapshotStatus: 'on', // on/off
       openedTabsManualSave: [],
       openedTabsAutoSave: [],
       lastSelectedTargetValue: ['0'],
     },
+    popup: {
+      isCompact: true,
+    }
   };
   state: StateProps = this.initialState;
 

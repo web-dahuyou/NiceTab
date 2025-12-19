@@ -1,7 +1,8 @@
-import { Menus } from 'wxt/browser';
+import { Menus, type Tabs } from 'wxt/browser';
 import {
   MANIFEST_VERSION,
   ENUM_ACTION_NAME,
+  ENUM_ACTION_NAME_FF,
   ENUM_SETTINGS_PROPS,
   TAB_EVENTS,
   defaultLanguage,
@@ -205,6 +206,50 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
   ];
 };
 
+// 获取 firefox 标签页菜单项
+export const getBaseMenusFirefoxTab = async (): Promise<CreateMenuPropertiesType[]> => {
+  const settings = await settingsUtils.getSettings();
+  const language = settings[LANGUAGE] || defaultLanguage;
+  const customMessages = getCustomLocaleMessages(language);
+
+  const hotkeysMap = await getMenuHotkeys();
+  const contexts: Menus.ContextType[] = ['tab'];
+
+  // 获取标题
+  const getTitle = (title: string, id: string) => {
+    const hotkey = hotkeysMap?.[id];
+    return hotkey ? title + ` (${hotkey})` : title;
+  };
+
+  // Firefox中，单独创建tab上下文菜单
+  const _sendCurrentTab: CreateMenuPropertiesType = {
+    tag: 'sendTabs',
+    id: ENUM_ACTION_NAME_FF.SEND_CURRENT_TAB,
+    title: getTitle(
+      customMessages['common.sendCurrentTab'],
+      ENUM_ACTION_NAME.SEND_CURRENT_TAB,
+    ),
+    contexts,
+    enabled: true,
+  };
+
+  const _hibernateTabs: CreateMenuPropertiesType = {
+    tag: 'common',
+    id: ENUM_ACTION_NAME_FF.HIBERNATE_TABS,
+    title: getTitle(
+      customMessages['common.hibernateTabs'],
+      ENUM_ACTION_NAME.HIBERNATE_TABS,
+    ),
+    contexts,
+    enabled: true,
+  };
+
+  return [
+    _sendCurrentTab,
+    // _hibernateTabs
+  ];
+};
+
 export const getBaseMenuMap = async () => {
   const menus = await getBaseMenus();
   return menus.reduce<Record<string, CreateMenuPropertiesType>>((result, menu) => {
@@ -268,6 +313,13 @@ async function createContextMenus(callback?: () => void) {
   for (let menu of menus) {
     await browser.contextMenus.create(omit(menu, ['tag']));
   }
+
+  if (import.meta.env.FIREFOX) {
+    const ffTabMenus = await getBaseMenusFirefoxTab();
+    for (let menu of ffTabMenus) {
+      await browser.contextMenus.create(omit(menu, ['tag']));
+    }
+  }
   isCreating = false;
   callback?.();
 }
@@ -279,26 +331,32 @@ async function handleContextMenusUpdate() {
   }, 500);
 }
 
-export async function actionHandler(actionName: string, targetData?: SendTargetProps) {
+export async function actionHandler(
+  actionName: string,
+  targetData?: SendTargetProps,
+  tab?: Tabs.Tab,
+) {
   switch (actionName) {
     case ENUM_ACTION_NAME.SEND_ALL_TABS:
       await tabUtils.sendAllTabs(targetData);
       break;
+    case ENUM_ACTION_NAME_FF.SEND_CURRENT_TAB:
     case ENUM_ACTION_NAME.SEND_CURRENT_TAB:
-      await tabUtils.sendCurrentTab(targetData);
+      await tabUtils.sendCurrentTab(targetData, tab);
       break;
     case ENUM_ACTION_NAME.SEND_OTHER_TABS:
       await tabUtils.sendOtherTabs(targetData);
       break;
     case ENUM_ACTION_NAME.SEND_LEFT_TABS:
-      await tabUtils.sendLeftTabs(targetData);
+      await tabUtils.sendLeftTabs(targetData, tab);
       break;
     case ENUM_ACTION_NAME.SEND_RIGHT_TABS:
-      await tabUtils.sendRightTabs(targetData);
+      await tabUtils.sendRightTabs(targetData, tab);
       break;
     case ENUM_ACTION_NAME.OPEN_ADMIN_TAB:
       await tabUtils.openAdminRoutePage({ path: '/home' });
       break;
+    case ENUM_ACTION_NAME_FF.HIBERNATE_TABS:
     case ENUM_ACTION_NAME.HIBERNATE_TABS:
       tabUtils.discardOtherTabs();
       break;
@@ -325,9 +383,10 @@ export async function actionHandler(actionName: string, targetData?: SendTargetP
 export async function handleSendTabsAction(
   actionName: string,
   targetData?: SendTargetProps,
+  tab?: Tabs.Tab,
 ) {
   try {
-    await actionHandler(actionName, targetData);
+    await actionHandler(actionName, targetData, tab);
     tabUtils.executeContentScript(actionName);
   } catch (error) {
     console.log(error);
@@ -336,7 +395,7 @@ export async function handleSendTabsAction(
 }
 
 // 右键菜单点击以及快捷命令操作
-export async function strategyHandler(actionName: string) {
+export async function strategyHandler(actionName: string, tab?: Tabs.Tab) {
   // 注释掉，放开拦截限制，在管理后台页面也允许展示发送目标选择弹窗
   // const { tab: adminTab } = await tabUtils.getAdminTabInfo();
   // const currentTabs = await browser.tabs.query({ active: true, currentWindow: true });
@@ -353,7 +412,7 @@ export async function strategyHandler(actionName: string) {
       ENUM_ACTION_NAME.HIBERNATE_TABS,
     ].includes(actionName as ENUM_ACTION_NAME)
   ) {
-    actionHandler(actionName);
+    actionHandler(actionName, undefined, tab);
     return;
   }
 
@@ -373,7 +432,7 @@ export async function strategyHandler(actionName: string) {
 
   const settings = await settingsUtils.getSettings();
   if (!settings[SHOW_SEND_TARGET_MODAL]) {
-    handleSendTabsAction(actionName);
+    handleSendTabsAction(actionName, undefined, tab);
   } else {
     const currWindow = await browser.windows.getCurrent();
     tabUtils.sendTabMessage(
@@ -383,7 +442,7 @@ export async function strategyHandler(actionName: string) {
         onlyCurrentTab: true,
       },
       () => {
-        actionHandler(actionName);
+        actionHandler(actionName, undefined, tab);
       },
     );
   }
@@ -409,6 +468,6 @@ export default async function contextMenusRegister() {
     }
 
     const actionName = String(info.menuItemId);
-    strategyHandler(actionName);
+    strategyHandler(actionName, tab);
   });
 }

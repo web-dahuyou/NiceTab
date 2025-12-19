@@ -107,7 +107,7 @@ Comprehensive user guide | <a href="./GUIDE-zh.md">NiceTab 用户指南</a> (Eng
 - Option to **Display ContextMenu on your webpage**.
 - Configurable **popup panel modules**: you can configure which modules to display in the popup. If none are selected, clicking the extension icon sends all tabs to NiceTab by default.
 - Option to **Automatically expand the tree list on Home Page**.
-- ...More settings can be found in extension `NiceTab Admin Page > Settings`.
+- ...More settings can be found in extension `NiceTab Admin Page > Settings` or refer to the user guide.
 
 ### Remote Sync
 
@@ -243,3 +243,7 @@ Feel free to join our QQ group: 924270240
 ## Extension Development
 
 See [NiceTab Contributing Guide](./CONTRIBUTING.md)
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=web-dahuyou/NiceTab&type=Date)](https://www.star-history.com/#web-dahuyou/NiceTab&Date)

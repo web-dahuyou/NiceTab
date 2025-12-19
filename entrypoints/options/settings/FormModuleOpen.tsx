@@ -5,6 +5,7 @@ import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { getKeysByOS } from '~/entrypoints/common/utils';
 import getPermission from '~/entrypoints/common/hooks/getPermission';
+import useTooltipOption from '@/entrypoints/common/hooks/tooltipOption';
 
 const {
   RESTORE_IN_NEW_WINDOW,
@@ -25,6 +26,7 @@ export default function FormModuleOpen(
   const { $fmt } = useIntlUtls();
   const { form, ...formItemProps } = props;
   const { isFirefoxTabGroupSupported, hasTabGroupsPermission } = getPermission();
+  const { getFormTooltipOption } = useTooltipOption();
 
   return (
     <Form.Item noStyle {...formItemProps}>
@@ -84,15 +86,9 @@ export default function FormModuleOpen(
       <Form.Item<SettingsProps>
         label={$fmt(`settings.${OPEN_TAB_MODIFIER_KEY}`)}
         name={OPEN_TAB_MODIFIER_KEY}
-        tooltip={{
-          color: token.colorBgElevated,
-          title: (
-            <Typography.Text>
-              {$fmt(`settings.${OPEN_TAB_MODIFIER_KEY}.tooltip`)}
-            </Typography.Text>
-          ),
-          styles: { root: { maxWidth: '320px', width: '320px' } },
-        }}
+        tooltip={getFormTooltipOption({
+          title: $fmt(`settings.${OPEN_TAB_MODIFIER_KEY}.tooltip`),
+        })}
       >
         <Radio.Group>
           <Radio value="alt">{modifierKeyLabels.alt.symbol}</Radio>

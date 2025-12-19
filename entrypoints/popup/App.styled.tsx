@@ -13,6 +13,55 @@ export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
   .fixed-top {
     flex-shrink: 0;
     flex-grow: 0;
+    position: relative;
+    transition: all 0.3s ease;
+    box-shadow: ${props => props.theme.boxShadow || '0 2px 12px 3px rgba(0, 0, 0, 0.1)'};
+
+    &.compact {
+      .block {
+        padding: 4px 10px;
+        min-height: 32px;
+        gap: 4px;
+        .block-title {
+          font-size: 12px;
+        }
+        .action-btn {
+          font-size: 12px;
+        }
+      }
+    }
+
+    .compact-toolbar {
+      display: flex;
+      align-items: center;
+      padding: 4px 42px 4px 6px;
+      min-height: 38px;
+      gap: 2px;
+
+      button {
+        color: ${props => props.theme.colorTextSecondary || '#333'};
+        border: none;
+        box-shadow: none;
+        &:hover {
+          color: ${props => props.theme.colorPrimary};
+          background: rgba(0, 0, 0, 0.05);
+        }
+      }
+    }
+    .toggle-compact-btn {
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      z-index: 10;
+      cursor: pointer;
+      color: ${props => props.theme.colorTextSecondary || '#333'};
+      border: none;
+      box-shadow: none;
+      &:hover {
+        color: ${props => props.theme.colorPrimary};
+        background: rgba(0, 0, 0, 0.05);
+      }
+    }
   }
   .block {
     display: flex;
@@ -60,7 +109,9 @@ export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
     font-weight: bold;
   }
   .block-opened-tabs {
-    padding-bottom: 12px;
+    flex: 1;
+    padding: 12px 0;
+    overflow-y: auto;
   }
 `;
 

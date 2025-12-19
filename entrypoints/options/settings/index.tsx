@@ -135,6 +135,10 @@ export default function Settings() {
     await settingsUtils.setSettings(newSettings);
     NiceGlobalContext.setSettings(newSettings);
     sendRuntimeMessage({ msgType: 'setLocale', data: { locale: newSettings.language } });
+    sendRuntimeMessage({
+      msgType: 'setThemeType',
+      data: { themeType: newSettings.themeType },
+    });
     reloadOtherAdminPage();
 
     const customMessages = getCustomLocaleMessages(
@@ -162,7 +166,7 @@ export default function Settings() {
       form?.setFieldsValue(settings);
       NiceGlobalContext.setSettings(settings);
     });
-  }, [urlParams]);
+  }, [urlParams, NiceGlobalContext.themeType]);
   useEffect(() => {
     settingsUtils.getSettings().then(settings => {
       setInitialFormValues(settings);
@@ -220,33 +224,34 @@ export default function Settings() {
           <Form
             form={form}
             name="settings"
+            key={urlParams.randomId}
             layout="vertical"
             autoComplete="off"
             onFinish={onFinish}
           >
             {/* ******************* 通用设置 ******************* */}
-            <FormModuleCommon hidden={currModule !== 'common'} form={form} key={urlParams.randomId} />
+            <FormModuleCommon hidden={currModule !== 'common'} form={form} />
 
             {/* ******************* 发送标签页相关设置 ******************* */}
-            <FormModuleSend hidden={currModule !== 'sendTabs'} form={form} key={urlParams.randomId} />
+            <FormModuleSend hidden={currModule !== 'sendTabs'} form={form} />
 
             {/* ******************* 打开标签页相关设置 ******************* */}
-            <FormModuleOpen hidden={currModule !== 'openTabs'} form={form} key={urlParams.randomId} />
+            <FormModuleOpen hidden={currModule !== 'openTabs'} form={form} />
 
             {/* ******************* 网页标题相关设置 ******************* */}
-            <FormModulePageTitle hidden={currModule !== 'pageTitleConfig'} form={form} key={urlParams.randomId} />
+            <FormModulePageTitle hidden={currModule !== 'pageTitleConfig'} form={form} />
 
             {/* ******************* 全局搜索相关设置 ******************* */}
-            <FormModuleGlobalSearch hidden={currModule !== 'globalSearch'} form={form} key={urlParams.randomId} />
+            <FormModuleGlobalSearch hidden={currModule !== 'globalSearch'} form={form} />
 
             {/* ******************* 其他操作相关设置 ******************* */}
-            <FormModuleOtherActions hidden={currModule !== 'otherActions'} form={form} key={urlParams.randomId} />
+            <FormModuleOtherActions hidden={currModule !== 'otherActions'} form={form} />
 
             {/* ******************* 展示相关设置 ******************* */}
-            <FormModuleDisplay hidden={currModule !== 'display'} form={form} key={urlParams.randomId} />
+            <FormModuleDisplay hidden={currModule !== 'display'} form={form} />
 
             {/* ******************* 远程同步相关设置 ******************* */}
-            <FormModuleSync hidden={currModule !== 'sync'} form={form} key={urlParams.randomId} />
+            <FormModuleSync hidden={currModule !== 'sync'} form={form} />
           </Form>
         </div>
       </StyledMainWrapper>

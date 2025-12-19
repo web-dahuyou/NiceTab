@@ -36,7 +36,7 @@ export default function Root({
     changeLocale: changeLocaleCustom,
     messages,
   } = useCustomLocale();
-  const { themeTypeConfig, changeThemeType } = useThemeTypeConfig();
+  const { themeTypeConfig, themeType, changeThemeType } = useThemeTypeConfig();
   const [hasReady, setHasReady] = useState(false);
   const [primaryColor, setPrimaryColor] = useState(PRIMARY_COLOR);
   const [pageWidthType, setPageWidthType] = useState<PageWidthTypes>(
@@ -59,10 +59,14 @@ export default function Root({
   };
   const handleSettingsChange = async (settings: Partial<SettingsProps>) => {
     await settingsUtils.setSettings(settings);
-    const { language, pageWidthType = settingsUtils.initialSettings.pageWidthType } =
-      settingsUtils.settings || {};
+    const {
+      language,
+      themeType = settingsUtils.initialSettings.themeType,
+      pageWidthType = settingsUtils.initialSettings.pageWidthType,
+    } = settingsUtils.settings || {};
     handleLocaleChange(language);
     handlePageWidthTypeChange(pageWidthType);
+    handleThemeTypeChange(themeType);
   };
 
   const initData = async () => {
@@ -143,6 +147,7 @@ export default function Root({
             version,
             colorPrimary: primaryColor,
             themeTypeConfig,
+            themeType,
             pageWidthType,
             pageContext,
             $message,

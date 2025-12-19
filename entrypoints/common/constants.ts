@@ -77,6 +77,11 @@ export const THEME_TYPE_CONFIG: Record<ThemeTypes, ThemeTypeConfig> = {
     bgColor: '#2f2f2f',
     algorithm: 'darkAlgorithm',
   },
+  auto: {
+    type: 'auto',
+    bgColor: '#fff',
+    algorithm: 'defaultAlgorithm',
+  },
 };
 // 默认主题类型
 export const defaultThemeType: ThemeTypes = 'light';
@@ -112,6 +117,12 @@ export enum ENUM_ACTION_NAME {
   HIBERNATE_TABS = 'action:hibernateTabs', // 休眠其他标签页
 }
 
+// action 名称枚举 (firefox)
+export enum ENUM_ACTION_NAME_FF {
+  SEND_CURRENT_TAB = 'action:ff-tab:sendCurrentTab', // 发送当前标签页(firefox标签页)
+  HIBERNATE_TABS = 'action:ff-tab:hibernateTabs', // 休眠其他标签页(firefox标签页)
+}
+
 // 右键菜单配置列表-默认
 export const defaultContextmenuConfigList = Object.values(ENUM_ACTION_NAME).map(name => {
   return { menuId: name, display: true };
@@ -124,6 +135,8 @@ export enum ENUM_SETTINGS_PROPS {
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH = 'openAdminTabAfterBrowserLaunch', // 启动浏览器时是否自动打开管理后台
   OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED = 'openAdminTabAfterWindowCreated', // 新开window窗口时是否自动打开管理后台
   AUTO_PIN_ADMIN_TAB = 'autoPinAdminTab', // 是否固定管理后台
+  RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH = 'restoreSnapshotAfterBrowserLaunch', // 启动浏览器时是否恢复快照
+  AUTO_CREATE_SNAPSHOT_INTERVAL = 'autoCreateSnapshotInterval', // 自动创建快照时间间隔
   /* 发送标签页配置 */
   SHOW_SEND_TARGET_MODAL = 'showSendTargetModal', // 发送标签页时是否显示目标选择弹窗
   ALLOW_SEND_PINNED_TABS = 'allowSendPinnedTabs', // 是否发送固定标签页

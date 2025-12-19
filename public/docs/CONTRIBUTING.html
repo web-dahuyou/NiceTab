@@ -25,8 +25,10 @@
 <pre><code class="language-bash">git checkout -b dev-your-awesome-code origin/dev
 </code></pre>
 </li>
-<li><p>Commit your changes (follow <a href="https://github.com/angular/angular/blob/main/contributing-docs/commit-message-guidelines.html">commit message conventions</a>).</p>
-<pre><code class="language-bash">git commit -m &#39;feat: add a new feature&#39;
+<li><p>Commit your changes (follow <a href="https://github.com/angular/angular/blob/main/contributing-docs/commit-message-guidelines.html">commit message conventions</a>).
+  Note: Before committing, it is recommended to run the <code>pnpm compile</code> command to check the typescript types.</p>
+<pre><code class="language-bash">pnpm compile
+git commit -m &#39;feat: add a new feature&#39;
 </code></pre>
 </li>
 <li><p>Push your branch to your remote repository.</p>
