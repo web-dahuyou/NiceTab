@@ -1,4 +1,5 @@
-import { Form, Radio, Slider } from 'antd';
+import { Form, Radio } from 'antd';
+import { DesktopOutlined, MoonOutlined, SunOutlined } from '@ant-design/icons';
 import type { FormItemProps, FormInstance } from 'antd';
 import type { SettingsProps } from '~/entrypoints/types';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
@@ -6,6 +7,7 @@ import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 
 const {
   LANGUAGE,
+  THEME_TYPE,
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
   OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED,
   AUTO_PIN_ADMIN_TAB,
@@ -30,7 +32,22 @@ export default function FormModuleCommon(
           <Radio value="en-US"> English </Radio>
         </Radio.Group>
       </Form.Item>
-
+      <Form.Item<SettingsProps>
+        label={$fmt({ id: `settings.${THEME_TYPE}`, values: { mark: '：' } })}
+        name={THEME_TYPE}
+      >
+        <Radio.Group>
+          <Radio value="light">
+            <SunOutlined /> {$fmt('common.light')}
+          </Radio>
+          <Radio value="dark">
+            <MoonOutlined /> {$fmt('common.dark')}
+          </Radio>
+          <Radio value="auto">
+            <DesktopOutlined /> {$fmt('common.auto')}
+          </Radio>
+        </Radio.Group>
+      </Form.Item>
       {/* 启动浏览器时是否自动打开NiceTab管理后台 */}
       <Form.Item<SettingsProps>
         label={$fmt(`settings.${OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH}`)}
