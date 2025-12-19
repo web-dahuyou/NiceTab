@@ -1,4 +1,4 @@
-import { defineConfig, WxtViteConfig } from 'wxt';
+import { defineConfig, type UserManifest } from 'wxt';
 import svgr from 'vite-plugin-svgr';
 import yargsParser from 'yargs-parser';
 
@@ -40,6 +40,14 @@ export default defineConfig({
           sandbox:
             "sandbox allow-scripts; script-src 'self' https://api.github.com https://gitee.com; object-src 'self'",
         },
+
+    browser_specific_settings: isFirefox ? {
+      "gecko": {
+        "data_collection_permissions": {
+          "required": ["none"]
+        }
+      }
+    } as UserManifest['browser_specific_settings'] : {},
     commands: {
       'action:openAdminTab': {
         suggested_key: {
