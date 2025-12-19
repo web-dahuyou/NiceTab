@@ -14,8 +14,9 @@
    git checkout -b dev-your-awesome-code origin/dev
    ```
 4. 提交修改（注意 [commit message规范](https://github.com/angular/angular/blob/main/contributing-docs/commit-message-guidelines.md)）。
-
+  注意：提交之前建议执行 `pnpm compile` 命令检查下 typescript 类型
    ```bash
+   pnpm compile
    git commit -m 'feat: add a new feature'
    ```
 5. 将你的分支推送到你的远程仓库。

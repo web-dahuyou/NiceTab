@@ -14,8 +14,10 @@
    git checkout -b dev-your-awesome-code origin/dev
    ```
 4. Commit your changes (follow [commit message conventions](https://github.com/angular/angular/blob/main/contributing-docs/commit-message-guidelines.md)).
+  Note: Before committing, it is recommended to run the `pnpm compile` command to check the typescript types.
 
    ```bash
+   pnpm compile
    git commit -m 'feat: add a new feature'
    ```
 5. Push your branch to your remote repository.

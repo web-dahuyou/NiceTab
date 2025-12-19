@@ -25,6 +25,7 @@ import {
   RestOutlined,
   GithubOutlined,
   MoonOutlined,
+  DesktopOutlined,
   SunOutlined,
   SmileOutlined,
   SendOutlined,
@@ -76,7 +77,7 @@ import type {
   StyledThemeProps,
   PageModuleNames,
   PageWidthTypes,
-  LanguageTypes,
+  ThemeTypes,
 } from '~/entrypoints/types';
 import Home from './home/index.tsx';
 import Settings from './settings/index.tsx';
@@ -205,6 +206,8 @@ const router = createHashRouter([
   },
 ]);
 
+const themeTypes: ThemeTypes[] = ['light', 'dark', 'auto'];
+
 function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -238,10 +241,11 @@ function AppLayout() {
     },
     [navs, navigate],
   );
-  // 切换主题类型
   const handleThemeTypeChange = () => {
-    const currThemeType = themeTypeConfig.type || defaultThemeType;
-    const themeType = currThemeType === 'light' ? 'dark' : 'light';
+    const currThemeType = NiceGlobalContext.themeType || defaultThemeType;
+    let index = themeTypes.indexOf(currThemeType);
+    const themeType = themeTypes[(index + 1) % 3];
+
     NiceGlobalContext.setThemeType(themeType);
     sendRuntimeMessage({ msgType: 'setThemeType', data: { themeType } });
   };
@@ -425,7 +429,9 @@ function AppLayout() {
               title={$fmt('common.toggleThemeType')}
               onClick={handleThemeTypeChange}
             >
-              {themeTypeConfig.type === 'light' ? <SunOutlined /> : <MoonOutlined />}
+              {NiceGlobalContext.themeType === 'light' && <SunOutlined />}
+              {NiceGlobalContext.themeType === 'dark' && <MoonOutlined />}
+              {NiceGlobalContext.themeType === 'auto' && <DesktopOutlined />}
             </StyledActionIconBtn>
             {/* language */}
             <Dropdown

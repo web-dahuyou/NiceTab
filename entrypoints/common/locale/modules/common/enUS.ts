@@ -128,6 +128,9 @@ const enUS: Record<LocaleKey, string> = {
   'common.filename': 'Filename',
   'common.expand': 'Expand',
   'common.collapse': 'Collapse',
+  'common.light': 'Light',
+  'common.dark': 'Dark',
+  'common.auto': 'Auto',
 };
 
 export default enUS;
