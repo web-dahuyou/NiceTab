@@ -115,6 +115,9 @@ const zhCN = {
   'common.regex': '正则',
   'common.directory': '目录',
   'common.filename': '文件名',
+  'common.light': '浅色',
+  'common.dark': '深色',
+  'common.auto': '自动',
 };
 
 export type LocaleKey = keyof typeof zhCN;

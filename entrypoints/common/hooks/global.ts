@@ -29,7 +29,7 @@ export const GlobalContext = createContext<GlobalContextProps>({
   themeType: defaultThemeType,
   pageWidthType: 'fixed',
   pageContext: 'optionsPage',
-  $message: (() => { }) as any,
+  $message: (() => {}) as any,
   setThemeType: async (themeType = defaultThemeType) => {
     settingsUtils.setSettings({ ...settingsUtils.settings, themeType });
   },
@@ -113,19 +113,18 @@ export function useThemeTypeConfig() {
     let config: ThemeTypeConfig;
     if (type === 'auto') {
       config = getAutoThemeConfig();
-      // 保留 type 为 auto，以便后续逻辑判断
-      config = { ...config, type: 'auto' };
     } else {
       config = THEME_TYPE_CONFIG[type];
     }
+
     setThemeTypeConfig({ ...config });
   };
 
-  const changeThemeType = async (newThemeType: ThemeTypes = defaultThemeType) => {
+  const changeThemeType = async (themeType: ThemeTypes = defaultThemeType) => {
     const settings = await settingsUtils.getSettings();
-    await settingsUtils.setSettings({ ...settings, themeType: newThemeType });
-    setThemeType(newThemeType);
-    updateThemeTypeConfig(newThemeType);
+    await settingsUtils.setSettings({ ...settings, themeType });
+    setThemeType(themeType);
+    updateThemeTypeConfig(themeType);
   };
 
   useEffect(() => {

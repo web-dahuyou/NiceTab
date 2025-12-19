@@ -84,7 +84,7 @@ export const THEME_TYPE_CONFIG: Record<ThemeTypes, ThemeTypeConfig> = {
   },
 };
 // 默认主题类型
-export const defaultThemeType: ThemeTypes = 'auto';
+export const defaultThemeType: ThemeTypes = 'light';
 
 // 发送标签页操作名称
 export const SEND_TAB_ACTION_NAMES = [

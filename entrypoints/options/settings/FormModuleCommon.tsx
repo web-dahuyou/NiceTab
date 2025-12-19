@@ -30,18 +30,21 @@ export default function FormModuleCommon(
         </Radio.Group>
       </Form.Item>
       <Form.Item<SettingsProps>
-        label={$fmt({ id: `settings.${ENUM_SETTINGS_PROPS.THEME_TYPE}`, values: { mark: '：' } })}
+        label={$fmt({
+          id: `settings.${ENUM_SETTINGS_PROPS.THEME_TYPE}`,
+          values: { mark: '：' },
+        })}
         name={ENUM_SETTINGS_PROPS.THEME_TYPE}
       >
         <Radio.Group>
           <Radio value="light">
-            <SunOutlined /> Light
+            <SunOutlined /> {$fmt('common.light')}
           </Radio>
           <Radio value="dark">
-            <MoonOutlined /> Dark
+            <MoonOutlined /> {$fmt('common.dark')}
           </Radio>
           <Radio value="auto">
-            <DesktopOutlined /> Auto
+            <DesktopOutlined /> {$fmt('common.auto')}
           </Radio>
         </Radio.Group>
       </Form.Item>

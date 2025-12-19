@@ -77,7 +77,7 @@ import type {
   StyledThemeProps,
   PageModuleNames,
   PageWidthTypes,
-  LanguageTypes,
+  ThemeTypes,
 } from '~/entrypoints/types';
 import Home from './home/index.tsx';
 import Settings from './settings/index.tsx';
@@ -206,6 +206,8 @@ const router = createHashRouter([
   },
 ]);
 
+const themeTypes: ThemeTypes[] = ['light', 'dark', 'auto'];
+
 function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -240,17 +242,9 @@ function AppLayout() {
     [navs, navigate],
   );
   const handleThemeTypeChange = () => {
-    // const currThemeType = themeTypeConfig.type || defaultThemeType;
-    // const themeType = currThemeType === 'light' ? 'dark' : 'light';
     const currThemeType = NiceGlobalContext.themeType || defaultThemeType;
-    let themeType: ThemeTypes = 'light';
-    if (currThemeType === 'light') {
-      themeType = 'dark';
-    } else if (currThemeType === 'dark') {
-      themeType = 'auto';
-    } else {
-      themeType = 'light';
-    }
+    let index = themeTypes.indexOf(currThemeType);
+    const themeType = themeTypes[(index + 1) % 3];
 
     NiceGlobalContext.setThemeType(themeType);
     sendRuntimeMessage({ msgType: 'setThemeType', data: { themeType } });
