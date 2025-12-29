@@ -11,7 +11,7 @@ import {
   ReadOutlined,
   SendOutlined,
   SearchOutlined,
-  RestOutlined,
+  CoffeeOutlined,
   CloudSyncOutlined,
   ReloadOutlined,
   GithubOutlined,
@@ -300,7 +300,7 @@ export default function App() {
 
     if (key === 'group-sendTabs') return <SendOutlined />;
     if (key === 'globalSearch') return <SearchOutlined />;
-    if (key === 'hibernateTabs') return <RestOutlined />;
+    if (key === 'hibernateTabs') return <CoffeeOutlined />;
     if (key === 'startSync') return <CloudSyncOutlined />;
     if (key === 'reload') return <ReloadOutlined />;
     return null;
