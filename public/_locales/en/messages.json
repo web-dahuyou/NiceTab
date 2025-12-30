@@ -5,6 +5,9 @@
   "action_sendAllTabs": {
     "message": "Send All Tabs"
   },
+  "action_sendAllWindowsTabs": {
+    "message": "Send All Tabs - All Windows"
+  },
   "action_sendCurrentTab": {
     "message": "Send Current Tab"
   },

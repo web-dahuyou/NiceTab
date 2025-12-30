@@ -7,6 +7,7 @@ const zhCN = {
   'common.home': '首页',
   'common.sendTabs': '发送标签页',
   'common.sendAllTabs': '发送所有标签页',
+  'common.sendAllWindowsTabs': '发送所有窗口的标签页',
   'common.sendCurrentTab': '发送当前标签页',
   'common.sendOtherTabs': '发送其他标签页',
   'common.sendLeftTabs': '发送左侧标签页',

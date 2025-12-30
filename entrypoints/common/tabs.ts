@@ -266,13 +266,21 @@ export async function getAllTabs(windowId?: number) {
   return await browser.tabs.query(queryInfo);
 }
 
-// 发送标签页逻辑
-async function sendAllTabs(targetData: SendTargetProps = {}) {
-  const tabs = await browser.tabs.query({
-    // url: matchUrls,
-    currentWindow: true,
-  });
+// 发送当前窗口的所有标签页
+async function sendAllTabs(
+  targetData: SendTargetProps = {},
+  { onlyCurrentWindow = true }: { onlyCurrentWindow?: boolean } = {},
+) {
+  const tabs = await browser.tabs.query(
+    onlyCurrentWindow
+      ? {
+          // url: matchUrls,
+          currentWindow: true,
+        }
+      : {},
+  );
 
+  console.log('sendAllTabs-tabs', tabs)
   // 获取插件设置
   const settings = await settingsUtils.getSettings();
   const filteredTabs = await getFilteredTabs(tabs, settings);

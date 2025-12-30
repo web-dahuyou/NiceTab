@@ -110,6 +110,14 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
     enabled: filteredTabs?.length > 0,
   };
 
+  const _sendAllWindowsTabs: CreateMenuPropertiesType = {
+    tag: 'sendTabs',
+    id: ENUM_ACTION_NAME.SEND_ALL_WINDOWS_TABS,
+    title: getTitle(customMessages['common.sendAllWindowsTabs'], ENUM_ACTION_NAME.SEND_ALL_WINDOWS_TABS),
+    contexts,
+    enabled: filteredTabs?.length > 0,
+  };
+
   const _sendCurrentTab: CreateMenuPropertiesType = {
     tag: 'sendTabs',
     id: ENUM_ACTION_NAME.SEND_CURRENT_TAB,
@@ -197,6 +205,7 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
     _openAdminTab,
     _openGlobalSearch,
     _sendAllTabs,
+    _sendAllWindowsTabs,
     _sendCurrentTab,
     _sendOtherTabs,
     _sendLeftTabs,
@@ -339,6 +348,9 @@ export async function actionHandler(
   switch (actionName) {
     case ENUM_ACTION_NAME.SEND_ALL_TABS:
       await tabUtils.sendAllTabs(targetData);
+      break;
+    case ENUM_ACTION_NAME.SEND_ALL_WINDOWS_TABS:
+      await tabUtils.sendAllTabs(targetData, { onlyCurrentWindow: false });
       break;
     case ENUM_ACTION_NAME_FF.SEND_CURRENT_TAB:
     case ENUM_ACTION_NAME.SEND_CURRENT_TAB:

@@ -61,6 +61,9 @@ export default defineConfig({
         },
         description: '__MSG_action_sendAllTabs__',
       },
+      'action:sendAllWindowsTabs': {
+        description: '__MSG_action_sendAllWindowsTabs__',
+      },
       'action:sendCurrentTab': {
         suggested_key: {
           default: 'Alt+Shift+C',
