@@ -57,7 +57,7 @@ Comprehensive user guide | <a href="./GUIDE-zh.md">NiceTab 用户指南</a> (Eng
 
 ### General Features
 
-- Supports sending all tabs, current tabs, other tabs, left-side tabs, and right-side tabs in just one click.
+- Supports sending all tabs, all tabs (all windows), currect tab group, current tabs, other tabs, left-side tabs, and right-side tabs in just one click.
 - Supports sending native browser tab groups into NiceTab, and re-open them as native tab groups in your browser.
 - Supports browser command shortcuts (open the NiceTab-Admin-Page, send all tabs, send the current tab, etc.).
 - Preferences support.
