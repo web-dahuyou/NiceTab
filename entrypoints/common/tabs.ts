@@ -255,6 +255,17 @@ export async function cancelHighlightTabs(tabs?: Tabs.Tab[]) {
     });
   }
 }
+
+// 根据选中的tabs获取所在标签组中所有tabs
+export async function getTabsWithinGroup(tabs: Tabs.Tab[]) {
+  const tabGroupIds = [...new Set(tabs.map(tab => tab.groupId).filter(Boolean))];
+  const allTabs = await browser.tabs.query({
+    currentWindow: true,
+  });
+  return allTabs.filter(
+    tab => tab.groupId && tab.groupId !== -1 && tabGroupIds.includes(tab.groupId),
+  );
+}
 // 获取全部标签页
 export async function getAllTabs(windowId?: number) {
   const queryInfo: Tabs.QueryQueryInfoType = {};
@@ -280,7 +291,6 @@ async function sendAllTabs(
       : {},
   );
 
-  console.log('sendAllTabs-tabs', tabs)
   // 获取插件设置
   const settings = await settingsUtils.getSettings();
   const filteredTabs = await getFilteredTabs(tabs, settings);
@@ -295,6 +305,34 @@ async function sendAllTabs(
     setTimeout(() => {
       browser.tabs.remove(filteredTabs.map(t => t.id as number).filter(Boolean));
     }, 30);
+  } else {
+    // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
+    cancelHighlightTabs(filteredTabs);
+  }
+}
+// 发送当前选中的标签页所在的标签组（支持多选）
+async function sendCurrentGroup(targetData: SendTargetProps = {}, tab?: Tabs.Tab) {
+  const settings = await settingsUtils.getSettings();
+
+  const tabs = await browser.tabs.query({
+    // url: matchUrls,
+    highlighted: true,
+    currentWindow: true,
+  });
+
+  const _tabsWithinGroup = await getTabsWithinGroup(tabs);
+
+  let filteredTabs = await getFilteredTabs(_tabsWithinGroup, settings);
+  if (!filteredTabs?.length) return;
+
+  const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs, targetData);
+  await openAdminTab(settings, { tagId, groupId });
+  const actionAutoCloseFlags = settings[ACTION_AUTO_CLOSE_FLAGS];
+  if (
+    settings[CLOSE_TABS_AFTER_SEND_TABS] ||
+    actionAutoCloseFlags?.includes('sendCurrentTab')
+  ) {
+    browser.tabs.remove(filteredTabs.map(t => t.id as number).filter(Boolean));
   } else {
     // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
     cancelHighlightTabs(filteredTabs);
@@ -677,6 +715,7 @@ export default {
   cancelHighlightTabs,
   getAllTabs,
   sendAllTabs,
+  sendCurrentGroup,
   sendCurrentTab,
   sendOtherTabs,
   sendLeftTabs,

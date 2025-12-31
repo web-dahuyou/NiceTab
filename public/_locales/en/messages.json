@@ -8,6 +8,9 @@
   "action_sendAllWindowsTabs": {
     "message": "Send All Tabs - All Windows"
   },
+  "action_sendCurrentGroup": {
+    "message": "Send Current Group"
+  },
   "action_sendCurrentTab": {
     "message": "Send Current Tab"
   },

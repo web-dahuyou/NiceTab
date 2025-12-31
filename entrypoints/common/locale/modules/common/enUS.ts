@@ -10,6 +10,7 @@ const enUS: Record<LocaleKey, string> = {
   'common.sendTabs': 'Send Tabs',
   'common.sendAllTabs': 'Send All Tabs',
   'common.sendAllWindowsTabs': 'Send All Tabs - All Windows',
+  'common.sendCurrentGroup': 'Send Current Group',
   'common.sendCurrentTab': 'Send Current Tab',
   'common.sendOtherTabs': 'Send Other Tabs',
   'common.sendLeftTabs': 'Send Left Tabs',
