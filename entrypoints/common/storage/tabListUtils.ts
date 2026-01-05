@@ -138,7 +138,8 @@ export function mergeGroupsAndTabs({
       resultList = [];
     for (let item of list) {
       if (exceptValue != undefined && item[key] === exceptValue) {
-        exceptList.push({ ...item, groupName: `group_${getRandomId()}` });
+        const randomName = dayjs(item.createTime).format('YYYYMMDD_HH:mm:ss_') + getRandomId(3, true);
+        exceptList.push({ ...item, groupName: `G_${randomName}` });
       } else {
         resultList.push(item);
       }
@@ -200,9 +201,10 @@ export default class TabListUtils {
 
   /* 分类相关方法 */
   getInitialTag(): TagItem {
+    const randomName = dayjs().format('YYYYMMDD_HH:mm:ss_') + getRandomId(3, true);
     return {
       tagId: getRandomId(),
-      tagName: UNNAMED_TAG,
+      tagName: `T_${randomName}` || UNNAMED_TAG,
       createTime: newCreateTime(),
       groupList: [],
     };
@@ -330,9 +332,10 @@ export default class TabListUtils {
 
   /* 标签组相关方法 */
   getInitialTabGroup(): GroupItem {
+    const randomName = dayjs().format('YYYYMMDD_HH:mm:ss_') + getRandomId(3, true);
     return {
       groupId: getRandomId(),
-      groupName: UNNAMED_GROUP,
+      groupName: `G_${randomName}` || UNNAMED_GROUP,
       createTime: newCreateTime(),
       tabList: [],
     };
