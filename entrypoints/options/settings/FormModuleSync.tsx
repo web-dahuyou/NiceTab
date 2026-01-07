@@ -8,7 +8,7 @@ import {
   ENUM_SETTINGS_PROPS,
   defaultAutoSyncRelation,
 } from '~/entrypoints/common/constants';
-import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { useIntlUtls, eventEmitter } from '~/entrypoints/common/hooks/global';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import useTooltipOption from '@/entrypoints/common/hooks/tooltipOption';
 import { useSyncType } from '../sync/hooks/syncType';
@@ -202,6 +202,8 @@ export default function FormModuleSync(
                         form.setFieldsValue({
                           [AUTO_SYNC_TIME_RANGES]: newValue,
                         });
+
+                        eventEmitter.emit('settings:values-change');
                       }}
                     />
                   </Form.Item>

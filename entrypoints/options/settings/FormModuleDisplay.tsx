@@ -21,11 +21,11 @@ const {
 } = ENUM_SETTINGS_PROPS;
 
 export default function FormModuleDisplay(
-  props: FormItemProps & { form: FormInstance<SettingsProps> },
+  props: FormItemProps & { form: FormInstance<SettingsProps>, onChange?: (val?: any) => void },
 ) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
-  const { form, ...formItemProps } = props;
+  const { form, onChange, ...formItemProps } = props;
 
   const { getFormTooltipOption } = useTooltipOption();
 
@@ -106,7 +106,7 @@ export default function FormModuleDisplay(
           title: $fmt(`settings.${CONTEXT_MENU_CONFIG}.tooltip`),
         })}
       >
-        <ContextMenuConfig form={form} />
+        <ContextMenuConfig form={form} onChange={onChange} />
       </Form.Item>
 
       {/* popup面板中模块设置 */}

@@ -10,7 +10,7 @@ import {
   defaultContextmenuConfigList,
 } from '~/entrypoints/common/constants';
 import { getBaseMenuMap } from '~/entrypoints/common/contextMenus';
-import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { useIntlUtls, eventEmitter } from '~/entrypoints/common/hooks/global';
 import type { SettingsProps, ContextMenuConfigItem } from '~/entrypoints/types';
 import { omit } from '~/entrypoints/common/utils';
 import DndComponent from '~/entrypoints/common/components/DndComponent';
@@ -105,6 +105,8 @@ export default function ContextMenuConfig({ form }: Props) {
       form.setFieldsValue({
         [CONTEXT_MENU_CONFIG]: _list.map(item => omit(item, ['name'])),
       });
+      // form?.submit?.();
+      eventEmitter.emit('settings:values-change');
     },
     [list],
   );
@@ -119,12 +121,14 @@ export default function ContextMenuConfig({ form }: Props) {
         axis: 'vertical',
         closestEdgeOfTarget: extractClosestEdge(targetData),
       });
-      console.log('_list', _list);
+      // console.log('_list', _list);
       setList(_list);
 
       form.setFieldsValue({
         [CONTEXT_MENU_CONFIG]: _list.map(item => omit(item, ['name'])),
       });
+      // form?.submit?.();
+      eventEmitter.emit('settings:values-change');
     },
     [list],
   );
