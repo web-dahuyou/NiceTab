@@ -1,4 +1,5 @@
 import { Menus, type Tabs } from 'wxt/browser';
+import { debounce } from 'lodash-es';
 import {
   MANIFEST_VERSION,
   ENUM_ACTION_NAME,
@@ -137,7 +138,7 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
     enabled:
       !!currTab?.id &&
       currTab?.id != adminTab?.id &&
-      !highlightedTabs.some(tab => !tab.groupId || tab.groupId == -1)
+      !highlightedTabs.some(tab => !tab.groupId || tab.groupId == -1),
   };
 
   const _sendCurrentTab: CreateMenuPropertiesType = {
@@ -357,11 +358,9 @@ async function createContextMenus(callback?: () => void) {
 }
 
 // 根据标签页状态更新 contextMenus
-async function handleContextMenusUpdate() {
-  setTimeout(() => {
-    createContextMenus();
-  }, 500);
-}
+export const handleContextMenusUpdate = debounce(() => {
+  createContextMenus();
+}, 500);
 
 export async function actionHandler(
   actionName: string,

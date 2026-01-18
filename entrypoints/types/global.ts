@@ -19,6 +19,7 @@ export type EventsEmitterProps = {
   'home:is-dragging': boolean;
   'home:set-tree-searchValue': { value: string; callback?: () => void };
   'home:set-editing-status': boolean;
+  'settings:values-change': any;
   'sync:push-to-all-remotes': undefined;
   'sync:sync-status-change--gist': SyncStatusChangeEventProps<'gist'>;
   'sync:sync-status-change--webdav': SyncStatusChangeEventProps<'webdav'>;

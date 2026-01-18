@@ -104,7 +104,9 @@ export default function FormModuleOtherActions(
               )}: ${defaultTemplate}`}
             />
           </Form.Item>
-          <QuickActions onChange={onQuickActionChange}></QuickActions>
+          <Form.Item<SettingsProps> name={LINK_TEMPLATE} noStyle>
+            <QuickActions onChange={onQuickActionChange}></QuickActions>
+          </Form.Item>
         </Space>
       </Form.Item>
 
