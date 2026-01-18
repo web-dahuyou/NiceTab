@@ -89,6 +89,7 @@ export const defaultThemeType: ThemeTypes = 'light';
 // 发送标签页操作名称
 export const SEND_TAB_ACTION_NAMES = [
   'sendAllTabs', // 发送全部标签页
+  'sendCurrentGroup', // 发送当前标签组
   'sendCurrentTab', // 发送当前标签页
   'sendOtherTabs', // 发送其他标签页
   'sendLeftTabs', // 发送左侧标签页
@@ -108,7 +109,9 @@ export const POPUP_MODULE_NAMES: PopupModuleNames[] = [
 export enum ENUM_ACTION_NAME {
   OPEN_ADMIN_TAB = 'action:openAdminTab', // 打开管理后台
   SEND_ALL_TABS = 'action:sendAllTabs', // 发送全部标签页
+  SEND_ALL_WINDOWS_TABS = 'action:sendAllWindowsTabs', // 发送全部窗口的所有标签页
   SEND_CURRENT_TAB = 'action:sendCurrentTab', // 发送当前标签页
+  SEND_CURRENT_GROUP = 'action:sendCurrentGroup', // 发送当前标签组
   SEND_OTHER_TABS = 'action:sendOtherTabs', // 发送其他标签页
   SEND_LEFT_TABS = 'action:sendLeftTabs', // 发送左侧标签页
   SEND_RIGHT_TABS = 'action:sendRightTabs', // 发送右侧标签页

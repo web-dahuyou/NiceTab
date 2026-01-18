@@ -1,8 +1,8 @@
 import { useContext, useState, useEffect, useMemo } from 'react';
-import { Menu, Form, Button, Modal, message } from 'antd';
+import { Menu, Form, Button, Badge, Modal, theme, message } from 'antd';
 import type { MenuProps, FormProps } from 'antd';
 import { SaveOutlined, SettingOutlined } from '@ant-design/icons';
-import { isEqual } from 'lodash-es';
+import { isEqual, debounce } from 'lodash-es';
 import { useBlocker } from 'react-router-dom';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import type { SettingsProps, TimeRange } from '~/entrypoints/types';
@@ -12,7 +12,11 @@ import {
   defaultLanguage,
   defaultTimeRange,
 } from '~/entrypoints/common/constants';
-import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
+import {
+  GlobalContext,
+  useIntlUtls,
+  eventEmitter,
+} from '~/entrypoints/common/hooks/global';
 import useUrlParams from '~/entrypoints/common/hooks/urlParams';
 import { sendRuntimeMessage, classNames } from '~/entrypoints/common/utils';
 import { reloadOtherAdminPage } from '~/entrypoints/common/tabs';
@@ -51,6 +55,7 @@ export default function Settings() {
   const { $fmt, locale } = useIntlUtls();
   const [messageApi, msgContextHolder] = message.useMessage();
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
+  const { token } = theme.useToken();
 
   const onCollapseChange = (status: boolean) => {
     setSidebarCollapsed(status);
@@ -121,7 +126,7 @@ export default function Settings() {
     return false;
   });
 
-  const onFinish: FormProps<SettingsProps>['onFinish'] = async values => {
+  const handleFinish: FormProps<SettingsProps>['onFinish'] = async values => {
     const settings = await settingsUtils.getSettings();
     const newSettings = {
       ...settingsUtils.initialSettings,
@@ -149,7 +154,23 @@ export default function Settings() {
       ...values,
       ...newSettings,
     }));
+    setHasChanged(false);
   };
+
+  const onFinish = useMemo(() => debounce(handleFinish, 500), [handleFinish]);
+
+  const [hasChanged, setHasChanged] = useState<boolean>(false);
+  const handleValuesChange = () => {
+    setHasChanged(true);
+    form?.validateFields().catch(err => {
+      console.log('form-valid-err', err);
+    });
+  };
+
+  const onValuesChange = useMemo(
+    () => debounce(handleValuesChange, 500),
+    [handleValuesChange],
+  );
 
   const handleSave = () => {
     form?.submit();
@@ -172,6 +193,11 @@ export default function Settings() {
       setInitialFormValues(settings);
       form?.setFieldsValue(settings);
     });
+
+    eventEmitter.on('settings:values-change', onValuesChange);
+    return () => {
+      eventEmitter.off('settings:values-change', onValuesChange);
+    };
   }, []);
 
   return (
@@ -181,6 +207,8 @@ export default function Settings() {
         title={$fmt('common.confirmReminder')}
         centered
         open={blocker.state === 'blocked'}
+        okText={$fmt('common.yes')}
+        cancelText={$fmt('common.cancel')}
         onOk={() => blocker.proceed?.()}
         onCancel={() => blocker.reset?.()}
       >
@@ -204,11 +232,19 @@ export default function Settings() {
                 collapsed={sidebarCollapsed}
                 onCollapseChange={onCollapseChange}
               />
-              <SidebarBaseBtn
-                title={$fmt('common.save')}
-                icon={<SaveOutlined />}
-                onClick={handleSave}
-              />
+              <Badge
+                dot={hasChanged}
+                status="processing"
+                color={token.colorPrimary}
+                offset={[-4, 4]}
+              >
+                <SidebarBaseBtn
+                  title={$fmt('common.save')}
+                  icon={<SaveOutlined />}
+                  blink={hasChanged}
+                  onClick={handleSave}
+                />
+              </Badge>
             </div>
             <div className="sidebar-inner-content">
               <Menu
@@ -228,6 +264,7 @@ export default function Settings() {
             layout="vertical"
             autoComplete="off"
             onFinish={onFinish}
+            onValuesChange={onValuesChange}
           >
             {/* ******************* 通用设置 ******************* */}
             <FormModuleCommon hidden={currModule !== 'common'} form={form} />

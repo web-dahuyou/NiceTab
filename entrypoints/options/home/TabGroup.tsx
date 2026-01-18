@@ -593,7 +593,7 @@ function TabGroup({
                   values: { count: tabList?.length || 0 },
                 })}
               </span>
-              <span className="group-create-time">{createTime}</span>
+              <span className="group-create-time">{createTime || ''}</span>
             </div>
           </div>
           <ActionBtnList

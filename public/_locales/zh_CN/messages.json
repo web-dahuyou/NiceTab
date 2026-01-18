@@ -5,6 +5,12 @@
   "action_sendAllTabs": {
     "message": "发送所有标签页"
   },
+  "action_sendAllWindowsTabs": {
+    "message": "发送所有窗口的标签页"
+  },
+  "action_sendCurrentGroup": {
+    "message": "发送当前标签组"
+  },
   "action_sendCurrentTab": {
     "message": "发送当前标签页"
   },

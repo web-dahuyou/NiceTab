@@ -1,4 +1,5 @@
 import { Menus, type Tabs } from 'wxt/browser';
+import { debounce } from 'lodash-es';
 import {
   MANIFEST_VERSION,
   ENUM_ACTION_NAME,
@@ -76,6 +77,11 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
   const hotkeysMap = await getMenuHotkeys();
   const contexts: Menus.ContextType[] = getContexts(settings);
 
+  const highlightedTabs = await browser.tabs.query({
+    highlighted: true,
+    currentWindow: true,
+  });
+
   // 获取标题
   const getTitle = (title: string, id: string) => {
     const hotkey = hotkeysMap?.[id];
@@ -108,6 +114,31 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
     title: getTitle(customMessages['common.sendAllTabs'], ENUM_ACTION_NAME.SEND_ALL_TABS),
     contexts,
     enabled: filteredTabs?.length > 0,
+  };
+
+  const _sendAllWindowsTabs: CreateMenuPropertiesType = {
+    tag: 'sendTabs',
+    id: ENUM_ACTION_NAME.SEND_ALL_WINDOWS_TABS,
+    title: getTitle(
+      customMessages['common.sendAllWindowsTabs'],
+      ENUM_ACTION_NAME.SEND_ALL_WINDOWS_TABS,
+    ),
+    contexts,
+    enabled: filteredTabs?.length > 0,
+  };
+
+  const _sendCurrentGroup: CreateMenuPropertiesType = {
+    tag: 'sendTabs',
+    id: ENUM_ACTION_NAME.SEND_CURRENT_GROUP,
+    title: getTitle(
+      customMessages['common.sendCurrentGroup'],
+      ENUM_ACTION_NAME.SEND_CURRENT_GROUP,
+    ),
+    contexts,
+    enabled:
+      !!currTab?.id &&
+      currTab?.id != adminTab?.id &&
+      !highlightedTabs.some(tab => !tab.groupId || tab.groupId == -1),
   };
 
   const _sendCurrentTab: CreateMenuPropertiesType = {
@@ -197,7 +228,9 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
     _openAdminTab,
     _openGlobalSearch,
     _sendAllTabs,
+    _sendAllWindowsTabs,
     _sendCurrentTab,
+    _sendCurrentGroup,
     _sendOtherTabs,
     _sendLeftTabs,
     _sendRightTabs,
@@ -325,11 +358,9 @@ async function createContextMenus(callback?: () => void) {
 }
 
 // 根据标签页状态更新 contextMenus
-async function handleContextMenusUpdate() {
-  setTimeout(() => {
-    createContextMenus();
-  }, 500);
-}
+export const handleContextMenusUpdate = debounce(() => {
+  createContextMenus();
+}, 500);
 
 export async function actionHandler(
   actionName: string,
@@ -340,9 +371,15 @@ export async function actionHandler(
     case ENUM_ACTION_NAME.SEND_ALL_TABS:
       await tabUtils.sendAllTabs(targetData);
       break;
+    case ENUM_ACTION_NAME.SEND_ALL_WINDOWS_TABS:
+      await tabUtils.sendAllTabs(targetData, { onlyCurrentWindow: false });
+      break;
     case ENUM_ACTION_NAME_FF.SEND_CURRENT_TAB:
     case ENUM_ACTION_NAME.SEND_CURRENT_TAB:
       await tabUtils.sendCurrentTab(targetData, tab);
+      break;
+    case ENUM_ACTION_NAME.SEND_CURRENT_GROUP:
+      await tabUtils.sendCurrentGroup(targetData, tab);
       break;
     case ENUM_ACTION_NAME.SEND_OTHER_TABS:
       await tabUtils.sendOtherTabs(targetData);

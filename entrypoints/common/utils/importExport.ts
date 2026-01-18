@@ -87,10 +87,12 @@ export const extContentImporter: ExtContentImporterProps = {
     const createTime = newCreateTime();
     tagList.forEach(tag => {
       tag.tagId = tag.static ? '0' : getRandomId();
-      tag.createTime = tag.createTime || createTime;
+      tag.createTime = tag.createTime ? newCreateTime(tag.createTime) : createTime;
       tag?.groupList?.forEach(group => {
         group.groupId = getRandomId();
-        group.createTime = group.createTime || createTime;
+        group.createTime = group.createTime
+          ? newCreateTime(group.createTime)
+          : createTime;
         group?.tabList?.forEach(tab => {
           const { favIconUrl } = tab;
           tab.tabId = getRandomId();

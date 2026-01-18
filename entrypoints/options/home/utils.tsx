@@ -5,7 +5,7 @@ import {
   ProductOutlined,
   LockFilled,
 } from '@ant-design/icons';
-import { getLocaleMessages } from '~/entrypoints/common/utils';
+import { getLocaleMessages, newCreateTime } from '~/entrypoints/common/utils';
 import type { TagItem } from '~/entrypoints/types';
 import type { TreeDataNodeUnion, MoveDataProps, CascaderOption } from './types';
 
@@ -23,7 +23,7 @@ export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
     ) : (
       <TagOutlined />
     ),
-    originData: { ...tag },
+    originData: { ...tag, createTime: newCreateTime(tag.createTime) },
     children: tag?.groupList?.map(group => {
       return {
         type: 'tabGroup',
@@ -33,7 +33,7 @@ export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
         title: group.groupName,
         isLeaf: true,
         icon: group.isLocked ? <LockFilled /> : <ProductOutlined />,
-        originData: { ...group },
+        originData: { ...group, createTime: newCreateTime(group.createTime) },
       };
     }),
   }));

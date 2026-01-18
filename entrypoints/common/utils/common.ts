@@ -86,8 +86,8 @@ export const groupBySize = (list: any[], size: number = 3) => {
 };
 
 // 生成创建时间
-export const newCreateTime = (stamp: number = Date.now()) => {
-  return dayjs(stamp).format('YYYY-MM-DD HH:mm');
+export const newCreateTime = (stamp: dayjs.ConfigType = Date.now()) => {
+  return dayjs(stamp).format('YYYY-MM-DD HH:mm:ss');
 };
 
 /**
