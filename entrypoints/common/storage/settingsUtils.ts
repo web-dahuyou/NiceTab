@@ -5,6 +5,7 @@ import type {
   PageWidthTypes,
   ActionBtnStyle,
   InsertPositions,
+  OpeningTabsOrder,
 } from '~/entrypoints/types';
 import {
   ENUM_SETTINGS_PROPS,
@@ -45,6 +46,7 @@ const {
   OPEN_TAB_MODIFIER_KEY,
   UNNAMED_GROUP_RESTORE_AS_GROUP,
   NAMED_GROUP_RESTORE_AS_GROUP,
+  OPENING_TABS_ORDER,
   /* 页面标题配置 */
   PAGE_TITLE_CONFIG,
   /* 全局搜索配置 */
@@ -100,6 +102,7 @@ export default class SettingsUtils {
     [DISCARD_WHEN_OPEN_TABS]: false, // 是否以休眠方式打开标签页
     [SILENT_OPEN_TAB_MODIFIER_KEY]: 'alt', // 静默打开标签页的修饰键
     [OPEN_TAB_MODIFIER_KEY]: '', // 前台打开标签页的修饰键
+    [OPENING_TABS_ORDER]: 'default' as OpeningTabsOrder, // 打开标签页的顺序
     [UNNAMED_GROUP_RESTORE_AS_GROUP]: import.meta.env.FIREFOX ? false : true, // 是否以标签组形式恢复未命名标签组
     [NAMED_GROUP_RESTORE_AS_GROUP]: import.meta.env.FIREFOX ? false : true, // 是否以标签组形式恢复已命名标签组
     /* 页面标题配置 */

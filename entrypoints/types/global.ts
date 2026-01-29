@@ -147,6 +147,8 @@ export type PageTitleConfigItem = {
 };
 
 export type TimeRange = [string, string];
+// 批量打开标签页顺序（default-正向 reverse-反向）
+export type OpeningTabsOrder = 'default' | 'reverse';
 
 // 管理后台-设置信息
 export type SettingsProps = {
@@ -172,6 +174,7 @@ export type SettingsProps = {
   discardWhenOpenTabs?: boolean; // 是否以休眠方式打开标签页
   silentOpenTabModifierKey?: string; // 静默打开标签页的修饰键
   openTabModifierKey?: string; // 前台打开标签页的修饰键
+  openingTabsOrder?: OpeningTabsOrder; // 批量打开标签页顺序
   unnamedGroupRestoreAsGroup?: boolean; // 是否以标签组形式恢复未命名标签组
   namedGroupRestoreAsGroup?: boolean; // 是否以标签组形式恢复已命名标签组
   /* 页面标题配置 */

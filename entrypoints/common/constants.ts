@@ -155,6 +155,7 @@ export enum ENUM_SETTINGS_PROPS {
   DISCARD_WHEN_OPEN_TABS = 'discardWhenOpenTabs', // 是否以休眠方式打开标签页
   SILENT_OPEN_TAB_MODIFIER_KEY = 'silentOpenTabModifierKey', // 静默打开标签页的修饰键
   OPEN_TAB_MODIFIER_KEY = 'openTabModifierKey', // 前台打开标签页的修饰键
+  OPENING_TABS_ORDER = 'openingTabsOrder', // 批量打开标签页的顺序
   UNNAMED_GROUP_RESTORE_AS_GROUP = 'unnamedGroupRestoreAsGroup', // 是否以标签组形式恢复未命名标签组
   NAMED_GROUP_RESTORE_AS_GROUP = 'namedGroupRestoreAsGroup', // 是否以标签组形式恢复已命名标签组
   /* 页面标题配置 */

@@ -15,6 +15,7 @@ const {
   UNNAMED_GROUP_RESTORE_AS_GROUP,
   NAMED_GROUP_RESTORE_AS_GROUP,
   DISCARD_WHEN_OPEN_TABS,
+  OPENING_TABS_ORDER,
 } = ENUM_SETTINGS_PROPS;
 
 const modifierKeyLabels = getKeysByOS();
@@ -95,6 +96,16 @@ export default function FormModuleOpen(
           <Radio value="cmdOrCtrl">{modifierKeyLabels.cmd.symbol}</Radio>
           <Radio value="shift">{modifierKeyLabels.shift.symbol}</Radio>
           <Radio value="">{$fmt('common.none')}</Radio>
+        </Radio.Group>
+      </Form.Item>
+      {/* 批量打开标签页的顺序 */}
+      <Form.Item<SettingsProps>
+        label={$fmt(`settings.${OPENING_TABS_ORDER}`)}
+        name={OPENING_TABS_ORDER}
+      >
+        <Radio.Group>
+          <Radio value="default">{$fmt(`common.default`)}</Radio>
+          <Radio value="reverse">{$fmt(`common.reverse`)}</Radio>
         </Radio.Group>
       </Form.Item>
       {(!import.meta.env.FIREFOX || isFirefoxTabGroupSupported && hasTabGroupsPermission) && (

@@ -32,6 +32,7 @@ const {
   ALLOW_SEND_PINNED_TABS,
   EXCLUDE_DOMAINS_FOR_SENDING,
   RESTORE_IN_NEW_WINDOW,
+  OPENING_TABS_ORDER,
 } = ENUM_SETTINGS_PROPS;
 
 // const matchUrls: string[] = ['https://*/*', 'http://*/*', 'chrome://*/*', 'file://*/*'];
@@ -508,13 +509,13 @@ export async function openNewTab(
     return;
   }
 
-  const { tab } = await getAdminTabInfo();
-  const newTabIndex = (tab?.index || 0) + 1;
+  const currentTabs = await browser.tabs.query({ active: true, currentWindow: true });
+  const newTabIndex = (currentTabs?.[0]?.index || 0) + 1;
   // 注意：如果打开标签页不想 active, 则 active 必须设置默认值为 false，
   // create 方法 active参数传 undefined 也会激活 active
   const createdTab = await browser.tabs.create({ url, active, index: newTabIndex });
   if (discard && createdTab.id && !active) {
-    waitToDiscard(tab);
+    waitToDiscard(createdTab);
   }
 }
 
@@ -549,15 +550,16 @@ export async function openNewGroup(
     });
     browser.tabGroups?.update(bsGroupId, { title: groupName });
   } else {
+    const _urls = settings[OPENING_TABS_ORDER] === 'reverse' ? [...urls].reverse() : urls;
     if (!isGroupSupported() || !asGroup) {
-      for (let url of urls) {
+      for (let url of _urls) {
         openNewTab(url, { discard });
       }
       return;
     }
 
     Promise.all(
-      urls.map(url => {
+      _urls.map(url => {
         return browser.tabs.create({ url, active: false });
       }),
     ).then(async tabs => {

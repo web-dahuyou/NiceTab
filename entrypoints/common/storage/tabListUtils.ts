@@ -29,6 +29,7 @@ import { openNewTab } from '../tabs';
 import Store from './instanceStore';
 
 const {
+  OPENING_TABS_ORDER,
   DELETE_UNLOCKED_EMPTY_GROUP,
   ALLOW_DUPLICATE_TABS,
   ALLOW_DUPLICATE_GROUPS,
@@ -982,7 +983,11 @@ export default class TabListUtils {
   // 还原快照
   async restoreTabsSnapshot(list: SnapshotItem[]) {
     const _isGroupSupported = isGroupSupported();
-    for (let item of list) {
+    const settings = Store.settingsUtils?.settings;
+    const openTabsOrder = settings?.[OPENING_TABS_ORDER];
+    const _list = openTabsOrder === 'reverse' ? [...list].reverse() : list;
+
+    for (let item of _list) {
       if (item.type === 'group') {
         if (!_isGroupSupported) {
           for (let tab of item.tabList) {
