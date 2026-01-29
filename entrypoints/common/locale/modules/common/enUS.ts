@@ -133,6 +133,8 @@ const enUS: Record<LocaleKey, string> = {
   'common.light': 'Light',
   'common.dark': 'Dark',
   'common.auto': 'Auto',
+  'common.default': 'Default',
+  'common.reverse': 'Reverse',
 };
 
 export default enUS;

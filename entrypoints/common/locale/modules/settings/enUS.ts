@@ -58,6 +58,7 @@ const enUS: Record<LocaleKey, string> = {
   'settings.silentOpenTabModifierKey': 'Modifier key for opening a tab silently (in background):',
   'settings.openTabModifierKey': 'Modifier key for opening a tab in the foreground:',
   'settings.openTabModifierKey.tooltip': 'Foreground opening takes precedence over background opening. When the modifier keys for both types of opening are the same, the foreground opening action will be triggered.',
+  'settings.openingTabsOrder': 'The order of opening multiple tabs:',
   'settings.unnamedGroupRestoreAsGroup': 'Restore the unnamed group as a browser tab group?',
   'settings.namedGroupRestoreAsGroup': 'Restore the named group as a browser tab group?',
 
