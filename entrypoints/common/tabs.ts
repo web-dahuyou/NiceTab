@@ -494,7 +494,7 @@ export async function openNewTab(
     discard = false,
   }: { active?: boolean; openToNext?: boolean; discard?: boolean } = {},
 ) {
-  if (!url) return;
+  if (!url?.trim()) return;
 
   if (!browser?.tabs?.create) {
     window.open(url, '_blank');
@@ -527,8 +527,8 @@ export async function openNewGroup(
 ) {
   const settings = await settingsUtils.getSettings();
 
+  let _urls = urls.filter(url => !!url?.trim()) as string[];
   if (settings[RESTORE_IN_NEW_WINDOW]) {
-    const _urls = urls.filter(url => !!url) as string[];
     const windowInfo = await browser.windows.create({ focused: true, url: _urls });
 
     const tabs = await browser.tabs.query({ windowId: windowInfo.id, pinned: false });
@@ -550,7 +550,7 @@ export async function openNewGroup(
     });
     browser.tabGroups?.update(bsGroupId, { title: groupName });
   } else {
-    const _urls = settings[OPENING_TABS_ORDER] === 'reverse' ? [...urls].reverse() : urls;
+    _urls = settings[OPENING_TABS_ORDER] === 'reverse' ? [..._urls].reverse() : _urls;
     if (!isGroupSupported() || !asGroup) {
       for (let url of _urls) {
         openNewTab(url, { discard });

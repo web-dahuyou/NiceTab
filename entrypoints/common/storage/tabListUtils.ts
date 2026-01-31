@@ -989,15 +989,17 @@ export default class TabListUtils {
 
     for (let item of _list) {
       if (item.type === 'group') {
+        const _tabList = item.tabList?.filter?.(tab => !!tab.url?.trim?.()) || [];
+        if (!_tabList.length) continue;
         if (!_isGroupSupported) {
-          for (let tab of item.tabList) {
+          for (let tab of _tabList) {
             openNewTab(tab.url);
           }
-          return;
+          continue;
         }
 
         Promise.all(
-          item.tabList?.map(tab => {
+          _tabList.map(tab => {
             return browser.tabs.create({ url: tab.url, active: false });
           }),
         ).then(async tabs => {
