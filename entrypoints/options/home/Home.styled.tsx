@@ -58,7 +58,7 @@ export const StyledSidebarWrapper = styled(StyledBaseSidebarWrapper)<{
 export const StyledTreeNodeItem = styled.div`
   display: flex;
   align-items: center;
-  padding-right: 8px;
+  padding-right: 8px; // 防止滚动条出现时，内容被遮挡
   cursor: pointer;
   .tree-node-title {
     width: 0;
