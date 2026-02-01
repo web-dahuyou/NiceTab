@@ -14,7 +14,7 @@
     "compile": "tsc --noEmit",
     "convert:guide": "node scripts/md2html.js GUIDE-zh.md",
     "postinstall": "wxt prepare",
-    "lint:no-fox": "eslint entrypoints --fix=false",
+    "lint:no-fix": "eslint entrypoints --fix=false",
     "lint": "eslint entrypoints --fix=true"
   },
   "dependencies": {
@@ -36,6 +36,7 @@
     "rc-virtual-list": "^3.18.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-icons": "^5.5.0",
     "react-intl": "^6.6.8",
     "react-router-dom": "^6.23.0",
     "react-virtuoso": "^4.10.4",
@@ -51,6 +52,7 @@
     "@types/yargs-parser": "^21.0.3",
     "@typescript-eslint/parser": "^8.35.0",
     "@wxt-dev/module-react": "^1.1.0",
+    "eslint": "^9.0.0",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-prettier": "^5.5.1",
     "eslint-plugin-react": "^7.37.5",

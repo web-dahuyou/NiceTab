@@ -21,7 +21,7 @@ export default function Favicon({
   const [renderUrl, setRenderUrl] = useState(faviconDefaultImage);
 
   const handleError = () => {
-    console.log('handleError');
+    // console.log('handleError');
     setRenderUrl(faviconDefaultImage);
   };
 

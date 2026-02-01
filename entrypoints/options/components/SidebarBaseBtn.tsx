@@ -10,9 +10,18 @@ const StyledActionBtn = styled.div<{ $blink?: boolean }>`
   ${props => (props.$blink ? 'animation: nt-blink 1s ease-in-out infinite;' : '')}
 
   @keyframes nt-blink {
-    0% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.95); }
-    100% { opacity: 1; transform: scale(1); }
+    0% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 `;
 

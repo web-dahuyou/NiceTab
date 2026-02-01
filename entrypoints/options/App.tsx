@@ -54,7 +54,7 @@ import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import useMenus from '@/entrypoints/common/hooks/menu';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import useUpdate from '~/entrypoints/common/hooks/update';
-import getPermission from '~/entrypoints/common/hooks/getPermission';
+import usePermission from '~/entrypoints/common/hooks/getPermission';
 import useUrlParams from '~/entrypoints/common/hooks/urlParams';
 import {
   GITHUB_URL,
@@ -220,7 +220,7 @@ function AppLayout() {
   const sendTargetActionRef = useRef<SendTargetActionHolderProps>();
 
   const { isFirefoxTabGroupSupported, hasTabGroupsPermission, getTabGroupsPermission } =
-    getPermission();
+    usePermission();
 
   const { version, themeTypeConfig, pageWidthType, $message } = NiceGlobalContext;
   const navs = useMemo(() => {

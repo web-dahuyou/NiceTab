@@ -32,12 +32,9 @@ export const StyledSidebarWrapper = styled(StyledBaseSidebarWrapper)<{
       flex-shrink: 0;
       display: flex;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: space-between;
       margin-bottom: 10px;
-      gap: 8px;
-      button {
-        font-size: 12px;
-      }
+      gap: 12px;
     }
     .sidebar-tree-wrapper {
       flex: 1;

@@ -8,12 +8,10 @@ import { GlobalStateProps, PermissionActionsProps } from '~/entrypoints/types/st
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { updateAdminPageUrlDebounced } from '~/entrypoints/common/tabs';
 
-const {
-  UNNAMED_GROUP_RESTORE_AS_GROUP,
-  NAMED_GROUP_RESTORE_AS_GROUP,
-} = ENUM_SETTINGS_PROPS;
+const { UNNAMED_GROUP_RESTORE_AS_GROUP, NAMED_GROUP_RESTORE_AS_GROUP } =
+  ENUM_SETTINGS_PROPS;
 
-export default function getPermission() {
+export default function usePermission() {
   const { $fmt } = useIntlUtls();
   const NiceGlobalContext = useContext(GlobalContext);
   const [hasTabGroupsPermission, setHasTabGroupsPermission] = useState(true);
@@ -68,7 +66,7 @@ export default function getPermission() {
 
     const _isFirefoxTabGroupSupported = await checkFirefoxTabGroupSupported();
     setIsFirefoxTabGroupSupported(_isFirefoxTabGroupSupported);
-    console.log('Firefox 是否支持 tabGroups', _isFirefoxTabGroupSupported)
+    console.log('Firefox 是否支持 tabGroups', _isFirefoxTabGroupSupported);
 
     if (!_isFirefoxTabGroupSupported) return;
 

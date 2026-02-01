@@ -12,7 +12,15 @@ import {
   Divider,
   type MenuProps,
 } from 'antd';
-import { QuestionCircleOutlined, MenuOutlined, ClearOutlined } from '@ant-design/icons';
+import {
+  FolderOutlined,
+  FolderOpenOutlined,
+  FolderAddOutlined,
+  QuestionCircleOutlined,
+  MenuOutlined,
+  ClearOutlined,
+} from '@ant-design/icons';
+// import { BiFolder, BiFolderOpen, BiFolderPlus } from 'react-icons/bi';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import useGlobalSelectionBox, {
   StyledSelectionBox,
@@ -270,16 +278,31 @@ export default function Home() {
                 </ul>
                 {/* 顶部操作按钮组 */}
                 <div className="sidebar-action-btns-wrapper">
-                  <Space size={8}>
-                    <Button type="primary" size="small" onClick={() => toggleExpand(true)}>
-                      {$fmt('home.expandAll')}
-                    </Button>
-                    <Button type="primary" size="small" onClick={() => toggleExpand(false)}>
-                      {$fmt('home.collapseAll')}
-                    </Button>
-                    <Button type="primary" size="small" onClick={handleTagCreate}>
-                      {$fmt('home.addTag')}
-                    </Button>
+                  <Space size={12}>
+                    <StyledActionIconBtn
+                      title={$fmt('home.collapseAll')}
+                      $size="20"
+                      onClick={() => toggleExpand(false)}
+                    >
+                      {/* <BiFolder /> */}
+                      <FolderOutlined />
+                    </StyledActionIconBtn>
+                    <StyledActionIconBtn
+                      title={$fmt('home.expandAll')}
+                      $size="20"
+                      onClick={() => toggleExpand(true)}
+                    >
+                      {/* <BiFolderOpen /> */}
+                      <FolderOpenOutlined />
+                    </StyledActionIconBtn>
+                    <StyledActionIconBtn
+                      title={$fmt('home.addTag')}
+                      $size="20"
+                      onClick={handleTagCreate}
+                    >
+                      {/* <PlusOutlined /> */}
+                      <FolderAddOutlined />
+                    </StyledActionIconBtn>
                   </Space>
 
                   <Dropdown
@@ -288,7 +311,7 @@ export default function Home() {
                   >
                     <StyledActionIconBtn
                       className="btn-more"
-                      $size="16"
+                      $size="18"
                       title={$fmt('common.more')}
                     >
                       <MenuOutlined />

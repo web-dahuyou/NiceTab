@@ -139,7 +139,8 @@ export function mergeGroupsAndTabs({
       resultList = [];
     for (let item of list) {
       if (exceptValue != undefined && item[key] === exceptValue) {
-        const randomName = dayjs(item.createTime).format('YYYYMMDD_HH:mm:ss_') + getRandomId(3, true);
+        const randomName =
+          dayjs(item.createTime).format('YYYYMMDD_HH:mm:ss_') + getRandomId(3, true);
         exceptList.push({ ...item, groupName: `G_${randomName}` });
       } else {
         resultList.push(item);
