@@ -21,7 +21,10 @@ const {
 } = ENUM_SETTINGS_PROPS;
 
 export default function FormModuleDisplay(
-  props: FormItemProps & { form: FormInstance<SettingsProps>, onChange?: (val?: any) => void },
+  props: FormItemProps & {
+    form: FormInstance<SettingsProps>;
+    onChange?: (val?: any) => void;
+  },
 ) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();

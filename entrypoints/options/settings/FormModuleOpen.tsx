@@ -4,7 +4,7 @@ import type { SettingsProps } from '~/entrypoints/types';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { getKeysByOS } from '~/entrypoints/common/utils';
-import getPermission from '~/entrypoints/common/hooks/getPermission';
+import usePermission from '~/entrypoints/common/hooks/getPermission';
 import useTooltipOption from '@/entrypoints/common/hooks/tooltipOption';
 
 const {
@@ -26,7 +26,7 @@ export default function FormModuleOpen(
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const { form, ...formItemProps } = props;
-  const { isFirefoxTabGroupSupported, hasTabGroupsPermission } = getPermission();
+  const { isFirefoxTabGroupSupported, hasTabGroupsPermission } = usePermission();
   const { getFormTooltipOption } = useTooltipOption();
 
   return (
@@ -108,7 +108,8 @@ export default function FormModuleOpen(
           <Radio value="reverse">{$fmt(`common.reverse`)}</Radio>
         </Radio.Group>
       </Form.Item>
-      {(!import.meta.env.FIREFOX || isFirefoxTabGroupSupported && hasTabGroupsPermission) && (
+      {(!import.meta.env.FIREFOX ||
+        (isFirefoxTabGroupSupported && hasTabGroupsPermission)) && (
         <>
           {/* 是否以标签组形式恢复未命名标签组 */}
           <Form.Item<SettingsProps>

@@ -156,4 +156,15 @@ export const GlobalStyle = createGlobalStyle`
     background: ${props =>
       `${props.theme.type === 'light' ? '#bfbfbf' : '#888'} !important`};
   }
+
+  .nicetab-ul-list {
+    padding-left: 16px;
+    list-style-type: disc;
+    &.circle {
+      list-style-type: circle;
+    }
+    li:not(:last-of-type) {
+      margin-bottom: 8px;
+    }
+  }
 `;

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { getFaviconUrl } from '~/entrypoints/common/utils/favicon';
 import faviconDefaultImage from '/icon/favicon-default.png';
 
-const StyledTabItemFavicon = styled.i<{ $bgUrl?: string }>`
+const StyledTabItemFavicon = styled.img<{ $bgUrl?: string }>`
   flex: 0 0 16px;
   width: 16px;
   height: 16px;
@@ -21,11 +21,15 @@ export default function Favicon({
   const [renderUrl, setRenderUrl] = useState(faviconDefaultImage);
 
   const handleError = () => {
-    console.log('handleError');
+    // console.log('handleError');
     setRenderUrl(faviconDefaultImage);
   };
 
   const init = async () => {
+    if (!pageUrl?.trim?.()) {
+      setRenderUrl(faviconDefaultImage);
+      return;
+    }
     const url = favIconUrl || (await getFaviconUrl(pageUrl));
     setTimeout(() => {
       setRenderUrl(url);
@@ -36,5 +40,5 @@ export default function Favicon({
     init();
   }, []);
 
-  return <StyledTabItemFavicon $bgUrl={renderUrl} onError={handleError} />;
+  return <StyledTabItemFavicon src={renderUrl} onError={handleError} />;
 }
