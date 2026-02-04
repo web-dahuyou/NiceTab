@@ -19,7 +19,7 @@ export default class StateUtils {
     },
     popup: {
       isCompact: true,
-    }
+    },
   };
   state: StateProps = this.initialState;
 

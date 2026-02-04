@@ -1,6 +1,11 @@
 import type { ReactElement } from 'react';
-import { theme, Typography } from 'antd';
+import { theme } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
+import styled from 'styled-components';
+
+const StyledText = styled.div`
+  color: var(--text-color);
+`;
 
 export default function useTooltipOption() {
   const { token } = theme.useToken();
@@ -10,11 +15,17 @@ export default function useTooltipOption() {
     icon,
     width = 320,
   }: {
-    title: string;
+    title: ReactElement | string;
     icon?: ReactElement;
     width?: number;
   }) => ({
-    title: <Typography.Text>{title}</Typography.Text>,
+    title: (
+      <StyledText
+        dangerouslySetInnerHTML={{
+          __html: title,
+        }}
+      ></StyledText>
+    ),
     icon: icon || <QuestionCircleOutlined />,
     color: token.colorBgElevated,
     styles: { root: { maxWidth: `${width}px`, width: `${width}px` } },

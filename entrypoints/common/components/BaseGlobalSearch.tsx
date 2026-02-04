@@ -41,7 +41,8 @@ import { tabListUtils } from '../storage';
 import ActionIconBtn from './ActionIconBtn.tsx';
 import { eventEmitter as homeEventEmitter } from '~/entrypoints/options/home/hooks/homeCustomEvent';
 
-const { GLOBAL_SEARCH_DELETE_AFTER_OPEN, DISCARD_WHEN_OPEN_TABS } = ENUM_SETTINGS_PROPS;
+const { GLOBAL_SEARCH_DELETE_AFTER_OPEN, DISCARD_WHEN_OPEN_TABS, OPENING_TABS_ORDER } =
+  ENUM_SETTINGS_PROPS;
 
 export type SearchListItemProps = Pick<TagItem, 'tagId' | 'tagName' | 'static'> &
   Pick<GroupItem, 'groupId' | 'groupName' | 'isLocked'> &
@@ -516,9 +517,11 @@ export const GlobalSearchBox = forwardRef(
           const settings = await settingsUtils.getSettings();
           const autoDelete = settings?.[GLOBAL_SEARCH_DELETE_AFTER_OPEN];
           const discard = settings?.[DISCARD_WHEN_OPEN_TABS];
+          const openTabsOrder = settings?.[OPENING_TABS_ORDER];
           const groupByList = groupBy(selectedItems, 'groupId');
           for (const [groupId, items] of Object.entries(groupByList)) {
-            items.forEach(item => {
+            const _items = openTabsOrder === 'reverse' ? [...items].reverse() : items;
+            _items.forEach(item => {
               item.url && openNewTab(item.url, { discard });
             });
 

@@ -1,6 +1,6 @@
 import { useState, memo, useCallback, useRef, useLayoutEffect } from 'react';
 import { debounce } from 'lodash-es';
-import { Tree, Button, Input, Empty, Spin } from 'antd';
+import { Tree, Space, Typography, Button, Checkbox, Input, Empty, Spin } from 'antd';
 import type { TreeDataNode, TreeProps } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
 import { DownOutlined } from '@ant-design/icons';
@@ -47,6 +47,7 @@ function TreeBox() {
   const listRef = useRef<HTMLDivElement>(null);
   const treeRef = useRef<any>(null);
 
+  const [filterList, setFilterList] = useState<string[]>([]);
   const [searchText, setSearchText] = useState<string>('');
   const [searchValue, setSearchValue] = useState<string>('');
   const [isEditing, setIsediting] = useState<boolean>(false);
@@ -74,6 +75,10 @@ function TreeBox() {
     [setSearchTextValue, toggleExpand],
   );
 
+  const onFilterChange = useCallback((values: string[]) => {
+    setFilterList(values);
+  }, []);
+
   const onSearchTextChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const text = e.target?.value?.trim().toLowerCase();
@@ -88,16 +93,20 @@ function TreeBox() {
   // 搜索过滤后的 treeData
   const searchTreeData = useMemo(() => {
     const value = searchValue?.trim().toLowerCase();
-    if (!value) return treeData;
+    if (!value && !filterList?.length) return treeData;
+    const isLocked = filterList.includes('isLocked');
+    const isStarred = filterList.includes('isStarred');
     const searchTagList =
       tagList.reduce<TagItem[]>((result, tag): TagItem[] => {
-        if (tag?.tagName?.toLowerCase().includes(value)) {
+        if (tag?.tagName?.toLowerCase().includes(value) && !isLocked && !isStarred) {
           return [...result, tag];
         }
 
         const groupList =
           tag?.groupList?.reduce<GroupItem[]>((list, group: GroupItem): GroupItem[] => {
-            if (group?.groupName?.toLowerCase().includes(value)) {
+            const isMatch =
+              (!isLocked || group?.isLocked) && (!isStarred || group?.isStarred);
+            if (group?.groupName?.toLowerCase().includes(value) && isMatch) {
               return [...list, group];
             }
             return list;
@@ -109,7 +118,7 @@ function TreeBox() {
         }
       }, []) || [];
     return getTreeData(searchTagList);
-  }, [tagList, treeData, searchValue]);
+  }, [tagList, treeData, filterList, searchValue]);
 
   // 判断节点是否可拖拽
   const isNodeDraggable = useCallback(
@@ -216,15 +225,29 @@ function TreeBox() {
 
   return (
     <>
-      {/* 列表搜索框 */}
-      <Input.Search
-        value={searchText}
-        style={{ marginBottom: 8 }}
-        placeholder={$fmt('home.searchTagAndGroup')}
-        allowClear
-        onChange={onSearchTextChange}
-        onSearch={onSearch}
-      />
+      <Space size={8} direction="vertical">
+        <Space size={12}>
+          <Typography.Text>{$fmt('common.filter')}:</Typography.Text>
+          <Checkbox.Group
+            options={[
+              { label: $fmt('common.starred'), value: 'isStarred' },
+              { label: $fmt('common.locked'), value: 'isLocked' },
+            ]}
+            value={filterList}
+            onChange={onFilterChange}
+          ></Checkbox.Group>
+        </Space>
+
+        {/* 列表搜索框 */}
+        <Input.Search
+          value={searchText}
+          style={{ marginBottom: 8 }}
+          placeholder={$fmt('home.searchTagAndGroup')}
+          allowClear
+          onChange={onSearchTextChange}
+          onSearch={onSearch}
+        />
+      </Space>
       <div ref={listRef} className="sidebar-tree-wrapper">
         <Spin spinning={loading} size="large">
           {searchTreeData?.length > 0 ? (

@@ -3,7 +3,8 @@ import {
   PushpinOutlined,
   TagOutlined,
   ProductOutlined,
-  LockFilled,
+  LockOutlined,
+  StarOutlined,
 } from '@ant-design/icons';
 import { getLocaleMessages, newCreateTime } from '~/entrypoints/common/utils';
 import type { TagItem } from '~/entrypoints/types';
@@ -19,7 +20,7 @@ export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
     icon: tag.static ? (
       <PushpinOutlined />
     ) : tag.isLocked ? (
-      <LockFilled />
+      <LockOutlined />
     ) : (
       <TagOutlined />
     ),
@@ -32,7 +33,13 @@ export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
         key: group.groupId,
         title: group.groupName,
         isLeaf: true,
-        icon: group.isLocked ? <LockFilled /> : <ProductOutlined />,
+        icon: group.isLocked ? (
+          <LockOutlined />
+        ) : group.isStarred ? (
+          <StarOutlined />
+        ) : (
+          <ProductOutlined />
+        ),
         originData: { ...group, createTime: newCreateTime(group.createTime) },
       };
     }),

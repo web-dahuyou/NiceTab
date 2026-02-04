@@ -29,6 +29,7 @@ import { openNewTab } from '../tabs';
 import Store from './instanceStore';
 
 const {
+  OPENING_TABS_ORDER,
   DELETE_UNLOCKED_EMPTY_GROUP,
   ALLOW_DUPLICATE_TABS,
   ALLOW_DUPLICATE_GROUPS,
@@ -138,7 +139,8 @@ export function mergeGroupsAndTabs({
       resultList = [];
     for (let item of list) {
       if (exceptValue != undefined && item[key] === exceptValue) {
-        const randomName = dayjs(item.createTime).format('YYYYMMDD_HH:mm:ss_') + getRandomId(3, true);
+        const randomName =
+          dayjs(item.createTime).format('YYYYMMDD_HH:mm:ss_') + getRandomId(3, true);
         exceptList.push({ ...item, groupName: `G_${randomName}` });
       } else {
         resultList.push(item);
@@ -982,17 +984,23 @@ export default class TabListUtils {
   // 还原快照
   async restoreTabsSnapshot(list: SnapshotItem[]) {
     const _isGroupSupported = isGroupSupported();
-    for (let item of list) {
+    const settings = Store.settingsUtils?.settings;
+    const openTabsOrder = settings?.[OPENING_TABS_ORDER];
+    const _list = openTabsOrder === 'reverse' ? [...list].reverse() : list;
+
+    for (let item of _list) {
       if (item.type === 'group') {
+        const _tabList = item.tabList?.filter?.(tab => !!tab.url?.trim?.()) || [];
+        if (!_tabList.length) continue;
         if (!_isGroupSupported) {
-          for (let tab of item.tabList) {
+          for (let tab of _tabList) {
             openNewTab(tab.url);
           }
-          return;
+          continue;
         }
 
         Promise.all(
-          item.tabList?.map(tab => {
+          _tabList.map(tab => {
             return browser.tabs.create({ url: tab.url, active: false });
           }),
         ).then(async tabs => {

@@ -8,7 +8,7 @@ export type SyncRemoteType = 'gitee' | 'github';
 export type SyncConfigItemProps = {
   accessToken?: string;
   gistId?: string;
-  filename?: string,
+  filename?: string;
   autoSync?: boolean;
 };
 // 同步配置

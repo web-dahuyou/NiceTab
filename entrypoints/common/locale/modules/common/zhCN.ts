@@ -122,6 +122,11 @@ const zhCN = {
   'common.light': '浅色',
   'common.dark': '深色',
   'common.auto': '自动',
+  'common.default': '默认',
+  'common.reverse': '反向',
+  'common.filter': '筛选',
+  'common.locked': '已锁定',
+  'common.starred': '已星标',
 };
 
 export type LocaleKey = keyof typeof zhCN;

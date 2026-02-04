@@ -32,12 +32,9 @@ export const StyledSidebarWrapper = styled(StyledBaseSidebarWrapper)<{
       flex-shrink: 0;
       display: flex;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: space-between;
       margin-bottom: 10px;
-      gap: 8px;
-      button {
-        font-size: 12px;
-      }
+      gap: 12px;
     }
     .sidebar-tree-wrapper {
       flex: 1;
@@ -58,7 +55,7 @@ export const StyledSidebarWrapper = styled(StyledBaseSidebarWrapper)<{
 export const StyledTreeNodeItem = styled.div`
   display: flex;
   align-items: center;
-  padding-right: 8px;
+  padding-right: 8px; // 防止滚动条出现时，内容被遮挡
   cursor: pointer;
   .tree-node-title {
     width: 0;
