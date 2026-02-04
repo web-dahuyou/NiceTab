@@ -419,7 +419,7 @@ function AppLayout() {
               arrow={false}
               fresh
             >
-              <StyledActionIconBtn $size={18} title={$fmt('common.theme')}>
+              <StyledActionIconBtn $size={18}>
                 <IconTheme></IconTheme>
               </StyledActionIconBtn>
             </Tooltip>
@@ -442,7 +442,7 @@ function AppLayout() {
               }}
               placement="bottomRight"
             >
-              <StyledActionIconBtn $size={18} title={$fmt('common.language')}>
+              <StyledActionIconBtn $size={18}>
                 <TranslationOutlined />
               </StyledActionIconBtn>
             </Dropdown>
@@ -453,7 +453,7 @@ function AppLayout() {
                 onClick: handleExtActionClick,
               }}
             >
-              <StyledActionIconBtn $size={18} title={$fmt('common.actions')}>
+              <StyledActionIconBtn $size={18}>
                 <MenuOutlined />
               </StyledActionIconBtn>
             </Dropdown>
