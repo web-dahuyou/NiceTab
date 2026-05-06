@@ -7,9 +7,9 @@
 
 ## Project Introduction
 
-This project is a free and open-source browser tab manager extension. It is a powerful upgraded alternative to OneTab, Toby, SessionBuddy, and similar extensions, with rich features and excellent usability.
+This project is a free and open-source browser tab manager extension. It is a powerful upgraded alternative to OneTab, Toby, SessionBuddy, and similar tools, offering rich features and excellent usability.
 
-For the basic project introduction, please refer to <a href="./README.md">README</a>. Details are not repeated here.
+For the basic project overview, please refer to the <a href="./README.md">README</a>.
 
 ## Installation
 
@@ -22,7 +22,7 @@ For the basic project introduction, please refer to <a href="./README.md">README
 - Download `nice-tab-<version>-chrome.zip` (for Chrome/Edge) or `nice-tab-<version>-firefox.zip` from the [Releases page](https://github.com/leonlovecode/NiceTab/releases).  
 - Search online for "how to install unpacked Chrome extension" if needed.
 
-After installation, we recommend pinning the extension icon for quick access.
+After installation, we recommend **pinning the extension icon** for quick access.
 
 On first launch, the list will be empty. Right-click the extension icon and select **Send all tabs** to get started.
 
@@ -78,55 +78,60 @@ Left-click the icon to open the popup panel, which includes **Extension Info**, 
 
 **Notes**:  
 - v2.8.4 added compact mode toggle.  
-- By default, left-click opens the popup. You can configure it in Preferences to send all tabs directly (like OneTab).  
+- By default, left-click opens the popup. You can configure it in **Preferences** to send all tabs directly (OneTab-style).  
 - Hibernation reduces memory usage without closing tabs. Tabs reactivate when switched to.
+
+**Tip**: The same actions appear in multiple places (popup panel, right-click menu, and dashboard) to suit different user habits:  
+- Most users prefer pinning the icon and using the popup or right-click menu.  
+- Others prefer not pinning the icon and performing operations in the dashboard.  
+- NiceTab also supports binding keyboard shortcuts to common actions for higher efficiency.
 
 ### Management Dashboard
 
 The dashboard includes: **List**, **Preferences**, **Import/Export**, **Remote Sync**, and **Recycle Bin**.
 
-**Tip**: The same actions are available in multiple places (popup, right-click, dashboard) to suit different user habits.
-
 ## Dashboard - Navigation Bar
 
 - Page switching (List / Preferences / Import-Export / Remote Sync / Recycle Bin)  
 - Version info & update notification  
-- Accent color picker  
-- Light/Dark theme toggle  
+- Accent color picker (limited presets)  
+- Light/Dark theme toggle (follows system by default)  
 - Language switch (English/Chinese)  
-- More actions (dropdown)
+- More actions (dropdown menu)
 
 ### Create Snapshot / Restore Snapshot
 
 Located in the **Actions** dropdown. Save current open tabs as a temporary snapshot and restore them later.
 
-Useful before manually closing/restarting the browser.
+**Tip**: Snapshots are also saved automatically in the background (UI will be improved in the future). Useful before manually closing tabs or restarting the browser.
 
 ## Dashboard - List
 
-The List page uses a `Category > Group > Tab` hierarchy.
-
-It consists of a left **directory tree** and a right **detail panel** (virtual scrolling).
+The List page uses a `Category > Group > Tab` hierarchy. It consists of a left **directory tree** and a right **detail panel** (virtual scrolling).
 
 ### Directory Tree
 
 - Level 1: Categories, Level 2: Groups  
-- **Transit Station**: A special fixed category (cannot be deleted) at the top. New tabs go here by default.  
-- Create, rename, delete, lock categories and groups.  
-- Drag & drop to move across categories.  
+- **Transit Station**: A special fixed category at the top that cannot be deleted. Newly sent tabs land here by default (unless you choose a target). You can freely edit, move, or delete items inside it.  
+- Create, rename, delete, expand/collapse, and **lock** categories/groups. Locked items become read-only (prevents accidental deletion or dragging).  
+- Drag & drop to move categories/groups across the tree.  
 - Search support.  
-- Locked categories become read-only.
+- Shortcuts (tree only, not yet customizable):  
+  - macOS: `⌥ + ⇧ + ↑/↓`  
+  - Windows: `Alt + Shift + ↑/↓`
 
 ### Right Panel
 
 **Group Operations**:  
 - Rename (default: `Unnamed Group`)  
-- Delete, Open in browser, Lock, Star, Clone, Deduplicate, Sort, Copy links, Move to, etc.  
+- Delete, Open in browser, **Lock**, **Star**, **Clone**, Deduplicate, Sort (by name), Copy links, Move to, etc.  
+- Copy links uses the custom Mustache template from **Preferences > Other Operations > Group copy links template format** (default: `{{url}} | {{title}}`).
 
 **Tab Operations**:  
 - Delete, edit, copy, QR code, drag to reorder.  
-- Multi-select (drag or Shift + click).  
-- Batch operations.
+- Multi-select with mouse box selection or `Shift + click` (range selection).  
+- Batch operations (delete, open, move, copy links, clone, etc.).  
+- **Tip**: You can also drag tabs directly onto groups in the left directory tree for quick moving.
 
 ## Dashboard - Preferences
 
@@ -156,6 +161,8 @@ Preferences control interaction behavior. Defaults follow the author’s habits 
 | Keep duplicate groups | ... | Yes | ★★ |
 | Keep duplicate tabs | ... | Yes | ★★ |
 
+**Additional notes**: When global auto-close is disabled, you can still enable conditional auto-close for specific send operations.
+
 ### Open Tabs Settings
 
 | Item | Description | Default | Importance |
@@ -169,7 +176,7 @@ Preferences control interaction behavior. Defaults follow the author’s habits 
 | Open unnamed groups as browser group | ... | Yes | ★★ |
 | Open named groups as browser group | ... | Yes | ★★ |
 
-**Notes**: You can swap modifiers to make silent open the default behavior.
+**Notes**: You can swap modifiers so silent open becomes the default.
 
 ### Webpage Title Customization
 
@@ -219,17 +226,27 @@ Preferences control interaction behavior. Defaults follow the author’s habits 
 
 ## Dashboard - Import/Export
 
-Supports import from NiceTab, OneTab, KepTab, Toby (json), Session Buddy, and browser HTML bookmarks.  
+Supports import from NiceTab, OneTab, KepTab, Toby (JSON), Session Buddy, and browser HTML bookmarks (since v2.7.7).  
+
 Import modes: **Add**, **Merge**, **Overwrite**.  
-Export list + preferences (also as HTML bookmarks since v2.7.7).
+Sources: Textbox or local file.  
+Export includes list + preferences (also as HTML bookmarks).  
+
+**Note**: Deep nesting is flattened to `Category > Group > Tab` structure.
 
 ## Dashboard - Remote Sync
 
-(Full section with current limitations, historical reasons, and recommended workflows — identical in detail to Chinese version.)
+Remote Sync supports syncing your tab list and preferences to remote storage (GitHub Gist, Gitee Gist, WebDAV). Automatic syncing is also available.
+
+**Important notes and recommended workflows**:  
+- Early versions used group/tab **names** for merging (no stable IDs yet). Unnamed groups may be randomly renamed during sync.  
+- **Single-device workflow** (recommended for most users): Use manual sync or enable auto-sync. Conflicts are rare.  
+- **Multi-device workflow**: Use different categories on each device + manual sync, or accept occasional manual conflict resolution.  
+- Future versions will introduce stable **Group IDs** to solve merging issues.
 
 ## Dashboard - Recycle Bin
 
-Deleted items are temporarily stored here and auto-cleared daily. Recover promptly if needed.
+Deleted items go to the Recycle Bin. It auto-clears daily to avoid memory usage. Recover mistaken deletions on the same day.
 
 ## Bind Shortcuts
 
@@ -243,7 +260,8 @@ Default shortcuts:
 | Send All Tabs | ⌥ + ⇧ + A | Alt + Shift + A | A = all |
 | Send Current Tab | ⌥ + ⇧ + C | Alt + Shift + C | C = current |
 
-Other shortcuts can be customized in the browser settings.
+Other shortcuts can be customized in the browser settings.  
+**Note**: Some tree-specific shortcuts (e.g., move up/down) are currently fixed and not yet customizable.
 
 ## Other
 
