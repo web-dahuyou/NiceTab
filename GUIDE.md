@@ -7,9 +7,9 @@
 
 ## Project Introduction
 
-This project is a free and open-source browser tab manager extension. It is a powerful upgrade and alternative to OneTab, Toby, SessionBuddy, and similar extensions, with rich features and excellent usability.
+This project is a free and open-source browser tab manager extension. It is a powerful upgraded alternative to OneTab, Toby, SessionBuddy, and similar extensions, with rich features and excellent usability.
 
-For the basic project introduction and details, please refer to the [README](./README.md). It will not be repeated here.
+For the basic project introduction, please refer to <a href="./README.md">README</a>. Details are not repeated here.
 
 ## Installation
 
@@ -22,26 +22,26 @@ For the basic project introduction and details, please refer to the [README](./R
 - Download `nice-tab-<version>-chrome.zip` (for Chrome/Edge) or `nice-tab-<version>-firefox.zip` from the [Releases page](https://github.com/leonlovecode/NiceTab/releases).  
 - Search online for "how to install unpacked Chrome extension" if needed.
 
-After installation, it is recommended to pin the extension icon for quick access.
+After installation, we recommend pinning the extension icon for quick access.
 
-On first launch of the management page (no tabs saved yet), the list will be empty. Right-click the extension icon and choose "Send all tabs" to try it out.
+On first launch, the list will be empty. Right-click the extension icon and select **Send all tabs** to get started.
 
-NiceTab also supports keyboard shortcuts. You can view default shortcuts in the right-click menu or customize them in the browser's keyboard shortcuts settings (see [Bind Shortcuts](#bind-shortcuts) below).
+NiceTab also supports keyboard shortcuts. You can view defaults in the right-click menu or customize them in the browser’s keyboard shortcuts settings (see [Bind Shortcuts](#bind-shortcuts) below).
 
 ## Feature Overview
 
-NiceTab's core function is to send browser tabs to its list with a one-click operation, managing them in a `Category > Group > Tab` hierarchy.
+NiceTab’s core function is to send browser tabs to its list with one click and manage them in a `Category > Group > Tab` hierarchy.
 
 The extension mainly consists of:  
-- [Extension Icon Right-click Menu](#extension-right-click-menu)  
+- [Extension Right-click Menu](#extension-right-click-menu)  
 - [Extension Icon Popup Panel](#extension-icon-popup-panel)  
 - [Management Dashboard](#management-dashboard)
 
-Before diving deeper, try left-clicking and right-clicking the NiceTab icon to explore the interactions.
+Try left-clicking and right-clicking the NiceTab icon to explore the interactions.
 
 ### Extension Right-click Menu
 
-When first installed (list empty), right-click the NiceTab icon to open the context menu and send tabs.
+When the list is empty (first install), right-click the NiceTab icon to open the context menu and send tabs.
 
 Current menu items:  
 - Open NiceTab Dashboard  
@@ -57,29 +57,35 @@ Current menu items:
 - Hibernate other tabs  
 
 **Notes**:  
-- v2.8.4 added "Send current tab" in Firefox tab context menu.
+- v2.8.4 added **Send current tab** to the Firefox tab context menu.
 
 ### Extension Icon Popup Panel
 
-Left-click the icon to open the popup, which includes: **Extension Info**, **Go To**, **Actions**, **Theme**, **Open Tabs**, etc.
+Left-click the icon to open the popup panel, which includes **Extension Info**, **Go To**, **Actions**, **Theme**, and **Open Tabs**.
 
 **Modules**:  
 - **Extension Info**: Current version (more info may be added later).  
-- **Go To**: Quick navigation (Dashboard, Bind Shortcuts).  
-- **Actions**: Send tabs (all/current/other/left/right), Global Search, Hibernate other tabs, Start Sync.  
+- **Go To**: Quick navigation  
+  - Dashboard  
+  - Bind Shortcuts  
+- **Actions**:  
+  - Send tabs (all / current / other / left / right)  
+  - Global Search  
+  - Hibernate other tabs  
+  - Start Sync  
 - **Theme**: Switch accent color.  
-- **Open Tabs**: List of currently open browser tabs (supports browser groups); close, hibernate, or switch to them.
+- **Open Tabs**: List of currently open browser tabs (supports browser groups). Supports close, hibernate, or switch.
 
 **Notes**:  
 - v2.8.4 added compact mode toggle.  
-- You can configure left-click to directly send all tabs (like OneTab) in Preferences.  
-- Hibernation reduces memory without closing tabs.
+- By default, left-click opens the popup. You can configure it in Preferences to send all tabs directly (like OneTab).  
+- Hibernation reduces memory usage without closing tabs. Tabs reactivate when switched to.
 
 ### Management Dashboard
 
-The options page includes: **List**, **Preferences**, **Import/Export**, **Remote Sync**, **Recycle Bin**.
+The dashboard includes: **List**, **Preferences**, **Import/Export**, **Remote Sync**, and **Recycle Bin**.
 
-**Quick Tip**: The same actions appear in multiple places (popup, right-click, dashboard) to suit different user habits.
+**Tip**: The same actions are available in multiple places (popup, right-click, dashboard) to suit different user habits.
 
 ## Dashboard - Navigation Bar
 
@@ -96,67 +102,149 @@ Located in the **Actions** dropdown. Save current open tabs as a temporary snaps
 
 Useful before manually closing/restarting the browser.
 
-## Dashboard - List Page
+## Dashboard - List
 
-Hierarchical view: `Category > Group > Tab`.  
-Left sidebar: directory tree. Right panel: detailed list (virtual scrolling).
+The List page uses a `Category > Group > Tab` hierarchy.
+
+It consists of a left **directory tree** and a right **detail panel** (virtual scrolling).
 
 ### Directory Tree
 
-- Categories (level 1) and Groups (level 2)  
-- **Transit Station**: Special fixed category (cannot be deleted). New tabs go here by default.  
-- Create/rename/delete/lock categories & groups  
-- Drag & drop to move across categories  
-- Search support
+- Level 1: Categories, Level 2: Groups  
+- **Transit Station**: A special fixed category (cannot be deleted) at the top. New tabs go here by default.  
+- Create, rename, delete, lock categories and groups.  
+- Drag & drop to move across categories.  
+- Search support.  
+- Locked categories become read-only.
 
 ### Right Panel
 
-Group-level operations:  
+**Group Operations**:  
 - Rename (default: `Unnamed Group`)  
-- Delete / Open in browser / Lock / Star / Clone / Deduplicate / Sort / Copy links  
-- Batch operations on selected tabs (multi-select with mouse drag or Shift)  
+- Delete, Open in browser, Lock, Star, Clone, Deduplicate, Sort, Copy links, Move to, etc.  
 
-Tabs support: delete, edit, copy, QR code, drag-sort, etc.
+**Tab Operations**:  
+- Delete, edit, copy, QR code, drag to reorder.  
+- Multi-select (drag or Shift + click).  
+- Batch operations.
 
 ## Dashboard - Preferences
 
-Preferences control interaction behavior. Defaults are based on the author's habits — adjust as needed.
+Preferences control interaction behavior. Defaults follow the author’s habits — adjust as needed.
 
 ### General Settings
+
 | Item | Description | Default | Importance |
 |------|-------------|---------|------------|
-| Language | ... | Auto (system) | ★★ |
-| Theme Mode | ... | Light | ★★ |
+| Language | Plugin display language | Auto (system, fallback English) | ★★ |
+| Theme Mode | Light/Dark + follow system | Light | ★★ |
 | Auto open dashboard on browser startup | ... | Yes | ★★ |
-| ... (and more) | ... | ... | ... |
+| Auto open dashboard in new browser window | ... | No | ★★ |
+| Pin NiceTab dashboard | Pin to left side of browser window | Yes | ★★ |
+| Auto restore previous tabs on browser startup | ... | No | ★★★★ |
 
-(Full tables for **Send Tabs**, **Open Tabs**, **Global Search**, **Other Operations**, **Display**, **Auto Sync** follow the same structure as in the Chinese version — all translated with accurate descriptions.)
+### Send Tabs Settings
+
+| Item | Description | Default | Importance |
+|------|-------------|---------|------------|
+| Show directory selector when sending tabs | Choose target category & group | No | ★★★★★ |
+| Send pinned tabs | ... | No | ★ |
+| Exclude domains | e.g. New Tab / blank pages (regex or wildcard supported) | New Tab pages | ★★ |
+| Open dashboard after sending | ... | Yes | ★★★ |
+| Auto close tabs after sending | ... | Yes | ★★★★ |
+| Create new group for single tab | ... | Yes | ★★★ |
+| Keep duplicate groups | ... | Yes | ★★ |
+| Keep duplicate tabs | ... | Yes | ★★ |
+
+### Open Tabs Settings
+
+| Item | Description | Default | Importance |
+|------|-------------|---------|------------|
+| Open group in new window | ... | No | ★★ |
+| Auto delete after opening | ... | No | ★★★★★ |
+| Auto hibernate when opening multiple tabs | ... | No | ★★★★ |
+| Modifier for silent (background) open | ... | Alt (⌥) | ★★★ |
+| Modifier for foreground open | ... | None | ★★★ |
+| Batch open order | ... | Default (left to right) | ★★ |
+| Open unnamed groups as browser group | ... | Yes | ★★ |
+| Open named groups as browser group | ... | Yes | ★★ |
+
+**Notes**: You can swap modifiers to make silent open the default behavior.
+
+### Webpage Title Customization
+
+| Item | Description | Default | Importance |
+|------|-------------|---------|------------|
+| Webpage Title Customization | Rewrite page titles (support exact, starts with, ends with, contains, regex, wildcard) | None | ★★★★★ |
+
+### Global Search Settings
+
+| Item | Description | Default | Importance |
+|------|-------------|---------|------------|
+| Auto delete after opening from search | ... | No | ★★ |
+
+### Other Operations Settings
+
+| Item | Description | Default | Importance |
+|------|-------------|---------|------------|
+| Auto delete empty group after clearing tabs | ... | Yes | ★★★ |
+| Confirm before deleting tab | ... | No | ★ |
+| Group - Copy links template format | Custom Mustache template for copying titles & URLs | `{{url}} \| {{title}}` | ★★★★ |
+| Insert group position in target category | Top or bottom | Top | ★★ |
+| Insert tab position in target group | Top or bottom | Bottom | ★★ |
+
+### Display Settings
+
+| Item | Description | Default | Importance |
+|------|-------------|---------|------------|
+| Operation button style | Icon or text | Icon | ★★★★★ |
+| Common group operation buttons | Customize visible buttons | All | ★★★ |
+| Show open tab count on extension icon | ... | Yes | ★★ |
+| Show NiceTab in webpage context menu | ... | Yes | ★★ |
+| Right-click menu configuration | Drag to sort, top 5 shown directly | All | ★★★★★ |
+| Popup panel module settings | Choose which modules to show. **Tip**: Deselect all → left-click sends all tabs directly | All | ★★★★★ |
+| Auto expand all nodes on list page | ... | No | ★★ |
+| Content area width | Fixed or adaptive | Fixed | ★★ |
+| Show tooltip on tab hover | Legacy feature, not recommended | No | ★ |
+
+### Auto Sync Settings
+
+| Item | Description | Default | Importance |
+|------|-------------|---------|------------|
+| Enable auto sync | ... | No | ★★★ |
+| Interval unit | Minutes or Hours | Minutes | ★★★★ |
+| Auto sync interval | ... | 30 minutes | ★★★★ |
+| Active time period | Only sync during specified periods | 00:00 ~ 23:59 | ★★★ |
+| Sync mode | Merge push / Overwrite push / Overwrite local | Merge push | ★★★★ |
 
 ## Dashboard - Import/Export
 
-Supports importing from NiceTab, OneTab, KepTab, Toby (json), Session Buddy, and browser HTML bookmarks.  
-Three modes: Add, Merge, Overwrite.  
+Supports import from NiceTab, OneTab, KepTab, Toby (json), Session Buddy, and browser HTML bookmarks.  
+Import modes: **Add**, **Merge**, **Overwrite**.  
 Export list + preferences (also as HTML bookmarks since v2.7.7).
 
 ## Dashboard - Remote Sync
 
-(Full section translated, including current limitations due to historical design using names instead of IDs, recommended workflows for single/multi-device use, etc.)
-
-**Note**: After the upcoming `groupId` refactor, the "random renaming of Unnamed Groups" issue will be resolved.
+(Full section with current limitations, historical reasons, and recommended workflows — identical in detail to Chinese version.)
 
 ## Dashboard - Recycle Bin
 
-Deleted items go here temporarily. Auto-cleared daily — recover promptly if needed.
+Deleted items are temporarily stored here and auto-cleared daily. Recover promptly if needed.
 
 ## Bind Shortcuts
 
-Use browser's built-in command system.  
-Default shortcuts (examples):  
-- Open Dashboard: `Alt + Shift + M`  
-- Send All Tabs: `Alt + Shift + A`  
-- Send Current Tab: `Alt + Shift + C`  
-... (others customizable)
+Use the browser’s built-in command system.
+
+Default shortcuts:
+
+| Action | macOS | Windows | Note |
+|--------|-------|---------|------|
+| Open Dashboard | ⌥ + ⇧ + M | Alt + Shift + M | M = manager |
+| Send All Tabs | ⌥ + ⇧ + A | Alt + Shift + A | A = all |
+| Send Current Tab | ⌥ + ⇧ + C | Alt + Shift + C | C = current |
+
+Other shortcuts can be customized in the browser settings.
 
 ## Other
 
-More content to be added later.
+More content will be added later.
