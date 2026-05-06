@@ -112,7 +112,7 @@ The List page uses a `Category > Group > Tab` hierarchy. It consists of a left *
 ### Directory Tree
 
 - Level 1: Categories, Level 2: Groups  
-- **Transit Station**: A special fixed category at the top that cannot be deleted. Newly sent tabs land here by default (unless you choose a target). You can freely edit, move, or delete items inside it.  
+- **Transit Station**: A special fixed category at the top that cannot be deleted. Newly sent tabs land here by default (unless you choose a target when sending). You can freely edit, move, or delete groups/tabs inside it.  
 - Create, rename, delete, expand/collapse, and **lock** categories/groups. Locked items become read-only (prevents accidental deletion or dragging).  
 - Drag & drop to move categories/groups across the tree.  
 - Search support.  
@@ -143,40 +143,36 @@ Preferences control interaction behavior. Defaults follow the author’s habits 
 |------|-------------|---------|------------|
 | Language | Plugin display language | Auto (system, fallback English) | ★★ |
 | Theme Mode | Light/Dark + follow system | Light | ★★ |
-| Auto open dashboard on browser startup | ... | Yes | ★★ |
-| Auto open dashboard in new browser window | ... | No | ★★ |
-| Pin NiceTab dashboard | Pin to left side of browser window | Yes | ★★ |
-| Auto restore previous tabs on browser startup | ... | No | ★★★★ |
+| Auto open dashboard on browser startup | Open dashboard automatically when browser starts | Yes | ★★ |
+| Auto open dashboard in new browser window | Open dashboard automatically in new browser window | No | ★★ |
+| Pin NiceTab dashboard | Pin dashboard to the left side of browser window | Yes | ★★ |
+| Auto restore previous tabs on browser startup | Restore previously open tabs when browser starts | No | ★★★★ |
 
 ### Send Tabs Settings
 
 | Item | Description | Default | Importance |
 |------|-------------|---------|------------|
-| Show directory selector when sending tabs | Choose target category & group | No | ★★★★★ |
-| Send pinned tabs | ... | No | ★ |
-| Exclude domains | e.g. New Tab / blank pages (regex or wildcard supported) | New Tab pages | ★★ |
-| Open dashboard after sending | ... | Yes | ★★★ |
-| Auto close tabs after sending | ... | Yes | ★★★★ |
-| Create new group for single tab | ... | Yes | ★★★ |
-| Keep duplicate groups | ... | Yes | ★★ |
-| Keep duplicate tabs | ... | Yes | ★★ |
-
-**Additional notes**: When global auto-close is disabled, you can still enable conditional auto-close for specific send operations.
+| Show directory selector when sending tabs | Choose target category & group when sending | No | ★★★★★ |
+| Send pinned tabs | Send pinned tabs to NiceTab | No | ★ |
+| Exclude domains | Tabs from these domains will not be sent (regex or wildcard supported) | New Tab / blank pages | ★★ |
+| Open dashboard after sending | Open dashboard after successfully sending tabs | Yes | ★★★ |
+| Auto close tabs after sending | Automatically close tabs after sending | Yes | ★★★★ |
+| Create new group for single tab | Create a new group when sending a single tab | Yes | ★★★ |
+| Keep duplicate groups | Keep duplicate groups when sending | Yes | ★★ |
+| Keep duplicate tabs | Keep duplicate tabs when sending or merging | Yes | ★★ |
 
 ### Open Tabs Settings
 
 | Item | Description | Default | Importance |
 |------|-------------|---------|------------|
-| Open group in new window | ... | No | ★★ |
-| Auto delete after opening | ... | No | ★★★★★ |
-| Auto hibernate when opening multiple tabs | ... | No | ★★★★ |
-| Modifier for silent (background) open | ... | Alt (⌥) | ★★★ |
-| Modifier for foreground open | ... | None | ★★★ |
-| Batch open order | ... | Default (left to right) | ★★ |
-| Open unnamed groups as browser group | ... | Yes | ★★ |
-| Open named groups as browser group | ... | Yes | ★★ |
-
-**Notes**: You can swap modifiers so silent open becomes the default.
+| Open group in new window | Open group in a new browser window | No | ★★ |
+| Auto delete after opening | Automatically delete from list after opening | No | ★★★★★ |
+| Auto hibernate when opening multiple tabs | Automatically hibernate tabs when opening multiple | No | ★★★★ |
+| Modifier for silent (background) open | Modifier key for opening tabs in background | Alt (⌥) | ★★★ |
+| Modifier for foreground open | Modifier key for opening tabs in foreground | None | ★★★ |
+| Batch open order | Order when opening multiple tabs | Default (left to right) | ★★ |
+| Open unnamed groups as browser group | Open unnamed groups as native browser tab groups | Yes | ★★ |
+| Open named groups as browser group | Open named groups as native browser tab groups | Yes | ★★ |
 
 ### Webpage Title Customization
 
@@ -188,61 +184,58 @@ Preferences control interaction behavior. Defaults follow the author’s habits 
 
 | Item | Description | Default | Importance |
 |------|-------------|---------|------------|
-| Auto delete after opening from search | ... | No | ★★ |
+| Auto delete after opening from search | Automatically delete from list after opening from global search | No | ★★ |
 
 ### Other Operations Settings
 
 | Item | Description | Default | Importance |
 |------|-------------|---------|------------|
-| Auto delete empty group after clearing tabs | ... | Yes | ★★★ |
-| Confirm before deleting tab | ... | No | ★ |
-| Group - Copy links template format | Custom Mustache template for copying titles & URLs | `{{url}} \| {{title}}` | ★★★★ |
-| Insert group position in target category | Top or bottom | Top | ★★ |
-| Insert tab position in target group | Top or bottom | Bottom | ★★ |
+| Auto delete empty group after clearing tabs | Automatically delete unlocked empty groups | Yes | ★★★ |
+| Confirm before deleting tab | Show confirmation dialog before deleting a tab | No | ★ |
+| Group - Copy links template format | Mustache template for copying group links | `{{url}} \| {{title}}` | ★★★★ |
+| Insert group position in target category | Position when inserting/moving group to a category | Top | ★★ |
+| Insert tab position in target group | Position when inserting/moving tab to a group | Bottom | ★★ |
 
 ### Display Settings
 
 | Item | Description | Default | Importance |
 |------|-------------|---------|------------|
-| Operation button style | Icon or text | Icon | ★★★★★ |
-| Common group operation buttons | Customize visible buttons | All | ★★★ |
-| Show open tab count on extension icon | ... | Yes | ★★ |
-| Show NiceTab in webpage context menu | ... | Yes | ★★ |
-| Right-click menu configuration | Drag to sort, top 5 shown directly | All | ★★★★★ |
+| Operation button style | Icon or text style for operation buttons | Icon | ★★★★★ |
+| Common group operation buttons | Customize which group operation buttons are always visible | All | ★★★ |
+| Show open tab count on extension icon | Show number of open tabs on the extension icon | Yes | ★★ |
+| Show NiceTab in webpage context menu | Show NiceTab in right-click menu on webpages | Yes | ★★ |
+| Right-click menu configuration | Drag to reorder; top 5 items shown directly | All | ★★★★★ |
 | Popup panel module settings | Choose which modules to show. **Tip**: Deselect all → left-click sends all tabs directly | All | ★★★★★ |
-| Auto expand all nodes on list page | ... | No | ★★ |
-| Content area width | Fixed or adaptive | Fixed | ★★ |
+| Auto expand all nodes on list page | Auto-expand all categories and groups when entering list | No | ★★ |
+| Content area width | Fixed or adaptive width | Fixed | ★★ |
 | Show tooltip on tab hover | Legacy feature, not recommended | No | ★ |
 
 ### Auto Sync Settings
 
 | Item | Description | Default | Importance |
 |------|-------------|---------|------------|
-| Enable auto sync | ... | No | ★★★ |
+| Enable auto sync | Enable automatic synchronization | No | ★★★ |
 | Interval unit | Minutes or Hours | Minutes | ★★★★ |
-| Auto sync interval | ... | 30 minutes | ★★★★ |
+| Auto sync interval | Synchronization frequency | 30 minutes | ★★★★ |
 | Active time period | Only sync during specified periods | 00:00 ~ 23:59 | ★★★ |
 | Sync mode | Merge push / Overwrite push / Overwrite local | Merge push | ★★★★ |
 
 ## Dashboard - Import/Export
 
-Supports import from NiceTab, OneTab, KepTab, Toby (JSON), Session Buddy, and browser HTML bookmarks (since v2.7.7).  
-
-Import modes: **Add**, **Merge**, **Overwrite**.  
+Supported formats: NiceTab, OneTab, KepTab, Toby (JSON), Session Buddy, and HTML bookmarks (since v2.7.7).  
+Modes: Add / Merge / Overwrite.  
 Sources: Textbox or local file.  
-Export includes list + preferences (also as HTML bookmarks).  
-
-**Note**: Deep nesting is flattened to `Category > Group > Tab` structure.
+Note: Deep nesting is flattened to Category > Group > Tab structure.
 
 ## Dashboard - Remote Sync
 
 Remote Sync supports syncing your tab list and preferences to remote storage (GitHub Gist, Gitee Gist, WebDAV). Automatic syncing is also available.
 
 **Important notes and recommended workflows**:  
-- Early versions used group/tab **names** for merging (no stable IDs yet). Unnamed groups may be randomly renamed during sync.  
+- Early versions relied on group/tab **names** for merging (no stable IDs yet). Unnamed groups may be randomly renamed during sync.  
 - **Single-device workflow** (recommended for most users): Use manual sync or enable auto-sync. Conflicts are rare.  
 - **Multi-device workflow**: Use different categories on each device + manual sync, or accept occasional manual conflict resolution.  
-- Future versions will introduce stable **Group IDs** to solve merging issues.
+- Future versions will introduce stable Group IDs to solve merging issues.
 
 ## Dashboard - Recycle Bin
 
