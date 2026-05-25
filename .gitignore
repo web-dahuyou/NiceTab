@@ -27,3 +27,4 @@ public/docs/*
 *.njsproj
 *.sln
 *.sw?
+.claude
