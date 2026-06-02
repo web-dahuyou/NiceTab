@@ -1,7 +1,11 @@
 import styled from 'styled-components';
 import { StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
 import type { StyledThemeProps } from '~/entrypoints/types';
-import { StyledBaseSidebarWrapper, StyledBaseMainWrapper } from '../Layout.styled';
+import {
+  StyledBaseSidebarWrapper,
+  StyledBaseMainWrapper,
+  StyledBaseRightPanelWrapper,
+} from '../Layout.styled';
 
 export const StyledMainWrapper = StyledBaseMainWrapper;
 
@@ -86,6 +90,83 @@ export const StyledHelpInfoBox = styled.div`
     list-style-type: disc;
     li {
       margin-bottom: 8px;
+    }
+  }
+`;
+
+export const StyledRightPanelWrapper = styled(StyledBaseRightPanelWrapper)<{
+  theme: StyledThemeProps;
+}>`
+  .right-panel-inner-content {
+    display: flex;
+    flex-direction: column;
+    .opened-tabs-title {
+      flex-shrink: 0;
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    .opened-tabs-list {
+      flex: 1;
+      height: 0;
+      overflow-y: auto;
+    }
+
+    .opened-tab-group {
+      margin-bottom: 12px;
+
+      .group-header {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+        padding: 4px 0;
+        font-size: 12px;
+        color: ${props => props.theme.colorTextSecondary || '#666'};
+        user-select: none;
+
+        .group-name {
+          ${StyledEllipsis}
+          flex: 1;
+        }
+
+        .group-count {
+          flex-shrink: 0;
+          color: ${props => props.theme.colorTextQuaternary || '#999'};
+        }
+      }
+
+      .group-tabs {
+        .opened-tab-item {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 2px 4px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 12px;
+
+          &:hover {
+            background: ${props => props.theme.colorFillSecondary || 'rgba(0,0,0,0.04)'};
+          }
+
+          .tab-favicon {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+          }
+
+          .tab-title {
+            ${StyledEllipsis}
+            flex: 1;
+          }
+
+          &.active {
+            background: ${props => props.theme.colorPrimaryBg || 'rgba(22,119,255,0.1)'};
+          }
+        }
+      }
     }
   }
 `;

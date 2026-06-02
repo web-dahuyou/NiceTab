@@ -55,6 +55,7 @@ import {
 } from './Home.styled';
 import ToggleSidebarBtn from '../components/ToggleSidebarBtn';
 import ToggleLockedBtn from './components/ToggleLockedBtn';
+import RightPanel from './rightPanel/RightPanel';
 import SearchTabsBtn from './components/SearchTabsBtn';
 import SortingBtns from './components/SortingBtns';
 import HotkeyList from '../components/HotkeyList';
@@ -113,6 +114,9 @@ export default function Home() {
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => {
     return stateUtils.state?.home?.sidebarCollapsed || false;
+  });
+  const [openedTabsCollapsed, setOpenedTabsCollapsed] = useState<boolean>(() => {
+    return stateUtils.state?.home?.rightPanelCollapsed || false;
   });
   const [confirmModalVisible, setConfirmModalVisible] = useState<boolean>(false);
   const [helpDrawerVisible, setHelpDrawerVisible] = useState<boolean>(false);
@@ -178,6 +182,12 @@ export default function Home() {
     reloadOtherAdminPage();
   };
 
+  const onRightPanelCollapseChange = (status: boolean) => {
+    setOpenedTabsCollapsed(status);
+    stateUtils.setStateByModule('home', { rightPanelCollapsed: status });
+    reloadOtherAdminPage();
+  };
+
   const lockTagBtnVisible = useMemo(() => {
     return !selectedTag.originData?.static;
   }, [selectedTag.originData]);
@@ -229,6 +239,7 @@ export default function Home() {
         <StyledMainWrapper
           className={classNames('home-wrapper', sidebarCollapsed && 'collapsed')}
           $collapsed={sidebarCollapsed}
+          $rightPanelCollapsed={openedTabsCollapsed}
         >
           <StyledSidebarWrapper className="sidebar" $collapsed={sidebarCollapsed}>
             <div
@@ -326,6 +337,12 @@ export default function Home() {
           <div ref={multiSelectContainerRef} id="tab-group-list-panel">
             <TabGroupList virtual={virtualMap.tabList}></TabGroupList>
           </div>
+
+          {/* 右侧面板 */}
+          <RightPanel
+            collapsed={openedTabsCollapsed}
+            onCollapseChange={onRightPanelCollapseChange}
+          ></RightPanel>
         </StyledMainWrapper>
 
         {/* 吸底footer */}

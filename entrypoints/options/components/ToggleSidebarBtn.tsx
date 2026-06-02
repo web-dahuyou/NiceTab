@@ -5,9 +5,11 @@ import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 
 export default function ToggleSidebarBtn({
   collapsed = false,
+  position = 'left',
   onCollapseChange,
 }: {
   collapsed?: boolean;
+  position?: 'left' | 'right';
   onCollapseChange?: (status: boolean) => void;
 }) {
   const { $fmt } = useIntlUtls();
@@ -19,10 +21,10 @@ export default function ToggleSidebarBtn({
   return (
     <div
       className="action-icon"
-      title={$fmt({
-        id: `home.${collapsed ? 'expand' : 'collapse'}`,
-        values: { name: $fmt('common.sidebar') },
-      })}
+      title={$fmt(`common.${collapsed ? 'expand' : 'collapse'}`)}
+      style={{
+        transform: `rotate(${position === 'left' ? 0 : 180}deg)`,
+      }}
       onClick={handleToggle}
     >
       <Button

@@ -51,7 +51,7 @@ export type DraggableStateItem =
 export type DragData = Record<string | symbol, any> & {
   index: number;
   dndKey?: symbol;
-  groupId?: string;
+  groupId?: string | number;
   selectedValues?: string[];
   isDragging?: boolean;
   draggableState?: DraggableStateItem;
@@ -83,6 +83,7 @@ export const draggingState: DraggableStateItem = { type: 'dragging' };
 export default function DndComponent<IncomeData extends DragData>({
   dndKey,
   canDrag,
+  canDrop = true,
   data,
   mainField, // 区分拖拽元素的唯一标识字段
   onDragStateChange,
@@ -92,6 +93,7 @@ export default function DndComponent<IncomeData extends DragData>({
 }: {
   dndKey: symbol;
   canDrag: boolean;
+  canDrop?: boolean;
   data: IncomeData;
   mainField: keyof IncomeData;
   onDragStateChange?: (state: DraggableStateItem, data: IncomeData) => void;
@@ -196,7 +198,7 @@ export default function DndComponent<IncomeData extends DragData>({
         },
         canDrop({ source }) {
           // console.log('dropTargetForElements-canDrop', source);
-          return source?.data?.dndKey === dndKey;
+          return canDrop && source?.data?.dndKey === dndKey;
         },
         onDrag({ self, source }) {
           const isSource = source.element === element;
