@@ -340,9 +340,17 @@ function TabGroup({
   );
   // 拖放到目标元素时触发 (targetData.groupId = 当前的groupId)
   const handleTabItemDrop: DndTabItemOnDropCallback = useCallback((...params) => {
+    console.log('tabGroup--handleTabItemDrop', params);
+    const params0 = { ...(params[0] || {}) };
+
+    // 从已打开的浏览器标签页拖拽到列表标签页
+    if (!params0.sourceData?.groupId || params0.sourceData?.groupId === -1) {
+      params0.actionType = 'opened2tab';
+    }
+
     eventEmitter.emit('home:treeDataHook', {
       action: 'handleTabItemDrop',
-      params,
+      params: [params0],
     });
   }, []);
 

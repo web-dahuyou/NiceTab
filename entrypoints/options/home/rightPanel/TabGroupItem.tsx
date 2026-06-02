@@ -6,6 +6,7 @@ import { classNames } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import DndComponent, {
   type DraggableStateItem,
+  type DragData,
 } from '~/entrypoints/common/components/DndComponent';
 import TabItem, { type TabItemProps } from './TabItem';
 import { StyledGroupWrapper } from './OpenedTabs.styled';
@@ -23,8 +24,12 @@ export type TabGroupItemProps = {
 
 export type TabGroupItemParams = {
   group: TabGroupItemProps;
-  onAction?: TabItemProps['onAction'];
+  onAction: TabItemProps['onAction'];
   onDragStateChange?: (value: DraggableStateItem, tab: Tabs.Tab) => void;
+};
+
+export type OpenedTabsDragData = DragData & {
+  selectedTabs: Tabs.Tab[];
 };
 
 export default function TabGroupItem({
@@ -58,7 +63,7 @@ export default function TabGroupItem({
       <>
         {group.tabs?.map((tab, index) => {
           return (
-            <DndComponent
+            <DndComponent<OpenedTabsDragData>
               key={tab.id || index}
               canDrag={true}
               canDrop={false}
@@ -68,7 +73,7 @@ export default function TabGroupItem({
                 index,
                 groupId: group.groupId,
                 dndKey,
-                selectedValues: [],
+                selectedTabs: [tab],
               }}
               mainField="id"
               onDragStateChange={value => onDragStateChange?.(value, tab)}
@@ -98,7 +103,7 @@ export default function TabGroupItem({
           const tabTitle = tab.title || tab.url || '';
 
           return (
-            <DndComponent
+            <DndComponent<OpenedTabsDragData>
               key={tabId}
               canDrag={true}
               canDrop={false}
@@ -108,7 +113,7 @@ export default function TabGroupItem({
                 index,
                 groupId: String(group.groupId),
                 dndKey,
-                selectedValues: [],
+                selectedTabs: [tab],
               }}
               mainField="id"
               onDragStateChange={value => onDragStateChange?.(value, tab)}

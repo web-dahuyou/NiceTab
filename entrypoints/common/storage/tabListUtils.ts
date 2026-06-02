@@ -1324,6 +1324,37 @@ export default class TabListUtils {
 
     await this.setTagList(tagList);
   }
+  // 打开的浏览器标签页拖拽到列表
+  async onOpenedTabDrop(sourceData: DragData, targetData: DragData, targetIndex: number) {
+    const selectedTabs: Tabs.Tab[] = sourceData.selectedTabs || [];
+    if (!selectedTabs.length) return;
+
+    const tagList = await this.getTagList();
+
+    // 将浏览器 Tab 对象转换为 TabItem 格式
+    const newTabItems: TabItem[] = selectedTabs.map(tab => ({
+      ...tab,
+      tabId: getRandomId(),
+    }));
+
+    // 遍历找到目标标签组并插入
+    let isTargetFound = false;
+    for (let tag of tagList) {
+      for (let group of tag.groupList) {
+        if (group.groupId === targetData.groupId) {
+          group.tabList.splice(targetIndex, 0, ...newTabItems);
+          isTargetFound = true;
+          break;
+        }
+      }
+      if (isTargetFound) break;
+    }
+
+    if (isTargetFound) {
+      await this.setTagList(tagList);
+    }
+  }
+
   // tab标签页移动到（穿越）
   async tabMoveThrough({
     sourceGroupId,

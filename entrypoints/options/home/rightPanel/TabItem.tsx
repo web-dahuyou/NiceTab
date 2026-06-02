@@ -10,7 +10,7 @@ import { StyledTabItem } from './OpenedTabs.styled';
 export type TabActions = 'active' | 'discard' | 'remove';
 export interface TabItemProps {
   tab: Tabs.Tab;
-  onAction?: (action: TabActions, tab: Tabs.Tab) => void;
+  onAction: (action: TabActions, tab: Tabs.Tab) => void;
 }
 
 export default function TabItem({ tab, onAction }: TabItemProps) {
@@ -21,7 +21,7 @@ export default function TabItem({ tab, onAction }: TabItemProps) {
       if (action === 'discard' || action === 'remove') {
         event.stopPropagation();
       }
-      onAction?.(action, tab);
+      onAction(action, tab);
     },
     [tab],
   );

@@ -53,7 +53,7 @@ If a page URL matches any of the above cases, opening tab may not work. Please m
 
 ## Features
 
-Comprehensive user guide | <a href="./GUIDE-zh.md">NiceTab 用户指南</a> (English version is coming soon...)
+Comprehensive user guide | <a href="./GUIDE.md">NiceTab User Guide</a>
 
 ### General Features
 

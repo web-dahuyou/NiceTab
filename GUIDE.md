@@ -274,7 +274,7 @@ The configuration items of this module are mainly related to interface display; 
 | Configure ContextMenu items | The right-click menu supports customization, **drag-and-drop sorting**. Select the right-click menu items to be displayed. The first 5 selected items are displayed at the outer level, the rest are collapsed into the "More" menu group. | All items | ★★★★★ |
 | Choose the modules to be displayed in the "Popup Panel" | The modules in the Popup Panel support free configuration, you can check the modules you want to display. <br/>**Important**: If no modules are checked, left-clicking the extension icon will directly send all tabs to the NiceTab list without opening the Popup Panel. You can use this feature to flexibly set interaction behavior. | All modules | ★★★★★ |
 | Automatically expand the tree list on Home Page? | When entering the list page, whether to automatically expand categories and tab groups in the tree list. | No | ★★ |
-| Width of the page content area | The width display mode of the main content area in the management dashboard; "Fixed" mode by default (approximately 1200 pixels, centered displayed). When set to "Responsive", will adapts to the width of the webpage, effect similar to left-aligned display. | Fixed width | ★★ |
+| ~~Width of the page content area~~ | ~~The width display mode of the main content area in the management dashboard; "Fixed" mode by default (approximately 1200 pixels, centered displayed). When set to "Responsive", will adapts to the width of the webpage, effect similar to left-aligned display.~~ | Fixed width | ★★ |
 | Show a tooltip when hovering over a tab? | This configuration item temporarily retains historical interaction; not recommended to enable tooltip display. | No | ★ |
 
 ### Auto Sync

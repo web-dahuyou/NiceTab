@@ -85,23 +85,26 @@ export default function RightPanel({
     [initTabs],
   );
 
-  const handleTabAction: TabItemProps['onAction'] = useCallback((action, tab) => {
-    if (!tab.id) return;
+  const handleTabAction = useCallback<Required<TabItemProps>['onAction']>(
+    (action, tab) => {
+      if (!tab.id) return;
 
-    switch (action) {
-      case 'active':
-        browser.tabs.update(tab.id, { active: true });
-        break;
-      case 'discard':
-        handleTabDiscard(tab);
-        break;
-      case 'remove':
-        handleTabRemove(tab);
-        break;
-      default:
-        break;
-    }
-  }, []);
+      switch (action) {
+        case 'active':
+          browser.tabs.update(tab.id, { active: true });
+          break;
+        case 'discard':
+          handleTabDiscard(tab);
+          break;
+        case 'remove':
+          handleTabRemove(tab);
+          break;
+        default:
+          break;
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     initTabs();
@@ -119,7 +122,7 @@ export default function RightPanel({
 
   const handleDragStateChange = useCallback(
     (value: DraggableStateItem, tab: Tabs.Tab) => {
-      // Tab is dragging
+      console.log('rightPanel--handleDragStateChange', value, tab);
     },
     [],
   );

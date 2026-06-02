@@ -71,7 +71,7 @@ export type CascaderOption = {
 // 拖拽tab数据
 export type DndTabItemProps = TabItem &
   DragData & {
-    groupId: string;
+    groupId: string | number;
     index: number;
     dndKey: symbol;
     isEmpty?: boolean; // 空标签组，默认设置一个空标签，便于拖拽
@@ -88,7 +88,7 @@ export type DndTabItemOnDropCallback = ({
   targetData: Pick<DndTabItemProps, 'groupId' | 'index'> & DragData;
   sourceIndex: number;
   targetIndex: number;
-  actionType?: 'tab2tab' | 'tab2group';
+  actionType?: 'tab2tab' | 'tab2group' | 'opened2tab' | 'opened2group';
   targetTabListLength?: number;
 }) => void;
 

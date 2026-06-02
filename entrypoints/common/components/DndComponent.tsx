@@ -52,7 +52,7 @@ export type DragData = Record<string | symbol, any> & {
   index: number;
   dndKey?: symbol;
   groupId?: string | number;
-  selectedValues?: string[];
+  selectedValues?: Array<string | number>;
   isDragging?: boolean;
   draggableState?: DraggableStateItem;
 };
