@@ -40,7 +40,7 @@ export default function Root({
   const [hasReady, setHasReady] = useState(false);
   const [primaryColor, setPrimaryColor] = useState(PRIMARY_COLOR);
   const [pageWidthType, setPageWidthType] = useState<PageWidthTypes>(
-    settingsUtils.settings?.pageWidthType || 'fixed',
+    settingsUtils.settings?.pageWidthType || 'responsive',
   );
 
   const handleLocaleChange = async (language?: LanguageTypes) => {

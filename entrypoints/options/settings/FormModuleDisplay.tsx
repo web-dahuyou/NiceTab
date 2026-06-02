@@ -131,8 +131,8 @@ export default function FormModuleDisplay(
         </Radio.Group>
       </Form.Item>
 
-      {/* 页面主内容宽度设置 */}
-      <Form.Item<SettingsProps>
+      {/* 页面主内容宽度设置-废弃 */}
+      {/* <Form.Item<SettingsProps>
         label={$fmt(`settings.${MAIN_CONTENT_WIDTH_TYPE}`)}
         name={MAIN_CONTENT_WIDTH_TYPE}
       >
@@ -142,7 +142,7 @@ export default function FormModuleDisplay(
             {$fmt(`settings.${MAIN_CONTENT_WIDTH_TYPE}.responsive`)}
           </Radio>
         </Radio.Group>
-      </Form.Item>
+      </Form.Item> */}
 
       {/* 是否显示标签页标题的tooltip */}
       <Form.Item<SettingsProps>
