@@ -92,7 +92,7 @@ export const StyledBaseRightPanelWrapper = styled.div<{
     height: calc(100vh - 180px);
     position: fixed;
     top: 100px;
-    right: 32px;
+    right: 24px;
     transition: transform 0.2s ease-in-out;
     border-left: 1px solid ${props => props.theme.colorBorder || 'rgba(5, 5, 5, 0.06)'};
     background: var(--bg-color);

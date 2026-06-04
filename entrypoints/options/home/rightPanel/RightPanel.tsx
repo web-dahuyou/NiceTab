@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { browser, Tabs } from 'wxt/browser';
-import { theme, Spin, Empty } from 'antd';
+import { Empty, Checkbox } from 'antd';
 import { isGroupSupported, classNames } from '~/entrypoints/common/utils';
 import { getAdminTabInfo } from '~/entrypoints/common/tabs';
 import { TAB_EVENTS } from '~/entrypoints/common/constants';
@@ -9,7 +9,7 @@ import type { DraggableStateItem } from '~/entrypoints/common/components/DndComp
 import ToggleSidebarBtn from '../../components/ToggleSidebarBtn';
 import { StyledRightPanelWrapper } from '../Home.styled';
 import TabGroupItem, { type TabGroupItemProps } from './TabGroupItem';
-import type { TabActions, TabItemProps } from './TabItem';
+import type { TabItemProps, QuickSelectFunc } from './TabItem';
 
 export default function RightPanel({
   collapsed,
@@ -19,25 +19,32 @@ export default function RightPanel({
   onCollapseChange: (status: boolean) => void;
 }) {
   const { $fmt } = useIntlUtls();
+  const [tabs, setTabs] = useState<Tabs.Tab[]>([]);
   const [tabGroupList, setTabGroupList] = useState<TabGroupItemProps[]>([]);
+  const [selectedTabIds, setSelectedTabIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const selectedTabs = useMemo(() => {
+    return tabs.filter(tab => tab.id && selectedTabIds.includes(tab.id));
+  }, [tabs, selectedTabIds]);
 
   const initTabs = useCallback(async () => {
     setLoading(true);
 
     const allTabs = await browser.tabs.query({ currentWindow: true });
     const { tab: adminTab } = await getAdminTabInfo();
-    const tabs = allTabs.filter(tab => tab.id !== adminTab?.id);
+    const _tabs = allTabs.filter(tab => tab.id && tab.id !== adminTab?.id);
+    setTabs(_tabs);
 
     let groupList: TabGroupItemProps[] = [];
     if (!isGroupSupported()) {
-      groupList = tabs.map(tab => ({
+      groupList = _tabs.map(tab => ({
         groupId: -1,
         groupName: '',
         tabs: [tab],
       }));
     } else {
-      groupList = tabs.reduce<TabGroupItemProps[]>((result, tab) => {
+      groupList = _tabs.reduce<TabGroupItemProps[]>((result, tab) => {
         const groupId = tab.groupId || -1;
         if (groupId === -1) {
           return result.concat({ groupId: -1, groupName: '', tabs: [tab] });
@@ -106,6 +113,38 @@ export default function RightPanel({
     [],
   );
 
+  // 快捷选择，起始位置
+  const [quickSelectedTabIds, setQuickSelectedTabIds] = useState<number[]>([]);
+  const handleTabQuickSelect: QuickSelectFunc = async (tab, selected) => {
+    // 由于快捷选择直接复用了checkbox的选择，onChange 回调中的setSelectedTabIds会覆盖quickSelect的setSelectedTabIds
+    // 所以这里延时100ms，等待onChange回调执行完毕，再执行后面的操作
+    await new Promise(r => setTimeout(r, 100));
+
+    if (quickSelectedTabIds.length === 0) {
+      selected && setQuickSelectedTabIds([tab.id!]);
+    } else if (quickSelectedTabIds.length === 1) {
+      if (selected) {
+        let startIndex = tabs.findIndex(item => item.id === quickSelectedTabIds[0]);
+        let endIndex = tabs.findIndex(item => item.id === tab.id);
+        if (startIndex > endIndex) {
+          [startIndex, endIndex] = [endIndex, startIndex];
+        }
+
+        const _selectedTabIds = tabs
+          .slice(startIndex, endIndex + 1)
+          .map(item => item.id!);
+
+        const newSelectedIds = [...new Set([...selectedTabIds, ..._selectedTabIds])];
+        setSelectedTabIds(newSelectedIds);
+        setQuickSelectedTabIds([]);
+      } else {
+        quickSelectedTabIds[0] === tab.id && setQuickSelectedTabIds([]);
+      }
+    } else {
+      setQuickSelectedTabIds([]);
+    }
+  };
+
   useEffect(() => {
     initTabs();
 
@@ -140,22 +179,29 @@ export default function RightPanel({
         <div className="right-panel-inner-content">
           <div className="opened-tabs-title">{$fmt('common.openedTabs')}</div>
           <div className="opened-tabs-list">
-            <Spin spinning={loading}>
-              {tabGroupList?.length > 0 ? (
-                tabGroupList.map((group, groupIndex) => (
+            {tabGroupList?.length > 0 || loading ? (
+              <Checkbox.Group
+                className="tab-list-checkbox-group"
+                value={selectedTabIds}
+                onChange={setSelectedTabIds}
+              >
+                {tabGroupList.map((group, groupIndex) => (
                   <TabGroupItem
                     key={~group.groupId || groupIndex}
                     group={group}
+                    selectedTabs={selectedTabs}
+                    quickSelectedTabIds={quickSelectedTabIds}
                     onDragStateChange={handleDragStateChange}
                     onAction={handleTabAction}
+                    onQuickSelect={handleTabQuickSelect}
                   />
-                ))
-              ) : (
-                <div className="no-data">
-                  <Empty description={$fmt('home.emptyTip')}></Empty>
-                </div>
-              )}
-            </Spin>
+                ))}
+              </Checkbox.Group>
+            ) : (
+              <div className="no-data">
+                <Empty description={$fmt('home.emptyTip')}></Empty>
+              </div>
+            )}
           </div>
         </div>
       </div>

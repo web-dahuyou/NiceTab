@@ -111,6 +111,17 @@ export const StyledRightPanelWrapper = styled(StyledBaseRightPanelWrapper)<{
       flex: 1;
       height: 0;
       overflow-y: auto;
+      .no-data {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+      }
+    }
+    .tab-list-checkbox-group {
+      width: 100%;
+      display: block;
     }
 
     .opened-tab-group {

@@ -473,19 +473,28 @@ function AppLayout() {
           <Outlet></Outlet>
         </div>
 
+        <FloatButton
+          shape="circle"
+          icon={<SendOutlined />}
+          tooltip={{ title: $fmt('common.sendAllTabs'), placement: 'top' }}
+          style={{ right: 30, bottom: 30 }}
+          onClick={handleSendAllTabs}
+        />
+        <FloatButton
+          shape="circle"
+          icon={<SearchOutlined />}
+          tooltip={{ title: $fmt('home.searchTabAndUrl'), placement: 'top' }}
+          style={{ right: 90, bottom: 30 }}
+          onClick={openGlobalSearchPanel}
+        />
         {/* 回到顶部 */}
-        <FloatButton.Group shape="circle" style={{ right: 30, bottom: 90 }}>
-          {/* BackTop组件自带的 tooltip 在点击按钮时会闪 */}
-          <span title={$fmt('common.backToTop')}>
-            <FloatButton.BackTop duration={100} visibilityHeight={400} />
-          </span>
-          <span title={$fmt('common.sendAllTabs')}>
-            <FloatButton icon={<SendOutlined />} onClick={handleSendAllTabs} />
-          </span>
-          <span title={$fmt('home.searchTabAndUrl')}>
-            <FloatButton icon={<SearchOutlined />} onClick={openGlobalSearchPanel} />
-          </span>
-        </FloatButton.Group>
+        <FloatButton.BackTop
+          shape="circle"
+          tooltip={{ title: $fmt('common.backToTop'), placement: 'top' }}
+          duration={100}
+          visibilityHeight={400}
+          style={{ right: 150, bottom: 30 }}
+        />
       </StyledPageContainer>
     </ThemeProvider>
   );

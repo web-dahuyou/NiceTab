@@ -1,10 +1,12 @@
+import type { GetProp, MenuProps } from 'antd';
 import { theme, Space, Divider, Dropdown } from 'antd';
 import { MoreOutlined } from '@ant-design/icons';
 import { ActionBtnStyle } from '~/entrypoints/types';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import ActionIconBtn from '~/entrypoints/common/components/ActionIconBtn.tsx';
 
-export interface ActionOptionItem {
+type menuItem = GetProp<MenuProps, 'items'>[number];
+export type ActionOptionItem = menuItem & {
   key: string;
   label: string;
   icon?: React.ReactNode;

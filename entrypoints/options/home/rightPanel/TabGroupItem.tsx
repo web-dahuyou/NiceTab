@@ -8,7 +8,7 @@ import DndComponent, {
   type DraggableStateItem,
   type DragData,
 } from '~/entrypoints/common/components/DndComponent';
-import TabItem, { type TabItemProps } from './TabItem';
+import TabItem, { type TabItemProps, QuickSelectFunc } from './TabItem';
 import { StyledGroupWrapper } from './OpenedTabs.styled';
 import { dndKeys } from '../constants';
 
@@ -24,8 +24,11 @@ export type TabGroupItemProps = {
 
 export type TabGroupItemParams = {
   group: TabGroupItemProps;
+  selectedTabs: Tabs.Tab[];
+  quickSelectedTabIds?: number[];
   onAction: TabItemProps['onAction'];
   onDragStateChange?: (value: DraggableStateItem, tab: Tabs.Tab) => void;
+  onQuickSelect?: QuickSelectFunc;
 };
 
 export type OpenedTabsDragData = DragData & {
@@ -34,11 +37,16 @@ export type OpenedTabsDragData = DragData & {
 
 export default function TabGroupItem({
   group,
+  selectedTabs = [],
+  quickSelectedTabIds = [],
   onAction,
   onDragStateChange,
+  onQuickSelect,
 }: TabGroupItemParams) {
   const { $fmt } = useIntlUtls();
   const [collapsed, setCollapsed] = useState(group.collapsed);
+
+  const selectedTabIds = selectedTabs.map(tab => tab.id!);
 
   const onToggle = useCallback(() => {
     setCollapsed(value => !value);
@@ -74,12 +82,19 @@ export default function TabGroupItem({
                 groupId: group.groupId,
                 dndKey,
                 from: 'opened-tabs',
-                selectedTabs: [tab],
+                selectedValues: selectedTabIds,
+                selectedTabs,
               }}
               mainField="id"
               onDragStateChange={value => onDragStateChange?.(value, tab)}
             >
-              <TabItem key={tab.id} tab={tab} onAction={onAction}></TabItem>
+              <TabItem
+                key={tab.id}
+                tab={tab}
+                highlighted={tab.id != undefined && quickSelectedTabIds.includes(tab.id)}
+                onAction={onAction}
+                onQuickSelect={onQuickSelect}
+              ></TabItem>
             </DndComponent>
           );
         })}
@@ -92,7 +107,7 @@ export default function TabGroupItem({
       className={classNames(collapsed && 'collapsed')}
       $color={group.color}
     >
-      <div className="group-header-btn" onClick={onToggle}>
+      <div className="group-header" onClick={onToggle}>
         <div className="collapse-icon-btn">
           {collapsed ? <RightOutlined /> : <DownOutlined />}
         </div>
@@ -115,14 +130,23 @@ export default function TabGroupItem({
                 groupId: String(group.groupId),
                 dndKey,
                 from: 'opened-tabs',
-                selectedTabs: [tab],
+                selectedValues: selectedTabIds,
+                selectedTabs,
               }}
               mainField="id"
               onDragStateChange={value => onDragStateChange?.(value, tab)}
             >
               <div className="tab-list-item" title={tabTitle}>
                 <i className="group-color-flag"></i>
-                <TabItem key={tab.id} tab={tab} onAction={onAction}></TabItem>
+                <TabItem
+                  key={tab.id}
+                  tab={tab}
+                  highlighted={
+                    tab.id != undefined && quickSelectedTabIds.includes(tab.id)
+                  }
+                  onAction={onAction}
+                  onQuickSelect={onQuickSelect}
+                ></TabItem>
               </div>
             </DndComponent>
           );

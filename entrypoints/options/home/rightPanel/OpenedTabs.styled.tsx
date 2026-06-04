@@ -4,7 +4,7 @@ import { StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
 export const StyledGroupWrapper = styled.div<{ $color?: string }>`
   margin-bottom: 4px;
 
-  .group-header-btn {
+  .group-header {
     display: flex;
     align-items: center;
     gap: 4px;
@@ -62,11 +62,14 @@ export const StyledTabItem = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  padding: 6px 8px;
-  cursor: pointer;
+  padding: 2px 8px;
+  gap: 8px;
   &:hover,
   &.active {
     background: ${props => props.theme.colorPrimaryBg || 'rgba(0, 0, 0, 0.1)'};
+  }
+  &.highlighted {
+    background: ${props => props.theme.colorWarningHover};
   }
   // &.active:before {
   //   content: '';
@@ -77,16 +80,19 @@ export const StyledTabItem = styled.div`
   //   height: 100%;
   //   background: ${props => props.theme.colorPrimary};
   // }
+  .tab-item-favicon {
+    margin-right: 0;
+  }
   .tab-item-title {
     flex: 1;
     overflow: hidden;
     font-size: 12px;
+    cursor: pointer;
     color: ${props => props.theme.colorText || '#000'};
     ${StyledEllipsis}
   }
   .action-icon-btn {
     flex-shrink: 0;
-    margin-left: 8px;
   }
   &.discarded {
     .tab-item-title,

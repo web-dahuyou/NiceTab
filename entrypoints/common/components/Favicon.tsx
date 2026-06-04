@@ -40,5 +40,11 @@ export default function Favicon({
     init();
   }, []);
 
-  return <StyledTabItemFavicon src={renderUrl} onError={handleError} />;
+  return (
+    <StyledTabItemFavicon
+      className="tab-item-favicon"
+      src={renderUrl}
+      onError={handleError}
+    />
+  );
 }
