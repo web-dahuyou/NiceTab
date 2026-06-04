@@ -344,7 +344,7 @@ function TabGroup({
     const params0 = { ...(params[0] || {}) };
 
     // 从已打开的浏览器标签页拖拽到列表标签页
-    if (!params0.sourceData?.groupId || params0.sourceData?.groupId === -1) {
+    if (params0.sourceData?.from === 'opened-tabs') {
       params0.actionType = 'opened2tab';
     }
 

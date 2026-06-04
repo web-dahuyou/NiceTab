@@ -465,15 +465,21 @@ export function useTreeData() {
     targetTabListLength = 0,
   }) => {
     if (actionType === 'opened2tab') {
-      await tabListUtils.onOpenedTabDrop(sourceData, targetData, targetIndex);
+      await tabListUtils.onOpenedTabsDrop(sourceData, targetData, targetIndex);
       refreshTreeData();
       return;
     }
 
     let _targetIndex = targetIndex;
-    if (actionType === 'tab2group') {
+    if (['opened2group', 'tab2group'].includes(actionType)) {
       const settings = await settingsUtils.getSettings();
       _targetIndex = settings[TAB_INSERT_POSITION] === 'bottom' ? targetTabListLength : 0;
+    }
+
+    if (actionType === 'opened2group') {
+      await tabListUtils.onOpenedTabsDrop(sourceData, targetData, _targetIndex);
+      refreshTreeData();
+      return;
     }
 
     if (sourceData.isMultiSelect) {

@@ -73,6 +73,7 @@ export default function TabGroupItem({
                 index,
                 groupId: group.groupId,
                 dndKey,
+                from: 'opened-tabs',
                 selectedTabs: [tab],
               }}
               mainField="id"
@@ -113,6 +114,7 @@ export default function TabGroupItem({
                 index,
                 groupId: String(group.groupId),
                 dndKey,
+                from: 'opened-tabs',
                 selectedTabs: [tab],
               }}
               mainField="id"

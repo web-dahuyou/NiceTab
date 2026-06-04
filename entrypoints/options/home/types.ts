@@ -68,6 +68,7 @@ export type CascaderOption = {
   parentKey?: string;
 } & Record<string, any>;
 
+export type DragActionType = 'tab2tab' | 'tab2group' | 'opened2tab' | 'opened2group';
 // 拖拽tab数据
 export type DndTabItemProps = TabItem &
   DragData & {
@@ -88,7 +89,7 @@ export type DndTabItemOnDropCallback = ({
   targetData: Pick<DndTabItemProps, 'groupId' | 'index'> & DragData;
   sourceIndex: number;
   targetIndex: number;
-  actionType?: 'tab2tab' | 'tab2group' | 'opened2tab' | 'opened2group';
+  actionType?: DragActionType;
   targetTabListLength?: number;
 }) => void;
 

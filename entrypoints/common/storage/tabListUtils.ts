@@ -1325,7 +1325,11 @@ export default class TabListUtils {
     await this.setTagList(tagList);
   }
   // 打开的浏览器标签页拖拽到列表
-  async onOpenedTabDrop(sourceData: DragData, targetData: DragData, targetIndex: number) {
+  async onOpenedTabsDrop(
+    sourceData: DragData,
+    targetData: DragData,
+    targetIndex: number,
+  ) {
     const selectedTabs: Tabs.Tab[] = sourceData.selectedTabs || [];
     if (!selectedTabs.length) return;
 

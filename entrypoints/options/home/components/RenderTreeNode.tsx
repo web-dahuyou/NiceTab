@@ -7,7 +7,7 @@ import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import EditInput from '~/entrypoints/options/components/EditInput';
 import DropComponent from '~/entrypoints/common/components/DropComponent';
 import { dndKeys } from '../constants';
-import type { RenderTreeNodeProps, TreeDataNodeTabGroup } from '../types';
+import type { RenderTreeNodeProps, TreeDataNodeTabGroup, DragActionType } from '../types';
 import { StyledTreeNodeItem } from '../Home.styled';
 import { type TreeDataHookProps } from '../hooks/treeData';
 import { eventEmitter as homeEventEmitter } from '../hooks/homeCustomEvent';
@@ -78,15 +78,20 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
     params => {
       const targetTabListLength =
         (node as TreeDataNodeTabGroup)?.originData?.tabList?.length || 0;
+
+      const _params = {
+        ...params,
+        actionType: 'tab2group' as DragActionType,
+        targetTabListLength,
+      };
+      // 从已打开的浏览器标签页拖拽到树节点
+      if (params?.sourceData?.from === 'opened-tabs') {
+        _params.actionType = 'opened2group';
+      }
+
       homeEventEmitter.emit('home:treeDataHook', {
         action: 'handleTabItemDrop',
-        params: [
-          {
-            ...params,
-            actionType: 'tab2group',
-            targetTabListLength,
-          },
-        ],
+        params: [_params],
       });
     },
     [node],

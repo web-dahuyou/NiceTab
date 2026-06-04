@@ -41,6 +41,7 @@ const StyledPreviewBox = styled.div`
 `;
 
 export type DraggableStateType = 'idle' | 'preview' | 'dragging';
+export type DragFromType = 'opened-tabs' | 'tree-node' | 'tab-list'; // 拖拽源
 
 export type DraggableStateItem =
   | { type: 'idle' }
@@ -55,6 +56,7 @@ export type DragData = Record<string | symbol, any> & {
   selectedValues?: Array<string | number>;
   isDragging?: boolean;
   draggableState?: DraggableStateItem;
+  from?: DragFromType;
 };
 
 type OnDropCallback<T extends DragData> = ({
