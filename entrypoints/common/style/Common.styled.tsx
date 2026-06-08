@@ -43,10 +43,10 @@ export const StyledActionIconBtn = styled.i<{
     transform 0.2s,
     color 0.2s;
   cursor: pointer;
+  transform: scale(1);
   ${props =>
     props.disabled
       ? `
-        transform: scale(1);
         color: ${props.theme.colorTextDisabled || 'rgba(0,0,0,0.25)'};
         cursor: not-allowed;
       `

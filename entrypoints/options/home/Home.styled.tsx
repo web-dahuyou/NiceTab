@@ -123,62 +123,6 @@ export const StyledRightPanelWrapper = styled(StyledBaseRightPanelWrapper)<{
       width: 100%;
       display: block;
     }
-
-    .opened-tab-group {
-      margin-bottom: 12px;
-
-      .group-header {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        cursor: pointer;
-        padding: 4px 0;
-        font-size: 12px;
-        color: ${props => props.theme.colorTextSecondary || '#666'};
-        user-select: none;
-
-        .group-name {
-          ${StyledEllipsis}
-          flex: 1;
-        }
-
-        .group-count {
-          flex-shrink: 0;
-          color: ${props => props.theme.colorTextQuaternary || '#999'};
-        }
-      }
-
-      .group-tabs {
-        .opened-tab-item {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          padding: 2px 4px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 12px;
-
-          &:hover {
-            background: ${props => props.theme.colorFillSecondary || 'rgba(0,0,0,0.04)'};
-          }
-
-          .tab-favicon {
-            width: 16px;
-            height: 16px;
-            flex-shrink: 0;
-          }
-
-          .tab-title {
-            ${StyledEllipsis}
-            flex: 1;
-          }
-
-          &.active {
-            background: ${props => props.theme.colorPrimaryBg || 'rgba(22,119,255,0.1)'};
-          }
-        }
-      }
-    }
   }
 `;
 

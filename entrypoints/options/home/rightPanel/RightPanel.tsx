@@ -1,13 +1,16 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { browser, Tabs } from 'wxt/browser';
 import { Empty, Checkbox } from 'antd';
+import type { CheckboxProps } from 'antd';
+import { CloseOutlined, CoffeeOutlined } from '@ant-design/icons';
 import { isGroupSupported, classNames } from '~/entrypoints/common/utils';
 import { getAdminTabInfo } from '~/entrypoints/common/tabs';
-import { TAB_EVENTS } from '~/entrypoints/common/constants';
+import { TAB_EVENTS, ENUM_COLORS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
-import type { DraggableStateItem } from '~/entrypoints/common/components/DndComponent';
 import ToggleSidebarBtn from '../../components/ToggleSidebarBtn';
+import ActionBtnList, { type ActionOptionItem } from '../../components/ActionBtnList';
 import { StyledRightPanelWrapper } from '../Home.styled';
+import { StyledOpenedTabsActions } from './OpenedTabs.styled';
 import TabGroupItem, { type TabGroupItemProps } from './TabGroupItem';
 import type { TabItemProps, QuickSelectFunc } from './TabItem';
 
@@ -113,6 +116,66 @@ export default function RightPanel({
     [],
   );
 
+  // 批量删除
+  const handleBatchRemove = useCallback(async () => {
+    if (selectedTabIds.length === 0) return;
+
+    await browser.tabs.remove(selectedTabIds);
+    setSelectedTabIds([]);
+    initTabs();
+  }, [selectedTabIds, initTabs]);
+
+  // 批量休眠
+  const handleBatchDiscard = useCallback(async () => {
+    if (selectedTabIds.length === 0) return;
+
+    const discardableTabs = selectedTabs.filter(tab => !tab.active && !tab.discarded);
+    const discardableTabIds = discardableTabs.map(tab => tab.id!).filter(Boolean);
+
+    if (discardableTabIds.length > 0) {
+      await Promise.all(discardableTabIds.map(id => browser.tabs.discard(id)));
+      setSelectedTabIds([]);
+      initTabs();
+    }
+  }, [selectedTabs, initTabs]);
+
+  // 全选相关
+  const isAllChecked = useMemo(() => {
+    return tabs.length > 0 && selectedTabIds.length === tabs.length;
+  }, [tabs, selectedTabIds]);
+
+  const checkAllIndeterminate = useMemo(() => {
+    return selectedTabIds.length > 0 && selectedTabIds.length < tabs.length;
+  }, [tabs, selectedTabIds]);
+
+  const handleSelectAll: CheckboxProps['onChange'] = e => {
+    const checked = e.target.checked;
+    if (checked) {
+      setSelectedTabIds(tabs.map(tab => tab.id!));
+    } else {
+      setSelectedTabIds([]);
+    }
+  };
+
+  // 批量操作按钮配置
+  const selectedTabsActions: ActionOptionItem[] = useMemo(() => {
+    return [
+      {
+        key: 'discard',
+        label: $fmt('common.hibernate'),
+        icon: <CoffeeOutlined />,
+        onClick: handleBatchDiscard,
+      },
+      {
+        key: 'remove',
+        label: $fmt('common.remove'),
+        icon: <CloseOutlined />,
+        hoverColor: ENUM_COLORS.red,
+        onClick: handleBatchRemove,
+      },
+    ];
+  }, [$fmt, handleBatchRemove, handleBatchDiscard]);
+
   // 快捷选择，起始位置
   const [quickSelectedTabIds, setQuickSelectedTabIds] = useState<number[]>([]);
   const handleTabQuickSelect: QuickSelectFunc = async (tab, selected) => {
@@ -159,13 +222,6 @@ export default function RightPanel({
     };
   }, []);
 
-  const handleDragStateChange = useCallback(
-    (value: DraggableStateItem, tab: Tabs.Tab) => {
-      console.log('rightPanel--handleDragStateChange', value, tab);
-    },
-    [],
-  );
-
   return (
     <StyledRightPanelWrapper className="opened-tabs-panel" $collapsed={collapsed}>
       <div className={classNames('right-panel-inner-box', collapsed && 'collapsed')}>
@@ -178,6 +234,34 @@ export default function RightPanel({
         </div>
         <div className="right-panel-inner-content">
           <div className="opened-tabs-title">{$fmt('common.openedTabs')}</div>
+
+          {/* 全选和批量操作区域 */}
+          {tabs.length > 0 && (
+            <StyledOpenedTabsActions>
+              <div className="checkall-wrapper">
+                <Checkbox
+                  checked={isAllChecked}
+                  indeterminate={checkAllIndeterminate}
+                  onChange={handleSelectAll}
+                />
+                <span
+                  className="selected-count-text"
+                  style={{ color: ENUM_COLORS.volcano }}
+                >
+                  {`${selectedTabIds.length} / ${tabs.length}`}
+                </span>
+              </div>
+              {selectedTabIds.length > 0 && (
+                <ActionBtnList
+                  actionBtnStyle="icon"
+                  outerList={selectedTabsActions}
+                  iconSize={14}
+                  gap={10}
+                />
+              )}
+            </StyledOpenedTabsActions>
+          )}
+
           <div className="opened-tabs-list">
             {tabGroupList?.length > 0 || loading ? (
               <Checkbox.Group
@@ -191,7 +275,6 @@ export default function RightPanel({
                     group={group}
                     selectedTabs={selectedTabs}
                     quickSelectedTabIds={quickSelectedTabIds}
-                    onDragStateChange={handleDragStateChange}
                     onAction={handleTabAction}
                     onQuickSelect={handleTabQuickSelect}
                   />

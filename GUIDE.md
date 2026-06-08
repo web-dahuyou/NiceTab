@@ -123,7 +123,7 @@ These two functions are located in the `Navigation Bar "Actions" dropdown option
 
 ## Management Dashboard - List
 
-The List page uses a `Category > Tab Group > Tab` hierarchical structure for tab management. It consists of a left **Directory Tree** (category and tab group directory) and a right **List Panel** (all tab groups in the currently selected category and all tabs within those tab groups).
+The List page uses a `Category > Tab Group > Tab` hierarchical structure for tab management. It consists of a left **Directory Tree** (category and tab group directory), a tab list in the middle g (all tab groups in the currently selected category and all tabs within those tab groups) and a right list panel **Opened Tabs Panel** (the tab list of the currently opened tabs/tab groups).
 
 ### Directory Tree
 
@@ -133,16 +133,16 @@ The left directory tree is like a folder, managing categories and tab groups, an
 - The categories support expanding/collapsing, deleting and locking; **the locked categories switch to read-only mode, preventing accidental operations**.
 - The categories support creating tab groups, one-click moving of tab groups from a category to other categories.
 - Categories/Tab Groups support renaming, deleting, and can be dragged and dropped across categories.
-- Clicking a category or tab group selects the corresponding category or tab group, while the right panel displays all tab groups under that category and the tab list within those tab groups.
+- Clicking a category or tab group selects the corresponding category or tab group, while the **Stored Tab List** displays all tab groups under that category and the tab list within those tab groups.
 - Selected categories/tab groups support shortcut operations for moving up/down (these shortcuts only apply to the directory tree and are not yet customizable).
   - Move Up: macOS (⌥ + ⇧ + ↑) Windows (Alt + Shift + ↑)
   - Move Down: macOS (⌥ + ⇧ + ↓) Windows (Alt + Shift + ↓)
 
-### Right Panel
+### Stored Tab List
 
-The right panel displays all tab groups in the currently selected category and all tabs within those tab groups, rendered using virtual scrolling list.
+The **Stored Tab List** displays all tab groups in the currently selected category and all tabs within those tab groups, rendered using virtual scrolling list.
 
-The right panel presents by group. Tab groups here support renaming, deleting, opening to browser, locking, starring, cloning, copying links, deduplication, etc.
+The **Stored Tab List** presents by group. Tab groups here support renaming, deleting, opening to browser, locking, starring, cloning, copying links, deduplication, etc.
 
 **Tab Group Operations**:
 - **Rename**: Click the edit icon to rename (group name has character length limit).
@@ -167,6 +167,11 @@ The right panel presents by group. Tab groups here support renaming, deleting, o
 - After multi-selecting tabs, you can batch remove, open, move to, batch drag-and-drop move, copy links, clone, etc.
 - **Tip**: You can also drag tabs and drop to a tab group in the left directory tree for quick moving.
 
+### Opened Tabs Panel
+
+The v2.9.0 version added a "Opened Tabs Panel" on the right side of the page.
+
+The collapsible panel on the right side of the page displays the opened tabs and tab groups in the current browser window. The tabs in this panel support quick and multiple selections, batch dragging and drop to the **Stored Tab List** and the tree node on the left of the page.
 
 ## Management Dashboard - Preferences
 

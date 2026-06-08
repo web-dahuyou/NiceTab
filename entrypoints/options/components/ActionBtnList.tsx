@@ -21,11 +21,13 @@ export default function ActionBtnList({
   outerList = [],
   innerList = [],
   iconSize = 16,
+  gap = 20,
 }: {
   actionBtnStyle?: ActionBtnStyle;
   outerList: ActionOptionItem[];
   innerList?: ActionOptionItem[];
   iconSize?: number;
+  gap?: number;
 }) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
@@ -33,7 +35,7 @@ export default function ActionBtnList({
   return (
     <Space
       className="group-action-btns"
-      size={actionBtnStyle === 'text' ? 0 : 20}
+      size={actionBtnStyle === 'text' ? 0 : gap}
       split={
         actionBtnStyle === 'text' ? (
           <Divider type="vertical" style={{ background: token.colorBorder }} />

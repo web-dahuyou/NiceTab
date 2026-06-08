@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
+import type { StyledThemeProps } from '~/entrypoints/types';
 
 export const StyledGroupWrapper = styled.div<{ $color?: string }>`
   margin-bottom: 4px;
@@ -98,6 +99,34 @@ export const StyledTabItem = styled.div`
     .tab-item-title,
     .btn-discarded {
       color: ${props => props.theme.colorTextQuaternary || 'rgba(0, 0, 0, 0.25)'};
+    }
+  }
+`;
+
+export const StyledOpenedTabsActions = styled.div<{ theme: StyledThemeProps }>`
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 26px;
+  margin: 8px 0;
+  font-size: 12px;
+  user-select: none;
+  .checkall-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .tab-action-btns {
+    margin: 4px 0;
+    font-size: 12px;
+    .action-btn {
+      display: flex;
+      align-items: center;
+      color: ${props => props.theme.colorTextSecondary || '#333'};
+      cursor: pointer;
+      &:hover {
+        color: ${props => props.theme.colorPrimary || '#1677ff'};
+      }
     }
   }
 `;
