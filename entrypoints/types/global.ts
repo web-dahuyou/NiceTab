@@ -99,6 +99,9 @@ export type TabEvents =
   | 'onUpdated'
   | 'onHighlighted';
 
+// 标签组事件
+export type TabGroupEvents = 'onCreated' | 'onMoved' | 'onRemoved' | 'onUpdated';
+
 // 操作名称
 export type ActionNames =
   | 'openAdminTab'

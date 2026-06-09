@@ -55,7 +55,7 @@ export default function FormModuleDisplay(
   return (
     <Form.Item noStyle {...formItemProps}>
       {/* 标签组和标签页操作按钮样式 */}
-      <Form.Item<SettingsProps>
+      {/* <Form.Item<SettingsProps>
         label={$fmt(`settings.${GROUP_ACTION_BTN_STYLE}`)}
         name={GROUP_ACTION_BTN_STYLE}
       >
@@ -63,7 +63,7 @@ export default function FormModuleDisplay(
           <Radio value="text">{$fmt('common.text')}</Radio>
           <Radio value="icon">{$fmt('common.icon')}</Radio>
         </Radio.Group>
-      </Form.Item>
+      </Form.Item> */}
 
       {/* 设置常用的标签组按钮 */}
       <Form.Item<SettingsProps>
@@ -145,7 +145,7 @@ export default function FormModuleDisplay(
       </Form.Item> */}
 
       {/* 是否显示标签页标题的tooltip */}
-      <Form.Item<SettingsProps>
+      {/* <Form.Item<SettingsProps>
         label={$fmt(`settings.${SHOW_TAB_TITLE_TOOLTIP}`)}
         name={SHOW_TAB_TITLE_TOOLTIP}
       >
@@ -153,7 +153,7 @@ export default function FormModuleDisplay(
           <Radio value={true}>{$fmt('common.yes')}</Radio>
           <Radio value={false}>{$fmt('common.no')}</Radio>
         </Radio.Group>
-      </Form.Item>
+      </Form.Item> */}
     </Form.Item>
   );
 }

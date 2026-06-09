@@ -1,6 +1,12 @@
 import { Key } from 'react';
 import { Tabs } from 'wxt/browser';
 // import { storage } from 'wxt/storage';
+import dayjs from 'dayjs';
+import {
+  // attachInstruction,
+  extractInstruction,
+  type Instruction,
+} from '@atlaskit/pragmatic-drag-and-drop-hitbox/tree-item';
 import type {
   SendTargetProps,
   TagItem,
@@ -12,7 +18,6 @@ import type {
   SnapshotItem,
   InsertPositions,
 } from '~/entrypoints/types';
-import dayjs from 'dayjs';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import type { DragData } from '~/entrypoints/common/components/DndComponent';
 import { ENUM_SETTINGS_PROPS, UNNAMED_TAG, UNNAMED_GROUP } from '../constants';
@@ -1369,23 +1374,57 @@ export default class TabListUtils {
     const settings = await Store.settingsUtils.getSettings();
     const tagList = await this.getTagList();
 
-    for (let tag of tagList) {
-      if (tag.tagId !== targetData.tagId) continue;
-      const targetIndex =
-        settings[TAB_INSERT_POSITION] === 'bottom' ? tag.groupList?.length || 0 : 0;
+    const instruction: Instruction | null = extractInstruction(targetData);
+    const targetTagIndex = tagList.findIndex(tag => tag.tagId === targetData.tagId);
+    // 入参 targetData 类型为 DragData，需要获取 tagList 中对应的分类数据，数据类型为 TagItem
+    let _targetData = tagList[targetTagIndex];
+    let targetGroupIndex = 0;
+    let targetGroupLength = targetData.nodeData?.groupList?.length || 0;
 
-      const newGroup = {
-        ...this.getInitialTabGroup(),
-        groupName: sourceData?.selectedGroup?.groupName || sourceData?.groupName,
-        tabList: (sourceData?.selectedGroup?.tabs || sourceData?.tabs || [])?.map?.(
-          (tab: Tabs.Tab) => ({
-            tabId: getRandomId(),
-            ...pick(tab, ['title', 'url', 'favIconUrl']),
-          }),
-        ),
-      };
-      tag.groupList?.splice(targetIndex, 0, newGroup);
+    if (targetData.nodeType === 'tag') {
+      // 如果是 'make-child'，则说明拖拽到当前的分类节点
+      if (instruction?.type === 'make-child') {
+        targetGroupIndex =
+          settings[GROUP_INSERT_POSITION] === 'bottom' ? targetGroupLength : 0;
+      }
+      // 如果是 'reorder-above'，则说明拖拽到当前的分类前一个节点末尾
+      else if (instruction?.type === 'reorder-above') {
+        if (targetTagIndex > 0) {
+          _targetData = tagList[targetTagIndex - 1];
+          targetGroupIndex = _targetData.groupList?.length || 0;
+        }
+      }
+      // 如果是 'reorder-below'，则说明拖拽到当前的分类节点末尾
+      else if (instruction?.type === 'reorder-below') {
+        targetGroupIndex = targetGroupLength;
+      }
+    } else if (targetData.nodeType === 'tabGroup') {
+      const currGroupIndex = _targetData?.groupList?.findIndex(
+        group => group.groupId === targetData.groupId,
+      );
+
+      // 如果是 'reorder-above'，则说明拖拽到当前分组之前
+      if (instruction?.type === 'reorder-above') {
+        targetGroupIndex = currGroupIndex;
+      }
+      // 如果是 'reorder-below'，则说明拖拽到当前分组之后
+      else if (instruction?.type === 'reorder-below') {
+        targetGroupIndex = currGroupIndex + 1;
+      }
     }
+
+    const newGroup = {
+      ...this.getInitialTabGroup(),
+      groupName: sourceData?.selectedGroup?.groupName || sourceData?.groupName,
+      tabList: (sourceData?.selectedGroup?.tabs || sourceData?.tabs || [])?.map?.(
+        (tab: Tabs.Tab) => ({
+          tabId: getRandomId(),
+          ...pick(tab, ['title', 'url', 'favIconUrl']),
+        }),
+      ),
+    };
+    _targetData.groupList?.splice(targetGroupIndex, 0, newGroup);
+
     await this.setTagList(tagList);
   }
 

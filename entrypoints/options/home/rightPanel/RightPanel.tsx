@@ -5,7 +5,11 @@ import type { CheckboxProps } from 'antd';
 import { CloseOutlined, CoffeeOutlined } from '@ant-design/icons';
 import { isGroupSupported, classNames } from '~/entrypoints/common/utils';
 import { getAdminTabInfo } from '~/entrypoints/common/tabs';
-import { TAB_EVENTS, ENUM_COLORS } from '~/entrypoints/common/constants';
+import {
+  TAB_EVENTS,
+  TAB_GROUP_EVENTS,
+  ENUM_COLORS,
+} from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import ToggleSidebarBtn from '../../components/ToggleSidebarBtn';
 import ActionBtnList, { type ActionOptionItem } from '../../components/ActionBtnList';
@@ -237,10 +241,16 @@ export default function RightPanel({
     TAB_EVENTS.forEach(event => {
       browser.tabs[event]?.addListener(initTabs);
     });
+    TAB_GROUP_EVENTS.forEach(event => {
+      browser.tabGroups?.[event]?.addListener(initTabs);
+    });
 
     return () => {
       TAB_EVENTS.forEach(event => {
         browser.tabs[event]?.removeListener(initTabs);
+      });
+      TAB_GROUP_EVENTS.forEach(event => {
+        browser.tabGroups?.[event]?.removeListener(initTabs);
       });
     };
   }, []);

@@ -112,7 +112,7 @@ function TabGroup({
   allowTabActions = defaultTabActions,
   canDrag = true,
   canDrop = true,
-  actionBtnStyle = 'text',
+  actionBtnStyle = 'icon',
   onChange,
   onRemove,
   onCreate,
@@ -291,6 +291,7 @@ function TabGroup({
     const settings = settingsUtils.settings;
     if (settings[DELETE_AFTER_RESTORE] && !group?.isLocked) {
       setSelectedTabIds([]);
+      setQuickSelectedTabIds([]);
     }
   }, [group, selectedTabs]);
 
@@ -302,6 +303,9 @@ function TabGroup({
         callback: () => {
           setSelectedTabIds(selectedTabIds =>
             selectedTabIds.filter(id => !tabs.some(tab => tab.tabId === id)),
+          );
+          setQuickSelectedTabIds(ids =>
+            ids.some(id => tabs.some(tab => tab.tabId === id)) ? [] : ids,
           );
         },
       });
@@ -364,6 +368,9 @@ function TabGroup({
         setSelectedTabIds(ids => {
           return ids.filter(id => !sourceData?.selectedValues?.includes(id));
         });
+        setQuickSelectedTabIds(ids =>
+          ids.some(id => sourceData?.selectedValues?.includes(id)) ? [] : ids,
+        );
       }
     },
     [draggingTabItem, selectedTabIds, setSelectedTabIds],

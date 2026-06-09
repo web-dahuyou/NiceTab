@@ -7,7 +7,7 @@ import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import EditInput from '~/entrypoints/options/components/EditInput';
 import DropComponent from '~/entrypoints/common/components/DropComponent';
 import { dndKeys } from '../constants';
-import type { RenderTreeNodeProps, TreeDataNodeTabGroup, DragActionType } from '../types';
+import type { RenderTreeNodeProps } from '../types';
 import { StyledTreeNodeItem } from '../Home.styled';
 import { type TreeDataHookProps } from '../hooks/treeData';
 import { eventEmitter as homeEventEmitter } from '../hooks/homeCustomEvent';
@@ -87,18 +87,14 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
 
       if (from === 'tab-list') {
         _params.actionType = 'tab2group';
-        _params.targetTabListLength = targetTabListLength;
       }
       // 从已打开的浏览器标签页拖拽到树节点
       else if (from === 'opened-tabs') {
         _params.actionType = 'opened2group';
-        _params.targetTabListLength = targetTabListLength;
       }
       // 从已打开的浏览器标签组拖拽到树节点
       else if (from === 'opened-tab-group') {
-        if (node.type === 'tag') {
-          _params.actionType = 'opened2tag';
-        }
+        _params.actionType = 'opened2tag';
       }
 
       homeEventEmitter.emit('home:treeDataHook', {
@@ -130,7 +126,14 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
       index: 0,
       tagId,
       groupId,
-      allowKeys: node.type === 'tag' ? [dndKeys.tabGroupItem] : [dndKeys.tabItem],
+      nodeType: node.type,
+      nodeName:
+        node.type === 'tag' ? node.originData?.tagName : node.originData?.groupName,
+      nodeData: node.originData,
+      allowKeys:
+        node.type === 'tag'
+          ? [dndKeys.tabGroupItem]
+          : [dndKeys.tabItem, dndKeys.tabGroupItem],
     };
   }, [node]);
 

@@ -1,15 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import {
-  draggable,
+  // draggable,
   dropTargetForElements,
-  monitorForElements,
+  // monitorForElements,
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import {
   attachInstruction,
   extractInstruction,
-  Instruction,
+  type Instruction,
 } from '@atlaskit/pragmatic-drag-and-drop-hitbox/tree-item';
 import { DropIndicator } from '@atlaskit/pragmatic-drag-and-drop-react-drop-indicator/tree-item';
 import { PRIMARY_COLOR } from '~/entrypoints/common/constants';
@@ -24,10 +24,17 @@ const StyledDndWrapper = styled.div`
 `;
 
 // 拖拽数据类型
-type DropTargetData = Record<string | symbol, any> & {
+export type DropTargetData = Record<string | symbol, any> & {
   index: number;
   allowKeys: Symbol[];
   groupId?: string;
+};
+
+export type DropTargetProps<T> = {
+  sourceData: T;
+  targetData: T;
+  sourceIndex: number;
+  targetIndex: number;
 };
 
 type OnDropCallback<T extends DropTargetData> = ({
@@ -35,12 +42,7 @@ type OnDropCallback<T extends DropTargetData> = ({
   targetData,
   sourceIndex,
   targetIndex,
-}: {
-  sourceData: T;
-  targetData: T;
-  sourceIndex: number;
-  targetIndex: number;
-}) => void;
+}: DropTargetProps<T>) => void;
 
 export default function DropComponent<IncomeData extends DropTargetData>({
   data,
@@ -71,7 +73,7 @@ export default function DropComponent<IncomeData extends DropTargetData>({
             currentLevel: 0,
             indentPerLevel: 10,
             mode: 'expanded',
-            block: ['reorder-above', 'reorder-below', 'reparent'],
+            // block: ['reorder-above', 'reorder-below', 'reparent'],
           });
         },
         canDrop({ source }) {
@@ -86,8 +88,26 @@ export default function DropComponent<IncomeData extends DropTargetData>({
           }
 
           const instruction: Instruction | null = extractInstruction(self.data);
-          if (instruction?.type === 'make-child') {
-            setInstruction(instruction);
+          // console.log('dropTargetForElements-onDrag-instruction', instruction);
+          // console.log('dropTargetForElements-onDrag-self', self);
+          // console.log('dropTargetForElements-onDrag-source', source);
+          const dragFrom = source.data?.from || 'tab-list';
+          if (dragFrom === 'tab-list' || dragFrom === 'opened-tabs') {
+            if (instruction?.type === 'make-child') {
+              setInstruction(instruction);
+            } else {
+              setInstruction(null);
+            }
+          } else if (dragFrom === 'opened-tab-group') {
+            if (instruction?.type === 'make-child') {
+              if (self.data?.groupId) {
+                setInstruction(null);
+              } else {
+                setInstruction(instruction);
+              }
+            } else {
+              setInstruction(instruction);
+            }
           } else {
             setInstruction(null);
           }

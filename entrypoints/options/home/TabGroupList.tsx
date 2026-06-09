@@ -77,7 +77,8 @@ const ListItem = memo(
         //   !virtual && tabGroup.key === selectedTabGroupKey ? refreshKey : undefined
         // }
         {...tabGroup?.originData}
-        actionBtnStyle={settings.groupActionBtnStyle || 'text'}
+        // actionBtnStyle={settings.groupActionBtnStyle || 'icon'}
+        actionBtnStyle="icon"
         onChange={data => handleTabGroupChange(tabGroup, data)}
         onRemove={() => handleTabGroupRemove(tabGroup)}
         onCreate={handleTabGroupCreate}

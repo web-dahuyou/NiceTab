@@ -89,14 +89,12 @@ export type DndTabItemOnDropCallback = ({
   sourceIndex,
   targetIndex,
   actionType,
-  targetTabListLength,
 }: {
   sourceData: Pick<DndTabItemProps, 'groupId' | 'index'> & DragData;
   targetData: Pick<DndTabItemProps, 'groupId' | 'index'> & DragData;
   sourceIndex: number;
   targetIndex: number;
   actionType?: DragActionType;
-  targetTabListLength?: number;
 }) => void;
 
 // 标签组操作 remove-删除 rename-重命名 restore-恢复 lock-锁定 star-星标 recover-从回收站复原到列表页

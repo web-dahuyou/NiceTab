@@ -18,6 +18,7 @@ import type {
   ColorItem,
   ThemeColors,
   TabEvents,
+  TabGroupEvents,
   SyncType,
   AutoSyncType,
   AutoSyncTimeUnits,
@@ -203,6 +204,13 @@ export const TAB_EVENTS: Array<keyof Pick<Tabs.Static, TabEvents>> = [
   'onHighlighted',
 ];
 
+export const TAB_GROUP_EVENTS: Array<keyof Pick<Tabs.Static, TabGroupEvents>> = [
+  'onCreated',
+  'onMoved',
+  'onUpdated',
+  'onRemoved',
+];
+
 // 语言选项
 export const LANGUAGE_OPTIONS: Array<{
   key: LanguageTypes;
@@ -296,6 +304,7 @@ export default {
   ENUM_ACTION_NAME,
   ENUM_SETTINGS_PROPS,
   TAB_EVENTS,
+  TAB_GROUP_EVENTS,
   LANGUAGE_OPTIONS,
   defaultLanguage,
   defaultAutoSyncType,

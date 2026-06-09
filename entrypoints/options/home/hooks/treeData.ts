@@ -462,8 +462,10 @@ export function useTreeData() {
     sourceIndex,
     targetIndex,
     actionType = 'tab2tab',
-    targetTabListLength = 0,
   }) => {
+    // console.log('handleTabItemDrop-sourceData', sourceData);
+    // console.log('handleTabItemDrop-targetData', targetData);
+    // console.log('handleTabItemDrop-actionType', actionType);
     if (actionType === 'opened2tab') {
       await tabListUtils.onOpenedTabsDrop(sourceData, targetData, targetIndex);
       refreshTreeData();
@@ -479,6 +481,7 @@ export function useTreeData() {
     let _targetIndex = targetIndex;
     if (['opened2group', 'tab2group'].includes(actionType)) {
       const settings = await settingsUtils.getSettings();
+      const targetTabListLength = targetData.nodeData?.tabList?.length || 0;
       _targetIndex = settings[TAB_INSERT_POSITION] === 'bottom' ? targetTabListLength : 0;
     }
 
