@@ -13,6 +13,19 @@ import { StyledRightPanelWrapper } from '../Home.styled';
 import { StyledOpenedTabsActions } from './OpenedTabs.styled';
 import TabGroupItem, { type TabGroupItemProps } from './TabGroupItem';
 import type { TabItemProps, QuickSelectFunc } from './TabItem';
+import DndComponent, {
+  idleState,
+  type DraggableStateItem,
+  type DragData,
+} from '~/entrypoints/common/components/DndComponent';
+import { dndKeys } from '../constants';
+
+const dndKey = dndKeys.tabGroupItem;
+
+export type OpenedGroupDragData = DragData & {
+  selectedGroup: TabGroupItemProps;
+  selectedTabs: Tabs.Tab[];
+};
 
 export default function RightPanel({
   collapsed,
@@ -208,6 +221,16 @@ export default function RightPanel({
     }
   };
 
+  const [draggableState, setDraggableState] = useState<DraggableStateItem>(idleState);
+  const [draggingTabItem, setDraggingTabItem] = useState<Tabs.Tab | null>(null);
+  const handleDragStateChange = useCallback(
+    (value: DraggableStateItem, tabItem: Tabs.Tab) => {
+      setDraggableState(value);
+      setDraggingTabItem(tabItem);
+    },
+    [setDraggableState, setDraggingTabItem],
+  );
+
   useEffect(() => {
     initTabs();
 
@@ -269,15 +292,38 @@ export default function RightPanel({
                 value={selectedTabIds}
                 onChange={setSelectedTabIds}
               >
-                {tabGroupList.map((group, groupIndex) => (
-                  <TabGroupItem
-                    key={~group.groupId || groupIndex}
-                    group={group}
-                    selectedTabs={selectedTabs}
-                    quickSelectedTabIds={quickSelectedTabIds}
-                    onAction={handleTabAction}
-                    onQuickSelect={handleTabQuickSelect}
-                  />
+                {tabGroupList.map((group, index) => (
+                  <DndComponent<OpenedGroupDragData>
+                    key={`opened-group-${index}`}
+                    canDrag={group.groupId !== -1}
+                    canDrop={false}
+                    dndKey={dndKey}
+                    data={{
+                      ...group,
+                      index,
+                      groupId: group.groupId,
+                      dndKey,
+                      from: 'opened-tab-group',
+                      selectedValues: selectedTabIds,
+                      selectedGroup: group,
+                      selectedTabs,
+                    }}
+                    mainField="groupId"
+                    showDragPreview
+                    previewContent={group.groupName}
+                  >
+                    <TabGroupItem
+                      key={~group.groupId || index}
+                      group={group}
+                      selectedTabs={selectedTabs}
+                      quickSelectedTabIds={quickSelectedTabIds}
+                      draggableState={draggableState}
+                      draggingTabItem={draggingTabItem}
+                      onAction={handleTabAction}
+                      onQuickSelect={handleTabQuickSelect}
+                      onDragStateChange={handleDragStateChange}
+                    />
+                  </DndComponent>
                 ))}
               </Checkbox.Group>
             ) : (

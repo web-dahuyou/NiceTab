@@ -1330,7 +1330,13 @@ export default class TabListUtils {
     targetData: DragData,
     targetIndex: number,
   ) {
-    const selectedTabs: Tabs.Tab[] = sourceData.selectedTabs || [];
+    let selectedTabs: Tabs.Tab[] = [];
+    if (sourceData.isMultiSelect) {
+      selectedTabs = sourceData.selectedTabs;
+    } else {
+      selectedTabs = [sourceData.draggingTabItem];
+    }
+
     if (!selectedTabs.length) return;
 
     const tagList = await this.getTagList();
@@ -1357,6 +1363,30 @@ export default class TabListUtils {
     if (isTargetFound) {
       await this.setTagList(tagList);
     }
+  }
+
+  async onOpenedTabGroupDrop(sourceData: DragData, targetData: DragData) {
+    const settings = await Store.settingsUtils.getSettings();
+    const tagList = await this.getTagList();
+
+    for (let tag of tagList) {
+      if (tag.tagId !== targetData.tagId) continue;
+      const targetIndex =
+        settings[TAB_INSERT_POSITION] === 'bottom' ? tag.groupList?.length || 0 : 0;
+
+      const newGroup = {
+        ...this.getInitialTabGroup(),
+        groupName: sourceData?.selectedGroup?.groupName || sourceData?.groupName,
+        tabList: (sourceData?.selectedGroup?.tabs || sourceData?.tabs || [])?.map?.(
+          (tab: Tabs.Tab) => ({
+            tabId: getRandomId(),
+            ...pick(tab, ['title', 'url', 'favIconUrl']),
+          }),
+        ),
+      };
+      tag.groupList?.splice(targetIndex, 0, newGroup);
+    }
+    await this.setTagList(tagList);
   }
 
   // tab标签页移动到（穿越）

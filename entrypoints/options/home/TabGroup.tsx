@@ -206,7 +206,7 @@ function TabGroup({
 
   // 已选择的tabItem数组
   const selectedTabs = useMemo(() => {
-    return tabList.filter(tab => selectedTabIds.includes(tab.tabId));
+    return tabList?.filter(tab => selectedTabIds.includes(tab.tabId)) || [];
   }, [tabList, selectedTabIds]);
   // 是否全选
   const isAllChecked = useMemo(() => {
@@ -340,7 +340,6 @@ function TabGroup({
   );
   // 拖放到目标元素时触发 (targetData.groupId = 当前的groupId)
   const handleTabItemDrop: DndTabItemOnDropCallback = useCallback((...params) => {
-    console.log('tabGroup--handleTabItemDrop', params);
     const params0 = { ...(params[0] || {}) };
 
     // 从已打开的浏览器标签页拖拽到列表标签页
@@ -727,6 +726,7 @@ function TabGroup({
                         index,
                         groupId,
                         dndKey,
+                        from: 'tab-list',
                         selectedValues: selectedTabIds,
                         isDragging:
                           draggableState.type !== idleState.type &&

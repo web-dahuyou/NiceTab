@@ -68,7 +68,13 @@ export type CascaderOption = {
   parentKey?: string;
 } & Record<string, any>;
 
-export type DragActionType = 'tab2tab' | 'tab2group' | 'opened2tab' | 'opened2group';
+export type DragActionType =
+  | 'tab2tab'
+  | 'tab2group'
+  | 'opened2tab'
+  | 'opened2group'
+  | 'opened2tag';
+
 // 拖拽tab数据
 export type DndTabItemProps = TabItem &
   DragData & {

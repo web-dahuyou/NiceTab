@@ -470,6 +470,12 @@ export function useTreeData() {
       return;
     }
 
+    if (actionType === 'opened2tag') {
+      await tabListUtils.onOpenedTabGroupDrop(sourceData, targetData);
+      refreshTreeData();
+      return;
+    }
+
     let _targetIndex = targetIndex;
     if (['opened2group', 'tab2group'].includes(actionType)) {
       const settings = await settingsUtils.getSettings();

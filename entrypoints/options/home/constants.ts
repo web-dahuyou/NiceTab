@@ -3,6 +3,7 @@ import { type LocaleKeys } from '~/entrypoints/common/locale';
 // drag and drop keys
 export const dndKeys = {
   tabItem: Symbol('dnd-tab-item'),
+  tabGroupItem: Symbol('dnd-tab-group-item'),
 };
 
 export const defaultGroupActions = [

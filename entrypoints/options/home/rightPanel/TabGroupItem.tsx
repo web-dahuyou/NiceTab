@@ -5,6 +5,7 @@ import { RightOutlined, DownOutlined } from '@ant-design/icons';
 import { classNames } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import DndComponent, {
+  idleState,
   type DraggableStateItem,
   type DragData,
 } from '~/entrypoints/common/components/DndComponent';
@@ -26,12 +27,15 @@ export type TabGroupItemParams = {
   group: TabGroupItemProps;
   selectedTabs: Tabs.Tab[];
   quickSelectedTabIds?: number[];
+  draggableState?: DraggableStateItem;
+  draggingTabItem?: Tabs.Tab | null;
   onAction: TabItemProps['onAction'];
   onDragStateChange?: (value: DraggableStateItem, tab: Tabs.Tab) => void;
   onQuickSelect?: QuickSelectFunc;
 };
 
 export type OpenedTabsDragData = DragData & {
+  id?: Tabs.Tab['id'];
   selectedTabs: Tabs.Tab[];
 };
 
@@ -39,6 +43,8 @@ export default function TabGroupItem({
   group,
   selectedTabs = [],
   quickSelectedTabIds = [],
+  draggableState,
+  draggingTabItem,
   onAction,
   onDragStateChange,
   onQuickSelect,
@@ -84,6 +90,11 @@ export default function TabGroupItem({
                 from: 'opened-tabs',
                 selectedValues: selectedTabIds,
                 selectedTabs,
+                draggingTabItem: { ...tab },
+                isDragging:
+                  draggableState?.type !== idleState.type &&
+                  selectedTabIds.includes(tab.id!) &&
+                  selectedTabIds.includes(draggingTabItem?.id!),
               }}
               mainField="id"
               onDragStateChange={value => onDragStateChange?.(value, tab)}
@@ -115,12 +126,12 @@ export default function TabGroupItem({
       </div>
       <div className="tab-list">
         {group.tabs?.map((tab, index) => {
-          const tabId = String(tab.id ?? `opened-${group.groupId}-${index}`);
+          const tabKey = String(tab.id ?? `opened-${group.groupId}-${index}`);
           const tabTitle = tab.title || tab.url || '';
 
           return (
             <DndComponent<OpenedTabsDragData>
-              key={tabId}
+              key={tabKey}
               canDrag={true}
               canDrop={false}
               dndKey={dndKey}
@@ -132,6 +143,11 @@ export default function TabGroupItem({
                 from: 'opened-tabs',
                 selectedValues: selectedTabIds,
                 selectedTabs,
+                draggingTabItem: { ...tab },
+                isDragging:
+                  draggableState?.type !== idleState.type &&
+                  selectedTabIds.includes(tab.id!) &&
+                  selectedTabIds.includes(draggingTabItem?.id!),
               }}
               mainField="id"
               onDragStateChange={value => onDragStateChange?.(value, tab)}

@@ -41,7 +41,7 @@ const StyledPreviewBox = styled.div`
 `;
 
 export type DraggableStateType = 'idle' | 'preview' | 'dragging';
-export type DragFromType = 'opened-tabs' | 'tree-node' | 'tab-list'; // 拖拽源
+export type DragFromType = 'tree-node' | 'tab-list' | 'opened-tabs' | 'opened-tab-group'; // 拖拽源
 
 export type DraggableStateItem =
   | { type: 'idle' }
@@ -56,6 +56,8 @@ export type DragData = Record<string | symbol, any> & {
   selectedValues?: Array<string | number>;
   isDragging?: boolean;
   draggableState?: DraggableStateItem;
+  isMultiSelect?: boolean;
+  draggingTabItem?: any;
   from?: DragFromType;
 };
 
@@ -88,6 +90,8 @@ export default function DndComponent<IncomeData extends DragData>({
   canDrop = true,
   data,
   mainField, // 区分拖拽元素的唯一标识字段
+  showDragPreview, // 拖拽元素自定义预览
+  previewContent, // 自定义预览内容
   onDragStateChange,
   onDrop, // 目标drop元素会触发
   onSourceDrop, // drag的元素会触发
@@ -98,6 +102,8 @@ export default function DndComponent<IncomeData extends DragData>({
   canDrop?: boolean;
   data: IncomeData;
   mainField: keyof IncomeData;
+  showDragPreview?: boolean;
+  previewContent?: JSX.Element | string;
   onDragStateChange?: (state: DraggableStateItem, data: IncomeData) => void;
   onDrop?: OnDropCallback<IncomeData>;
   onSourceDrop?: OnSourceDropCallback<IncomeData>;
@@ -150,21 +156,29 @@ export default function DndComponent<IncomeData extends DragData>({
           return getDragData();
         },
         onGenerateDragPreview({ nativeSetDragImage }) {
+          const handleDragPreview = () => {
+            setCustomNativeDragPreview({
+              nativeSetDragImage,
+              getOffset: pointerOutsideOfPreview({
+                x: '16px',
+                y: '8px',
+              }),
+              render({ container }) {
+                handleDragStateChange({ type: 'preview', container });
+
+                return () => handleDragStateChange(draggingState);
+              },
+            });
+          };
+
+          if (showDragPreview) {
+            return handleDragPreview();
+          }
           if (!isMultiSelect || !isDragItemSelected) {
             return () => handleDragStateChange(draggingState);
           }
-          setCustomNativeDragPreview({
-            nativeSetDragImage,
-            getOffset: pointerOutsideOfPreview({
-              x: '16px',
-              y: '8px',
-            }),
-            render({ container }) {
-              handleDragStateChange({ type: 'preview', container });
 
-              return () => handleDragStateChange(draggingState);
-            },
-          });
+          handleDragPreview();
         },
         onDragStart() {
           // console.log('--------------draggable--onDragStart', data);
@@ -280,14 +294,15 @@ export default function DndComponent<IncomeData extends DragData>({
     >
       {children}
       {closestEdge && <DropIndicator edge={closestEdge} gap="0px" />}
-      {(data?.selectedValues || [])?.length > 1 &&
+      {(showDragPreview || (data?.selectedValues || [])?.length > 1) &&
         draggableState.type === 'preview' &&
         ReactDOM.createPortal(
           <StyledPreviewBox>
-            {$fmt({
-              id: 'home.tab.selectedCount',
-              values: { count: data?.selectedValues?.length || 0 },
-            })}
+            {previewContent ||
+              $fmt({
+                id: 'home.tab.selectedCount',
+                values: { count: data?.selectedValues?.length || 0 },
+              })}
           </StyledPreviewBox>,
           draggableState.container,
         )}
