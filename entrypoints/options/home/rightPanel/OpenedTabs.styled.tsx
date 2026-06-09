@@ -32,6 +32,11 @@ export const StyledGroupWrapper = styled.div<{ $color?: string }>`
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+
+    .group-actions {
+      flex-shrink: 0;
+      padding: 0 8px;
+    }
   }
 
   .tab-list {
@@ -115,19 +120,6 @@ export const StyledOpenedTabsActions = styled.div<{ theme: StyledThemeProps }>`
     display: flex;
     align-items: center;
     gap: 12px;
-  }
-  .tab-action-btns {
-    margin: 4px 0;
-    font-size: 12px;
-    .action-btn {
-      display: flex;
-      align-items: center;
-      color: ${props => props.theme.colorTextSecondary || '#333'};
-      cursor: pointer;
-      &:hover {
-        color: ${props => props.theme.colorPrimary || '#1677ff'};
-      }
-    }
   }
 `;
 

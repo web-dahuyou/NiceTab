@@ -1,15 +1,23 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Tabs } from 'wxt/browser';
-import styled from 'styled-components';
-import { RightOutlined, DownOutlined } from '@ant-design/icons';
+import { browser, Tabs } from 'wxt/browser';
+import {
+  RightOutlined,
+  DownOutlined,
+  CloseOutlined,
+  CoffeeOutlined,
+} from '@ant-design/icons';
 import { classNames } from '~/entrypoints/common/utils';
+import { ENUM_COLORS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import DndComponent, {
   idleState,
   type DraggableStateItem,
   type DragData,
 } from '~/entrypoints/common/components/DndComponent';
-import TabItem, { type TabItemProps, QuickSelectFunc } from './TabItem';
+import ActionBtnList, {
+  type ActionOptionItem,
+} from '@/entrypoints/common/components/ActionBtnList';
+import TabItem, { type TabItemProps, type TabActions, QuickSelectFunc } from './TabItem';
 import { StyledGroupWrapper } from './OpenedTabs.styled';
 import { dndKeys } from '../constants';
 
@@ -32,6 +40,7 @@ export type TabGroupItemParams = {
   onAction: TabItemProps['onAction'];
   onDragStateChange?: (value: DraggableStateItem, tab: Tabs.Tab) => void;
   onQuickSelect?: QuickSelectFunc;
+  onGroupAction?: (action: TabActions, group: TabGroupItemProps) => void;
 };
 
 export type OpenedTabsDragData = DragData & {
@@ -48,6 +57,7 @@ export default function TabGroupItem({
   onAction,
   onDragStateChange,
   onQuickSelect,
+  onGroupAction,
 }: TabGroupItemParams) {
   const { $fmt } = useIntlUtls();
   const [collapsed, setCollapsed] = useState(group.collapsed);
@@ -70,6 +80,45 @@ export default function TabGroupItem({
       autoFocus();
     }, 30);
   }, [autoFocus]);
+
+  // 分组级批量操作
+  const handleGroupDiscard = useCallback(async () => {
+    const discardableTabs = group.tabs.filter(tab => !tab.active && !tab.discarded);
+    const discardableTabIds = discardableTabs.map(tab => tab.id!).filter(Boolean);
+    if (discardableTabIds.length > 0) {
+      await Promise.all(discardableTabIds.map(id => browser.tabs.discard(id)));
+      onGroupAction?.('discard', group);
+    }
+  }, [group, onGroupAction]);
+
+  const handleGroupRemove = useCallback(async () => {
+    const tabIds = group.tabs.map(tab => tab.id!).filter(Boolean);
+    if (tabIds.length > 0) {
+      await browser.tabs.remove(tabIds);
+      onGroupAction?.('remove', group);
+    }
+  }, [group, onGroupAction]);
+
+  const groupActions: ActionOptionItem[] = useMemo(() => {
+    const discardableTabs = group.tabs.filter(tab => !tab.active && !tab.discarded);
+
+    return [
+      {
+        key: 'discard',
+        label: $fmt('common.hibernate'),
+        icon: <CoffeeOutlined />,
+        disabled: !discardableTabs?.length,
+        onClick: handleGroupDiscard,
+      },
+      {
+        key: 'remove',
+        label: $fmt('common.remove'),
+        icon: <CloseOutlined />,
+        hoverColor: ENUM_COLORS.red,
+        onClick: handleGroupRemove,
+      },
+    ];
+  }, [group]);
 
   // 如果是未分组的标签（groupId === -1），直接渲染标签项列表
   if (group.groupId === -1) {
@@ -123,6 +172,9 @@ export default function TabGroupItem({
           {collapsed ? <RightOutlined /> : <DownOutlined />}
         </div>
         <div className="group-name">{group.groupName}</div>
+        <div className="group-actions" onClick={e => e.stopPropagation()}>
+          <ActionBtnList actionBtnStyle="icon" outerList={groupActions} gap={8} />
+        </div>
       </div>
       <div className="tab-list">
         {group.tabs?.map((tab, index) => {

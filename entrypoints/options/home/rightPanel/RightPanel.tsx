@@ -11,8 +11,10 @@ import {
   ENUM_COLORS,
 } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import ActionBtnList, {
+  type ActionOptionItem,
+} from '@/entrypoints/common/components/ActionBtnList';
 import ToggleSidebarBtn from '../../components/ToggleSidebarBtn';
-import ActionBtnList, { type ActionOptionItem } from '../../components/ActionBtnList';
 import { StyledRightPanelWrapper } from '../Home.styled';
 import { StyledOpenedTabsActions } from './OpenedTabs.styled';
 import TabGroupItem, { type TabGroupItemProps } from './TabGroupItem';
@@ -132,6 +134,11 @@ export default function RightPanel({
     },
     [],
   );
+
+  // 分组操作回调
+  const handleGroupAction = useCallback(() => {
+    initTabs();
+  }, [initTabs]);
 
   // 批量删除
   const handleBatchRemove = useCallback(async () => {
@@ -288,7 +295,6 @@ export default function RightPanel({
                 <ActionBtnList
                   actionBtnStyle="icon"
                   outerList={selectedTabsActions}
-                  iconSize={14}
                   gap={10}
                 />
               )}
@@ -332,6 +338,7 @@ export default function RightPanel({
                       onAction={handleTabAction}
                       onQuickSelect={handleTabQuickSelect}
                       onDragStateChange={handleDragStateChange}
+                      onGroupAction={handleGroupAction}
                     />
                   </DndComponent>
                 ))}

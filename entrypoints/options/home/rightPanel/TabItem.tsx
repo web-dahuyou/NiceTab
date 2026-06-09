@@ -78,7 +78,7 @@ export default function TabItem({
 
       {!tab.active && (
         <StyledActionIconBtn
-          className={classNames('action-icon-btn', tab.discarded && 'btn-discarded')}
+          className={classNames('action-icon-btn', tab.discarded && 'disabled')}
           $size={16}
           title={$fmt(tab.discarded ? 'common.hibernated' : 'common.hibernate')}
           onClick={event => handleAction(event, 'discard')}
