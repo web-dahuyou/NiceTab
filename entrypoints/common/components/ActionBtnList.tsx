@@ -1,10 +1,12 @@
+import type { GetProp, MenuProps } from 'antd';
 import { theme, Space, Divider, Dropdown } from 'antd';
 import { MoreOutlined } from '@ant-design/icons';
 import { ActionBtnStyle } from '~/entrypoints/types';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import ActionIconBtn from '~/entrypoints/common/components/ActionIconBtn.tsx';
 
-export interface ActionOptionItem {
+type menuItem = GetProp<MenuProps, 'items'>[number];
+export type ActionOptionItem = menuItem & {
   key: string;
   label: string;
   icon?: React.ReactNode;
@@ -19,11 +21,13 @@ export default function ActionBtnList({
   outerList = [],
   innerList = [],
   iconSize = 16,
+  gap = 20,
 }: {
   actionBtnStyle?: ActionBtnStyle;
   outerList: ActionOptionItem[];
   innerList?: ActionOptionItem[];
   iconSize?: number;
+  gap?: number;
 }) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
@@ -31,7 +35,7 @@ export default function ActionBtnList({
   return (
     <Space
       className="group-action-btns"
-      size={actionBtnStyle === 'text' ? 0 : 20}
+      size={actionBtnStyle === 'text' ? 0 : gap}
       split={
         actionBtnStyle === 'text' ? (
           <Divider type="vertical" style={{ background: token.colorBorder }} />

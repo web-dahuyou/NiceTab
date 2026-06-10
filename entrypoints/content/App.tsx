@@ -13,7 +13,7 @@ export default function App() {
   return (
     <ThemeProvider theme={{ ...themeTypeConfig, ...token }}>
       <GlobalStyle />
-      <SendTargetActionHolder></SendTargetActionHolder>
+      <SendTargetActionHolder pageContext="contentScriptPage"></SendTargetActionHolder>
       <GlobalSearchPanel pageContext="contentScriptPage"></GlobalSearchPanel>
     </ThemeProvider>
   );

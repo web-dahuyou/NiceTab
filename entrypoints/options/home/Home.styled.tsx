@@ -1,7 +1,11 @@
 import styled from 'styled-components';
 import { StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
 import type { StyledThemeProps } from '~/entrypoints/types';
-import { StyledBaseSidebarWrapper, StyledBaseMainWrapper } from '../Layout.styled';
+import {
+  StyledBaseSidebarWrapper,
+  StyledBaseMainWrapper,
+  StyledBaseRightPanelWrapper,
+} from '../Layout.styled';
 
 export const StyledMainWrapper = StyledBaseMainWrapper;
 
@@ -86,6 +90,38 @@ export const StyledHelpInfoBox = styled.div`
     list-style-type: disc;
     li {
       margin-bottom: 8px;
+    }
+  }
+`;
+
+export const StyledRightPanelWrapper = styled(StyledBaseRightPanelWrapper)<{
+  theme: StyledThemeProps;
+}>`
+  .right-panel-inner-content {
+    display: flex;
+    flex-direction: column;
+    .opened-tabs-title {
+      flex-shrink: 0;
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    .opened-tabs-list {
+      flex: 1;
+      height: 0;
+      overflow-y: auto;
+      .no-data {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+      }
+    }
+    .tab-list-checkbox-group {
+      width: 100%;
+      display: block;
     }
   }
 `;

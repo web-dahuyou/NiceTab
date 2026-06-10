@@ -39,7 +39,9 @@ import DropComponent from '~/entrypoints/common/components/DropComponent';
 import { HomeContext } from './hooks/treeData';
 import { eventEmitter } from './hooks/homeCustomEvent';
 import EditInput from '../components/EditInput';
-import ActionBtnList, { type ActionOptionItem } from '../components/ActionBtnList';
+import ActionBtnList, {
+  type ActionOptionItem,
+} from '@/entrypoints/common/components/ActionBtnList';
 import TabListItem, { type QuickSelectFunc } from './TabListItem';
 import {
   StyledGroupWrapper,
@@ -112,7 +114,7 @@ function TabGroup({
   allowTabActions = defaultTabActions,
   canDrag = true,
   canDrop = true,
-  actionBtnStyle = 'text',
+  actionBtnStyle = 'icon',
   onChange,
   onRemove,
   onCreate,
@@ -206,7 +208,7 @@ function TabGroup({
 
   // 已选择的tabItem数组
   const selectedTabs = useMemo(() => {
-    return tabList.filter(tab => selectedTabIds.includes(tab.tabId));
+    return tabList?.filter(tab => selectedTabIds.includes(tab.tabId)) || [];
   }, [tabList, selectedTabIds]);
   // 是否全选
   const isAllChecked = useMemo(() => {
@@ -291,6 +293,7 @@ function TabGroup({
     const settings = settingsUtils.settings;
     if (settings[DELETE_AFTER_RESTORE] && !group?.isLocked) {
       setSelectedTabIds([]);
+      setQuickSelectedTabIds([]);
     }
   }, [group, selectedTabs]);
 
@@ -302,6 +305,9 @@ function TabGroup({
         callback: () => {
           setSelectedTabIds(selectedTabIds =>
             selectedTabIds.filter(id => !tabs.some(tab => tab.tabId === id)),
+          );
+          setQuickSelectedTabIds(ids =>
+            ids.some(id => tabs.some(tab => tab.tabId === id)) ? [] : ids,
           );
         },
       });
@@ -340,9 +346,16 @@ function TabGroup({
   );
   // 拖放到目标元素时触发 (targetData.groupId = 当前的groupId)
   const handleTabItemDrop: DndTabItemOnDropCallback = useCallback((...params) => {
+    const params0 = { ...(params[0] || {}) };
+
+    // 从已打开的浏览器标签页拖拽到列表标签页
+    if (params0.sourceData?.from === 'opened-tabs') {
+      params0.actionType = 'opened2tab';
+    }
+
     eventEmitter.emit('home:treeDataHook', {
       action: 'handleTabItemDrop',
-      params,
+      params: [params0],
     });
   }, []);
 
@@ -357,6 +370,9 @@ function TabGroup({
         setSelectedTabIds(ids => {
           return ids.filter(id => !sourceData?.selectedValues?.includes(id));
         });
+        setQuickSelectedTabIds(ids =>
+          ids.some(id => sourceData?.selectedValues?.includes(id)) ? [] : ids,
+        );
       }
     },
     [draggingTabItem, selectedTabIds, setSelectedTabIds],
@@ -719,6 +735,7 @@ function TabGroup({
                         index,
                         groupId,
                         dndKey,
+                        from: 'tab-list',
                         selectedValues: selectedTabIds,
                         isDragging:
                           draggableState.type !== idleState.type &&

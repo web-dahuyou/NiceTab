@@ -1,6 +1,12 @@
 import { Key } from 'react';
 import { Tabs } from 'wxt/browser';
 // import { storage } from 'wxt/storage';
+import dayjs from 'dayjs';
+import {
+  // attachInstruction,
+  extractInstruction,
+  type Instruction,
+} from '@atlaskit/pragmatic-drag-and-drop-hitbox/tree-item';
 import type {
   SendTargetProps,
   TagItem,
@@ -12,7 +18,6 @@ import type {
   SnapshotItem,
   InsertPositions,
 } from '~/entrypoints/types';
-import dayjs from 'dayjs';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import type { DragData } from '~/entrypoints/common/components/DndComponent';
 import { ENUM_SETTINGS_PROPS, UNNAMED_TAG, UNNAMED_GROUP } from '../constants';
@@ -1324,6 +1329,105 @@ export default class TabListUtils {
 
     await this.setTagList(tagList);
   }
+  // 打开的浏览器标签页拖拽到列表
+  async onOpenedTabsDrop(
+    sourceData: DragData,
+    targetData: DragData,
+    targetIndex: number,
+  ) {
+    let selectedTabs: Tabs.Tab[] = [];
+    if (sourceData.isMultiSelect) {
+      selectedTabs = sourceData.selectedTabs;
+    } else {
+      selectedTabs = [sourceData.draggingTabItem];
+    }
+
+    if (!selectedTabs.length) return;
+
+    const tagList = await this.getTagList();
+
+    // 将浏览器 Tab 对象转换为 TabItem 格式
+    const newTabItems: TabItem[] = selectedTabs.map(tab => ({
+      ...tab,
+      tabId: getRandomId(),
+    }));
+
+    // 遍历找到目标标签组并插入
+    let isTargetFound = false;
+    for (let tag of tagList) {
+      for (let group of tag.groupList) {
+        if (group.groupId === targetData.groupId) {
+          group.tabList.splice(targetIndex, 0, ...newTabItems);
+          isTargetFound = true;
+          break;
+        }
+      }
+      if (isTargetFound) break;
+    }
+
+    if (isTargetFound) {
+      await this.setTagList(tagList);
+    }
+  }
+
+  async onOpenedTabGroupDrop(sourceData: DragData, targetData: DragData) {
+    const settings = await Store.settingsUtils.getSettings();
+    const tagList = await this.getTagList();
+
+    const instruction: Instruction | null = extractInstruction(targetData);
+    const targetTagIndex = tagList.findIndex(tag => tag.tagId === targetData.tagId);
+    // 入参 targetData 类型为 DragData，需要获取 tagList 中对应的分类数据，数据类型为 TagItem
+    let _targetData = tagList[targetTagIndex];
+    let targetGroupIndex = 0;
+    let targetGroupLength = targetData.nodeData?.groupList?.length || 0;
+
+    if (targetData.nodeType === 'tag') {
+      // 如果是 'make-child'，则说明拖拽到当前的分类节点
+      if (instruction?.type === 'make-child') {
+        targetGroupIndex =
+          settings[GROUP_INSERT_POSITION] === 'bottom' ? targetGroupLength : 0;
+      }
+      // 如果是 'reorder-above'，则说明拖拽到当前的分类前一个节点末尾
+      else if (instruction?.type === 'reorder-above') {
+        if (targetTagIndex > 0) {
+          _targetData = tagList[targetTagIndex - 1];
+          targetGroupIndex = _targetData.groupList?.length || 0;
+        }
+      }
+      // 如果是 'reorder-below'，则说明拖拽到当前的分类节点末尾
+      else if (instruction?.type === 'reorder-below') {
+        targetGroupIndex = targetGroupLength;
+      }
+    } else if (targetData.nodeType === 'tabGroup') {
+      const currGroupIndex = _targetData?.groupList?.findIndex(
+        group => group.groupId === targetData.groupId,
+      );
+
+      // 如果是 'reorder-above'，则说明拖拽到当前分组之前
+      if (instruction?.type === 'reorder-above') {
+        targetGroupIndex = currGroupIndex;
+      }
+      // 如果是 'reorder-below'，则说明拖拽到当前分组之后
+      else if (instruction?.type === 'reorder-below') {
+        targetGroupIndex = currGroupIndex + 1;
+      }
+    }
+
+    const newGroup = {
+      ...this.getInitialTabGroup(),
+      groupName: sourceData?.selectedGroup?.groupName || sourceData?.groupName,
+      tabList: (sourceData?.selectedGroup?.tabs || sourceData?.tabs || [])?.map?.(
+        (tab: Tabs.Tab) => ({
+          tabId: getRandomId(),
+          ...pick(tab, ['title', 'url', 'favIconUrl']),
+        }),
+      ),
+    };
+    _targetData.groupList?.splice(targetGroupIndex, 0, newGroup);
+
+    await this.setTagList(tagList);
+  }
+
   // tab标签页移动到（穿越）
   async tabMoveThrough({
     sourceGroupId,

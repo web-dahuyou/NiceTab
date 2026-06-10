@@ -462,12 +462,33 @@ export function useTreeData() {
     sourceIndex,
     targetIndex,
     actionType = 'tab2tab',
-    targetTabListLength = 0,
   }) => {
+    // console.log('handleTabItemDrop-sourceData', sourceData);
+    // console.log('handleTabItemDrop-targetData', targetData);
+    // console.log('handleTabItemDrop-actionType', actionType);
+    if (actionType === 'opened2tab') {
+      await tabListUtils.onOpenedTabsDrop(sourceData, targetData, targetIndex);
+      refreshTreeData();
+      return;
+    }
+
+    if (actionType === 'opened2tag') {
+      await tabListUtils.onOpenedTabGroupDrop(sourceData, targetData);
+      refreshTreeData();
+      return;
+    }
+
     let _targetIndex = targetIndex;
-    if (actionType === 'tab2group') {
+    if (['opened2group', 'tab2group'].includes(actionType)) {
       const settings = await settingsUtils.getSettings();
+      const targetTabListLength = targetData.nodeData?.tabList?.length || 0;
       _targetIndex = settings[TAB_INSERT_POSITION] === 'bottom' ? targetTabListLength : 0;
+    }
+
+    if (actionType === 'opened2group') {
+      await tabListUtils.onOpenedTabsDrop(sourceData, targetData, _targetIndex);
+      refreshTreeData();
+      return;
     }
 
     if (sourceData.isMultiSelect) {

@@ -818,7 +818,7 @@ export const GlobalSearchPanel = forwardRef(
         title={$fmt('common.globalSearch')}
         className="global-search-modal"
         width="70%"
-        destroyOnClose
+        destroyOnHidden
         maskClosable
         centered
         getContainer={() => contentContext.rootWrapper}

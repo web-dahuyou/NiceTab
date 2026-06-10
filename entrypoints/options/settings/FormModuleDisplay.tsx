@@ -54,8 +54,8 @@ export default function FormModuleDisplay(
 
   return (
     <Form.Item noStyle {...formItemProps}>
-      {/* 标签组和标签页操作按钮样式 */}
-      <Form.Item<SettingsProps>
+      {/* 标签组和标签页操作按钮样式-已弃用 */}
+      {/* <Form.Item<SettingsProps>
         label={$fmt(`settings.${GROUP_ACTION_BTN_STYLE}`)}
         name={GROUP_ACTION_BTN_STYLE}
       >
@@ -63,7 +63,7 @@ export default function FormModuleDisplay(
           <Radio value="text">{$fmt('common.text')}</Radio>
           <Radio value="icon">{$fmt('common.icon')}</Radio>
         </Radio.Group>
-      </Form.Item>
+      </Form.Item> */}
 
       {/* 设置常用的标签组按钮 */}
       <Form.Item<SettingsProps>
@@ -131,8 +131,8 @@ export default function FormModuleDisplay(
         </Radio.Group>
       </Form.Item>
 
-      {/* 页面主内容宽度设置 */}
-      <Form.Item<SettingsProps>
+      {/* 页面主内容宽度设置-已弃用 */}
+      {/* <Form.Item<SettingsProps>
         label={$fmt(`settings.${MAIN_CONTENT_WIDTH_TYPE}`)}
         name={MAIN_CONTENT_WIDTH_TYPE}
       >
@@ -142,10 +142,10 @@ export default function FormModuleDisplay(
             {$fmt(`settings.${MAIN_CONTENT_WIDTH_TYPE}.responsive`)}
           </Radio>
         </Radio.Group>
-      </Form.Item>
+      </Form.Item> */}
 
-      {/* 是否显示标签页标题的tooltip */}
-      <Form.Item<SettingsProps>
+      {/* 是否显示标签页标题的tooltip-已弃用 */}
+      {/* <Form.Item<SettingsProps>
         label={$fmt(`settings.${SHOW_TAB_TITLE_TOOLTIP}`)}
         name={SHOW_TAB_TITLE_TOOLTIP}
       >
@@ -153,7 +153,7 @@ export default function FormModuleDisplay(
           <Radio value={true}>{$fmt('common.yes')}</Radio>
           <Radio value={false}>{$fmt('common.no')}</Radio>
         </Radio.Group>
-      </Form.Item>
+      </Form.Item> */}
     </Form.Item>
   );
 }

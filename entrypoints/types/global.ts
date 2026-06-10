@@ -43,7 +43,7 @@ export interface GlobalContextProps {
 }
 
 // 语言
-export type LanguageTypes = 'zh-CN' | 'en-US';
+export type LanguageTypes = 'zh-CN' | 'zh-TW' | 'en-US';
 // react-intl formatMessage 参数
 export type IntlForamtMessageParams = MessageDescriptor & {
   id?: LocaleKeys;
@@ -98,6 +98,9 @@ export type TabEvents =
   | 'onReplaced'
   | 'onUpdated'
   | 'onHighlighted';
+
+// 标签组事件
+export type TabGroupEvents = 'onCreated' | 'onMoved' | 'onRemoved' | 'onUpdated';
 
 // 操作名称
 export type ActionNames =

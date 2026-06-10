@@ -18,6 +18,7 @@ import type {
   ColorItem,
   ThemeColors,
   TabEvents,
+  TabGroupEvents,
   SyncType,
   AutoSyncType,
   AutoSyncTimeUnits,
@@ -203,6 +204,13 @@ export const TAB_EVENTS: Array<keyof Pick<Tabs.Static, TabEvents>> = [
   'onHighlighted',
 ];
 
+export const TAB_GROUP_EVENTS: Array<keyof Pick<Tabs.Static, TabGroupEvents>> = [
+  'onCreated',
+  'onMoved',
+  'onUpdated',
+  'onRemoved',
+];
+
 // 语言选项
 export const LANGUAGE_OPTIONS: Array<{
   key: LanguageTypes;
@@ -210,6 +218,7 @@ export const LANGUAGE_OPTIONS: Array<{
   label: string;
 }> = [
   { key: 'zh-CN', locale: 'zh-CN', label: '简体中文' },
+  { key: 'zh-TW', locale: 'zh-TW', label: '繁體中文' },
   { key: 'en-US', locale: 'en-US', label: 'English' },
 ];
 
@@ -285,6 +294,7 @@ export const pageContextTypes: PageContextType[] = [
 // 用户指南页面链接
 export const USER_GUIDE_URL_MAP: Record<LanguageTypes, string> = {
   'zh-CN': '/docs/GUIDE-zh.html',
+  'zh-TW': '/docs/GUIDE-zh.html',
   'en-US': '/docs/GUIDE.html',
 };
 
@@ -296,6 +306,7 @@ export default {
   ENUM_ACTION_NAME,
   ENUM_SETTINGS_PROPS,
   TAB_EVENTS,
+  TAB_GROUP_EVENTS,
   LANGUAGE_OPTIONS,
   defaultLanguage,
   defaultAutoSyncType,

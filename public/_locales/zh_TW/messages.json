@@ -1,0 +1,35 @@
+{
+  "action_openAdminTab": {
+    "message": "開啟 NiceTab 管理後台"
+  },
+  "action_sendAllTabs": {
+    "message": "傳送全部分頁"
+  },
+  "action_sendAllWindowsTabs": {
+    "message": "傳送所有視窗的分頁"
+  },
+  "action_sendCurrentGroup": {
+    "message": "傳送目前分頁群組"
+  },
+  "action_sendCurrentTab": {
+    "message": "傳送目前分頁"
+  },
+  "action_sendOtherTabs": {
+    "message": "傳送其他分頁"
+  },
+  "action_sendLeftTabs": {
+    "message": "傳送左側分頁"
+  },
+  "action_sendRightTabs": {
+    "message": "傳送右側分頁"
+  },
+  "action_globalSearch": {
+    "message": "全域搜尋"
+  },
+  "action_startSync": {
+    "message": "開始同步"
+  },
+  "action_hibernateTabs": {
+    "message": "休眠其他分頁"
+  }
+}

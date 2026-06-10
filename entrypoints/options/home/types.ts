@@ -68,10 +68,17 @@ export type CascaderOption = {
   parentKey?: string;
 } & Record<string, any>;
 
+export type DragActionType =
+  | 'tab2tab'
+  | 'tab2group'
+  | 'opened2tab'
+  | 'opened2group'
+  | 'opened2tag';
+
 // 拖拽tab数据
 export type DndTabItemProps = TabItem &
   DragData & {
-    groupId: string;
+    groupId: string | number;
     index: number;
     dndKey: symbol;
     isEmpty?: boolean; // 空标签组，默认设置一个空标签，便于拖拽
@@ -82,14 +89,12 @@ export type DndTabItemOnDropCallback = ({
   sourceIndex,
   targetIndex,
   actionType,
-  targetTabListLength,
 }: {
   sourceData: Pick<DndTabItemProps, 'groupId' | 'index'> & DragData;
   targetData: Pick<DndTabItemProps, 'groupId' | 'index'> & DragData;
   sourceIndex: number;
   targetIndex: number;
-  actionType?: 'tab2tab' | 'tab2group';
-  targetTabListLength?: number;
+  actionType?: DragActionType;
 }) => void;
 
 // 标签组操作 remove-删除 rename-重命名 restore-恢复 lock-锁定 star-星标 recover-从回收站复原到列表页

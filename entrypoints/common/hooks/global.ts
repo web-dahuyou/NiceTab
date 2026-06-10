@@ -27,7 +27,7 @@ export const GlobalContext = createContext<GlobalContextProps>({
   colorPrimary: PRIMARY_COLOR,
   themeTypeConfig: THEME_TYPE_CONFIG[defaultThemeType],
   themeType: defaultThemeType,
-  pageWidthType: 'fixed',
+  pageWidthType: 'responsive',
   pageContext: 'optionsPage',
   $message: (() => {}) as any,
   setThemeType: async (themeType = defaultThemeType) => {
@@ -43,7 +43,7 @@ export const GlobalContext = createContext<GlobalContextProps>({
     settingsUtils.setSettings({ ...settingsUtils.settings, language });
     callback?.();
   },
-  setPageWidthType: async (pageWidthType = 'fixed') => {
+  setPageWidthType: async (pageWidthType = 'responsive') => {
     settingsUtils.setSettings({ ...settingsUtils.settings, pageWidthType });
   },
 });

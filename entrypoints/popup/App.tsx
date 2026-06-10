@@ -273,6 +273,13 @@ export default function App() {
     [handleTabsChange],
   );
 
+  // 分组操作回调
+  const handleGroupAction = useCallback(async () => {
+    const { tab: adminTab } = await getAdminTabInfo();
+    const newTabs = tabs.filter(t => t.id !== adminTab?.id);
+    handleTabsChange(newTabs);
+  }, [tabs]);
+
   const init = async () => {
     const settings = await settingsUtils.getSettings();
     const modules =
@@ -521,6 +528,7 @@ export default function App() {
                 key={~group.groupId || index}
                 group={group}
                 onAction={handleTabAction}
+                onGroupAction={handleGroupAction}
               ></TabGroupItem>
             ))}
           </div>

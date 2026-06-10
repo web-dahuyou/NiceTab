@@ -218,6 +218,7 @@ export default function Settings() {
         className={classNames('sync-wrapper', sidebarCollapsed && 'collapsed')}
         $collapsed={sidebarCollapsed}
         $sidebarWidth={240}
+        $rightPanelCollapsed={true}
       >
         <StyledSidebarWrapper
           className="sidebar"

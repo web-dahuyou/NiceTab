@@ -7,12 +7,10 @@ import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import EditInput from '~/entrypoints/options/components/EditInput';
 import DropComponent from '~/entrypoints/common/components/DropComponent';
 import { dndKeys } from '../constants';
-import type { RenderTreeNodeProps, TreeDataNodeTabGroup } from '../types';
+import type { RenderTreeNodeProps } from '../types';
 import { StyledTreeNodeItem } from '../Home.styled';
 import { type TreeDataHookProps } from '../hooks/treeData';
 import { eventEmitter as homeEventEmitter } from '../hooks/homeCustomEvent';
-
-const allowDropKey = dndKeys.tabItem;
 
 // 渲染 treeNode 节点
 function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
@@ -76,17 +74,32 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
   // 这个 onTabItemDrop 只是为了方便右侧面板的标签页拖拽到左侧树的标签组，左侧树中的 分类和标签组的拖拽由 antd 的 Tree 组件自带实现
   const onTabItemDrop: TreeDataHookProps['handleTabItemDrop'] = useCallback(
     params => {
-      const targetTabListLength =
-        (node as TreeDataNodeTabGroup)?.originData?.tabList?.length || 0;
+      const from = params?.sourceData?.from || 'tab-list';
+      let targetGroupLength = 0;
+      let targetTabListLength = 0;
+      if (node.type === 'tabGroup') {
+        targetTabListLength = node?.originData?.tabList?.length || 0;
+      } else if (node.type === 'tag') {
+        targetGroupLength = node?.originData?.groupList?.length || 0;
+      }
+
+      const _params = { ...params };
+
+      if (from === 'tab-list') {
+        _params.actionType = 'tab2group';
+      }
+      // 从已打开的浏览器标签页拖拽到树节点
+      else if (from === 'opened-tabs') {
+        _params.actionType = 'opened2group';
+      }
+      // 从已打开的浏览器标签组拖拽到树节点
+      else if (from === 'opened-tab-group') {
+        _params.actionType = 'opened2tag';
+      }
+
       homeEventEmitter.emit('home:treeDataHook', {
         action: 'handleTabItemDrop',
-        params: [
-          {
-            ...params,
-            actionType: 'tab2group',
-            targetTabListLength,
-          },
-        ],
+        params: [_params],
       });
     },
     [node],
@@ -106,15 +119,29 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
     e.stopPropagation();
   }, []);
 
+  const dragData = useMemo(() => {
+    const tagId = (node.type === 'tag' ? node.key : node.parentKey) as string;
+    const groupId = (node.type === 'tag' ? '' : node.key) as string;
+    return {
+      index: 0,
+      tagId,
+      groupId,
+      nodeType: node.type,
+      nodeName:
+        node.type === 'tag' ? node.originData?.tagName : node.originData?.groupName,
+      nodeData: node.originData,
+      allowKeys:
+        node.type === 'tag'
+          ? [dndKeys.tabGroupItem]
+          : [dndKeys.tabItem, dndKeys.tabGroupItem],
+    };
+  }, [node]);
+
   return (
     // 这个 DropComponent 只是为了方便右侧面板的标签页拖拽到左侧树的标签组，左侧树中的 分类和标签组的拖拽由 antd 的 Tree 组件自带实现
     <DropComponent
-      data={{
-        index: 0,
-        groupId: node.key as string,
-        allowKeys: node.type === 'tag' ? [] : [allowDropKey],
-      }}
-      canDrop={node.type === 'tabGroup'}
+      data={dragData}
+      // canDrop={node.type === 'tabGroup'}
       onDrop={onTabItemDrop}
     >
       <>

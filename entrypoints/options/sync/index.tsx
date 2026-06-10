@@ -155,6 +155,7 @@ export default function SyncPage() {
         className={classNames('sync-wrapper', sidebarCollapsed && 'collapsed')}
         $collapsed={sidebarCollapsed}
         $sidebarWidth={400}
+        $rightPanelCollapsed={true}
       >
         <StyledSidebarWrapper
           className="sidebar"
