@@ -1,6 +1,7 @@
 import { type ConfigProviderProps } from 'antd';
 import {createIntl, createIntlCache, RawIntlProvider} from 'react-intl';
 import antd_zhCN from 'antd/locale/zh_CN';
+import antd_zhTW from 'antd/locale/zh_TW';
 import antd_enUS from 'antd/locale/en_US';
 // import 'dayjs/locale/zh-cn';
 import { type LanguageTypes } from '~/entrypoints/types';
@@ -11,12 +12,14 @@ export type LocaleKeys = keyof LocaleModules;
 export type LocaleAntd = ConfigProviderProps['locale'];
 export const antdMap: Record<LanguageTypes, LocaleAntd> = {
   'zh-CN': antd_zhCN,
+  'zh-TW': antd_zhTW,
   'en-US': antd_enUS
 };
 
 
 export const customMap: Record<LanguageTypes, LocaleModules> = {
   'zh-CN': modules['zh-CN'],
+  'zh-TW': modules['zh-TW'],
   'en-US': modules['en-US']
 };
 export const getCustomLocaleMessages = (locale: LanguageTypes = 'zh-CN') => {

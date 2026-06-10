@@ -2,7 +2,7 @@ import { Form, Radio } from 'antd';
 import { DesktopOutlined, MoonOutlined, SunOutlined } from '@ant-design/icons';
 import type { FormItemProps, FormInstance } from 'antd';
 import type { SettingsProps } from '~/entrypoints/types';
-import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
+import { ENUM_SETTINGS_PROPS, LANGUAGE_OPTIONS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 
 const {
@@ -28,8 +28,13 @@ export default function FormModuleCommon(
         name={LANGUAGE}
       >
         <Radio.Group>
-          <Radio value="zh-CN"> 中文简体 </Radio>
-          <Radio value="en-US"> English </Radio>
+          {LANGUAGE_OPTIONS.map(option => {
+            return (
+              <Radio key={option.key} value={option.key}>
+                {option.label}
+              </Radio>
+            );
+          })}
         </Radio.Group>
       </Form.Item>
       <Form.Item<SettingsProps>

@@ -15,7 +15,8 @@
     "convert:guide": "node scripts/md2html.js GUIDE-zh.md",
     "postinstall": "wxt prepare",
     "lint:no-fix": "eslint entrypoints --fix=false",
-    "lint": "eslint entrypoints --fix=true"
+    "lint": "eslint entrypoints --fix=true",
+    "verify:utf8": "node scripts/verify-utf8.mjs"
   },
   "dependencies": {
     "@ant-design/colors": "^7.0.2",
