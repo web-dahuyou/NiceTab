@@ -13,13 +13,13 @@ For the basic project overview, please refer to the <a href="./README.md">README
 
 ## Installation
 
-**Method 1: Install from the browser extension store**  
-- Google Chrome: [Chrome Web Store](https://chromewebstore.google.com/detail/fonflmjnjbkigocpoommgmhljdpljain)  
-- Microsoft Edge: [Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/ompjiaelpibiggcnanhbdblkhfdmkgnl) (Due to longer review cycles, version releases may be slower than Chrome)  
+**Method 1: Install from the browser extension store**
+- Google Chrome: [Chrome Web Store](https://chromewebstore.google.com/detail/fonflmjnjbkigocpoommgmhljdpljain)
+- Microsoft Edge: [Microsoft Edge Addons](https://microsoftedge.microsoft.com/addons/detail/ompjiaelpibiggcnanhbdblkhfdmkgnl) (Due to longer review cycles, version releases may be slower than Chrome)
 - Firefox Add-ons: [Firefox Browser Addons](https://addons.mozilla.org/firefox/addon/nice-tab-manager)
 
-**Method 2: Manual installation from ZIP**  
-- Download `nice-tab-<version>-chrome.zip` (for Chrome/Edge) or `nice-tab-<version>-firefox.zip` from the [Releases page](https://github.com/web-dahuyou/NiceTab/releases).  
+**Method 2: Manual installation from ZIP**
+- Download `nice-tab-<version>-chrome.zip` (for Chrome/Edge) or `nice-tab-<version>-firefox.zip` from the [Releases page](https://github.com/web-dahuyou/NiceTab/releases).
 - Search online for "how to install unpacked Chrome extension" if needed.
 
 After installation, we recommend **pinning the extension icon** for quick access to extension features.
@@ -32,9 +32,9 @@ NiceTab also supports keyboard shortcuts. You can view the corresponding shortcu
 
 NiceTab’s core function is to send browser tabs to the tab list with one click and manage them through a hierarchical structure of `Category > Tab Group > Tab`.
 
-The extension mainly consists of:  
-- [Extension Right-click Menu](#extension-right-click-menu)  
-- [Extension Icon Popup Panel](#extension-icon-popup-panel)  
+The extension mainly consists of:
+- [Extension Right-click Menu](#extension-right-click-menu)
+- [Extension Icon Popup Panel](#extension-icon-popup-panel)
 - [Management Dashboard](#management-dashboard); Displayed as `NiceTab Admin Page`。
 
 Try left-clicking and right-clicking the NiceTab extension icon to explore the interactions.
@@ -43,7 +43,7 @@ Try left-clicking and right-clicking the NiceTab extension icon to explore the i
 
 When first installing the extension, no tabs have been sent to NiceTab, so the NiceTab list is empty. You can right-click the NiceTab extension icon to open the plugin's right-click menu and send the tabs currently open in the browser to the NiceTab management page.
 
-Current menu items: 
+Current menu items:
 - **Open NiceTab Admin Page**: Clicking this will open the NiceTab management dashboard page.
 - **Global Search**: You can globally search for tabs sent to the NiceTab Admin Page in the browser. Refer to the [Global Search](#global-search) section below.
 - **Send All Tabs**: Send all opened tabs in the current browser window to the NiceTab Admin Page.
@@ -79,8 +79,8 @@ Left-click the icon to open the the `Popup Panel`, which includes **Extension In
 
 **Notes**:
 - v2.8.4 added compact mode toggle button.
-- By default, left-clicking the extension icon opens the `Popup Panel`. You can configure it in [Management Dashboard - Preferences](#management-dashboard---preferences) to send all tabs directly (OneTab-style). 
-- Hibernation reduces memory usage without closing tabs. When switching to a hibernated tab, it will be reactivated. 
+- By default, left-clicking the extension icon opens the `Popup Panel`. You can configure it in [Management Dashboard - Preferences](#management-dashboard---preferences) to send all tabs directly (OneTab-style).
+- Hibernation reduces memory usage without closing tabs. When switching to a hibernated tab, it will be reactivated.
 
 
 ### Management Dashboard
@@ -272,15 +272,15 @@ The configuration items of this module are mainly related to interface display; 
 
 | Item | Description | Default Value | Key Index |
 | --- | --- | --- | --- |
-| Action button style (for tab groups and tabs) | The action buttons of tab group/tabs were text-style in the earlier versions, and icon-style buttons were added starting from version `v2.7.4` | Icon style | ★★★★★ |
+| ~~Action button style (for tab groups and tabs)~~ | ~~`(Deprecated)`The action buttons of tab group/tabs were text-style in the earlier versions, and icon-style buttons were added starting from version `v2.7.4`~~ | Icon style | ★★★★★ |
 | Configure commonly used tab group action buttons | The commonly used action buttons can be checked for permanent display, while other unchecked buttons will be collapsed into the "More" dropdown menu | All action buttons | ★★★ |
 | Display the number of open tabs on the extension icon? | The extension icon supports displaying the number of currently opened tabs, which is displayed by default | Yes | ★★ |
 | Display ContextMenu on your webpage? | By default, the ContextMenu is displayed in two places: the extension icon and the right-click menu on webpages. If you have installed many browser extensions, the right-click menu on webpages will showcase numerous extension menus, which can be overwhelming. You can choose not to display the ContextMenu on webpages | Yes | ★★ |
 | Configure ContextMenu items | The right-click menu supports customization, **drag-and-drop sorting**. Select the right-click menu items to be displayed. The first 5 selected items are displayed at the outer level, the rest are collapsed into the "More" menu group. | All items | ★★★★★ |
 | Choose the modules to be displayed in the "Popup Panel" | The modules in the Popup Panel support free configuration, you can check the modules you want to display. <br/>**Important**: If no modules are checked, left-clicking the extension icon will directly send all tabs to the NiceTab list without opening the Popup Panel. You can use this feature to flexibly set interaction behavior. | All modules | ★★★★★ |
 | Automatically expand the tree list on Home Page? | When entering the list page, whether to automatically expand categories and tab groups in the tree list. | No | ★★ |
-| ~~Width of the page content area~~ | ~~The width display mode of the main content area in the management dashboard; "Fixed" mode by default (approximately 1200 pixels, centered displayed). When set to "Responsive", will adapts to the width of the webpage, effect similar to left-aligned display.~~ | Fixed width | ★★ |
-| Show a tooltip when hovering over a tab? | This configuration item temporarily retains historical interaction; not recommended to enable tooltip display. | No | ★ |
+| ~~Width of the page content area~~ | ~~`(Deprecated)`The width display mode of the main content area in the management dashboard; "Fixed" mode by default (approximately 1200 pixels, centered displayed). When set to "Responsive", will adapts to the width of the webpage, effect similar to left-aligned display.~~ | Fixed width | ★★ |
+| ~~Show a tooltip when hovering over a tab?~~ | ~~`(Deprecated)`This configuration item temporarily retains historical interaction; not recommended to enable tooltip display.~~ | No | ★ |
 
 ### Auto Sync
 
@@ -302,7 +302,7 @@ Includes import/export of tab list and preferences.
 
 ### Import Tab Data from Other Extensions
 
-Supports importing data from other extensions into NiceTab.    
+Supports importing data from other extensions into NiceTab.
 
 Currently supported extensions:
 - NiceTab
@@ -346,7 +346,7 @@ Currently remote sync is just a basic backup functionality. Due to historical fa
 1. NiceTab remote sync's original purpose was only for remote backup and ensuring data integrity, using incremental merge strategy; does not sync deletion operations.
 2. NiceTab uses category/tab group **names** to distinguish same categories/groups (initially to save data storage, didn't store id attribute, so didn't use id as unique identifier). NiceTab allows the existence of the same category/tab group names.
 3. When remote sync merges local and remote data, categories/tab groups with the same names will be merged. However, the default name for creating a tag group is `Unnamed Tag`, and the default name for creating a group is `Unnamed Group`. If these categories/tab groups have not been renamed, during merge, to avoid merging these unrenamed categories/groups together, NiceTab will first renames them randomly before merging them. Ultimately, you may find that unrenamed tag groups have been duplicated, because the extension cannot determine which local `Unnamed Group` to merge with which remote `Unnamed Group`. Therefore, it simply retains all for renaming.
-4. Due to above reasons, many users were confused about remote sync functionality, and consequently disabled the automatic synchronization function. Actually, as long as categories/tab groups are renamed, such forced random renaming and duplication won't occur. This also indirectly indicates that many people do not have the habit of renaming (I personally have OCD and manually rename categories and tag groups). 
+4. Due to above reasons, many users were confused about remote sync functionality, and consequently disabled the automatic synchronization function. Actually, as long as categories/tab groups are renamed, such forced random renaming and duplication won't occur. This also indirectly indicates that many people do not have the habit of renaming (I personally have OCD and manually rename categories and tag groups).
 5. The full feature sync functionality development may start in the future; due to personal time constraints, I'm not sure when it will be launched. If you encounter any usage issues, please join the communication group for further discussion.
 
 ### Current Recommended Usage
@@ -356,7 +356,7 @@ Based on above reasons, here are some recommended usages:
 **Single Device Usage**:
 - Manual sync method: Regularly manually "push data to the remote - force overwrite"
 - Automatic synchronization method: Enable the automatic synchronization function, and set the synchronization method to "Automatic Synchronization - Overwrite and Push". This ensures that the remote backup data is fully consistent with the local data
-- 
+-
 - Auto Sync Method: Periodically manually "Push local data to remote (force to overwrite)".
 - Auto Sync Method: Enable auto sync, set sync method to "Automatically push local data to remote (force to overwrite)". This ensures that the remote backup data is fully consistent with the local data.
 
@@ -389,7 +389,7 @@ Default shortcuts:
 | Send All Tabs | macOS (⌥ + ⇧ + A) <br /> Windows (Alt + Shift + A) | Letter `A` is the first letter of `all` |
 | Send Current Tab | macOS (⌥ + ⇧ + C) <br /> Windows (Alt + Shift + C) | Letter `C` is the first letter of `current` |
 
-Other shortcuts can be customized in the browser built-in page. 
+Other shortcuts can be customized in the browser built-in page.
 
 
 ## Other

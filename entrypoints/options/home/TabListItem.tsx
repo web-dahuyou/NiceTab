@@ -268,7 +268,7 @@ export default memo(function TabListItem({
     scrollToTab();
   }, []);
 
-  // 标签页 tooltip 下线
+  // 标签页 tooltip （已弃用-代码暂时保留）
   // useEffect(() => {
   //   const _toolTipswitch = !!settingsUtils?.settings?.[SHOW_TAB_TITLE_TOOLTIP];
   //   setTooltipSwitch(_toolTipswitch);

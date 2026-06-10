@@ -54,7 +54,7 @@ export default function FormModuleDisplay(
 
   return (
     <Form.Item noStyle {...formItemProps}>
-      {/* 标签组和标签页操作按钮样式 */}
+      {/* 标签组和标签页操作按钮样式-已弃用 */}
       {/* <Form.Item<SettingsProps>
         label={$fmt(`settings.${GROUP_ACTION_BTN_STYLE}`)}
         name={GROUP_ACTION_BTN_STYLE}
@@ -131,7 +131,7 @@ export default function FormModuleDisplay(
         </Radio.Group>
       </Form.Item>
 
-      {/* 页面主内容宽度设置-废弃 */}
+      {/* 页面主内容宽度设置-已弃用 */}
       {/* <Form.Item<SettingsProps>
         label={$fmt(`settings.${MAIN_CONTENT_WIDTH_TYPE}`)}
         name={MAIN_CONTENT_WIDTH_TYPE}
@@ -144,7 +144,7 @@ export default function FormModuleDisplay(
         </Radio.Group>
       </Form.Item> */}
 
-      {/* 是否显示标签页标题的tooltip */}
+      {/* 是否显示标签页标题的tooltip-已弃用 */}
       {/* <Form.Item<SettingsProps>
         label={$fmt(`settings.${SHOW_TAB_TITLE_TOOLTIP}`)}
         name={SHOW_TAB_TITLE_TOOLTIP}
