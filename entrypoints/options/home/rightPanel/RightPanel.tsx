@@ -279,7 +279,7 @@ export default function RightPanel({
             {$fmt('common.openedTabs')}
             <Tooltip
               color={token.colorBgElevated}
-              destroyOnHidden
+              destroyTooltipOnHide
               title={<Typography.Text>{$fmt('home.tip.multiSelection')}</Typography.Text>}
               styles={{ root: { maxWidth: '300px', width: '300px' } }}
             >

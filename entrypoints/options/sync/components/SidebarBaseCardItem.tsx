@@ -83,7 +83,7 @@ export default function BaseCardItem<T extends { label: string } = RemoteOptionP
               <StyledLabel>{$fmt('sync.lastSyncType')}: </StyledLabel>
               <Tooltip
                 color={token.colorBgElevated}
-                destroyOnHidden
+                destroyTooltipOnHide
                 title={<Typography.Text>{syncTypeTipText}</Typography.Text>}
               >
                 <Tag color="blue">{syncTypeText}</Tag>
@@ -113,7 +113,7 @@ export default function BaseCardItem<T extends { label: string } = RemoteOptionP
     return [
       <Tooltip
         color={token.colorBgElevated}
-        destroyOnHidden
+        destroyTooltipOnHide
         title={<Typography.Text>{$fmt('common.settings')}</Typography.Text>}
       >
         <div className="icon-btn-wrapper" onClick={() => onAction?.(option, 'setting')}>
@@ -122,7 +122,7 @@ export default function BaseCardItem<T extends { label: string } = RemoteOptionP
       </Tooltip>,
       <Tooltip
         color={token.colorBgElevated}
-        destroyOnHidden
+        destroyTooltipOnHide
         title={<Typography.Text>{$fmt('sync.tip.manualPullForce')}</Typography.Text>}
       >
         <div
@@ -134,7 +134,7 @@ export default function BaseCardItem<T extends { label: string } = RemoteOptionP
       </Tooltip>,
       <Tooltip
         color={token.colorBgElevated}
-        destroyOnHidden
+        destroyTooltipOnHide
         title={<Typography.Text>{$fmt('sync.tip.manualPushMerge')}</Typography.Text>}
       >
         <div className="icon-btn-wrapper" onClick={handlePushMerge}>
@@ -143,7 +143,7 @@ export default function BaseCardItem<T extends { label: string } = RemoteOptionP
       </Tooltip>,
       <Tooltip
         color={token.colorBgElevated}
-        destroyOnHidden
+        destroyTooltipOnHide
         title={<Typography.Text>{$fmt('sync.tip.manualPushForce')}</Typography.Text>}
       >
         <div
@@ -155,7 +155,7 @@ export default function BaseCardItem<T extends { label: string } = RemoteOptionP
       </Tooltip>,
       <Tooltip
         color={token.colorBgElevated}
-        destroyOnHidden
+        destroyTooltipOnHide
         title={<Typography.Text>{$fmt('sync.tip.resetStatus')}</Typography.Text>}
       >
         <div
