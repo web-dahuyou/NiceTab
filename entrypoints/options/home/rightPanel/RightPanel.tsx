@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { browser, Tabs } from 'wxt/browser';
-import { Empty, Checkbox } from 'antd';
+import { Empty, Checkbox, Tooltip, Typography, theme } from 'antd';
 import type { CheckboxProps } from 'antd';
-import { CloseOutlined, CoffeeOutlined } from '@ant-design/icons';
+import { CloseOutlined, CoffeeOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { isGroupSupported, classNames } from '~/entrypoints/common/utils';
 import { getAdminTabInfo } from '~/entrypoints/common/tabs';
 import {
@@ -15,6 +15,7 @@ import ActionBtnList, {
   type ActionOptionItem,
 } from '@/entrypoints/common/components/ActionBtnList';
 import ToggleSidebarBtn from '../../components/ToggleSidebarBtn';
+import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { StyledRightPanelWrapper } from '../Home.styled';
 import { StyledOpenedTabsActions } from './OpenedTabs.styled';
 import TabGroupItem, { type TabGroupItemProps } from './TabGroupItem';
@@ -40,6 +41,7 @@ export default function RightPanel({
   collapsed: boolean;
   onCollapseChange: (status: boolean) => void;
 }) {
+  const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const [tabs, setTabs] = useState<Tabs.Tab[]>([]);
   const [tabGroupList, setTabGroupList] = useState<TabGroupItemProps[]>([]);
@@ -273,7 +275,19 @@ export default function RightPanel({
           ></ToggleSidebarBtn>
         </div>
         <div className="right-panel-inner-content">
-          <div className="opened-tabs-title">{$fmt('common.openedTabs')}</div>
+          <div className="opened-tabs-title">
+            {$fmt('common.openedTabs')}
+            <Tooltip
+              color={token.colorBgElevated}
+              destroyOnHidden
+              title={<Typography.Text>{$fmt('home.tip.multiSelection')}</Typography.Text>}
+              styles={{ root: { maxWidth: '300px', width: '300px' } }}
+            >
+              <StyledActionIconBtn className="btn-tips" title={$fmt('common.tips')}>
+                <QuestionCircleOutlined />
+              </StyledActionIconBtn>
+            </Tooltip>
+          </div>
 
           {/* 全选和批量操作区域 */}
           {tabs.length > 0 && (

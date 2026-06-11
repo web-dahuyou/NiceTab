@@ -33,7 +33,7 @@ export default function SyncResultList({ resultList }: SyncResultListProps) {
         <Tooltip
           color={token.colorBgElevated}
           placement="bottom"
-          destroyTooltipOnHide
+          destroyOnHidden
           title={<Typography.Text>{$fmt('sync.tip.syncHistory')}</Typography.Text>}
         >
           <QuestionCircleOutlined />
@@ -48,7 +48,7 @@ export default function SyncResultList({ resultList }: SyncResultListProps) {
                 <StyledLabel>{$fmt('sync.syncType')}: </StyledLabel>
                 <Tooltip
                   color={token.colorBgElevated}
-                  destroyTooltipOnHide
+                  destroyOnHidden
                   title={
                     <Typography.Text>{syncTypeTipMap[result.syncType]}</Typography.Text>
                   }

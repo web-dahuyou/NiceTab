@@ -582,6 +582,7 @@ export const GlobalSearchBox = forwardRef(
                     className="action-btn btn-remove"
                     label={$fmt('common.remove')}
                     btnStyle="icon"
+                    size={16}
                     hoverColor={ENUM_COLORS.red}
                     onClick={() => handleBatchAction('remove')}
                   >
@@ -591,6 +592,7 @@ export const GlobalSearchBox = forwardRef(
                     className="action-btn btn-open"
                     label={$fmt('common.open')}
                     btnStyle="icon"
+                    size={16}
                     onClick={() => handleBatchAction('open')}
                   >
                     <ExportOutlined />

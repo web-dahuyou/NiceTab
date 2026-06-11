@@ -105,6 +105,7 @@ const enUS: Record<LocaleKey, string> = {
     <li>
       <strong>Left Click</strong>: this will open a new tab and jump to it.<br>
       <strong>Alt + Left Click</strong>: this will silently open a new tab and stay on the NiceTab page.
+      You can modify the preference settings to adjust your click behavior.
     </li>
     <li>The "Recover" action means recover the tags / tab groups / tabs from the "Recycle Bin" to the "List" home.</li>
     <li>The "Ascending" and "Descending" only work for unstarred tab groups in the current category.</li>
@@ -129,6 +130,7 @@ const enUS: Record<LocaleKey, string> = {
     'The number of tabs exceeds the set value, enabling virtual scrolling.',
   'home.tip.addScope':
     'The next version will add new features that require additional authorization. Once the new version is released, the NiceTab extension will be automatically disabled. If you want to continue using it, please manually enable it.',
+  'home.tip.multiSelection': 'Shift multi-select: Step1, Shift + Click A (got highlighted A); Step2, Shift + Click B (A to B selected). It is also applicable to the tab list in the middle of the page',
 
   'recycleBin.tip.autoClear':
     'Note: The recycle bin will be automatically cleared once a day!',

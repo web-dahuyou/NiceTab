@@ -1,4 +1,6 @@
-const zhTW = {
+import { LocaleKey } from './zhCN';
+
+const zhTW: Record<LocaleKey, string> = {
   "sync.settings": "同步設定",
   "sync.autoSync": "是否自動同步",
   "sync.syncing": "正在同步",
@@ -34,6 +36,7 @@ const zhTW = {
   "sync.tip.manualPushForce": "推送本地數據到遠程（強制覆蓋）",
   "sync.tip.resetStatus": "状态重置",
   "sync.tip.tokenChange": "修改access token會清空本地{type}的同步歷史記錄",
+  // "sync.tip.contentTooLarge": "遠程文件内容太大，返回的内容被 gist API 截斷了，取消合併到本地",
   "sync.tip.syncHistory": "同步歷史只保留最近的50條紀錄，您還可以手動清空歷史記錄",
   "sync.tip.supportTip": "遠程同步已支持分頁列表和偏好設定同步，同步操作時會同時同步分頁列表和偏好設定數據，不支持分開同步。",
   "sync.getYourToken": "前往獲取/設定 token",
@@ -51,11 +54,8 @@ const zhTW = {
   "sync.password": "WebDAV 密碼",
   "sync.addConfig": "新增設定",
   "sync.tip.connectionName": "用於區分多個 webDAV 的設定名稱",
-  "sync.tip.directory": "WebDAV 目錄，可填寫多级目錄，如 \u003cstrong\u003e/dir/subdir\u003c/strong\u003e",
-  "sync.tip.filename": "數據存储檔案名稱，可使用任意後缀名，如 \u003cstrong\u003enicetab-sync.txt\u003c/strong\u003e",
-  "sync.tip.contentTooLarge": "遠程文件内容太大，返回的内容被 gist API 截斷了，取消合併到本地",
+  "sync.tip.directory": "WebDAV 目錄，可填寫多级目錄，如 <strong>/dir/subdir</strong>",
+  "sync.tip.filename": "數據存储檔案名稱，可使用任意後缀名，如 <strong>nicetab-sync.txt</strong>",
 };
-
-export type LocaleKey = keyof typeof zhTW;
 
 export default zhTW;

@@ -214,7 +214,7 @@ export default memo(function TabListItem({
         label: (
           <Popover
             color="#fbfbfb"
-            destroyTooltipOnHide
+            destroyOnHidden
             content={<QRCode value={tab.url!} color="#000" bordered={false} />}
           >
             <Space>

@@ -90,7 +90,8 @@ const zhCN = {
     <li>点击打开标签组时，会在浏览器中依次打开该标签组中的标签页，如果设置了“打开标签页时自动从列表中删除”，则该标签组中的标签页会被删除。</li>
     <li>
       <strong>单击标签页</strong>：会打开新标签页并激活该标签页。<br>
-      <strong>Alt键 + 单击标签页</strong>：则会静默打开新标签页，停留在NiceTab后台页面。
+      <strong>Alt键 + 单击标签页</strong>：则会静默打开新标签页，停留在NiceTab后台页面。<br>
+      您可以修改偏好设置来调整点击行为。
     </li>
     <li>“还原”操作表示将回收站中的标签组还原到首页列表中。</li>
     <li>“升序”和“降序”功能只对当前分类中的非星标的标签组进行排序。</li>
@@ -110,6 +111,7 @@ const zhCN = {
   'home.moveTo.mergeTip.2': '2、勾选后，如果移动标签组，则与目标分类中同名的标签组合并，标签页去重。',
   'home.tip.tooManyTabs': '当前分类中标签页数量超过预定值, 已开启虚拟滚动。',
   'home.tip.addScope': '下一个版本将添加快捷键等功能，需要新增授权，新版本发布后可能会自动停用，如需继续使用请手动启用。',
+  'home.tip.multiSelection': 'Shift多选：第一步，Shift + Click A (高亮显示A) 。第二步，Shift + Click B (A到B全被选中)。Shift多选操作也适用于页面中间的标签页列表。',
 
   'recycleBin.tip.autoClear': '注意：回收站的数据每天会自动清空一次！',
 }

@@ -102,6 +102,9 @@ export const StyledRightPanelWrapper = styled(StyledBaseRightPanelWrapper)<{
     flex-direction: column;
     .opened-tabs-title {
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
       font-weight: bold;
       font-size: 14px;
       margin-bottom: 12px;

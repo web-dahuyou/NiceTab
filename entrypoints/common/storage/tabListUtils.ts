@@ -1369,7 +1369,7 @@ export default class TabListUtils {
       await this.setTagList(tagList);
     }
   }
-
+  // 打开的浏览器标签组拖拽到分类
   async onOpenedTabGroupDrop(sourceData: DragData, targetData: DragData) {
     const settings = await Store.settingsUtils.getSettings();
     const tagList = await this.getTagList();
@@ -1413,8 +1413,15 @@ export default class TabListUtils {
       }
     }
 
+    const lastStarredIndex = _targetData.groupList.findLastIndex(g => g.isStarred);
+    let needStarred = false;
+    if (~lastStarredIndex && targetGroupIndex <= lastStarredIndex) {
+      needStarred = true;
+    }
+
     const newGroup = {
       ...this.getInitialTabGroup(),
+      isStarred: needStarred,
       groupName: sourceData?.selectedGroup?.groupName || sourceData?.groupName,
       tabList: (sourceData?.selectedGroup?.tabs || sourceData?.tabs || [])?.map?.(
         (tab: Tabs.Tab) => ({

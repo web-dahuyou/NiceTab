@@ -1,4 +1,6 @@
-const zhTW = {
+import { LocaleKey } from './zhCN';
+
+const zhTW: Record<LocaleKey, string> = {
   "common.list": "列表",
   "common.settings": "設定",
   "common.importExport": "匯入/匯出",
@@ -128,8 +130,7 @@ const zhTW = {
   "common.filter": "篩選",
   "common.locked": "已鎖定",
   "common.starred": "已加星號",
+  'common.tips': '小貼士',
 };
-
-export type LocaleKey = keyof typeof zhTW;
 
 export default zhTW;

@@ -1,4 +1,6 @@
-const zhTW = {
+import { LocaleKey } from './zhCN';
+
+const zhTW: Record<LocaleKey, string> = {
   "importExport.import": "匯入",
   "importExport.export": "匯出",
   "importExport.moduleTitle": "標籤{action, select,\n    import {匯入}\n    export {匯出}\n    other {匯入/匯出}\n  }",
@@ -21,7 +23,5 @@ const zhTW = {
   "importExport.CopySuccess": "複製成功",
   "importExport.CopyFailed": "複製失敗",
 };
-
-export type LocaleKey = keyof typeof zhTW;
 
 export default zhTW;
