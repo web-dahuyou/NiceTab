@@ -1,4 +1,6 @@
-const zhTW = {
+import { LocaleKey } from './zhCN';
+
+const zhTW: Record<LocaleKey, string> = {
   "settings.block.common": "通用設定",
   "settings.block.sendTabs": "傳送分頁設定",
   "settings.block.openTabs": "開啟分頁設定",
@@ -109,7 +111,5 @@ const zhTW = {
   "settings.syncType.manualPushMerge": "手動同步-合併推送（推薦）",
   "settings.syncType.manualPushForce": "手動同步-覆蓋推送",
 };
-
-export type LocaleKey = keyof typeof zhTW;
 
 export default zhTW;

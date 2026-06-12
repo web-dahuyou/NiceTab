@@ -13,7 +13,7 @@ import {
   Space,
   Tooltip,
   Typography,
-  FloatButton,
+  Button,
   type MenuProps,
 } from 'antd';
 import {
@@ -37,6 +37,7 @@ import {
   RollbackOutlined,
   SearchOutlined,
   ReadOutlined,
+  ToTopOutlined,
 } from '@ant-design/icons';
 import styled, { ThemeProvider } from 'styled-components';
 import '~/assets/css/reset.css';
@@ -134,6 +135,13 @@ const StyledPageContainer = styled.div<{
     width: 1200px;
     padding: 100px 32px 40px;
     margin: 0 auto;
+  }
+  .float-button-box {
+    position: fixed;
+    bottom: 24px;
+    right: 30px;
+    display: flex;
+    gap: 16px;
   }
   @media screen and (max-width: 1199px) {
     .main-content {
@@ -473,28 +481,29 @@ function AppLayout() {
           <Outlet></Outlet>
         </div>
 
-        <FloatButton
-          shape="circle"
-          icon={<SendOutlined />}
-          tooltip={{ title: $fmt('common.sendAllTabs'), placement: 'top' }}
-          style={{ right: 30, bottom: 30 }}
-          onClick={handleSendAllTabs}
-        />
-        <FloatButton
-          shape="circle"
-          icon={<SearchOutlined />}
-          tooltip={{ title: $fmt('home.searchTabAndUrl'), placement: 'top' }}
-          style={{ right: 90, bottom: 30 }}
-          onClick={openGlobalSearchPanel}
-        />
-        {/* 回到顶部 */}
-        <FloatButton.BackTop
-          shape="circle"
-          tooltip={{ title: $fmt('common.backToTop'), placement: 'top' }}
-          duration={100}
-          visibilityHeight={400}
-          style={{ right: 150, bottom: 30 }}
-        />
+        <div className="float-button-box">
+          {/* 回到顶部 */}
+          <Button
+            shape="circle"
+            icon={<ToTopOutlined />}
+            title={$fmt('common.backToTop')}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          />
+
+          <Button
+            shape="circle"
+            icon={<SearchOutlined />}
+            title={$fmt('home.searchTabAndUrl')}
+            onClick={openGlobalSearchPanel}
+          />
+
+          <Button
+            shape="circle"
+            icon={<SendOutlined />}
+            title={$fmt('common.sendAllTabs')}
+            onClick={handleSendAllTabs}
+          />
+        </div>
       </StyledPageContainer>
     </ThemeProvider>
   );

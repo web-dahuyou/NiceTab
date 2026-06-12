@@ -128,6 +128,7 @@ const zhCN = {
   'common.filter': '筛选',
   'common.locked': '已锁定',
   'common.starred': '已星标',
+  'common.tips': '提示',
 };
 
 export type LocaleKey = keyof typeof zhCN;

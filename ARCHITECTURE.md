@@ -45,7 +45,7 @@ Uses `react-intl` for i18n:
 ### UI Framework
 
 - **React 18** with TypeScript
-- **Ant Design 5.23.4** for UI components
+- **Ant Design 5.29.3** for UI components
 - **styled-components** for custom styling
 - **react-router-dom** for options page navigation
 - **pragmatic-drag-and-drop** (Atlassian) for drag-and-drop functionality
@@ -57,7 +57,7 @@ Key permissions configured in `wxt.config.ts`:
 - `storage`: For data persistence
 - `tabs`: For tab management
 - `contextMenus`: For right-click menu
-- `tabGroups`: Chrome-only for native tab groups
+- `tabGroups`: For broswer's native tab groups
 - `commands`: Chrome-only for keyboard shortcuts
 - `alarms`: For auto-sync scheduling
 - `scripting`: For content script injection

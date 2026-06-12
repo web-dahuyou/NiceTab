@@ -139,6 +139,7 @@ const enUS: Record<LocaleKey, string> = {
   'common.filter': 'Filter',
   'common.locked': 'Locked',
   'common.starred': 'Starred',
+  'common.tips': 'Tips',
 };
 
 export default enUS;
