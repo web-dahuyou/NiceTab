@@ -1,10 +1,18 @@
-import React, { createContext, useCallback, useEffect, useState, useMemo } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  useMemo,
+} from 'react';
 import type { TreeProps } from 'antd';
 import type { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
 import { settingsUtils, stateUtils, tabListUtils } from '~/entrypoints/common/storage';
 import { openNewTab, openNewGroup } from '~/entrypoints/common/tabs';
 import { ENUM_SETTINGS_PROPS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { getRandomId } from '~/entrypoints/common/utils';
+import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import useUrlParams from '~/entrypoints/common/hooks/urlParams';
 import {
   initialSelectionBoxData,
@@ -18,6 +26,7 @@ import {
   DndTabItemOnDropCallback,
 } from '../types';
 import { getTreeData } from '../utils';
+import { copyLinksToClipboard } from './groupActions';
 
 const {
   DELETE_AFTER_RESTORE,
@@ -62,6 +71,8 @@ export function useTreeData() {
   const [refreshKey, setRefreshKey] = useState<string>(getRandomId());
   const [highlightTabId, setHighlightTabId] = useState<string | undefined>();
 
+  const { $fmt } = useIntlUtls();
+  const { $message } = useContext(GlobalContext);
   const { urlParams, setSearchParams } = useUrlParams();
 
   const selectedTag: TreeDataNodeTag = useMemo(() => {
@@ -419,6 +430,19 @@ export function useTreeData() {
     });
   };
 
+  const handleTabsSort = async ({
+    tagId,
+    groupId,
+    sortType,
+  }: {
+    tagId: string;
+    groupId: string;
+    sortType: string;
+  }) => {
+    await tabListUtils.tabsSortbyName(sortType, groupId, tagId);
+    refreshTreeData();
+  };
+
   // treeNode 节点操作
   const onTreeNodeAction = useCallback(
     ({ actionType, node, actionName, data }: RenderTreeNodeActionProps) => {
@@ -438,10 +462,41 @@ export function useTreeData() {
               node as TreeDataNodeTabGroup,
               (data as Partial<GroupItem>) || {},
             ),
+          restore: () => handleTabGroupRestore(node as TreeDataNodeTabGroup),
+          lock: () =>
+            handleTabGroupChange(node as TreeDataNodeTabGroup, {
+              isLocked: !(node as TreeDataNodeTabGroup).originData?.isLocked,
+            }),
+          star: () =>
+            handleTabGroupStarredChange(
+              node as TreeDataNodeTabGroup,
+              !(node as TreeDataNodeTabGroup).originData?.isStarred,
+            ),
+          clone: () => handleTabGroupCopy(node.key as string),
+          copyLinks: () => {},
+          dedup: () => handleTabGroupDedup(node as TreeDataNodeTabGroup),
           moveTo: () => {}, // 在index.tsx中实现
+          addGroupBefore: () => handleTabGroupCreate(node.parentKey!, node.key, 'before'),
+          addGroupAfter: () => handleTabGroupCreate(node.parentKey!, node.key, 'after'),
+          tabsSortAsc: () =>
+            handleTabsSort({
+              tagId: (node as TreeDataNodeTabGroup).parentKey,
+              groupId: node.key as string,
+              sortType: 'ascending',
+            }),
+          tabsSortDesc: () =>
+            handleTabsSort({
+              tagId: (node as TreeDataNodeTabGroup).parentKey,
+              groupId: node.key as string,
+              sortType: 'descending',
+            }),
         },
       };
-      const handler = handlerMap[actionType][actionName];
+
+      const handler = (
+        handlerMap[actionType] as Record<string, (() => void) | undefined>
+      )?.[actionName];
+
       handler?.();
     },
     [
@@ -452,6 +507,13 @@ export function useTreeData() {
       handleTabGroupCreate,
       handleTabGroupRemove,
       handleTabGroupChange,
+      handleTabGroupRestore,
+      handleTabGroupStarredChange,
+      handleTabGroupCopy,
+      handleTabGroupDedup,
+      handleTabsSort,
+      $fmt,
+      $message,
     ],
   );
 
@@ -501,19 +563,6 @@ export function useTreeData() {
         _targetIndex,
       );
     }
-    refreshTreeData();
-  };
-
-  const handleTabsSort = async ({
-    tagId,
-    groupId,
-    sortType,
-  }: {
-    tagId: string;
-    groupId: string;
-    sortType: string;
-  }) => {
-    await tabListUtils.tabsSortbyName(sortType, groupId, tagId);
     refreshTreeData();
   };
 

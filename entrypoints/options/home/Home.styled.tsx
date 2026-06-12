@@ -72,7 +72,7 @@ export const StyledTreeNodeItem = styled.div`
     align-items: center;
     margin-left: 8px;
     flex-shrink: 0;
-    gap: 2px;
+    gap: 4px;
     visibility: hidden;
     pointer-eventes: none;
   }

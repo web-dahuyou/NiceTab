@@ -1,4 +1,5 @@
 import { type LocaleKeys } from '~/entrypoints/common/locale';
+import type { GroupActionName, TabActionName } from './types';
 
 // drag and drop keys
 export const dndKeys = {
@@ -6,7 +7,7 @@ export const dndKeys = {
   tabGroupItem: Symbol('dnd-tab-group-item'),
 };
 
-export const defaultGroupActions = [
+export const defaultGroupActions: GroupActionName[] = [
   'remove',
   'rename',
   'restore',
@@ -22,10 +23,13 @@ export const defaultGroupActions = [
   'tabsSortDesc',
 ];
 
-export const defaultTabActions = ['open', 'remove', 'clone', 'copyLinks', 'moveTo'];
-
-export type GroupActionName = (typeof defaultGroupActions)[number];
-export type TabActionName = (typeof defaultTabActions)[number];
+export const defaultTabActions: TabActionName[] = [
+  'open',
+  'remove',
+  'clone',
+  'copyLinks',
+  'moveTo',
+];
 
 export interface ActionOption<T extends 'group' | 'tab' = 'group'> {
   actionName: T extends 'group' ? GroupActionName : TabActionName;

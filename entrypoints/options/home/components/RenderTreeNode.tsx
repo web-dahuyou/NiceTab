@@ -1,13 +1,19 @@
-import React, { useMemo, useRef, memo } from 'react';
-import { theme } from 'antd';
-import { CloseOutlined, PlusOutlined, SendOutlined } from '@ant-design/icons';
+import React, { useMemo, useRef, useCallback, memo } from 'react';
+import { theme, Dropdown } from 'antd';
+import {
+  CloseOutlined,
+  PlusOutlined,
+  SendOutlined,
+  MenuOutlined,
+} from '@ant-design/icons';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { ENUM_COLORS, UNNAMED_TAG, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import EditInput from '~/entrypoints/options/components/EditInput';
 import DropComponent from '~/entrypoints/common/components/DropComponent';
-import { dndKeys } from '../constants';
-import type { RenderTreeNodeProps } from '../types';
+import { dndKeys, defaultGroupActions } from '../constants';
+import type { RenderTreeNodeProps, GroupActionName } from '../types';
+import useGroupActions from '../hooks/groupActions';
 import { StyledTreeNodeItem } from '../Home.styled';
 import { type TreeDataHookProps } from '../hooks/treeData';
 import { eventEmitter as homeEventEmitter } from '../hooks/homeCustomEvent';
@@ -32,6 +38,38 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
   const isStaticTag = useMemo(() => {
     return node.type === 'tag' && !!node?.originData?.static;
   }, [node]);
+
+  const tagId = useMemo(
+    () => (node.type === 'tabGroup' ? (node.parentKey as string) : (node.key as string)),
+    [node],
+  );
+  // 标签组操作相关
+  const groupId = useMemo(
+    () => (node.type === 'tabGroup' ? (node.key as string) : ''),
+    [node],
+  );
+
+  const onGroupAction = useCallback(
+    (actionName: GroupActionName, groupId: string) => {
+      onAction?.({ actionType: 'tabGroup', node, actionName, data: { groupId } });
+    },
+    [node, onAction],
+  );
+
+  const { groupActions } = useGroupActions({
+    groupId,
+    tagId,
+    tagLocked: node.type === 'tabGroup' && !!node.parentData?.isLocked,
+    isLocked: node.type === 'tabGroup' && !!node.originData?.isLocked,
+    isStarred: node.type === 'tabGroup' && !!node.originData?.isStarred,
+    tabList: node.type === 'tabGroup' ? node.originData?.tabList : undefined,
+    allowGroupActions: defaultGroupActions,
+    onAction: onGroupAction,
+  });
+
+  const groupMenuItems = useMemo(() => {
+    return [...groupActions.outerList, ...groupActions.innerList];
+  }, [groupActions]);
 
   const onMoveToClick = useCallback(
     (e: React.MouseEvent) => {
@@ -191,6 +229,20 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
                 </StyledActionIconBtn>
               </>
             )}
+
+            {node.type === 'tabGroup' && (
+              <Dropdown menu={{ items: groupMenuItems }} arrow trigger={['click']}>
+                <StyledActionIconBtn
+                  className="btn-more"
+                  $size="14"
+                  title={$fmt('common.more')}
+                  onClick={e => e.stopPropagation()}
+                >
+                  <MenuOutlined />
+                </StyledActionIconBtn>
+              </Dropdown>
+            )}
+
             {!isLocked && !isStaticTag && (
               <StyledActionIconBtn
                 className="btn-remove"

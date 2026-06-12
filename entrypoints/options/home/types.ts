@@ -24,7 +24,7 @@ export type TreeDataNodeUnion = TreeDataNodeTag | TreeDataNodeTabGroup;
 export type RenderTreeNodeActionProps = {
   actionType: 'tag' | 'tabGroup';
   node: TreeDataNodeUnion;
-  actionName: 'create' | 'remove' | 'rename' | 'moveTo';
+  actionName: TagActionName | GroupActionName;
   data?: Partial<TagItem | GroupItem>;
 };
 export type RenderTreeNodeProps = {
@@ -97,5 +97,22 @@ export type DndTabItemOnDropCallback = ({
   actionType?: DragActionType;
 }) => void;
 
+export type TagActionName = 'create' | 'remove' | 'rename' | 'moveTo';
+
 // 标签组操作 remove-删除 rename-重命名 restore-恢复 lock-锁定 star-星标 recover-从回收站复原到列表页
-export type GroupActions = 'remove' | 'rename' | 'restore' | 'lock' | 'star' | 'recover';
+export type GroupActionName =
+  | 'remove'
+  | 'rename'
+  | 'restore'
+  | 'lock'
+  | 'star'
+  | 'clone'
+  | 'copyLinks'
+  | 'dedup'
+  | 'moveTo'
+  | 'tabsSortAsc'
+  | 'tabsSortDesc'
+  | 'addGroupBefore'
+  | 'addGroupAfter';
+
+export type TabActionName = 'open' | 'remove' | 'clone' | 'copyLinks' | 'moveTo';
