@@ -29,11 +29,14 @@ const zhTW: Record<LocaleKey, string> = {
   "home.recoverDesc": "您確定要還原該{type}嗎？",
   "home.recoverAllDesc": "您確定要全部還原嗎？",
   "home.copyLinks": "複製連結",
+
   "home.tag.remove": "刪除",
   "home.tag.recover": "還原",
   "home.tag.countInfo": "目前分類統計",
   "home.tag.lock": "鎖定該分類",
-  "home.tag.unlock": "解锁該分類",
+  "home.tag.unlock": "解鎖該分類",
+  'home.tag.open': '開啟分類',
+
   "home.tabGroup.add": "創建分頁群組",
   "home.tabGroup.remove": "刪除該組",
   "home.tabGroup.restore": "恢复該組",
@@ -55,12 +58,14 @@ const zhTW: Record<LocaleKey, string> = {
   "home.tab.url": "網址",
   "home.tab.selectedCount": "{count} 個分頁",
   "home.tab.removeSelected": "您確定要刪除{count, plural, =0 {分頁} =1 {這個分頁} other {這#個分頁} }嗎？",
+
   "home.createSnapshot": "創建快照",
   "home.createSnapshot.tip": "將目前開啟的分頁儲存為快照",
   "home.restoreSnapshot": "恢復快照",
   "home.getPermission.tabGroups": "獲取分頁群組權限",
   "home.getPermission.tabGroups.tip": "授權 tabGroups 權限，可對接原生分頁群組功能，體驗更佳！",
   "home.displayPinnedTabs": "是否顯示釘選分頁",
+
   "home.help.tip.userGuide": "更多信息請檢視{userGuide}。",
   "home.help.reminder.start": "出於安全原因，在 Firefox 中，可能不允许使用特權 URL，例如：",
   'home.help.reminder.list': `
@@ -71,6 +76,7 @@ const zhTW: Record<LocaleKey, string> = {
     <li>Firefox 的特權 about: URLs (e.g. about:config, about:addons, about:debugging). 非特權 URL（例如 about:blank）是允許的。</li>
   `,
   "home.help.reminder.end": "如果頁面連結符合上述場景，點擊連結可能無法開啟頁面，請手動複製連結進行訪問。",
+
   'home.help.content': `
     <li>左側列表一級選單表示分類，二級選單表示分頁群組，左側列表支援分類和分頁群組的搜尋；右側面板顯示的是目前選中分類中的全部分頁群組以及分頁群組中的分頁。</li>
     <li>右側面板中的分頁支援拖曳排序以及跨組移動，您還可以將右側面板中的分頁拖曳到左側列表的分頁群組中，以實現跨分類移動；另外可點擊「移動到」按鈕進行分頁群組和分頁的移動操作。</li>
@@ -92,6 +98,7 @@ const zhTW: Record<LocaleKey, string> = {
   "home.help.hotkey.2": ")；您還可以自行前往擴充功能程序頁面",
   "home.help.hotkey.modify": "修改快捷鍵",
   "home.help.hotkey.modifyTip": "快速鍵修改完后，會立即生效，但右鍵菜單中的快速鍵按鍵名需在切換瀏覽器tab後自動更新。",
+
   "home.moveTo.missingTip": "請選擇{type}",
   "home.moveTo.copyLabel": "複製所選項",
   "home.moveTo.copyTip": "勾選後，則將所選項複製到目標分類/分組中。",

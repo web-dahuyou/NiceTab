@@ -2,8 +2,6 @@ import React, { useMemo, useRef, useCallback, memo } from 'react';
 import { theme, Dropdown } from 'antd';
 import {
   CloseOutlined,
-  PlusOutlined,
-  SendOutlined,
   MenuOutlined,
 } from '@ant-design/icons';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -11,9 +9,10 @@ import { ENUM_COLORS, UNNAMED_TAG, UNNAMED_GROUP } from '~/entrypoints/common/co
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import EditInput from '~/entrypoints/options/components/EditInput';
 import DropComponent from '~/entrypoints/common/components/DropComponent';
-import { dndKeys, defaultGroupActions } from '../constants';
-import type { RenderTreeNodeProps, GroupActionName } from '../types';
+import { dndKeys, defaultGroupActions, defaultTagActions } from '../constants';
+import type { RenderTreeNodeProps, TagActionName, GroupActionName } from '../types';
 import useGroupActions from '../hooks/groupActions';
+import useTagActions from '../hooks/tagActions';
 import { StyledTreeNodeItem } from '../Home.styled';
 import { type TreeDataHookProps } from '../hooks/treeData';
 import { eventEmitter as homeEventEmitter } from '../hooks/homeCustomEvent';
@@ -71,27 +70,30 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
     return [...groupActions.outerList, ...groupActions.innerList];
   }, [groupActions]);
 
-  const onMoveToClick = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      onAction?.({ actionType: node.type, node, actionName: 'moveTo' });
+  // 分类操作相关
+  const onTagAction = useCallback(
+    (actionName: TagActionName, tagId: string) => {
+      if (actionName === 'create') {
+        onAction?.({ actionType: 'tabGroup', node, actionName, data: { tagId } });
+      } else {
+        onAction?.({ actionType: 'tag', node, actionName, data: { tagId } });
+      }
     },
-    [onAction],
+    [node, onAction],
   );
+
+  const { tagMenuItems } = useTagActions({
+    tagId: tagId as string,
+    isLocked: node.type === 'tag' && !!node.originData?.isLocked,
+    groupList: node.type === 'tag' ? node.originData?.groupList : [],
+    allowTagActions: defaultTagActions,
+    onAction: onTagAction,
+  });
 
   const onRemoveClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
       onAction?.({ actionType: node.type, node, actionName: 'remove' });
-    },
-    [onAction],
-  );
-
-  const handleGroupCreate = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      node.type === 'tag' &&
-        onAction?.({ actionType: 'tabGroup', node, actionName: 'create' });
     },
     [onAction],
   );
@@ -205,29 +207,17 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
           )}
 
           <span className="tree-node-icon-group">
-            {node.type === 'tag' && !node.originData?.isLocked && (
-              <>
-                {node.children?.length ? (
-                  <StyledActionIconBtn
-                    className="btn-send"
-                    $size="14"
-                    title={$fmt('home.moveAllGroupTo')}
-                    $hoverColor={token.colorPrimaryHover}
-                    onClick={onMoveToClick}
-                  >
-                    <SendOutlined />
-                  </StyledActionIconBtn>
-                ) : null}
+            {node.type === 'tag' && (
+              <Dropdown menu={{ items: tagMenuItems }} arrow trigger={['click']}>
                 <StyledActionIconBtn
-                  className="btn-add"
+                  className="btn-more"
                   $size="14"
-                  title={$fmt('home.createTabGroup')}
-                  $hoverColor={token.colorPrimaryHover}
-                  onClick={handleGroupCreate}
+                  title={$fmt('common.more')}
+                  onClick={e => e.stopPropagation()}
                 >
-                  <PlusOutlined />
+                  <MenuOutlined />
                 </StyledActionIconBtn>
-              </>
+              </Dropdown>
             )}
 
             {node.type === 'tabGroup' && (

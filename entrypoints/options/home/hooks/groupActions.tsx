@@ -99,6 +99,7 @@ export default function useGroupActions({
         key: 'restore',
         label: $fmt(actionMap['restore'].labelKey),
         icon: <ExportOutlined />,
+        disabled: !tabList.length,
         onClick: () => onAction('restore', groupId),
       },
       {

@@ -1,5 +1,5 @@
 import { type LocaleKeys } from '~/entrypoints/common/locale';
-import type { GroupActionName, TabActionName } from './types';
+import type { TagActionName, GroupActionName, TabActionName } from './types';
 
 // drag and drop keys
 export const dndKeys = {
@@ -23,6 +23,57 @@ export const defaultGroupActions: GroupActionName[] = [
   'tabsSortDesc',
 ];
 
+export const defaultTagActions: TagActionName[] = [
+  'create',
+  'remove',
+  'lock',
+  'restore',
+  'moveTo',
+  'sortByNameAsc',
+  'sortByNameDesc',
+  'sortByCreateTimeAsc',
+  'sortByCreateTimeDesc',
+];
+
+export const tagActionOptions: ActionOption<'tag'>[] = [
+  {
+    actionName: 'create',
+    labelKey: 'home.createTabGroup',
+  },
+  {
+    actionName: 'remove',
+    labelKey: 'common.remove',
+  },
+  {
+    actionName: 'lock',
+    labelKey: 'home.tag.lock',
+  },
+  {
+    actionName: 'restore',
+    labelKey: 'home.tag.open',
+  },
+  {
+    actionName: 'moveTo',
+    labelKey: 'home.moveAllGroupTo',
+  },
+  {
+    actionName: 'sortByNameAsc',
+    labelKey: 'common.ascending',
+  },
+  {
+    actionName: 'sortByNameDesc',
+    labelKey: 'common.descending',
+  },
+  {
+    actionName: 'sortByCreateTimeAsc',
+    labelKey: 'common.ascending',
+  },
+  {
+    actionName: 'sortByCreateTimeDesc',
+    labelKey: 'common.descending',
+  },
+];
+
 export const defaultTabActions: TabActionName[] = [
   'open',
   'remove',
@@ -31,8 +82,12 @@ export const defaultTabActions: TabActionName[] = [
   'moveTo',
 ];
 
-export interface ActionOption<T extends 'group' | 'tab' = 'group'> {
-  actionName: T extends 'group' ? GroupActionName : TabActionName;
+export interface ActionOption<T extends 'tag' | 'group' | 'tab' = 'group'> {
+  actionName: T extends 'tag'
+    ? TagActionName
+    : T extends 'group'
+      ? GroupActionName
+      : TabActionName;
   labelKey: LocaleKeys;
 }
 export const groupActionOptions: ActionOption[] = [

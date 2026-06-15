@@ -35,6 +35,7 @@ const enUS: Record<LocaleKey, string> = {
   'home.tag.countInfo': 'Current Counts',
   'home.tag.lock': 'Lock the Tag',
   'home.tag.unlock': 'Unlock the Tag',
+  'home.tag.open': 'Open Tag',
 
   'home.tabGroup.add': 'Create Tab Group',
   'home.tabGroup.remove': 'Remove',

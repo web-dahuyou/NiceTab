@@ -33,6 +33,7 @@ const zhCN = {
   'home.tag.countInfo': '当前分类统计',
   'home.tag.lock': '锁定该分类',
   'home.tag.unlock': '解锁该分类',
+  'home.tag.open': '打开分类',
 
   'home.tabGroup.add': '创建标签组',
   'home.tabGroup.remove': '删除该组',

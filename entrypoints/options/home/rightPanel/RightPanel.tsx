@@ -283,7 +283,7 @@ export default function RightPanel({
               title={<Typography.Text>{$fmt('home.tip.multiSelection')}</Typography.Text>}
               styles={{ root: { maxWidth: '300px', width: '300px' } }}
             >
-              <StyledActionIconBtn className="btn-tips" title={$fmt('common.tips')}>
+              <StyledActionIconBtn className="btn-tips">
                 <QuestionCircleOutlined />
               </StyledActionIconBtn>
             </Tooltip>

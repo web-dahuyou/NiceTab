@@ -97,9 +97,22 @@ export type DndTabItemOnDropCallback = ({
   actionType?: DragActionType;
 }) => void;
 
-export type TagActionName = 'create' | 'remove' | 'rename' | 'moveTo';
+// 分类操作
+export type TagActionName =
+  | 'create'
+  | 'remove'
+  | 'rename'
+  | 'restore'
+  | 'lock'
+  | 'moveTo'
+  | 'sortByNameAsc'
+  | 'sortByNameDesc'
+  | 'sortByCreateTimeAsc'
+  | 'sortByCreateTimeDesc';
 
-// 标签组操作 remove-删除 rename-重命名 restore-恢复 lock-锁定 star-星标 recover-从回收站复原到列表页
+// 标签组操作
+// remove-删除 rename-重命名 restore-恢复 lock-锁定 star-星标 recover-从回收站复原到列表页 clone-克隆 copyLinks-复制链接 dedup-去重
+// moveTo-移动/发送到 tabsSortAsc-标签组内排序升序 tabsSortDesc-标签组内排序降序 addGroupBefore-在当前标签组前添加一个标签组 addGroupAfter-在当前标签组后添加一个标签组
 export type GroupActionName =
   | 'remove'
   | 'rename'
@@ -115,4 +128,5 @@ export type GroupActionName =
   | 'addGroupBefore'
   | 'addGroupAfter';
 
+// 标签页操作
 export type TabActionName = 'open' | 'remove' | 'clone' | 'copyLinks' | 'moveTo';
