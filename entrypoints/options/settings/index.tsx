@@ -23,7 +23,6 @@ import { reloadOtherAdminPage } from '~/entrypoints/common/tabs';
 // import StickyFooter from '~/entrypoints/common/components/StickyFooter';
 
 import SidebarBaseBtn from '~/entrypoints/options/components/SidebarBaseBtn';
-import ToggleSidebarBtn from '../components/ToggleSidebarBtn';
 
 import FormModuleCommon from './FormModuleCommon';
 import FormModuleSend from './FormModuleSend';
@@ -222,41 +221,34 @@ export default function Settings() {
       >
         <StyledSidebarWrapper
           className="sidebar"
-          $collapsed={sidebarCollapsed}
-          $sidebarWidth={240}
-        >
-          <div
-            className={classNames('sidebar-inner-box', sidebarCollapsed && 'collapsed')}
-          >
-            <div className="sidebar-action-box">
-              <ToggleSidebarBtn
-                collapsed={sidebarCollapsed}
-                onCollapseChange={onCollapseChange}
+          collapsed={sidebarCollapsed}
+          sidebarWidth={240}
+          showCollapseBtn={true}
+          onCollapseChange={onCollapseChange}
+          sideActionBox={
+            <Badge
+              dot={hasChanged}
+              status="processing"
+              color={token.colorPrimary}
+              offset={[-4, 4]}
+            >
+              <SidebarBaseBtn
+                title={$fmt('common.save')}
+                icon={<SaveOutlined />}
+                blink={hasChanged}
+                onClick={handleSave}
               />
-              <Badge
-                dot={hasChanged}
-                status="processing"
-                color={token.colorPrimary}
-                offset={[-4, 4]}
-              >
-                <SidebarBaseBtn
-                  title={$fmt('common.save')}
-                  icon={<SaveOutlined />}
-                  blink={hasChanged}
-                  onClick={handleSave}
-                />
-              </Badge>
-            </div>
-            <div className="sidebar-inner-content">
-              <Menu
-                selectedKeys={[currModule]}
-                mode="vertical"
-                items={blockModuleOptions}
-                onClick={onModuleChange}
-              />
-            </div>
-          </div>
-        </StyledSidebarWrapper>
+            </Badge>
+          }
+          innerContent={
+            <Menu
+              selectedKeys={[currModule]}
+              mode="vertical"
+              items={blockModuleOptions}
+              onClick={onModuleChange}
+            />
+          }
+        />
         <div className="main-content-wrapper settings-wrapper">
           <Form
             form={form}

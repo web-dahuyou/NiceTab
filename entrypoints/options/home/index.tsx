@@ -53,7 +53,6 @@ import {
   StyledMainWrapper,
   StyledHelpInfoBox,
 } from './Home.styled';
-import ToggleSidebarBtn from '../components/ToggleSidebarBtn';
 import ToggleLockedBtn from './components/ToggleLockedBtn';
 import RightPanel from './rightPanel/RightPanel';
 import SearchTabsBtn from './components/SearchTabsBtn';
@@ -241,15 +240,13 @@ export default function Home() {
           $collapsed={sidebarCollapsed}
           $rightPanelCollapsed={openedTabsCollapsed}
         >
-          <StyledSidebarWrapper className="sidebar" $collapsed={sidebarCollapsed}>
-            <div
-              className={classNames('sidebar-inner-box', sidebarCollapsed && 'collapsed')}
-            >
-              <div className="sidebar-action-box">
-                <ToggleSidebarBtn
-                  collapsed={sidebarCollapsed}
-                  onCollapseChange={onCollapseChange}
-                ></ToggleSidebarBtn>
+          <StyledSidebarWrapper
+            className="sidebar"
+            collapsed={sidebarCollapsed}
+            showCollapseBtn={true}
+            onCollapseChange={onCollapseChange}
+            sideActionBox={
+              <>
                 <SearchTabsBtn></SearchTabsBtn>
                 {lockTagBtnVisible && (
                   <ToggleLockedBtn
@@ -264,9 +261,10 @@ export default function Home() {
                     onSort={onCreateTimeSort}
                   ></SortingBtns>
                 ) : null}
-              </div>
-
-              <div className="sidebar-inner-content">
+              </>
+            }
+            innerContent={
+              <>
                 <div className="tag-list-title">
                   {$fmt('home.tabGroupList')}
                   <StyledActionIconBtn
@@ -329,9 +327,9 @@ export default function Home() {
 
                 {/* 分类和标签组列表 */}
                 <TreeBox></TreeBox>
-              </div>
-            </div>
-          </StyledSidebarWrapper>
+              </>
+            }
+          />
 
           {/* 标签组和标签页列表 */}
           <div ref={multiSelectContainerRef} id="tab-group-list-panel">

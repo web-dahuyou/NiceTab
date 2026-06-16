@@ -23,7 +23,6 @@ import type {
 import { updateAdminPageUrlDebounced } from '~/entrypoints/common/tabs';
 
 import { StyledSidebarWrapper, StyledMainWrapper } from './Sync.styled';
-// import ToggleSidebarBtn from '../components/ToggleSidebarBtn';
 import SidebarContentModuleGist from './components/gist/SidebarContentModule';
 import SidebarContentModuleWebDAV from './components/webdav/SidebarContentModule';
 import SyncResultList from './SyncResultList';
@@ -159,14 +158,10 @@ export default function SyncPage() {
       >
         <StyledSidebarWrapper
           className="sidebar"
-          $collapsed={sidebarCollapsed}
-          $sidebarWidth={400}
-        >
-          <div
-            className={classNames('sidebar-inner-box', sidebarCollapsed && 'collapsed')}
-          >
-            <div className="sidebar-action-box">
-              {/* <ToggleSidebarBtn onCollapseChange={setSidebarCollapsed}></ToggleSidebarBtn> */}
+          collapsed={sidebarCollapsed}
+          sidebarWidth={400}
+          sideActionBox={
+            <>
               <div
                 className="action-icon"
                 title={$fmt('sync.pushToAllRemotes')}
@@ -181,30 +176,30 @@ export default function SyncPage() {
               >
                 <Button icon={<ClearOutlined />}></Button>
               </div>
-            </div>
-            <div className="sidebar-inner-content">
-              <Flex vertical gap={12}>
-                <SidebarContentModuleGist
-                  ref={gistRef}
-                  targetType={selectedTargetType}
-                  selectedKey={selectedKey}
-                  onSelect={key => onSelect('gist', key)}
-                  onAction={({ key }) => onAction?.('gist', key)}
-                  onConfigChange={getSyncInfo}
-                />
+            </>
+          }
+          innerContent={
+            <Flex vertical gap={12}>
+              <SidebarContentModuleGist
+                ref={gistRef}
+                targetType={selectedTargetType}
+                selectedKey={selectedKey}
+                onSelect={key => onSelect('gist', key)}
+                onAction={({ key }) => onAction?.('gist', key)}
+                onConfigChange={getSyncInfo}
+              />
 
-                <SidebarContentModuleWebDAV
-                  ref={webDAVRef}
-                  targetType={selectedTargetType}
-                  selectedKey={selectedKey}
-                  onSelect={key => onSelect('webdav', key)}
-                  onAction={({ key }) => onAction?.('webdav', key)}
-                  onConfigChange={getWebDavConfig}
-                />
-              </Flex>
-            </div>
-          </div>
-        </StyledSidebarWrapper>
+              <SidebarContentModuleWebDAV
+                ref={webDAVRef}
+                targetType={selectedTargetType}
+                selectedKey={selectedKey}
+                onSelect={key => onSelect('webdav', key)}
+                onAction={({ key }) => onAction?.('webdav', key)}
+                onConfigChange={getWebDavConfig}
+              />
+            </Flex>
+          }
+        />
         <div className="main-content-wrapper">
           <SyncResultList resultList={resultList}></SyncResultList>
         </div>

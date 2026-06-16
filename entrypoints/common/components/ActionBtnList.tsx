@@ -14,7 +14,7 @@ export type ActionOptionItem = menuItem & {
   hoverColor?: string;
   validator?: () => boolean;
   onClick?: () => void;
-}
+};
 
 export default function ActionBtnList({
   actionBtnStyle = 'text',

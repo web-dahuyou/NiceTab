@@ -1,15 +1,13 @@
 import styled from 'styled-components';
 import { StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
 import type { StyledThemeProps } from '~/entrypoints/types';
-import {
-  StyledBaseSidebarWrapper,
-  StyledBaseMainWrapper,
-  StyledBaseRightPanelWrapper,
-} from '../Layout.styled';
+import { StyledBaseMainWrapper } from '../Layout.styled';
+import SidebarLayout from '../components/SidebarLayout';
+import RightPanelLayout from '../components/RightPanelLayout';
 
 export const StyledMainWrapper = StyledBaseMainWrapper;
 
-export const StyledSidebarWrapper = styled(StyledBaseSidebarWrapper)<{
+export const StyledSidebarWrapper = styled(SidebarLayout)<{
   theme: StyledThemeProps;
 }>`
   .sidebar-inner-content {
@@ -94,7 +92,7 @@ export const StyledHelpInfoBox = styled.div`
   }
 `;
 
-export const StyledRightPanelWrapper = styled(StyledBaseRightPanelWrapper)<{
+export const StyledRightPanelWrapper = styled(RightPanelLayout)<{
   theme: StyledThemeProps;
 }>`
   .right-panel-inner-content {

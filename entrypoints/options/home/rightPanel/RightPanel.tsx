@@ -3,7 +3,7 @@ import { browser, Tabs } from 'wxt/browser';
 import { Empty, Checkbox, Tooltip, Typography, theme } from 'antd';
 import type { CheckboxProps } from 'antd';
 import { CloseOutlined, CoffeeOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import { isGroupSupported, classNames } from '~/entrypoints/common/utils';
+import { isGroupSupported } from '~/entrypoints/common/utils';
 import { getAdminTabInfo } from '~/entrypoints/common/tabs';
 import {
   TAB_EVENTS,
@@ -14,7 +14,6 @@ import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import ActionBtnList, {
   type ActionOptionItem,
 } from '@/entrypoints/common/components/ActionBtnList';
-import ToggleSidebarBtn from '../../components/ToggleSidebarBtn';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { StyledRightPanelWrapper } from '../Home.styled';
 import { StyledOpenedTabsActions } from './OpenedTabs.styled';
@@ -265,16 +264,13 @@ export default function RightPanel({
   }, []);
 
   return (
-    <StyledRightPanelWrapper className="opened-tabs-panel" $collapsed={collapsed}>
-      <div className={classNames('right-panel-inner-box', collapsed && 'collapsed')}>
-        <div className="right-panel-action-box">
-          <ToggleSidebarBtn
-            collapsed={collapsed}
-            position="right"
-            onCollapseChange={onCollapseChange}
-          ></ToggleSidebarBtn>
-        </div>
-        <div className="right-panel-inner-content">
+    <StyledRightPanelWrapper
+      className="opened-tabs-panel"
+      collapsed={collapsed}
+      showCollapseBtn={true}
+      onCollapseChange={onCollapseChange}
+      innerContent={
+        <>
           <div className="opened-tabs-title">
             {$fmt('common.openedTabs')}
             <Tooltip
@@ -363,8 +359,8 @@ export default function RightPanel({
               </div>
             )}
           </div>
-        </div>
-      </div>
-    </StyledRightPanelWrapper>
+        </>
+      }
+    />
   );
 }

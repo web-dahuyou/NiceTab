@@ -1,11 +1,12 @@
 import styled from 'styled-components';
-import { StyledBaseSidebarWrapper, StyledBaseMainWrapper } from '../Layout.styled';
+import { StyledBaseMainWrapper } from '../Layout.styled';
+import SidebarLayout from '../components/SidebarLayout';
 
 export const StyledMainWrapper = StyledBaseMainWrapper;
 
-export const StyledSidebarWrapper = styled(StyledBaseSidebarWrapper)<{
-  $collapsed?: boolean;
-  $sidebarWidth?: number;
+export const StyledSidebarWrapper = styled(SidebarLayout)<{
+  collapsed?: boolean;
+  sidebarWidth?: number;
 }>`
   .sidebar-inner-box {
     display: flex;
