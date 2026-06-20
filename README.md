@@ -123,9 +123,9 @@ Comprehensive user guide | <a href="./GUIDE.md">NiceTab User Guide</a>
 
 ### Extension Icon (Popup)
 
-- By default, clicking the `NiceTab` extension icon opens a popup panel where you can quickly access the  list page, settings page, import/export page, sync page and recycle bin page.
+- By default, clicking the `NiceTab` extension icon opens a popup panel where you can quickly access the list page, settings page, import/export page, sync page and recycle bin page.
 - You can quickly switch theme colors or view/close the current open tab.
-- If none popup modules are configured in preferences, clicking the extension icon will sends all tabs to NiceTab by default.
+- If no popup modules are configured in preferences, clicking the extension icon sends all tabs to NiceTab by default.
 
 Screenshots of other actions are not yet updated.
 
@@ -156,7 +156,7 @@ Screenshots of other actions are not yet updated.
 ### Import/Export
 
 - Currently supports import for `NiceTab`, `OneTab`, `Toby`, `SessionBuddy` and `KepTab` formats.
-- You can import `OneTab`, `Toby` `SessionBuddy` or `KepTab` data, and parsed into `NiceTab` format.
+- You can import `OneTab`, `Toby`, `SessionBuddy` or `KepTab` data, and parse it into `NiceTab` format.
 - You can export `NiceTab` data to local file.
 
 Screenshots are not yet updated.
@@ -210,7 +210,7 @@ Switch between Chinese and English in the management dashboard.
 - In `Dashboard > List` page, view all sent tabs organized by category and group.
 - In `Dashboard > Settings` page, manage the extension's preferences.
 - In `Dashboard > Import & Export` page, import or export tabs in NiceTab, OneTab, SessionBuddy, Toby or KepTab formats.
-- In `Dashboard > Sync` page, sync tabs to your Github and Gitee accounts as needed, just configure your access token (note, token permissions only check `gists` scope).
+- In `Dashboard > Sync` page, sync tabs to your GitHub and Gitee accounts as needed, just configure your access token (note, token permissions only check `gists` scope).
 - In `Dashboard > Recycle Bin` page, view and manage any deleted categories, tab groups, or tabs. You can restore or permanently delete them.
 
 ### Notes
