@@ -15,6 +15,7 @@ import ActionBtnList, {
   type ActionOptionItem,
 } from '@/entrypoints/common/components/ActionBtnList';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
+import type { RightPanelLayoutProps } from '../../components/RightPanelLayout';
 import { StyledRightPanelWrapper } from '../Home.styled';
 import { StyledOpenedTabsActions } from './OpenedTabs.styled';
 import TabGroupItem, { type TabGroupItemProps } from './TabGroupItem';
@@ -33,13 +34,7 @@ export type OpenedGroupDragData = DragData & {
   selectedTabs: Tabs.Tab[];
 };
 
-export default function RightPanel({
-  collapsed,
-  onCollapseChange,
-}: {
-  collapsed: boolean;
-  onCollapseChange: (status: boolean) => void;
-}) {
+export default function RightPanel(rightPanelProps: RightPanelLayoutProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const [tabs, setTabs] = useState<Tabs.Tab[]>([]);
@@ -266,9 +261,7 @@ export default function RightPanel({
   return (
     <StyledRightPanelWrapper
       className="opened-tabs-panel"
-      collapsed={collapsed}
-      showCollapseBtn={true}
-      onCollapseChange={onCollapseChange}
+      {...rightPanelProps}
       innerContent={
         <>
           <div className="opened-tabs-title">

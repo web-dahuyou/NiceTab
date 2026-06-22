@@ -1,22 +1,21 @@
 import styled from 'styled-components';
 import type { StyledThemeProps } from '~/entrypoints/types';
 
-const defaultSidebarWidth = 280;
-const defaultRightPanelWidth = 400;
+export const defaultSidebarWidth = 280;
+export const defaultRightPanelWidth = 400;
 
 export const StyledBaseSidebarWrapper = styled.div<{
   theme: StyledThemeProps;
-  $collapsed?: boolean;
-  $sidebarWidth?: number;
 }>`
   position: relative;
 
   .sidebar-inner-box {
-    width: ${props => props.$sidebarWidth || defaultSidebarWidth}px;
+    width: var(--sidebar-width, ${defaultSidebarWidth}px);
     height: calc(100vh - 180px);
     position: fixed;
     top: 100px;
     transition: transform 0.2s ease-in-out;
+    transform: translateX(0);
     border-right: 1px solid ${props => props.theme.colorBorder || 'rgba(5, 5, 5, 0.06)'};
 
     &.collapsed {
@@ -25,7 +24,12 @@ export const StyledBaseSidebarWrapper = styled.div<{
         visibility: hidden;
         opacity: 0;
       }
-      transform: translateX(-${props => props.$sidebarWidth || defaultSidebarWidth}px);
+      transform: translateX(calc(-1 * var(--sidebar-width, ${defaultSidebarWidth}px)));
+    }
+
+    /* 拖拽期间禁用 transition，避免布局滞后于鼠标 */
+    body.dragging-resize & {
+      transition: none;
     }
 
     .sidebar-action-box {
@@ -53,26 +57,21 @@ export const StyledBaseSidebarWrapper = styled.div<{
   }
 `;
 
-export const StyledBaseMainWrapper = styled.div<{
-  $collapsed?: boolean;
-  $sidebarWidth?: number;
-  $rightPanelCollapsed?: boolean;
-  $rightPanelWidth?: number;
-}>`
+export const StyledBaseMainWrapper = styled.div`
   position: relative;
   width: 100%;
   min-height: 400px;
   display: grid;
-  grid-template-columns: ${props => {
-    const leftCol = props.$collapsed
-      ? '0px'
-      : `${props.$sidebarWidth || defaultSidebarWidth}px`;
-    const rightCol = props.$rightPanelCollapsed
-      ? '0px'
-      : `${props.$rightPanelWidth || defaultRightPanelWidth}px`;
-    return `${leftCol} auto ${rightCol}`;
-  }};
+  grid-template-columns:
+    var(--sidebar-grid-col, ${defaultSidebarWidth}px)
+    auto
+    var(--right-panel-grid-col, ${defaultRightPanelWidth}px);
   transition: grid-template-columns 0.2s ease-in-out;
+
+  /* 拖拽期间禁用 transition，避免布局滞后于鼠标 */
+  body.dragging-resize & {
+    transition: none;
+  }
 
   .main-content-wrapper {
     padding: 0 60px;
@@ -82,18 +81,17 @@ export const StyledBaseMainWrapper = styled.div<{
 // 右侧面板基础样式
 export const StyledBaseRightPanelWrapper = styled.div<{
   theme: StyledThemeProps;
-  $collapsed?: boolean;
-  $panelWidth?: number;
 }>`
   position: relative;
 
   .right-panel-inner-box {
-    width: ${props => props.$panelWidth || defaultRightPanelWidth}px;
+    width: var(--panel-width, ${defaultRightPanelWidth}px);
     height: calc(100vh - 180px);
     position: fixed;
     top: 100px;
-    right: 24px;
+    right: 32px;
     transition: transform 0.2s ease-in-out;
+    transform: translateX(0);
     border-left: 1px solid ${props => props.theme.colorBorder || 'rgba(5, 5, 5, 0.06)'};
     background: var(--bg-color);
 
@@ -103,7 +101,12 @@ export const StyledBaseRightPanelWrapper = styled.div<{
         visibility: hidden;
         opacity: 0;
       }
-      transform: translateX(${props => props.$panelWidth || defaultRightPanelWidth}px);
+      transform: translateX(var(--panel-width, ${defaultRightPanelWidth}px));
+    }
+
+    /* 拖拽期间禁用 transition，避免布局滞后于鼠标 */
+    body.dragging-resize & {
+      transition: none;
     }
 
     .right-panel-action-box {

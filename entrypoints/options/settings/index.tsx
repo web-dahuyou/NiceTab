@@ -54,10 +54,14 @@ export default function Settings() {
   const { $fmt, locale } = useIntlUtls();
   const [messageApi, msgContextHolder] = message.useMessage();
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
+  const [sidebarWidth, setSidebarWidth] = useState<number>(240);
   const { token } = theme.useToken();
 
   const onCollapseChange = (status: boolean) => {
     setSidebarCollapsed(status);
+  };
+  const onSidebarWidthChange = (width: number) => {
+    setSidebarWidth(width);
   };
 
   const [form] = Form.useForm();
@@ -215,16 +219,20 @@ export default function Settings() {
       </Modal>
       <StyledMainWrapper
         className={classNames('sync-wrapper', sidebarCollapsed && 'collapsed')}
-        $collapsed={sidebarCollapsed}
-        $sidebarWidth={240}
-        $rightPanelCollapsed={true}
+        style={
+          {
+            '--sidebar-grid-col': `${sidebarCollapsed ? 0 : sidebarWidth}px`,
+            '--right-panel-grid-col': '0px',
+          } as React.CSSProperties
+        }
       >
         <StyledSidebarWrapper
           className="sidebar"
           collapsed={sidebarCollapsed}
-          sidebarWidth={240}
-          showCollapseBtn={true}
+          sidebarWidth={sidebarWidth}
+          initialWidth={240}
           onCollapseChange={onCollapseChange}
+          onWidthChange={onSidebarWidthChange}
           sideActionBox={
             <Badge
               dot={hasChanged}

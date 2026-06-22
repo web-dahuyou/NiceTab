@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useContext, useMemo, useCallback } from 'react';
 import { theme, Flex, Button, Modal } from 'antd';
 import { CloudUploadOutlined, ClearOutlined } from '@ant-design/icons';
 import { classNames } from '~/entrypoints/common/utils';
@@ -152,14 +152,18 @@ export default function SyncPage() {
       {modalContextHolder}
       <StyledMainWrapper
         className={classNames('sync-wrapper', sidebarCollapsed && 'collapsed')}
-        $collapsed={sidebarCollapsed}
-        $sidebarWidth={400}
-        $rightPanelCollapsed={true}
+        style={
+          {
+            '--sidebar-grid-col': `${sidebarCollapsed ? 0 : 400}px`,
+            '--right-panel-grid-col': '0px',
+          } as React.CSSProperties
+        }
       >
         <StyledSidebarWrapper
           className="sidebar"
           collapsed={sidebarCollapsed}
           sidebarWidth={400}
+          showCollapseBtn={false}
           sideActionBox={
             <>
               <div
