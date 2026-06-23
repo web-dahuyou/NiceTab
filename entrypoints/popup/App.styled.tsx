@@ -157,6 +157,11 @@ export const StyledGroupWrapper = styled.div<{ $color?: string }>`
       color: ${props => props.theme.colorText || '#000'};
       ${StyledEllipsis}
     }
+    .group-actions {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+    }
   }
   .tab-list {
     display: block;

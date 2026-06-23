@@ -12,7 +12,7 @@ export default function useThemeColors() {
         if (typeof colorItem === 'string') {
           map[name] = colorItem;
         } else {
-          map[name] = colorItem?.primary || colorItem?.[6] || ENUM_COLORS?.[name];
+          map[name] = colorItem?.primary || colorItem?.[5] || ENUM_COLORS?.[name];
         }
         return map;
       },
@@ -26,7 +26,7 @@ export default function useThemeColors() {
       if (typeof colorItem === 'string') return { key: name, color: colorItem };
       return {
         key: name,
-        color: colorItem?.primary || colorItem?.[6] || ENUM_COLORS?.[name],
+        color: colorItem?.primary || colorItem?.[5] || ENUM_COLORS?.[name],
       };
     });
   }, [token]);

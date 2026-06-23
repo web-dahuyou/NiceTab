@@ -464,18 +464,31 @@ async function sendRightTabs(targetData: SendTargetProps = {}, currTab?: Tabs.Ta
 
 // 打开页面后等待加载完成才能执行discard
 export async function waitToDiscard(tab: Tabs.Tab) {
+  if (!tab.id || tab.discarded) return;
+
   let title = '',
     url = '';
 
+  const cleanup = () => {
+    browser.tabs.onUpdated.removeListener(listener);
+    clearTimeout(timer);
+  };
+
+  // 超时保护：避免页面永远加载不完导致listener泄漏
+  const timer = setTimeout(cleanup, 10000);
+
   // 等待标签页加载完成后再discard
   const listener = (tabId: number, changeInfo: Tabs.OnUpdatedChangeInfoType) => {
-    if (tabId === tab.id) {
-      if (changeInfo.title) title = changeInfo.title;
-      if (changeInfo.url) url = changeInfo.url;
-      if ((title && url) || changeInfo.status === 'complete') {
-        browser.tabs.discard(tabId);
-        browser.tabs.onUpdated.removeListener(listener);
-      }
+    if (tabId !== tab.id) return;
+
+    if (changeInfo.title) title = changeInfo.title;
+    if (changeInfo.url) url = changeInfo.url;
+    if ((title && url) || changeInfo.status === 'complete') {
+      cleanup();
+      browser.tabs.discard(tabId).catch(() => {
+        // 标签页可能已被关闭或已休眠，忽略错误
+        // console.log('标签页休眠失败');
+      });
     }
   };
   browser.tabs.onUpdated.addListener(listener);
