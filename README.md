@@ -113,15 +113,15 @@ Comprehensive user guide | <a href="./GUIDE.md">NiceTab User Guide</a>
 
 Screenshots of other actions are not yet updated.
 
-![NiceTab-extension-icon-1](https://github.com/user-attachments/assets/cf65a363-3a2b-465a-936c-8fc8274856dc)
+![NiceTab-extension-icon-1](https://github.com/user-attachments/assets/debe19ca-cd80-4ec9-a8d3-79de6dafb5a7)
 
-![NiceTab-extension-icon-2](https://github.com/user-attachments/assets/899bfd01-c426-4c5b-af5e-0beb52882edf)
+![NiceTab-extension-icon-2](https://github.com/user-attachments/assets/f441c6c5-6da3-4769-a8a7-6691c0263613)
 
 ### Right-Click Menu
 
 - Right-clicking the extension icon reveals a quick-access context menu, you can open the `NiceTab Admin Page` (aka `Dashboard`) or try one-click actions to send all tabs, the current tab, other tabs, left-side tabs, or right-side tabs.
 
-![NiceTab-right-click-menu](https://github.com/user-attachments/assets/2fe82628-9dde-4cba-b336-6ca59b2ec5eb)
+![NiceTab-right-click-menu](https://github.com/user-attachments/assets/555a2ed0-50d3-4bb3-8008-c6e61792aa9c)
 
 ### Tab List
 
@@ -129,13 +129,13 @@ Screenshots of other actions are not yet updated.
 - The left panel supports drag-and-drop reordering and shortcuts sorting. The right panel displays all tab groups and tabs for the current category, and allows corresponding operations.
 - You can easily delete tab groups or move them to other categories. Multiple tabs can also be selected and moved or deleted in bulk.
 
-![NiceTab-list-page](https://github.com/user-attachments/assets/03a534d0-c034-4b9a-98fd-2d8d084ebcd3)
+![NiceTab-list-page](https://github.com/user-attachments/assets/244fb841-a036-42ca-9840-edb29b0e81db)
 
 ### Preferences
 
 - Customize various preference settings according to your own preferences.
 
-![NiceTab-preferences](https://github.com/user-attachments/assets/90e19998-206b-42de-9329-410e553955a4)
+![NiceTab-preferences](https://github.com/user-attachments/assets/18448d35-060c-47fe-9ad5-251b2324e7a0)
 
 ### Import/Export
 
@@ -145,7 +145,7 @@ Screenshots of other actions are not yet updated.
 
 Screenshots are not yet updated.
 
-![NiceTab-import-export](https://github.com/user-attachments/assets/e2ea4b00-3531-4819-b67a-e45f09b4e948)
+![NiceTab-import-export](https://github.com/user-attachments/assets/48b6d09b-342c-448e-b235-ae54c4aae235)
 
 ### Remote Sync
 
@@ -159,32 +159,39 @@ Supports syncing via Gitee Gists, GitHub Gists, and WebDAV:
 
 Screenshots of WebDAV sync are not yet updated.
 
-![NiceTab-remote-sync](https://github.com/user-attachments/assets/1d082c8f-4660-4f8e-9ac9-7cf468178ee1)
+![NiceTab-remote-sync](https://github.com/user-attachments/assets/446c6b94-55ad-46b3-a790-45e29027ee05)
 
 ### Theme Color Switching
 
 You can easily switch theme colors in the management dashboard or the popup panel.
 
-![NiceTab-theme-color-switch](https://github.com/user-attachments/assets/9e6dce98-8b6e-4fe7-846d-d5a00f410e6d)
+![NiceTab-theme-color-switch](https://github.com/user-attachments/assets/33ba956f-6801-490d-8507-b28854a8c0bc)
 
 ### Light/Dark Mode
 
 Light and dark themes are available, which can be toggled in the management dashboard.
 
-![NiceTab-light-dark-switch](https://github.com/user-attachments/assets/8d7a6f02-9feb-4289-b9f8-f066ab02f32e)
+![NiceTab-light-dark-switch](https://github.com/user-attachments/assets/148d9f26-d1ad-4f1c-909a-02ad099432c2)
 
 ### Language Switching
 
 Switch between Chinese and English in the management dashboard.
 
-![NiceTab-language-switch](https://github.com/user-attachments/assets/2d6b2348-a666-4996-bdd9-8653dfabf1d4)
+![NiceTab-language-switch](https://github.com/user-attachments/assets/ce9a7a2d-8b71-400a-98dd-e76cb565c021)
+
+### 全局搜索
+Global search all the tabs saved in NiceTab (including tab title and tab URL).
+
+![NiceTab-global-search-1](https://github.com/user-attachments/assets/6e94258d-75f5-4964-8b3b-a8fdefd93b94)
+
+![NiceTab-global-search-2](https://github.com/user-attachments/assets/a799282c-f702-4133-9478-bccf048d0a9d)
 
 ### Recycle Bin
 
 - Deleted categories, tab groups, or tabs go into the recycle bin.
 - You can restore them back to the tab list or permanently delete them.
 
-![NiceTab-recycle-bin](https://github.com/user-attachments/assets/016cb266-fe12-4063-b786-c979288f01fb)
+![NiceTab-recycle-bin](https://github.com/user-attachments/assets/2f22b6d3-ccf0-4939-a905-b781b74b25e9)
 
 ## Usage
 
