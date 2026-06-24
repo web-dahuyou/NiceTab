@@ -1,9 +1,6 @@
 import React, { useMemo, useRef, useCallback, memo } from 'react';
 import { theme, Dropdown } from 'antd';
-import {
-  CloseOutlined,
-  MenuOutlined,
-} from '@ant-design/icons';
+import { CloseOutlined, MenuOutlined, MoreOutlined } from '@ant-design/icons';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { ENUM_COLORS, UNNAMED_TAG, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
@@ -67,7 +64,16 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
   });
 
   const groupMenuItems = useMemo(() => {
-    return [...groupActions.outerList, ...groupActions.innerList];
+    const items = [...groupActions.outerList];
+    if (groupActions.innerList.length > 0) {
+      items.push({
+        key: 'more',
+        label: $fmt('common.more'),
+        icon: <MoreOutlined />,
+        children: groupActions.innerList,
+      });
+    }
+    return items;
   }, [groupActions]);
 
   // 分类操作相关

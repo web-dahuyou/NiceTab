@@ -21,7 +21,7 @@ import { type ActionOptionItem } from '@/entrypoints/common/components/ActionBtn
 import type { TabItem, IntlForamtMessageParams } from '~/entrypoints/types';
 import type { LocaleKeys } from '~/entrypoints/common/locale';
 import type { GroupActionName } from '../types';
-import { groupActionOptions, type ActionOption } from '../constants';
+import { defaultGroupActions, groupActionOptions, type ActionOption } from '../constants';
 
 const { GROUP_ACTION_BTNS_COMMONLY_USED } = ENUM_SETTINGS_PROPS;
 
@@ -68,7 +68,7 @@ export default function useGroupActions({
   isLocked,
   isStarred,
   tabList = [],
-  allowGroupActions = [],
+  allowGroupActions = defaultGroupActions,
   onAction,
 }: UseGroupActionsProps): UseGroupActionsReturn {
   const { $fmt } = useIntlUtls();

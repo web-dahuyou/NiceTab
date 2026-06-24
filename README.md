@@ -16,22 +16,6 @@
 - Developed using `React` and based on the [`wxt framework`](https://wxt.dev/), which provides built-in templates for `Vanilla`, `Vue`, `React`, `Svelte`, and `Solid`.
 - The UI is powered by the popular [`Ant Design`](https://ant-design.antgroup.com/) library.
 
-## Motivation
-
-I personally get anxious when there are too many tabs open, and switching to a specific tab among them is a hassle. After using OneTab, managing tabs became much easier, improving efficiency and saving memory, so I used it for a long time.
-
-However, I felt a few aspects weren't quite smooth:
-
-- Group names are lost after exporting and re-importing tabs.
-- Because renaming group names isn't persisted, I gave up on renaming them. Once many groups accumulate, locating a specific group is difficult.
-- The right-click menu on the extension icon often shows several duplicate menu groups, but only one group of menus actually works, you have to try each to find out.
-- Sometimes I just want to bookmark some tabs without closing them, but OneTab lacks an option for that (a personal preference).
-- There's no straightforward way to create a new group within OneTab directly and move tabs from an existing group into that new group.
-- And a few more smaller issues...
-
-Additionally, the `N-Tab` extension is open-source, but after reviewing it, I found the tech stack a bit outdated, making it difficult to contribute effectively.
-
-Based on the above reasons, I decided to develop the `NiceTab` extension. incorporate additional features upon some features from `OneTab`, `N-Tab`, to enhance the experience.
 
 ## Extension Installation
 
