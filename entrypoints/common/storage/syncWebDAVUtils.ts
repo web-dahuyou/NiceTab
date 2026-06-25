@@ -481,9 +481,12 @@ export default class syncWebDAVUtils {
 
     const { webdavConnectionUrl, username, password } = configItem;
     const client = createClient(webdavConnectionUrl, {
-      authType: AuthType.Auto,
+      authType: AuthType.Password,
       username,
       password,
+      headers: {
+        Authorization: `Basic ${btoa(`${username}:${password}`)}`,
+      },
     });
     try {
       // 使用配置项中的自定义目录，如果存在的话
