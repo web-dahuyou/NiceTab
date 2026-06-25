@@ -56,6 +56,12 @@ const zhCN = {
   'sync.tip.connectionName': '用于区分多个 webDAV 的配置名称',
   'sync.tip.directory': `WebDAV 目录，可填写多级目录，如 <strong>/dir/subdir</strong>`,
   'sync.tip.filename': `数据存储文件名，可使用任意后缀名，如 <strong>nicetab-sync.txt</strong>`,
+
+  // 备份相关
+  'sync.bakFilename': '备份文件名',
+  'sync.tip.bakFilenameGists': '远程容灾备份文件名，或许用得上',
+  'sync.bakDirectory': '备份目录',
+  'sync.tip.bakDirectory': 'WebDAV 远程容灾备份目录，可填写多级目录，如 <strong>/dir/subdir</strong>',
 }
 
 export type LocaleKey = keyof typeof zhCN;

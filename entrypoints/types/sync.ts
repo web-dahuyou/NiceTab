@@ -9,6 +9,7 @@ export type SyncConfigItemProps = {
   accessToken?: string;
   gistId?: string;
   filename?: string;
+  bakFilename?: string; // 自定义备份文件名
   autoSync?: boolean;
 };
 // 同步配置
@@ -60,6 +61,9 @@ export type SyncConfigItemWebDAVProps = WebDAVClientOptions & {
   directory?: string; // 自定义目录字段
   filename_tabList?: string; // 自定义列表文件名
   filename_settings?: string; // 自定义偏好设置文件名
+  bakDirectory?: string; // 自定义备份目录
+  filename_tabList_bak?: string; // 自定义列表备份文件名
+  filename_settings_bak?: string; // 自定义设置备份文件名
   autoSync?: boolean;
   syncStatus?: SyncStatus;
   syncResult?: SyncResultItemProps[];
