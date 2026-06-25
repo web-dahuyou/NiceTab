@@ -369,6 +369,35 @@ Based on above reasons, here are some recommended usages:
   - Set sync method to "Auto Sync - Merge Push". Each time auto sync is triggered, the remote data will be merged with the local data, then pushes to remote (currently, deletion operations will not be synchronized, and the data will always be incrementally merged).
   - If you are not satisfied with the current auto sync function, I suggest using manual sync method (I personally prefer using manual synchronization).
 
+### Remote Disaster Recovery Backup
+Version 2.9.2 added a simplified remote disaster recovery backup feature. When pushing data to remote via sync, the remote data will be backed up first (with the backup directory and backup file name being customizable), and then the local data will be pushed to the remote.
+
+> The backup data is one version behind the main data. Under normal circumstances, the latest main data takes priority. If there is an issue with the main data, the previous version of the backup data may be useful.
+> The extension does not automatically restore data from backups. The backup data serves only as a safeguard. You can log into your remote account (Gists/WebDAV) to view the backup data by yourself.
+
+### Default Directories and File Names
+
+**Gists Main Data**
+- Default description key: `__NiceTab_gist_key__`
+- Default list file name: `__NiceTab_gist__.json`
+- Default settings file name: `__NiceTab_settings_gist__.json`
+
+**Gists Backup Data**
+- Default description key: `__NiceTab_gist_key_bak__`
+- Default list file name: `__NiceTab_gist__.json`
+- Default settings file name: `__NiceTab_settings_gist__.json`
+
+**WebDAV Main Data**
+- Default directory name: `__NiceTab_web_dav__`
+- Default list file name: `__NiceTab_web_dav__.json`
+- Default settings file name: `__NiceTab_settings_web_dav__.json`
+
+**WebDAV Backup Data**
+- Default directory name: `__NiceTab_web_dav_bak__`
+- Default list file name: `__NiceTab_web_dav__.bak.json`
+- Default settings file name: `__NiceTab_settings_web_dav__.bak.json`
+
+
 ## Management Dashboard - Recycle Bin
 
 The data removed from the tab list will be temporarily retained in the recycle bin. In case of accidental deletion, you can enter the recycle bin to recover the data.
