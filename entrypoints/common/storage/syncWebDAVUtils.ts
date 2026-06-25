@@ -66,6 +66,13 @@ export default class syncWebDAVUtils {
     settings: '__NiceTab_settings_web_dav__.json',
   };
 
+  // 备份相关配置
+  webDAVBackupDirectory: string = '__NiceTab_web_dav_bak__';
+  fileNameBackupConfig: Record<ModuleType, string> = {
+    tabList: '__NiceTab_web_dav__.bak.json',
+    settings: '__NiceTab_settings_web_dav__.bak.json',
+  };
+
   constructor() {
     this.getConfig();
   }
@@ -280,6 +287,52 @@ export default class syncWebDAVUtils {
     return `${directory?.replace(/\/$/, '') || ''}/${fileName}`;
   }
 
+  // 获取备份文件路径
+  getBackupFilepath(moduleType: ModuleType, configItem: SyncConfigItemWebDAVProps) {
+    const directory = configItem.bakDirectory || this.webDAVBackupDirectory;
+    let fileName =
+      configItem[`filename_${moduleType}_bak`]?.trim?.() ||
+      this.fileNameBackupConfig[moduleType];
+
+    return `${directory?.replace(/\/$/, '') || ''}/${fileName}`;
+  }
+
+  // 备份远程数据（在推送成功后调用）
+  async backupRemoteData(client: WebDAVClient, configItem: SyncConfigItemWebDAVProps) {
+    try {
+      const filepath = this.getRemoteFilepath('tabList', configItem);
+      const settingsFilepath = this.getRemoteFilepath('settings', configItem);
+      const backupFilepath = this.getBackupFilepath('tabList', configItem);
+      const backupSettingsFilepath = this.getBackupFilepath('settings', configItem);
+
+      // 创建备份目录
+      const backupDir = configItem.bakDirectory || this.webDAVBackupDirectory;
+      await this.createDirectory(client, backupDir);
+
+      // 检查源文件是否存在，存在则复制到备份位置
+      const isTabListExists = await withTimeout(() => client.exists(filepath));
+      if (isTabListExists) {
+        await withTimeout((signal: AbortSignal) =>
+          client.copyFile(filepath, backupFilepath, { signal }),
+        );
+      }
+
+      // 备份设置文件
+      const localSettings = await Store.settingsUtils.getSettings();
+      if (localSettings[REMOTE_SYNC_WITH_SETTINGS]) {
+        const isSettingsExists = await withTimeout(() => client.exists(settingsFilepath));
+        if (isSettingsExists) {
+          await withTimeout((signal: AbortSignal) =>
+            client.copyFile(settingsFilepath, backupSettingsFilepath, { signal }),
+          );
+        }
+      }
+    } catch (error) {
+      // 备份失败不影响主流程
+      console.error('备份远程数据失败:', error);
+    }
+  }
+
   // 根据syncType执行不同的操作
   async handleBySyncType(
     client: WebDAVClient,
@@ -294,6 +347,7 @@ export default class syncWebDAVUtils {
       syncType === syncTypeMap.MANUAL_PUSH_FORCE ||
       syncType === syncTypeMap.AUTO_PUSH_FORCE
     ) {
+      await this.backupRemoteData(client, configItem);
       const localContent = await this.getSyncContent();
       const result = await withTimeout((signal: AbortSignal) =>
         client.putFileContents(filepath, localContent, { signal }),
@@ -307,6 +361,7 @@ export default class syncWebDAVUtils {
           client.putFileContents(settingsFilepath, settingsContent, { signal }),
         );
       }
+
       return;
     }
 
@@ -401,6 +456,7 @@ export default class syncWebDAVUtils {
       syncType === syncTypeMap.MANUAL_PUSH_MERGE ||
       syncType === syncTypeMap.AUTO_PUSH_MERGE
     ) {
+      await this.backupRemoteData(client, configItem);
       const localContent = await this.getSyncContent();
       const result = await withTimeout((signal: AbortSignal) =>
         client.putFileContents(filepath, localContent, { signal }),

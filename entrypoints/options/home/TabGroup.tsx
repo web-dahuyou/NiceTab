@@ -2,25 +2,16 @@ import { useEffect, useRef, useState, useMemo, memo, useCallback } from 'react';
 import { theme, message, Modal, Checkbox, Spin, Skeleton } from 'antd';
 import type { CheckboxProps } from 'antd';
 import {
-  CloseOutlined,
   DeleteOutlined,
-  LockOutlined,
   LockFilled,
-  UnlockOutlined,
-  StarOutlined,
   StarFilled,
   ExportOutlined,
   SendOutlined,
   CopyOutlined,
-  BlockOutlined,
-  SortAscendingOutlined,
-  SortDescendingOutlined,
 } from '@ant-design/icons';
 import copyToClipboard from 'copy-to-clipboard';
-import { LuFolderUp, LuFolderDown } from 'react-icons/lu';
 import { IconRepeat } from '~/entrypoints/common/components/icon/CustomIcon';
 import { GroupItem, TabItem, ActionBtnStyle } from '~/entrypoints/types';
-import { type LocaleKeys } from '~/entrypoints/common/locale';
 import {
   ENUM_COLORS,
   UNNAMED_GROUP,
@@ -53,27 +44,26 @@ import type {
   DndTabItemProps,
   DndTabItemOnDropCallback,
   MoveToCallbackProps,
+  GroupActionName,
+  TabActionName,
 } from './types';
 import {
   dndKeys,
   defaultGroupActions,
   defaultTabActions,
-  groupActionOptions,
   tabsActionOptions,
-  type GroupActionName,
-  type TabActionName,
   type ActionOption,
 } from './constants';
 import MoveToModal from './MoveToModal';
 import useMoveTo from './hooks/moveTo';
 import useMultiSelection from './hooks/multiSelection';
+import useGroupActions from './hooks/groupActions.tsx';
 
 const dndKey = dndKeys.tabItem;
 const {
   CONFIRM_BEFORE_DELETING_TABS,
   CONFIRM_BEFORE_DELETING_GROUPS,
   DELETE_AFTER_RESTORE,
-  GROUP_ACTION_BTNS_COMMONLY_USED,
 } = ENUM_SETTINGS_PROPS;
 
 type TabGroupProps = GroupItem & {
@@ -246,16 +236,6 @@ function TabGroup({
     onCopy?.(groupId);
   }, [groupId]);
 
-  const handleCopyLinks = useCallback(() => {
-    const tabLinks = tabListUtils.copyLinks(tabList);
-    const result = copyToClipboard(tabLinks);
-    if (result) {
-      messageApi.success($fmt('common.CopySuccess'));
-    } else {
-      messageApi.error($fmt('common.CopyFailed'));
-    }
-  }, [tabList]);
-
   const handleTabChange = useCallback((newData: TabItem) => {
     eventEmitter.emit('home:treeDataHook', {
       action: 'handleTabItemChange',
@@ -385,150 +365,63 @@ function TabGroup({
     });
   }, []);
 
-  const getGroupActionOptions: () => ActionOptionItem[] = useCallback(() => {
-    const actionMap = groupActionOptions.reduce(
-      (result, option) => {
-        result[option.actionName] = option;
-        return result;
-      },
-      {} as Record<GroupActionName, ActionOption>,
-    );
+  const handleGroupAction = useCallback(
+    (actionName: GroupActionName, actionGroupId: string) => {
+      if (actionName === 'remove') {
+        const settings = settingsUtils.settings || {};
+        if (settings[CONFIRM_BEFORE_DELETING_GROUPS]) {
+          setModalVisible(true);
+        } else {
+          onRemove?.();
+        }
+      } else if (actionName === 'restore') {
+        onRestore?.();
+      } else if (actionName === 'addGroupBefore') {
+        onCreate?.(tagId!, actionGroupId, 'before');
+      } else if (actionName === 'addGroupAfter') {
+        onCreate?.(tagId!, actionGroupId, 'after');
+      } else if (actionName === 'lock') {
+        onChange?.({ isLocked: !isLocked });
+      } else if (actionName === 'star') {
+        onStarredChange?.(!isStarred);
+      } else if (actionName === 'moveTo') {
+        openMoveToModal?.({ groupId: actionGroupId });
+      } else if (actionName === 'clone') {
+        handleGroupCopy();
+      } else if (actionName === 'dedup') {
+        setDedupModalVisible(true);
+      } else if (actionName === 'tabsSortAsc') {
+        handleTabsSort('ascending');
+      } else if (actionName === 'tabsSortDesc') {
+        handleTabsSort('descending');
+      }
+    },
+    [
+      tagId,
+      groupId,
+      isLocked,
+      isStarred,
+      onRestore,
+      onChange,
+      onRemove,
+      onCreate,
+      onStarredChange,
+      openMoveToModal,
+      handleGroupCopy,
+      handleTabsSort,
+    ],
+  );
 
-    const btns: ActionOptionItem[] = [
-      {
-        key: 'remove',
-        label: $fmt(actionMap['remove'].labelKey),
-        icon: <CloseOutlined />,
-        disabled: tagLocked || isLocked,
-        hoverColor: ENUM_COLORS.red,
-        // validator: () => !isLocked,
-        onClick: () => {
-          const settings = settingsUtils.settings || {};
-          if (settings[CONFIRM_BEFORE_DELETING_GROUPS]) {
-            setModalVisible(true);
-          } else {
-            onRemove?.();
-          }
-        },
-      },
-      {
-        key: 'restore',
-        label: $fmt(actionMap['restore'].labelKey),
-        icon: <ExportOutlined />,
-        onClick: () => onRestore?.(),
-      },
-      {
-        key: 'addGroupBefore',
-        label: $fmt(actionMap['addGroupBefore'].labelKey),
-        icon: <LuFolderUp />,
-        onClick: () => onCreate?.(tagId!, groupId, 'before'),
-      },
-      {
-        key: 'addGroupAfter',
-        label: $fmt(actionMap['addGroupAfter'].labelKey),
-        icon: <LuFolderDown />,
-        onClick: () => onCreate?.(tagId!, groupId, 'after'),
-      },
-      {
-        key: 'lock',
-        label: $fmt(
-          isLocked ? 'home.tabGroup.unlock' : 'home.tabGroup.lock',
-        ) as LocaleKeys,
-        disabled: tagLocked,
-        icon: isLocked ? <UnlockOutlined /> : <LockOutlined />,
-        onClick: () => onChange?.({ isLocked: !isLocked }),
-      },
-      {
-        key: 'star',
-        label: $fmt(
-          isStarred ? 'home.tabGroup.unstar' : 'home.tabGroup.star',
-        ) as LocaleKeys,
-        disabled: tagLocked,
-        icon: <StarOutlined />,
-        onClick: () => onStarredChange?.(!isStarred),
-      },
-      {
-        key: 'moveTo',
-        label: $fmt(actionMap['moveTo'].labelKey),
-        disabled: tagLocked,
-        icon: <SendOutlined />,
-        onClick: () => openMoveToModal?.({ groupId }),
-      },
-      {
-        key: 'copyLinks',
-        label: $fmt(actionMap['copyLinks'].labelKey),
-        icon: <CopyOutlined />,
-        onClick: handleCopyLinks,
-      },
-      {
-        key: 'clone',
-        label: $fmt(actionMap['clone'].labelKey),
-        disabled: tagLocked,
-        icon: <IconRepeat />,
-        onClick: handleGroupCopy,
-      },
-      {
-        key: 'dedup',
-        label: $fmt(actionMap['dedup'].labelKey),
-        icon: <BlockOutlined />,
-        disabled: tagLocked || isLocked,
-        onClick: () => setDedupModalVisible(true),
-      },
-      {
-        key: 'tabsSortAsc',
-        label: $fmt(actionMap['tabsSortAsc'].labelKey),
-        icon: <SortAscendingOutlined />,
-        disabled: tagLocked || isLocked,
-        onClick: () => handleTabsSort('ascending'),
-      },
-      {
-        key: 'tabsSortDesc',
-        label: $fmt(actionMap['tabsSortDesc'].labelKey),
-        icon: <SortDescendingOutlined />,
-        disabled: tagLocked || isLocked,
-        onClick: () => handleTabsSort('descending'),
-      },
-    ];
-
-    return btns.filter(item => {
-      const isAllowed = allowGroupActions.includes(item.key);
-      const isValid = item.validator?.() ?? true;
-      return isAllowed && isValid;
-    });
-  }, [
-    $fmt,
-    allowGroupActions,
-    tagLocked,
+  const { groupActions } = useGroupActions({
     groupId,
+    tagId,
+    tagLocked,
     isLocked,
     isStarred,
-    onRestore,
-    onChange,
-    onRemove,
-    onStarredChange,
-    openMoveToModal,
-    handleCopyLinks,
-    handleGroupCopy,
-    handleTabsSort,
-  ]);
-
-  const groupActions = useMemo(() => {
-    const settings = settingsUtils.settings;
-    const outerList: ActionOptionItem[] = [],
-      innerList: ActionOptionItem[] = [];
-
-    const groupActionBtnOptions = getGroupActionOptions();
-
-    groupActionBtnOptions.forEach(item => {
-      if (settings[GROUP_ACTION_BTNS_COMMONLY_USED]?.includes(item.key)) {
-        outerList.push(item);
-      } else {
-        innerList.push(item);
-      }
-    });
-
-    return { outerList, innerList };
-  }, [getGroupActionOptions]);
+    tabList,
+    allowGroupActions,
+    onAction: handleGroupAction,
+  });
 
   const selectedTabsActions: ActionOptionItem[] = useMemo(() => {
     const actionMap = tabsActionOptions.reduce(
@@ -574,7 +467,7 @@ function TabGroup({
         disabled: tagLocked || isLocked,
         onClick: handleSelectedTabsCopy,
       },
-    ].filter(item => allowTabActions.includes(item.key));
+    ].filter(item => allowTabActions.includes(item.key as TabActionName));
   }, [
     $fmt,
     allowTabActions,

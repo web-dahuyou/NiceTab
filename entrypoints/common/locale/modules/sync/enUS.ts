@@ -58,6 +58,12 @@ const enUS: Record<LocaleKey, string> = {
   'sync.tip.connectionName': 'Used to distinguish different WebDAV configs',
   'sync.tip.directory': `WebDAV directory, supports multiple-level directories, such as <strong>/dir/subdir</strong>`,
   'sync.tip.filename': `The filename for synchronizing data, any suffix can be used, such as <strong>nicetab-sync.txt</strong>`,
+
+  // Backup related
+  'sync.bakFilename': 'Backup Filename',
+  'sync.tip.bakFilenameGists': 'Remote disaster recovery backup filename, maybe useful',
+  'sync.bakDirectory': 'Backup Directory',
+  'sync.tip.bakDirectory': 'Remote disaster recovery backup directory, supports multiple-level directories, such as <strong>/dir/subdir</strong>',
 }
 
 export default enUS;

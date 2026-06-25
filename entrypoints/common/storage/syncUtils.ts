@@ -83,6 +83,7 @@ export default class SyncUtils {
     github: 'https://api.github.com/gists',
   };
   gistDescKey: string = '__NiceTab_gist_key__';
+  gistDescBackupKey: string = '__NiceTab_gist_key_bak__';
 
   // 同步的文件名配置（标签页列表，设置项）
   gistFileNameConfig = {
@@ -284,6 +285,70 @@ export default class SyncUtils {
     return (data as GistResponseItemProps) || {};
   }
 
+  // 备份远程数据（在推送成功后调用）
+  async backupRemoteData(
+    remoteType: SyncRemoteType,
+    currentGistData: GistResponseItemProps,
+  ) {
+    try {
+      const { accessToken } = this.config[remoteType] || {};
+      if (!accessToken || !currentGistData?.id) return;
+
+      // 获取备份描述标识
+      const backupDesc = this.config[remoteType]?.bakFilename || this.gistDescBackupKey;
+
+      // 查找已有的备份 Gist
+      const allGists = await this.getGistsList(remoteType);
+      const backupGist = allGists.find(gist => gist.description === backupDesc);
+
+      // 构建备份文件内容（从当前 Gist 复制）
+      const files: Record<string, { content: string }> = {};
+      const currentFiles = currentGistData.files || {};
+
+      if (currentFiles[this.gistFileNameConfig.tabList]) {
+        files[this.gistFileNameConfig.tabList] = {
+          content: currentFiles[this.gistFileNameConfig.tabList].content || '[]',
+        };
+      }
+      if (currentFiles[this.gistFileNameConfig.settings]) {
+        files[this.gistFileNameConfig.settings] = {
+          content: currentFiles[this.gistFileNameConfig.settings].content || '{}',
+        };
+      }
+
+      const params = {
+        description: backupDesc,
+        files,
+      };
+
+      if (backupGist?.id) {
+        // 更新已有备份
+        const url = `${this.apiBaseUrl[remoteType]}/${backupGist.id}`;
+        await fetchApi(
+          url,
+          { ...params, id: backupGist.id },
+          {
+            method: 'PATCH',
+            headers: {
+              Authorization: `token ${accessToken}`,
+            },
+          },
+        );
+      } else {
+        // 创建新备份
+        await fetchApi(this.apiBaseUrl[remoteType], params, {
+          method: 'POST',
+          headers: {
+            Authorization: `token ${accessToken}`,
+          },
+        });
+      }
+    } catch (error) {
+      // 备份失败不影响主流程
+      console.error('备份远程数据失败:', error);
+    }
+  }
+
   // 根据syncType执行不同的操作
   async handleBySyncType(
     remoteType: SyncRemoteType,
@@ -300,6 +365,7 @@ export default class SyncUtils {
       syncType === syncTypeMap.MANUAL_PUSH_FORCE ||
       syncType === syncTypeMap.AUTO_PUSH_FORCE
     ) {
+      await this.backupRemoteData(remoteType, gistData);
       result = await this.updateGist(remoteType);
     } else {
       const localSettings = await Store.settingsUtils.getSettings();
@@ -365,6 +431,7 @@ export default class SyncUtils {
         syncType === syncTypeMap.MANUAL_PUSH_MERGE ||
         syncType === syncTypeMap.AUTO_PUSH_MERGE
       ) {
+        await this.backupRemoteData(remoteType, gistData);
         result = await this.updateGist(remoteType);
       } else {
         result = { id: gistData?.id } as GistResponseItemProps;

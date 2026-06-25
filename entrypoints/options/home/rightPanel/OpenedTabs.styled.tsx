@@ -35,6 +35,8 @@ export const StyledGroupWrapper = styled.div<{ $color?: string }>`
 
     .group-actions {
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
       padding: 0 8px;
     }
   }

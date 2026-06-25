@@ -140,6 +140,27 @@ export default function SyncConfigFormItem({ form }: SyncConfigFormItemProps) {
                         <Input placeholder="__NiceTab_settings_web_dav__.json" />
                       </Form.Item>
                       <Form.Item
+                        name={[field.name, 'bakDirectory']}
+                        label={$fmt('sync.bakDirectory')}
+                        tooltip={getFormTooltipOption({
+                          title: $fmt('sync.tip.bakDirectory'),
+                        })}
+                      >
+                        <Input placeholder="__NiceTab_web_dav_bak__" />
+                      </Form.Item>
+                      <Form.Item
+                        name={[field.name, 'filename_tabList_bak']}
+                        label={`${$fmt('sync.bakFilename')} - ${$fmt('common.list')}`}
+                      >
+                        <Input placeholder="__NiceTab_web_dav__.bak.json" />
+                      </Form.Item>
+                      <Form.Item
+                        name={[field.name, 'filename_settings_bak']}
+                        label={`${$fmt('sync.bakFilename')} - ${$fmt('common.settings')}`}
+                      >
+                        <Input placeholder="__NiceTab_settings_web_dav__.bak.json" />
+                      </Form.Item>
+                      <Form.Item
                         label={$fmt('sync.autoSync')}
                         name={[field.name, 'autoSync']}
                         style={{ marginBottom: 0 }}

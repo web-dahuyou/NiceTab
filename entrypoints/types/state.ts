@@ -23,7 +23,9 @@ export interface SelectedKeysStoreItem {
 /* 首页状态 */
 export interface HomeStateProps {
   sidebarCollapsed?: boolean;
+  sidebarWidth?: number;
   rightPanelCollapsed?: boolean;
+  rightPanelWidth?: number;
   selectedKeysStore?: SelectedKeysStoreItem[];
 }
 // Popup 面板状态

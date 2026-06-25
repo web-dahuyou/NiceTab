@@ -1,4 +1,5 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { debounce } from 'lodash-es';
 import {
   theme,
   Flex,
@@ -49,11 +50,14 @@ import {
 
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import {
+  defaultSidebarWidth,
+  defaultRightPanelWidth,
+} from '~/entrypoints/options/Layout.styled';
+import {
   StyledSidebarWrapper,
   StyledMainWrapper,
   StyledHelpInfoBox,
 } from './Home.styled';
-import ToggleSidebarBtn from '../components/ToggleSidebarBtn';
 import ToggleLockedBtn from './components/ToggleLockedBtn';
 import RightPanel from './rightPanel/RightPanel';
 import SearchTabsBtn from './components/SearchTabsBtn';
@@ -115,9 +119,54 @@ export default function Home() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => {
     return stateUtils.state?.home?.sidebarCollapsed || false;
   });
+  const [sidebarWidth, setSidebarWidth] = useState<number>(() => {
+    return stateUtils.state?.home?.sidebarWidth || 280;
+  });
   const [openedTabsCollapsed, setOpenedTabsCollapsed] = useState<boolean>(() => {
     return stateUtils.state?.home?.rightPanelCollapsed || false;
   });
+  const [rightPanelWidth, setRightPanelWidth] = useState<number>(() => {
+    return stateUtils.state?.home?.rightPanelWidth || 400;
+  });
+
+  const onCollapseChange = (status: boolean) => {
+    setSidebarCollapsed(status);
+    stateUtils.setStateByModule('home', { sidebarCollapsed: status });
+    reloadOtherAdminPage();
+  };
+
+  const persistSidebarWidth = useMemo(
+    () =>
+      debounce((width: number) => {
+        stateUtils.setStateByModule('home', { sidebarWidth: width });
+        reloadOtherAdminPage();
+      }, 1000),
+    [],
+  );
+  const onSidebarWidthChange = (width: number) => {
+    setSidebarWidth(width);
+    persistSidebarWidth(width);
+  };
+
+  const onRightPanelCollapseChange = (status: boolean) => {
+    setOpenedTabsCollapsed(status);
+    stateUtils.setStateByModule('home', { rightPanelCollapsed: status });
+    reloadOtherAdminPage();
+  };
+
+  const persistRightPanelWidth = useMemo(
+    () =>
+      debounce((width: number) => {
+        stateUtils.setStateByModule('home', { rightPanelWidth: width });
+        reloadOtherAdminPage();
+      }, 1000),
+    [],
+  );
+  const onRightPanelWidthChange = (width: number) => {
+    setRightPanelWidth(width);
+    persistRightPanelWidth(width);
+  };
+
   const [confirmModalVisible, setConfirmModalVisible] = useState<boolean>(false);
   const [helpDrawerVisible, setHelpDrawerVisible] = useState<boolean>(false);
 
@@ -176,18 +225,6 @@ export default function Home() {
     [selectedTagKey],
   );
 
-  const onCollapseChange = (status: boolean) => {
-    setSidebarCollapsed(status);
-    stateUtils.setStateByModule('home', { sidebarCollapsed: status });
-    reloadOtherAdminPage();
-  };
-
-  const onRightPanelCollapseChange = (status: boolean) => {
-    setOpenedTabsCollapsed(status);
-    stateUtils.setStateByModule('home', { rightPanelCollapsed: status });
-    reloadOtherAdminPage();
-  };
-
   const lockTagBtnVisible = useMemo(() => {
     return !selectedTag.originData?.static;
   }, [selectedTag.originData]);
@@ -237,19 +274,23 @@ export default function Home() {
         }}
       >
         <StyledMainWrapper
-          className={classNames('home-wrapper', sidebarCollapsed && 'collapsed')}
-          $collapsed={sidebarCollapsed}
-          $rightPanelCollapsed={openedTabsCollapsed}
+          className={classNames('home-wrapper')}
+          style={
+            {
+              '--sidebar-grid-col': `${sidebarCollapsed ? 0 : sidebarWidth}px`,
+              '--right-panel-grid-col': `${openedTabsCollapsed ? 0 : rightPanelWidth}px`,
+            } as React.CSSProperties
+          }
         >
-          <StyledSidebarWrapper className="sidebar" $collapsed={sidebarCollapsed}>
-            <div
-              className={classNames('sidebar-inner-box', sidebarCollapsed && 'collapsed')}
-            >
-              <div className="sidebar-action-box">
-                <ToggleSidebarBtn
-                  collapsed={sidebarCollapsed}
-                  onCollapseChange={onCollapseChange}
-                ></ToggleSidebarBtn>
+          <StyledSidebarWrapper
+            className="sidebar"
+            collapsed={sidebarCollapsed}
+            sidebarWidth={sidebarWidth}
+            initialWidth={defaultSidebarWidth}
+            onCollapseChange={onCollapseChange}
+            onWidthChange={onSidebarWidthChange}
+            sideActionBox={
+              <>
                 <SearchTabsBtn></SearchTabsBtn>
                 {lockTagBtnVisible && (
                   <ToggleLockedBtn
@@ -264,9 +305,10 @@ export default function Home() {
                     onSort={onCreateTimeSort}
                   ></SortingBtns>
                 ) : null}
-              </div>
-
-              <div className="sidebar-inner-content">
+              </>
+            }
+            innerContent={
+              <>
                 <div className="tag-list-title">
                   {$fmt('home.tabGroupList')}
                   <StyledActionIconBtn
@@ -329,9 +371,9 @@ export default function Home() {
 
                 {/* 分类和标签组列表 */}
                 <TreeBox></TreeBox>
-              </div>
-            </div>
-          </StyledSidebarWrapper>
+              </>
+            }
+          />
 
           {/* 标签组和标签页列表 */}
           <div ref={multiSelectContainerRef} id="tab-group-list-panel">
@@ -341,7 +383,10 @@ export default function Home() {
           {/* 右侧面板 */}
           <RightPanel
             collapsed={openedTabsCollapsed}
+            panelWidth={rightPanelWidth}
+            initialWidth={defaultRightPanelWidth}
             onCollapseChange={onRightPanelCollapseChange}
+            onWidthChange={onRightPanelWidthChange}
           ></RightPanel>
         </StyledMainWrapper>
 

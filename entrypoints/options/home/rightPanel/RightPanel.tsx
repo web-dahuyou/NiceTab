@@ -3,7 +3,7 @@ import { browser, Tabs } from 'wxt/browser';
 import { Empty, Checkbox, Tooltip, Typography, theme } from 'antd';
 import type { CheckboxProps } from 'antd';
 import { CloseOutlined, CoffeeOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import { isGroupSupported, classNames } from '~/entrypoints/common/utils';
+import { isGroupSupported } from '~/entrypoints/common/utils';
 import { getAdminTabInfo } from '~/entrypoints/common/tabs';
 import {
   TAB_EVENTS,
@@ -14,8 +14,8 @@ import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import ActionBtnList, {
   type ActionOptionItem,
 } from '@/entrypoints/common/components/ActionBtnList';
-import ToggleSidebarBtn from '../../components/ToggleSidebarBtn';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
+import type { RightPanelLayoutProps } from '../../components/RightPanelLayout';
 import { StyledRightPanelWrapper } from '../Home.styled';
 import { StyledOpenedTabsActions } from './OpenedTabs.styled';
 import TabGroupItem, { type TabGroupItemProps } from './TabGroupItem';
@@ -34,13 +34,7 @@ export type OpenedGroupDragData = DragData & {
   selectedTabs: Tabs.Tab[];
 };
 
-export default function RightPanel({
-  collapsed,
-  onCollapseChange,
-}: {
-  collapsed: boolean;
-  onCollapseChange: (status: boolean) => void;
-}) {
+export default function RightPanel(rightPanelProps: RightPanelLayoutProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const [tabs, setTabs] = useState<Tabs.Tab[]>([]);
@@ -265,16 +259,11 @@ export default function RightPanel({
   }, []);
 
   return (
-    <StyledRightPanelWrapper className="opened-tabs-panel" $collapsed={collapsed}>
-      <div className={classNames('right-panel-inner-box', collapsed && 'collapsed')}>
-        <div className="right-panel-action-box">
-          <ToggleSidebarBtn
-            collapsed={collapsed}
-            position="right"
-            onCollapseChange={onCollapseChange}
-          ></ToggleSidebarBtn>
-        </div>
-        <div className="right-panel-inner-content">
+    <StyledRightPanelWrapper
+      className="opened-tabs-panel"
+      {...rightPanelProps}
+      innerContent={
+        <>
           <div className="opened-tabs-title">
             {$fmt('common.openedTabs')}
             <Tooltip
@@ -283,7 +272,7 @@ export default function RightPanel({
               title={<Typography.Text>{$fmt('home.tip.multiSelection')}</Typography.Text>}
               styles={{ root: { maxWidth: '300px', width: '300px' } }}
             >
-              <StyledActionIconBtn className="btn-tips" title={$fmt('common.tips')}>
+              <StyledActionIconBtn className="btn-tips">
                 <QuestionCircleOutlined />
               </StyledActionIconBtn>
             </Tooltip>
@@ -363,8 +352,8 @@ export default function RightPanel({
               </div>
             )}
           </div>
-        </div>
-      </div>
-    </StyledRightPanelWrapper>
+        </>
+      }
+    />
   );
 }

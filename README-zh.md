@@ -13,21 +13,6 @@
 - 采用 `react` 语言，基于[wxt框架](https://wxt.dev/)开发（wxt框架内置 `vanilla | vue | react | svelte | solid` 语言的初始化模板）。
 - UI直接使用了 `Ant Design` 这个常用的 UI 框架。
 
-## 项目初衷
-我本人有点强迫症，浏览器标签页开多了就会焦虑，而且想要在众多标签页中切换到指定的页面也比较费劲儿。
-后来用上 OneTab 之后，管理标签页方便了不少，提升了效率也节省了内存。因此很长一段时间一直使用 OneTab 插件来管理浏览器标签页。
-
-经过一段时间对 OneTab 的使用体验，个人感觉有几个点不是特别顺手：
-- 标签组虽然能重命名，但是导出后再导入就会丢失。
-- 由于标签组重命名会丢失，所以我懒得花时间重命名，当标签组积累多了之后，很难找到指定的标签组。
-- 插件图标右键菜单经常会出现好几个重复的菜单组，其中只有一个菜单组是能用的，但是你得挨个试才知道。
-- 有时候我只是想要将一些标签页收藏进列表，并不想关闭它们，但是 OneTab 没有对应的设置项（这个只是我个人体验）。
-- 还有就是，我想将某个标签组中的标签页移动到新的标签组，但是又没办法创建标签组，只能通过插件图标发送标签页到 OneTab 列表来创建新标签页。
-- 。。。
-
-另外，N-Tab 插件是开源的，当我看了它的源码后发现技术栈相对比较老旧，想参与共建有心无力了。
-
-基于上面几点原因，最终促使我开发了 NiceTab 这个插件，在借鉴 `OneTab`、`N-Tab` 等插件现有部分功能的基础上，添加了一些其他的功能。
 
 ## 扩展安装
 - 谷歌 Chrome 应用商店：[Chrome Web Store](https://chromewebstore.google.com/detail/fonflmjnjbkigocpoommgmhljdpljain)
@@ -58,7 +43,7 @@
 - 支持**远程同步功能**。
 - 支持手动切换**亮色/暗黑主题**。
 - 支持**皮肤主题切换**，目前暂时设置了有限的几种主题色提供选择，后续可根据需求扩大选择范围。
-- 支持**多语言**，目前暂时支持中英文切换 (非地道英语，期待英语大佬帮忙校正)。
+- 支持**多语言**，目前暂时支持简体中文、繁体中文、英文。
 - 支持**回收站功能**，回收站中的标签页可还原到标签列表或者彻底删除。标签列表和回收站支持根据分类和标签组归类合并，方便管理。
 - 支持手动休眠标签页来释放内存（休眠中的标签页仍会显示在标签栏中，并会在激活后重新加载）。
 
@@ -119,35 +104,33 @@
 - popup面板，可快捷切换主题色。
 - popup面板，可快捷访问和关闭当前打开的标签页。
 
-![NiceTab-扩展图标点击](https://github.com/user-attachments/assets/cf65a363-3a2b-465a-936c-8fc8274856dc)
+![NiceTab-扩展图标点击1](https://github.com/user-attachments/assets/debe19ca-cd80-4ec9-a8d3-79de6dafb5a7)
 
-![NiceTab-扩展图标点击](https://github.com/user-attachments/assets/899bfd01-c426-4c5b-af5e-0beb52882edf)
+![NiceTab-扩展图标点击2](https://github.com/user-attachments/assets/f441c6c5-6da3-4769-a8a7-6691c0263613)
 
 ### 右键菜单
 右击扩展图标，展示右键菜单，可打开扩展管理后台页面。支持 一键发送 所有标签页、当前标签页、其他标签页、左侧标签页、右侧标签页。
 
-![NiceTab-扩展图标右键菜单](https://github.com/user-attachments/assets/2fe82628-9dde-4cba-b336-6ca59b2ec5eb)
+![NiceTab-扩展图标右键菜单](https://github.com/user-attachments/assets/555a2ed0-50d3-4bb3-8008-c6e61792aa9c)
 
 ### 扩展管理后台-列表页
 - 管理发送到NiceTab的标签页，支持分类，标签组管理。
 - 左侧列表支持拖拽和快捷键排序，右侧面板展示当前分类中的所有标签组和标签页，可进行相应的操作。
 - 支持标签组删除和跨分类移动，以及多选标签页删除和跨标签组移动。
 
-![NiceTab-列表页](https://github.com/user-attachments/assets/03a534d0-c034-4b9a-98fd-2d8d084ebcd3)
+![NiceTab-列表页](https://github.com/user-attachments/assets/244fb841-a036-42ca-9840-edb29b0e81db)
 
 ### 扩展管理后台-偏好设置页
 您可根据自己的喜好，进行相应的偏好设置。
 
-截图待更新。
-![NiceTab-偏好设置页](https://github.com/user-attachments/assets/90e19998-206b-42de-9329-410e553955a4)
+![NiceTab-偏好设置页](https://github.com/user-attachments/assets/18448d35-060c-47fe-9ad5-251b2324e7a0)
 
 ### 扩展管理后台-导入导出
 目前支持 `NiceTab` 和 `OneTab`、`Toby`、`SessionBuddy`、`KepTab` 格式的数据导入。
 - 支持导入 `OneTab`、`Toby`、`SessionBuddy`、`KepTab` 格式的列表并解析为 `NiceTab` 格式。
 - 支持将列表导出到本地。
 
-截图待更新。
-![NiceTab-导入导出](https://github.com/user-attachments/assets/e2ea4b00-3531-4819-b67a-e45f09b4e948)
+![NiceTab-导入导出](https://github.com/user-attachments/assets/48b6d09b-342c-448e-b235-ae54c4aae235)
 
 ### 远程同步功能
 远程同步支持 gitee gists, github gists 和 webdav 同步。
@@ -158,29 +141,34 @@
 - gists token 权限只勾选 gists 操作
 - 合并推送不进行diff对比删除操作，而是合并远程和本地，然后推送到远程，所以标签页是会逐渐增多的，想要同步删除操作的话，请删除标签页后手动覆盖推送到远程
 
-webdav 方式远程同步截图暂未更新。
-
-![NiceTab-远程同步功能](https://github.com/user-attachments/assets/1d082c8f-4660-4f8e-9ac9-7cf468178ee1)
+![NiceTab-远程同步功能](https://github.com/user-attachments/assets/446c6b94-55ad-46b3-a790-45e29027ee05)
 
 ### 主题色切换
 插件支持主题色切换，您可以在扩展管理后台页或者 popup 弹窗中进行切换。
 
-![NiceTab-主题色切换](https://github.com/user-attachments/assets/9e6dce98-8b6e-4fe7-846d-d5a00f410e6d)
+![NiceTab-主题色切换](https://github.com/user-attachments/assets/33ba956f-6801-490d-8507-b28854a8c0bc)
 
 ### 亮色/暗黑主题切换
 插件支持亮色/暗黑主题切换，您可以在扩展管理后台页中进行切换。
 
-![NiceTab-亮色-黑暗主题切换](https://github.com/user-attachments/assets/8d7a6f02-9feb-4289-b9f8-f066ab02f32e)
+![NiceTab-亮色-黑暗主题切换](https://github.com/user-attachments/assets/148d9f26-d1ad-4f1c-909a-02ad099432c2)
 
 ### 切换语言
 插件支持语言切换，您可以在扩展管理后台页进行切换。
 
-![NiceTab-切换语言](https://github.com/user-attachments/assets/2d6b2348-a666-4996-bdd9-8653dfabf1d4)
+![NiceTab-切换语言](https://github.com/user-attachments/assets/ce9a7a2d-8b71-400a-98dd-e76cb565c021)
+
+### 全局搜索
+插件支持在任意网页进行全局搜索保存在 NiceTab 的标签页(支持标签名和 URL 链接)。
+
+![NiceTab-全局搜索1](https://github.com/user-attachments/assets/6e94258d-75f5-4964-8b3b-a8fdefd93b94)
+
+![NiceTab-全局搜索2](https://github.com/user-attachments/assets/a799282c-f702-4133-9478-bccf048d0a9d)
 
 ### 扩展管理后台-回收站
 - 分类、标签组、标签页删除后，会保留到回收站，您可将回收站的分类、标签组等还原到列表页或者彻底删除。
 
-![NiceTab-回收站](https://github.com/user-attachments/assets/016cb266-fe12-4063-b786-c979288f01fb)
+![NiceTab-回收站](https://github.com/user-attachments/assets/2f22b6d3-ccf0-4939-a905-b781b74b25e9)
 
 
 ## 使用

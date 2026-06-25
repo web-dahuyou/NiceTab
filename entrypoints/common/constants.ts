@@ -33,16 +33,16 @@ export const GITHUB_URL = 'https://github.com/web-dahuyou/NiceTab';
 
 // 主题列表（供切换选择）
 export const ENUM_COLORS = {
-  blue: blue.primary || blue[6],
-  cyan: cyan.primary || cyan[6],
-  volcano: volcano.primary || volcano[6],
-  orange: orange.primary || orange[6],
-  red: red.primary || red[6],
-  green: green.primary || green[6],
-  purple: purple.primary || purple[6],
-  magenta: magenta.primary || magenta[6],
-  gold: gold.primary || gold[6],
-  lime: lime.primary || lime[6],
+  blue: blue.primary || blue[5],
+  cyan: cyan.primary || cyan[5],
+  volcano: volcano.primary || volcano[5],
+  orange: orange.primary || orange[5],
+  red: red.primary || red[5],
+  green: green.primary || green[5],
+  purple: purple.primary || purple[5],
+  magenta: magenta.primary || magenta[5],
+  gold: gold.primary || gold[5],
+  lime: lime.primary || lime[5],
 };
 
 export const THEME_COLOR_NAMES: ThemeColors[] = [

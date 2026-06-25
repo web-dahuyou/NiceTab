@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useContext, useMemo, useCallback } from 'react';
 import { theme, Flex, Button, Modal } from 'antd';
 import { CloudUploadOutlined, ClearOutlined } from '@ant-design/icons';
 import { classNames } from '~/entrypoints/common/utils';
@@ -23,7 +23,6 @@ import type {
 import { updateAdminPageUrlDebounced } from '~/entrypoints/common/tabs';
 
 import { StyledSidebarWrapper, StyledMainWrapper } from './Sync.styled';
-// import ToggleSidebarBtn from '../components/ToggleSidebarBtn';
 import SidebarContentModuleGist from './components/gist/SidebarContentModule';
 import SidebarContentModuleWebDAV from './components/webdav/SidebarContentModule';
 import SyncResultList from './SyncResultList';
@@ -153,20 +152,20 @@ export default function SyncPage() {
       {modalContextHolder}
       <StyledMainWrapper
         className={classNames('sync-wrapper', sidebarCollapsed && 'collapsed')}
-        $collapsed={sidebarCollapsed}
-        $sidebarWidth={400}
-        $rightPanelCollapsed={true}
+        style={
+          {
+            '--sidebar-grid-col': `${sidebarCollapsed ? 0 : 400}px`,
+            '--right-panel-grid-col': '0px',
+          } as React.CSSProperties
+        }
       >
         <StyledSidebarWrapper
           className="sidebar"
-          $collapsed={sidebarCollapsed}
-          $sidebarWidth={400}
-        >
-          <div
-            className={classNames('sidebar-inner-box', sidebarCollapsed && 'collapsed')}
-          >
-            <div className="sidebar-action-box">
-              {/* <ToggleSidebarBtn onCollapseChange={setSidebarCollapsed}></ToggleSidebarBtn> */}
+          collapsed={sidebarCollapsed}
+          sidebarWidth={400}
+          showCollapseBtn={false}
+          sideActionBox={
+            <>
               <div
                 className="action-icon"
                 title={$fmt('sync.pushToAllRemotes')}
@@ -181,30 +180,30 @@ export default function SyncPage() {
               >
                 <Button icon={<ClearOutlined />}></Button>
               </div>
-            </div>
-            <div className="sidebar-inner-content">
-              <Flex vertical gap={12}>
-                <SidebarContentModuleGist
-                  ref={gistRef}
-                  targetType={selectedTargetType}
-                  selectedKey={selectedKey}
-                  onSelect={key => onSelect('gist', key)}
-                  onAction={({ key }) => onAction?.('gist', key)}
-                  onConfigChange={getSyncInfo}
-                />
+            </>
+          }
+          innerContent={
+            <Flex vertical gap={12}>
+              <SidebarContentModuleGist
+                ref={gistRef}
+                targetType={selectedTargetType}
+                selectedKey={selectedKey}
+                onSelect={key => onSelect('gist', key)}
+                onAction={({ key }) => onAction?.('gist', key)}
+                onConfigChange={getSyncInfo}
+              />
 
-                <SidebarContentModuleWebDAV
-                  ref={webDAVRef}
-                  targetType={selectedTargetType}
-                  selectedKey={selectedKey}
-                  onSelect={key => onSelect('webdav', key)}
-                  onAction={({ key }) => onAction?.('webdav', key)}
-                  onConfigChange={getWebDavConfig}
-                />
-              </Flex>
-            </div>
-          </div>
-        </StyledSidebarWrapper>
+              <SidebarContentModuleWebDAV
+                ref={webDAVRef}
+                targetType={selectedTargetType}
+                selectedKey={selectedKey}
+                onSelect={key => onSelect('webdav', key)}
+                onAction={({ key }) => onAction?.('webdav', key)}
+                onConfigChange={getWebDavConfig}
+              />
+            </Flex>
+          }
+        />
         <div className="main-content-wrapper">
           <SyncResultList resultList={resultList}></SyncResultList>
         </div>

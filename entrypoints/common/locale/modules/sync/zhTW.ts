@@ -56,6 +56,12 @@ const zhTW: Record<LocaleKey, string> = {
   "sync.tip.connectionName": "用於區分多個 webDAV 的設定名稱",
   "sync.tip.directory": "WebDAV 目錄，可填寫多级目錄，如 <strong>/dir/subdir</strong>",
   "sync.tip.filename": "數據存储檔案名稱，可使用任意後缀名，如 <strong>nicetab-sync.txt</strong>",
+
+  // 備份相關
+  "sync.bakFilename": "備份檔案名稱",
+  "sync.tip.bakFilenameGists": "遠程容災備份檔案名，或許用得上",
+  "sync.bakDirectory": "備份目錄",
+  "sync.tip.bakDirectory": "WebDAV 遠程容災備份目錄，可填寫多級目錄，如 <strong>/dir/subdir</strong>",
 };
 
 export default zhTW;

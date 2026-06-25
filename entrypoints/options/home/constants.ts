@@ -1,4 +1,5 @@
 import { type LocaleKeys } from '~/entrypoints/common/locale';
+import type { TagActionName, GroupActionName, TabActionName } from './types';
 
 // drag and drop keys
 export const dndKeys = {
@@ -6,7 +7,7 @@ export const dndKeys = {
   tabGroupItem: Symbol('dnd-tab-group-item'),
 };
 
-export const defaultGroupActions = [
+export const defaultGroupActions: GroupActionName[] = [
   'remove',
   'rename',
   'restore',
@@ -22,13 +23,71 @@ export const defaultGroupActions = [
   'tabsSortDesc',
 ];
 
-export const defaultTabActions = ['open', 'remove', 'clone', 'copyLinks', 'moveTo'];
+export const defaultTagActions: TagActionName[] = [
+  'create',
+  'remove',
+  'lock',
+  'restore',
+  'moveTo',
+  'sortByNameAsc',
+  'sortByNameDesc',
+  'sortByCreateTimeAsc',
+  'sortByCreateTimeDesc',
+];
 
-export type GroupActionName = (typeof defaultGroupActions)[number];
-export type TabActionName = (typeof defaultTabActions)[number];
+export const tagActionOptions: ActionOption<'tag'>[] = [
+  {
+    actionName: 'create',
+    labelKey: 'home.createTabGroup',
+  },
+  {
+    actionName: 'remove',
+    labelKey: 'common.remove',
+  },
+  {
+    actionName: 'lock',
+    labelKey: 'home.tag.lock',
+  },
+  {
+    actionName: 'restore',
+    labelKey: 'home.tag.open',
+  },
+  {
+    actionName: 'moveTo',
+    labelKey: 'home.moveAllGroupTo',
+  },
+  {
+    actionName: 'sortByNameAsc',
+    labelKey: 'common.ascending',
+  },
+  {
+    actionName: 'sortByNameDesc',
+    labelKey: 'common.descending',
+  },
+  {
+    actionName: 'sortByCreateTimeAsc',
+    labelKey: 'common.ascending',
+  },
+  {
+    actionName: 'sortByCreateTimeDesc',
+    labelKey: 'common.descending',
+  },
+];
 
-export interface ActionOption<T extends 'group' | 'tab' = 'group'> {
-  actionName: T extends 'group' ? GroupActionName : TabActionName;
+export const defaultTabActions: TabActionName[] = [
+  'open',
+  'remove',
+  'clone',
+  'copyLinks',
+  'moveTo',
+];
+
+export interface ActionOption<T extends 'tag' | 'group' | 'tab' = 'group'> {
+  actionName: T extends 'tag'
+    ? TagActionName
+    : T extends 'group'
+      ? GroupActionName
+      : TabActionName;
   labelKey: LocaleKeys;
 }
 export const groupActionOptions: ActionOption[] = [

@@ -1,12 +1,11 @@
 import { useState, memo, useCallback, useRef, useLayoutEffect } from 'react';
 import { debounce } from 'lodash-es';
 import { Tree, Space, Typography, Button, Checkbox, Input, Empty, Spin } from 'antd';
-import type { TreeDataNode, TreeProps } from 'antd';
-import type { SearchProps } from 'antd/es/input/Search';
+import type { TreeDataNode } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import type { TagItem, GroupItem } from '~/entrypoints/types';
-import type { TreeDataNodeTag, TreeDataNodeUnion, MoveToCallbackProps } from './types';
+import type { TreeDataNodeUnion, MoveToCallbackProps } from './types';
 import { HomeContext, type TreeDataHookProps } from './hooks/treeData';
 import { eventEmitter as homeEventEmitter } from './hooks/homeCustomEvent';
 import RenderTreeNode from './components/RenderTreeNode';
@@ -14,6 +13,7 @@ import {
   useTreeNodeAction,
   RemoveActionModal,
   MoveToActionModal,
+  DedupActionModal,
 } from './TreeNodeActionModals';
 import { getTreeData, checkAllowDrop } from './utils';
 
@@ -41,6 +41,7 @@ function TreeBox() {
     actionParams: treeNodeActionParams,
     removeModalVisible,
     moveToModalVisible,
+    dedupModalVisible,
     closeModal,
   } = useTreeNodeAction(onTreeNodeAction);
 
@@ -152,13 +153,25 @@ function TreeBox() {
     [handleTreeNodeAction],
   );
 
-  // 移动所有标签组
-  const handleAllTabGroupsMoveTo = async ({ targetData }: MoveToCallbackProps) => {
+  // 移动标签组
+  const handleTabGroupMoveTo = async ({ targetData }: MoveToCallbackProps) => {
     refreshTreeData(treeData => {
-      const { targetTagId } = targetData || {};
+      const { targetTagId, targetGroupId } = targetData || {};
       for (let tag of treeData) {
         if (tag.key == targetTagId) {
-          handleSelect(treeData, [targetTagId], { node: tag as TreeDataNodeTag });
+          if (targetGroupId) {
+            for (let g of tag.children || []) {
+              if (g.key == targetGroupId) {
+                handleSelect(treeData, [targetTagId, targetGroupId], {
+                  node: g as TreeDataNodeUnion,
+                });
+                break;
+              }
+            }
+          } else {
+            handleSelect(treeData, [targetTagId], { node: tag as TreeDataNodeUnion });
+          }
+
           break;
         }
       }
@@ -302,10 +315,23 @@ function TreeBox() {
           actionParams={treeNodeActionParams}
           onOk={(...props) => {
             closeModal('moveTo');
-            handleAllTabGroupsMoveTo(...props);
+            handleTabGroupMoveTo(...props);
           }}
           onCancel={() => closeModal('moveTo')}
         ></MoveToActionModal>
+      )}
+
+      {/* 标签组去重确认弹窗 */}
+      {dedupModalVisible && (
+        <DedupActionModal
+          open={dedupModalVisible}
+          actionParams={treeNodeActionParams}
+          onOk={(...props) => {
+            closeModal('dedup');
+            onTreeNodeAction(...props);
+          }}
+          onCancel={() => closeModal('dedup')}
+        ></DedupActionModal>
       )}
     </>
   );
