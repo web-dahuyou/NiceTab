@@ -61,9 +61,9 @@ const enUS: Record<LocaleKey, string> = {
 
   // Backup related
   'sync.bakFilename': 'Backup Filename',
-  'sync.tip.bakFilenameGists': 'Remote disaster recovery backup filename, maybe useful',
+  'sync.tip.bakFilenameGists': 'Remote disaster recovery backup filename (may be useful)',
   'sync.bakDirectory': 'Backup Directory',
-  'sync.tip.bakDirectory': 'Remote disaster recovery backup directory, supports multiple-level directories, such as <strong>/dir/subdir</strong>',
+  'sync.tip.bakDirectory': 'WebDAV remote disaster recovery backup directory. Supports multi-level directories, e.g. <strong>/dir/subdir</strong>',
 }
 
 export default enUS;

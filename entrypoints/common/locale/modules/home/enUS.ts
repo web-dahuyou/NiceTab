@@ -98,9 +98,9 @@ const enUS: Record<LocaleKey, string> = {
 
   'home.help.content': `
     <li>The List page consists of three parts: the left Directory Tree (category and tab group directory index), the middle Stored Tab List (all tab groups and tabs in the currently selected category), and the right Opened Tabs Panel.</li>
-    <li>The left-side list displays the tags, and the secondary menus represent the tab groups. The list supports searching for both tags and tab groups. The middle list displays all the tab groups and the tabs within each tab group.</li>
-    <li>The tabs in the middle list support drag-and-drop sorting and cross-group movement. You can also drag the tabs from the middle list to the groups in the left-side list. Additionally, you can click the "Move To" button to move tab group and tabs.</li>
-    <li>The collapsible panel on the right side of the page displays the opened tabs and tab groups in the current browser window. The tabs in this panel support quick and multiple selections, batch dragging and drop to the middle list and the tree node in the left-side list. You can also drag an entire group directly.</li>
+    <li>The left Directory Tree uses primary items to represent tags (categories) and secondary items to represent tab groups. It supports searching for both categories and tab groups. The middle list displays all tab groups within the currently selected category, along with the tabs contained in each tab group.</li>
+    <li>Tabs in the middle list support drag-and-drop reordering and moving between tab groups. You can also drag tabs from the middle list onto tab groups in the left Directory Tree to move them across categories. Alternatively, click the "Move To" button to relocate tab groups and tabs.</li>
+    <li>The collapsible panel on the right side of the page displays the tabs and tab groups currently open in the browser window. Tabs in this panel support quick multi-selection and batch drag-and-drop to the middle list or to nodes in the left Directory Tree. You can also drag entire tab groups directly.</li>
     <li>For more detailed information and usage tips, please refer to the "User Guide".</li>
     <li>When a tab group is locked, the group and its tabs cannot be removed or moved out. However, tabs from other tab groups can be moved into the locked group. To remove a tab group, you need to first unlock it.</li>
     <li>When a tab group is starred, it will be placed at the top of the current category. Moving other tab groups to a position before the starred tab group will automatically star them as well. If a starred tab group is moved to a position after a non-starred tab group, the star status will be automatically released.</li>
@@ -112,7 +112,7 @@ const enUS: Record<LocaleKey, string> = {
       You can modify the preference settings to adjust your click behavior.
     </li>
     <li>The "Ascending" and "Descending" only work for unstarred tab groups in the current category.</li>
-    <li>Tags / tab groups / tabs in the left-side list support drag-and-drop sorting. When a category/tab group is selected, it can be sorted using shortcuts. The shortcuts are shown in the table below:</li>
+    <li>Tags (categories), tab groups, and tabs in the left Directory Tree support drag-and-drop reordering. When a category or tab group is selected, you can sort them using keyboard shortcuts. The shortcut mappings are shown in the table below:</li>
   `,
   'home.help.hotkey.1': `The above shortcuts are only available for the home page. In addition, the extension also registers browser shortcuts for several commonly used actions, (such as`,
   'home.help.hotkey.2': `); You can also go to the extension page by yourself and `,
