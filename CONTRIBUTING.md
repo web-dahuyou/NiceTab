@@ -31,13 +31,24 @@
    https://github.com/web-dahuyou/NiceTab/compare/dev...${yourname}:NiceTab:dev-your-awesome-code
    ```
 
-## Project Setup
+## Development Guidelines
+
+### Project Setup
 - Install dependencies:  
   `pnpm install`
 - Start the dev server:  
   `pnpm run dev`
 
+### File Export Requirement
+
 Important: Each `.js .ts .tsx` file must have an `export default` statement. Otherwise, you'll encounter errors when running the local service.
+
+### Import Path Alias
+
+The project uses the `~` alias for imports from the entrypoints directory (Although using `@` also works).
+```ts
+import { something } from '~/entrypoints/common/utils';
+```
 
 ### Set Browser Binaries
 

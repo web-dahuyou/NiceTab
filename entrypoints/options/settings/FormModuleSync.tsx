@@ -10,7 +10,7 @@ import {
 } from '~/entrypoints/common/constants';
 import { useIntlUtls, eventEmitter } from '~/entrypoints/common/hooks/global';
 import { settingsUtils } from '~/entrypoints/common/storage';
-import useTooltipOption from '@/entrypoints/common/hooks/tooltipOption';
+import useTooltipOption from '~/entrypoints/common/hooks/tooltipOption';
 import { useSyncType } from '../sync/hooks/syncType';
 
 const {

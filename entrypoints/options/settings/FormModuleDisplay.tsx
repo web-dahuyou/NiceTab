@@ -6,7 +6,7 @@ import { POPUP_MODULE_NAMES, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/co
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { groupActionOptions } from '~/entrypoints/options/home/constants';
 import ContextMenuConfig from './components/ContextMenuConfig';
-import useTooltipOption from '@/entrypoints/common/hooks/tooltipOption';
+import useTooltipOption from '~/entrypoints/common/hooks/tooltipOption';
 
 const {
   GROUP_ACTION_BTN_STYLE,

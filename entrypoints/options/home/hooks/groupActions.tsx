@@ -17,7 +17,7 @@ import { IconRepeat } from '~/entrypoints/common/components/icon/CustomIcon';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
-import { type ActionOptionItem } from '@/entrypoints/common/components/ActionBtnList';
+import { type ActionOptionItem } from '~/entrypoints/common/components/ActionBtnList';
 import type { TabItem, IntlForamtMessageParams } from '~/entrypoints/types';
 import type { LocaleKeys } from '~/entrypoints/common/locale';
 import type { GroupActionName } from '../types';

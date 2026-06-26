@@ -11,6 +11,7 @@ import {
   ENUM_SETTINGS_PROPS,
   defaultLanguage,
   USER_GUIDE_URL_MAP,
+  CHANGELOG_URL_MAP,
 } from '~/entrypoints/common/constants';
 import {
   objectToUrlParams,
@@ -706,12 +707,21 @@ export const setPageTitle = async ({
 
 // 打开用户指南
 export const openUserGuide = async () => {
-  // TODO: 等英文版翻译完成后再启用
-  // const settings = await settingsUtils.getSettings();
-  // const language = settings.language || 'en-US';
-  const language = 'zh-CN';
+  const settings = await settingsUtils.getSettings();
+  const language = settings.language || 'en-US';
   const guideUrl = USER_GUIDE_URL_MAP[language];
   openNewTab(guideUrl, {
+    active: true,
+    openToNext: true,
+  });
+};
+
+// 打开更新日志
+export const openChangelog = async () => {
+  const settings = await settingsUtils.getSettings();
+  const language = settings.language || 'en-US';
+  const url = CHANGELOG_URL_MAP[language];
+  openNewTab(url, {
     active: true,
     openToNext: true,
   });
@@ -741,4 +751,5 @@ export default {
   restoreOpenedTabsSnapshot,
   setPageTitle,
   openUserGuide,
+  openChangelog,
 };

@@ -110,6 +110,7 @@ const zhTW: Record<LocaleKey, string> = {
   "common.aborted": "請求取消",
   "common.networkError": "網路連線異常",
   "common.userGuide": "使用者指南",
+  'common.changelog': '更新日誌',
   "common.itemCount": "{count}項",
   "common.matchMode": "比對模式",
   "common.equal": "相同",

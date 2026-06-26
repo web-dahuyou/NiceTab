@@ -222,14 +222,14 @@ Feel free to join our QQ group: 924270240
 
 ## References
 
-- [Chrome for Developers - Extensions API Docs](https://developer.chrome.com/docs/extensions/reference/api?hl=zh-cn)
+- [Chrome for Developers - Extensions API Docs](https://developer.chrome.com/docs/extensions/reference/api)
+- [Mozilla for Developers - WebExtensions API Docs](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions)
 - [WXT Official Site](https://wxt.dev/)
 - [Ant Design](https://ant-design.antgroup.com/)
 - [React Router](https://reactrouter.com/)
 - [styled-components](https://styled-components.com/)
 - [react-intl](https://formatjs.io/docs/react-intl)
 - [pragmatic-drag-and-drop](https://atlassian.design/components/pragmatic-drag-and-drop/about)
-- ["Complete Guide to Developing Chrome Extensions" (Chinese)](https://www.cnblogs.com/liuxianan/p/chrome-plugin-develop.html)
 
 ## Extension Development
 

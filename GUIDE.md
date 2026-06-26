@@ -28,6 +28,11 @@ On first launch, since no tabs have been saved, the list will be empty. You can 
 
 NiceTab also supports keyboard shortcuts. You can view the corresponding shortcuts in the right-click menu, or go to the keyboard shortcuts settings page to customize them (see [Bind Shortcuts](#bind-shortcuts) below).
 
+
+## Changelog
+
+For detailed changelog, please refer to <a href="./CHANGELOG.md">CHANGELOG</a>。
+
 ## Feature Overview
 
 NiceTab’s core function is to send browser tabs to the tab list with one click and manage them through a hierarchical structure of `Category > Tab Group > Tab`.

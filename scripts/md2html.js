@@ -12,6 +12,12 @@ const __dirname = path.dirname(__filename);
 const pageTitleMap = {
   GUIDE: 'User Guide',
   'GUIDE-zh': '用户指南',
+  README: 'README',
+  'README-zh': 'README',
+  CONTRIBUTING: 'CONTRIBUTING',
+  'CONTRIBUTING-zh': '贡献指南',
+  CHANGELOG: 'CHANGELOG',
+  'CHANGELOG-zh': '更新日志',
 };
 
 // 复制 GitHub Markdown 样式到 public/docs/css/github-markdown.css

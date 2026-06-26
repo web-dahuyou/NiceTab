@@ -11,7 +11,7 @@ import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { ENUM_COLORS } from '~/entrypoints/common/constants';
 import ActionBtnList, {
   type ActionOptionItem,
-} from '@/entrypoints/common/components/ActionBtnList';
+} from '~/entrypoints/common/components/ActionBtnList';
 import TabItem from './TabItem';
 import { StyledGroupWrapper } from './App.styled';
 

@@ -115,6 +115,7 @@ const enUS: Record<LocaleKey, string> = {
   'common.aborted': 'Request Aborted',
   'common.networkError': 'Network Connection Error',
   'common.userGuide': 'User Guide',
+  'common.changelog': 'Changelog',
   'common.itemCount': `{count, plural,
     =0 {No Items}
     =1 {# Item}

@@ -32,7 +32,7 @@ import { eventEmitter } from './hooks/homeCustomEvent';
 import EditInput from '../components/EditInput';
 import ActionBtnList, {
   type ActionOptionItem,
-} from '@/entrypoints/common/components/ActionBtnList';
+} from '~/entrypoints/common/components/ActionBtnList';
 import TabListItem, { type QuickSelectFunc } from './TabListItem';
 import {
   StyledGroupWrapper,

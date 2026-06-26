@@ -10,7 +10,7 @@ import {
   SortDescendingOutlined,
 } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { type ActionOptionItem } from '@/entrypoints/common/components/ActionBtnList';
+import { type ActionOptionItem } from '~/entrypoints/common/components/ActionBtnList';
 import {
   IconTimeAscending,
   IconTimeDescending,

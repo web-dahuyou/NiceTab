@@ -30,11 +30,22 @@
    https://github.com/web-dahuyou/NiceTab/compare/dev...${yourname}:NiceTab:dev-your-awesome-code
    ```
 
-## 项目启动
+## 开发指引
+
+### 启动服务
 - 依赖安装：`pnpm install`
 - 启动插件服务：`pnpm run dev`
 
+### 文件导出要求
+
 **注意**：每个js文件都必须有 `export default` 默认导出，否则本地启动服务时会报错。
+
+### 文件导入路径别名
+
+项目统一采用 `~` 别名导入 `entrypoints` 文件夹下的文件（虽然使用 `@` 也能生效）。
+```ts
+import { something } from '~/entrypoints/common/utils';
+```
 
 ### 指定浏览器可执行文件路径
 
