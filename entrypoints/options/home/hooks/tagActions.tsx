@@ -21,6 +21,7 @@ import { tagActionOptions, type ActionOption } from '../constants';
 
 interface UseTagActionsProps {
   tagId: string;
+  isStatic?: boolean;
   isLocked?: boolean;
   groupList?: GroupItem[];
   allowTagActions?: TagActionName[];
@@ -33,6 +34,7 @@ interface UseTagActionsReturn {
 
 export default function useTagActions({
   tagId,
+  isStatic = false,
   isLocked = false,
   groupList = [],
   allowTagActions = [],
@@ -68,6 +70,7 @@ export default function useTagActions({
         key: 'lock',
         label: $fmt(isLocked ? 'home.tag.unlock' : 'home.tag.lock'),
         icon: isLocked ? <UnlockOutlined /> : <LockOutlined />,
+        disabled: isStatic,
         onClick: () => onAction('lock', tagId),
       },
       {
