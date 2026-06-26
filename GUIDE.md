@@ -318,11 +318,11 @@ Currently supported extensions:
 
 ### Import Modes
 
-Currently supports three import modes: Append, Merge, Override.
+Currently supports three import modes: Append, Merge, Overwrite.
 
 - **Append**: Create new categories and tab groups, without affecting the existing ones.
 - **Merge**: Imported data merges with existing data; if imported category has same name with existing category, they are merged.
-- **Override**: Directly overwrite existing data with the imported data; original data is overwritten.
+- **Overwrite**: Directly overwrite existing data with the imported data; original data is overwritten.
 
 ### Import Sources
 

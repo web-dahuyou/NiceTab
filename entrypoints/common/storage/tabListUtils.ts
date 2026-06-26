@@ -1607,12 +1607,12 @@ export default class TabListUtils {
   // 导入
   async importTags(tags: TagItem[], importMode = 'append') {
     const tagList = await this.getTagList();
-    const needOverride =
-      importMode === 'override' ||
+    const needOverwrite =
+      importMode === 'overwrite' ||
       !tagList.length ||
       (tagList.length == 1 && !tagList?.[0].groupList?.length);
 
-    if (needOverride) {
+    if (needOverwrite) {
       await this.setTagList(tags);
     } else if (importMode === 'merge') {
       // merge mode

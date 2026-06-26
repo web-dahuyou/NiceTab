@@ -57,7 +57,11 @@ const zhTW: Record<LocaleKey, string> = {
   "home.tab.name": "名稱",
   "home.tab.url": "網址",
   "home.tab.selectedCount": "{count} 個分頁",
-  "home.tab.removeSelected": "您確定要刪除{count, plural, =0 {分頁} =1 {這個分頁} other {這#個分頁} }嗎？",
+  'home.tab.removeSelected': `您確定要刪除{count, plural,
+    =0 {分頁}
+    =1 {這個分頁}
+    other {這#個分頁}
+  }嗎？`,
 
   "home.createSnapshot": "創建快照",
   "home.createSnapshot.tip": "將目前開啟的分頁儲存為快照",

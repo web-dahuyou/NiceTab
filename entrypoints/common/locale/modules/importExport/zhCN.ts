@@ -16,7 +16,7 @@ const zhCN = {
   'importExport.importMode': '选择导入模式：',
   'importExport.importMode.optionLabel': `{label, select,
     Append {新增导入}
-    Override {覆盖导入}
+    Overwrite {覆盖导入}
     Merge {合并导入}
     other {新增导入}
   }`,
