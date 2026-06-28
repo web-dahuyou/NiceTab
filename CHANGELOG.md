@@ -1,538 +1,536 @@
-# 变更日志
+# Changelog
 
-本文档记录 NiceTab 的版本更新历史。
+This document records the version update logs.
 
-详细的更新记录请参阅 [GitHub Releases](https://github.com/web-dahuyou/NiceTab/releases)。
+For detailed update records, please refer to [GitHub Releases](https://github.com/web-dahuyou/NiceTab/releases).
 
 ---
 
 ## v2.9.2
 
-**发布日期：** 2026年6月25日
+**Release Date:** June 25, 2026
 
-- 新增精简版的远程容灾备份功能
-- 左右侧边栏支持拖拽调整宽度
-- 左侧目录树分类和标签组添加下拉菜单
+- Added remote disaster recovery backup feature
+- Left sidebar and right panel support drag-and-resize to adjust width
+- Added dropdown menus for categories and tab groups in the left directory tree
 
 ---
 
 ## v2.9.1
 
-**发布日期：** 2026年6月12日
+**Release Date:** June 12, 2026
 
-- 多语言调整，添加 shift 多选操作提示
+- Multilingual adjustments, added Shift multi-select operation tips
 
 ---
 
 ## v2.9.0
 
-**发布日期：** 2026年6月10日
+**Release Date:** June 10, 2026
 
-- 添加完整英文 GUIDE.md
-- 添加繁体中文语言支持
-- 目录选择弹窗支持创建分类和标签组
-- 列表页新增已打开标签页右侧面板
+- Added English GUIDE.md
+- Added Traditional Chinese language support
+- Directory selection modal supports creating categories and tab groups
+- Added **Opened Tabs Panel** on the right side of the List page
 
 ---
 
 ## v2.8.8
 
-**发布日期：** 2026年4月27日
+**Release Date:** April 27, 2026
 
-- 修复 Send All Tabs 覆盖已有标签组的问题
-- 新增 confirmBeforeDeletingGroups 设置项
-- 网页标题配置和域名排除配置支持通配符模式
-- gist 和 webdav 新增独立自动同步开关
-- popup 面板展示固定标签页开关持久化存储
+- Fixed issue where `Send All Tabs` overwrites existing tab groups
+- Added `confirmBeforeDeletingGroups` setting
+- Page title overwrite and domain exclusion configurations support wildcard patterns
+- Added independent auto-sync switches for Gist and WebDAV
+- Added persistent storage for pinned tabs switch in Popup Panel.
 
 ---
 
 ## v2.8.7
 
-**发布日期：** 2026年4月9日
+**Release Date:** April 9, 2026
 
-- 标签页列表支持 shift 快捷多选
-- 新增偏好设置项—发送单个标签页时是否创建标签组
-- popup 面板添加固定标签页展示开关
-- 标签组新增操作按钮
+- The tab list supports Shift key for multi-selection.
+- Added new configuration option: `Create a new tab group when sending a single tab?`
+- Added pinned tabs switch in Popup Panel.
+- Added action buttons for tab groups.
 
 ---
 
 ## v2.8.6
 
-**发布日期：** 2026年2月4日
+**Release Date:** February 4, 2026
 
-- 新增配置项—批量打开标签页顺序
-- 新增配置项和筛选项
+- Added new configuration option: `The order when opening multiple tabs:`
+- Added new configuration options and filter options
 
 ---
 
 ## v2.8.5
 
-**发布日期：** 2026年1月18日
+**Release Date:** January 18, 2026
 
-- 新增右键菜单项
-- 修改配置闪烁提醒
+- Added new context menu items
+- Added flashing badge after configuration changes
 
 ---
 
 ## v2.8.4
 
-**发布日期：** 2025年12月19日
+**Release Date:** December 19, 2025
 
-- 启动浏览器恢复之前打开的标签页
-- 添加 popup 紧凑模式
-- 添加 firefox 标签页上下文菜单—发送当前标签页
-- 新增亮暗色配置项，新增跟随系统自动主题支持
+- Restore previously opened tabs after launching the browser
+- Added compact mode for Popup Panel
+- Added tab context menu item for Firefox: `Send Current Tab`
+- Added light/dark mode configuration option (follow system mode)
 
 ---
 
 ## v2.8.3
 
-**发布日期：** 2025年12月11日
+**Release Date:** December 11, 2025
 
-- 支持 firefox 原生标签组 API
+- Firefox native tab groups API support.
 
 ---
 
 ## v2.8.2
 
-**发布日期：** 2025年11月17日
+**Release Date:** November 17, 2025
 
-- 英文本地化微调
-- 远程同步支持自定义目录
+- Fine-tune the English translation
+- Remote sync supports custom directories
 
 ---
 
 ## v2.8.1
 
-**发布日期：** 2025年10月20日
+**Release Date:** October 20, 2025
 
-- 标签页支持多选拖拽
-- 新增网页标题自定义功能
-- 右键菜单添加"休眠其他标签页"菜单项
-- 新增配置项：同步列表数据时偏好设置是否一起同步
+- The tabs support multi-select and drag-and-drop.
+- Added page title customization feature
+- added context menu item: `Hibernate Other Tabs`.
+- Added configuration option: `Sync preferences along with list data?`
 
 ---
 
 ## v2.7.8
 
-**发布日期：** 2025年9月29日
+**Release Date:** September 29, 2025
 
-- 新增右键菜单配置项，支持自定义
-- 全局搜索面板中按 ESC 键关闭面板
-- 更新用户指南
+- Added configuration options (with customization support) for context menu.
+- Close **Global Search Panel** when pressing `ESC`.
+- Updated `User Guide`
 
 ---
 
 ## v2.7.7
 
-**发布日期：** 2025年9月10日
+**Release Date:** September 10, 2025
 
-- 新增用户操作指南
-- 新增配置项：支持休眠方式批量打开标签页
-- 用户指南本地化
-- 新增 HTML 书签格式导入导出
+- Added `User Guide`
+- Added configuration option: `Auto-hibernate when opening multiple tabs?`
+- `User Guide` localization
+- Support import/export `HTML` format bookmark
 
 ---
 
 ## v2.7.6
 
-**发布日期：** 2025年6月30日
+**Release Date:** June 30, 2025
 
-- 新增自动同步时间单位配置，支持分钟级和小时级
-- 新增同步状态重置按钮
-- 新增远程同步开启时段配置项
-- 新增远程同步快捷键
-- 同步请求异常信息优化
-- 添加标签页按名称排序功能
-- 添加 lint 和 format 配置
+- Added auto-sync time unit configuration, supporting minute-level and hour-level intervals
+- Added sync status reset button
+- Added configuration for remote sync active time ranges
+- Added keyboard shortcut for remote sync 
+- Optimized error messages for sync request 
+- Added new feature for tabs: reordering by name
+- Added lint and format configuration for project
 
 ---
 
 ## v2.7.5
 
-**发布日期：** 2025年6月12日
+**Release Date:** June 12, 2025
 
-- 新增分类锁定功能
-- 全局搜索支持多选操作
-- 新增配置项：移动和插入标签组时可设置为队首或队尾
-- 发送标签页目标选择弹窗记忆上次选择的分类和标签组
-- 去掉虚拟滚动阈值配置项
-- 修复初次进入偏好设置页时默认菜单项高亮选中问题
+- Added category locking feature
+- Global search supports multi-select operations
+- Added configuration option: `Position for inserting tab groups when moving or inserting them into the target category:` (top/bottom).
+- Send tabs target selection modal remembers last selected category and tab group
+- Removed virtual scrolling threshold configuration
+- Fixed default selecting issue when first entering settings page
 
 ---
 
 ## v2.7.4
 
-**发布日期：** 2025年5月29日
+**Release Date:** May 29, 2025
 
-- 交互和样式调整
-- 标签组和标签页交互操作调整
-- 新增标签组操作按钮样式类型配置项
-- popup 面板支持标签组展示
-- 功能和样式优化
+- Interaction and style adjustments
+- Tab group and tab interaction adjustments
+- Added configuration for tab group action button style
+- Popup panel displays tab groups
+- Feature and style optimizations
 
 ---
 
 ## v2.7.3.1
 
-**发布日期：** 2025年5月14日
+**Release Date:** May 14, 2025
 
-- 英文本地化微调
-- 缩小框选多选框的作用范围
-- 多选标签页后支持批量打开
-- 过滤特殊字符
+- Fine-tune the English translation
+- Reduce the scope of the multi-select box
+- Multi-selected tabs support batch opening
+- Filter special characters
 
 ---
 
 ## v2.7.3
 
-**发布日期：** 2025年4月27日
+**Release Date:** April 27, 2025
 
-- 新增全局搜索弹窗及快捷命令
-- 新增标签组和标签页复制功能
-- 新增配置项：支持配置移动拖拽到标签组的位置（队首/队尾）
-- 标签页支持多选
+- Added **Global Search** modal and keyboard shortcuts
+- Added copy feature for tab group and tabs
+- Added configuration option: `Position for inserting tabs when moving or inserting them into the target tab group:` (top/bottom).
+- Tabs support multi-selection
 
 ---
 
 ## v2.7.2
 
-**发布日期：** 2025年4月16日
+**Release Date:** April 16, 2025
 
-- SessionBuddy 扩展数据适配
-- 设置页表单模块拆分
-- 偏好设置页表单模块拆分，新增菜单切换
-- 修复 gist 请求 raw_url 的 responseType 调整为 text
+- SessionBuddy extension data adaptation.
+- Split modules for Settings page form, added menu navigation.
+- adjusted the responseType to `text` for gist raw_url request.
 
 ---
 
 ## v2.7.1
 
-**发布日期：** 2025年4月3日
+**Release Date:** April 3, 2025
 
-- 英文本地化更新
-- 修复 popup 面板中发送标签页后不会自动关闭标签页
-- 删除选中的标签组取消重新定位，保持原位置
-- 保存和恢复当前选中的分类或标签组（每个窗口独立存储）
-- contentScript 中 shadowDOM 交互和样式作用域控制优化
+- English localization updates.
+- Fixed issue where tabs are not automatically closed after sending in popup panel.
+- Removed repositioning when removing selected tab groups, maintaining original position.
+- Save and restore currently selected category or tab group (stored independently per window).
+- interaction and style scope control optimization for shadowDOM in ContentScript.
 
 ---
 
 ## v2.7.0
 
-**发布日期：** 2025年3月28日
+**Release Date:** March 28, 2025
 
-- 升级 WXT 版本
-- 增加 CONTRIBUTING 文档
-- 回收站页面开启虚拟滚动
-- Firefox 兼容
-- 保存快照和恢复快照功能
-- 支持 Firefox 浏览器
+- Upgraded WXT version
+- Added CONTRIBUTING documentation
+- Enabled virtual scrolling for Recycle Bin page
+- Firefox compatibility
+- Create and restore snapshot feature
+- Firefox browser Support
 
 ---
 
 ## v2.6.4
 
-**发布日期：** 2025年3月13日
+**Release Date:** March 13, 2025
 
-- 增强国际化类型安全
-- 偏好设置交互优化
-- EN 的本地化微调
-- 功能优化：标签页链接样式调整、全局标签页搜索、favicon 获取优化
+- Enhanced internationalization type safety
+- Preferences interaction optimization
+- Fine-tune the English translation
+- Feature optimizations: link style adjustments for tab, global search, favicon retrieval optimization
 
 ---
 
 ## v2.6.3
 
-**发布日期：** 2025年2月28日
+**Release Date:** February 28, 2025
 
-- 启动时初始化 state 数据
-- 管理后台页面支持目录选择弹窗
-- popup 面板操作合并到下拉菜单
-- 新增标签页手动休眠功能
-- 前台/后台打开标签页配置项
-- 新增配置项"是否以标签组形式打开已命名的标签组"
+- Initialize state data on startup
+- Added directory selection modal in Admin Page
+- Popup panel action buttons collapse into dropdown menu
+- Added manual hibernation for tabs
+- Foreground/background opening configuration for tabs
+- Added configuration option: `Restore the named group as a browser tab group?`
 
 ---
 
 ## v2.6.2
 
-**发布日期：** 2025年2月18日
+**Release Date:** February 18, 2025
 
-- popup 面板发送标签页操作按钮优化
-- 列表导入自动识别格式
-- contextMenus 菜单逻辑调整
-- 新增 toby 扩展数据格式的导入导出
+- Send tabs action buttons optimization for Popup panel
+- format auto-detects for import data
+- Context menus logic adjustment
+- Added Toby extension data format
 
 ---
 
 ## v2.6.1
 
-**发布日期：** 2025年2月16日
+**Release Date:** February 16, 2025
 
-- 小功能优化
-- EN 的本地化微调
-- 添加 keptab 导入导出功能
-- 交互优化
-- 修复分类中所有标签组星标后排序异常
-- 多窗口数据同步，runtime message 优化
+- Feature optimizations
+- Fine-tune the English translation
+- Added KepTab extension data format
+- Interaction optimizations
+- Fixed reordering issue when all tab groups in a category are starred
+- Multi-window data sync, runtime message optimization
 
 ---
 
 ## v2.6.0
 
-**发布日期：** 2025年1月9日
+**Release Date:** January 9, 2025
 
-- 新增自动同步功能和相关配置项
+- Added auto-sync feature and related configuration options
 - Bump nanoid from 3.3.7 to 3.3.8
-- EN 的本地化微调
+- Fine-tune the English translation
 
 ---
 
 ## v2.5.13.1
 
-**发布日期：** 2024年12月24日
+**Release Date:** December 24, 2024
 
-- EN 的本地化微调
-- divider 标题位置调整
-- 调整小版本
+- Fine-tune the English translation
+- Title position adjustment for Divider Component
+- Version Adjusted
 
 ---
 
 ## v2.5.13
 
-**发布日期：** 2024年12月23日
+**Release Date:** December 23, 2024
 
-- 新增支持偏好设置信息的远程同步
-- 新增偏好设置信息导入导出功能
+- Added preferences for remote sync
+- Added import/export feature for preferences
 
 ---
 
 ## v2.5.12
 
-**发布日期：** 2024年12月18日
+**Release Date:** December 18, 2024
 
-- 调整按时间排序的 icon 图标，更新隐私协议
-- 问题修复和新增配置项
-- 打开标签页自动删除标签页时保留锁定的标签页
+- Adjusted sort-by-time icon, updated privacy policy
+- Bug fixes and new configuration options
+- Preserve locked tabs when setting auto-deleting tabs after opening
 
 ---
 
 ## v2.5.11
 
-**发布日期：** 2024年12月6日
+**Release Date:** December 6, 2024
 
-- EN 的 locale 微调
-- 新增功能和交互优化
-- 功能增删改
-- 新增按创建时间排序标签组功能
-- 搜索标签页后可定位到指定标签页
-- popup 面板新增操作模块与重新加载按钮
-- 管理后台添加下拉菜单含重新加载、发送所有标签页等操作
-- 回收站每天自动清空一次
+- Fine-tune the English translation
+- New features and interaction optimizations
+- Feature Optimizations
+- Added tab group reordering by creation time
+- Navigate to specific tab After searching and clicking on it
+- Added action module and reload button in Popup panel 
+- Added dropdown menu with reload, send all tabs, and other operations in Admin Page 
+- Auto-clears once a day for **Recycle Bin**
 
 ---
 
 ## v2.5.10
 
-**发布日期：** 2024年12月2日
+**Release Date:** December 2, 2024
 
-- 列表页展示全部按钮恢复展示及交互优化
-- 交互调整，问题处理
-- 标签页属性弹窗按 enter 键自动确认保存
-- 列表页恢复展示全部展开按钮
-- 发送标签页新增 url 排除功能及配置项
-- popup 面板标签页删除操作问题处理
+- Interaction optimization
+- Auto-confirm on `Enter` key in tab info modal
+- Display "Expand All" button in list page
+- Added URL exclusion and configuration for Sending tabs
+- fixed issue for tab removing in Popup panel
 
 ---
 
 ## v2.5.9
 
-**发布日期：** 2024年11月26日
+**Release Date:** November 26, 2024
 
-- 部分性能优化
+- Performance optimization
 
 ---
 
 ## v2.5.8
 
-**发布日期：** 2024年11月22日
+**Release Date:** November 22, 2024
 
 - Bump cross-spawn from 7.0.3 to 7.0.6
-- 隔离样式，防止样式和主题污染
+- Isolated styles to prevent style and theme pollution
 
 ---
 
 ## v2.5.6
 
-**发布日期：** 2024年11月18日
+**Release Date:** November 18, 2024
 
-- EN 的 locale 文件更新
-- 发送标签页支持选择指定目录
-- Locale update nov 24
-- 调整 stopPropagation 位置
+- English localization updates
+- supports selecting specific directory for Sending tabs
+- Adjusted stopPropagation
 
 ---
 
 ## v2.5.5
 
-**发布日期：** 2024年11月14日
+**Release Date:** November 14, 2024
 
-- 新增 popup 面板设置及扩展图标点击交互
-- 完善 EN 目标的 locale 文件，同时修改了几处键名
+- Added configuration option for popup panel and click interaction for extension icon
+- Fine-tune the English translation
 
 ---
 
 ## v2.5.4
 
-**发布日期：** 2024年11月10日
+**Release Date:** November 10, 2024
 
-- 显示当前插件版本
-- 可升级时版本展示
-- 新增配置项，导出内容字段调整
+- Display current extension version
+- Version display when upgrade available
+- New configuration options, export content adjustments
 
 ---
 
 ## v2.5.3
 
-**发布日期：** 2024年11月6日
+**Release Date:** November 6, 2024
 
-- 新增一键推送本地数据到所有远程存储
+- Support pushing local data to all remote storage with one click
 
 ---
 
 ## v2.5.2
 
-**发布日期：** 2024年10月25日
+**Release Date:** October 25, 2024
 
-- 问题修复及交互调整
-- 更新版本
+- Bug fixes and interaction adjustments
+- Version update
 
 ---
 
 ## v2.5.1
 
-**发布日期：** 2024年10月23日
+**Release Date:** October 23, 2024
 
-- 功能体验优化：标签组列表编辑状态禁用拖拽
-- 新增配置项"是否在新窗口打开标签组"
-- 标签页 favicon 图标链接获取优化
+- Experience optimization: disable drag-and-drop when the tab list is in edit mode
+- Added configuration option: `Open tab group in a new window?`
+- Optimization of favicon icon link url
 
 ---
 
 ## v2.5.0
 
-**发布日期：** 2024年10月18日
+**Release Date:** October 18, 2024
 
-- 新增 WebDAV 同步功能
-- content-scripts 中 nicetab-message 样式调整
-- 页面 lang 属性动态切换
+- Added WebDAV sync
+- Nicetab-message style adjustments for Content-scripts
+- Dynamic switching for lang attribute 
 
 ---
 
 ## v2.4.0
 
-**发布日期：** 2024年10月10日
+**Release Date:** October 10, 2024
 
-- 支持 commands 快捷命令，新增授权
-- 新增配置项：发送标签页是否打开管理后台
-- 新增配置项：网页中是否展示 NiceTab 右键菜单
+- Support commands shortcuts, added authorization
+- Added configuration option: `Open NiceTab Admin Page when sending tabs?`
+- Added configuration option: `Display ContextMenu on your webpage?`
 
 ---
 
 ## v2.3.1
 
-**发布日期：** 2024年10月6日
+**Release Date:** October 6, 2024
 
-- 标签页打开方式支持前台和后台静默打开
-- 新增扩展图标展示/隐藏打开标签页数量设置项
-- 新增 UI 状态缓存
-- 添加下一版本新增授权提示信息
+- The tab supports foreground opening and background silent opening
+- Added configuration option: `Display the number of open tabs on the extension icon?`
+- Added persistent storage for UI state
+- Added authorization prompt message for the next version
 
 ---
 
 ## v2.3.0
 
-**发布日期：** 2024年9月30日
+**Release Date:** September 30, 2024
 
-- 支持标签页和 URL 搜索功能
+- Support tab and URL search functions
 
 ---
 
 ## v2.2.8
 
-**发布日期：** 2024年9月23日
+**Release Date:** September 23, 2024
 
-- 新增标签页二维码查看功能
-- 右侧根据情况开启虚拟滚动
+- Added QR code viewing function for tabs
+- The tab list enables virtual scrolling based on the situation
 
 ---
 
 ## v2.2.7
 
-**发布日期：** 2024年9月20日
+**Release Date:** September 20, 2024
 
-- 添加当前分类下标签页阈值设置项（默认 500），去掉"展示更多"按钮
+- Added tab threshold setting for current category (default 500), removed "Show More" button
 
 ---
 
 ## v2.2.6
 
-**发布日期：** 2024年9月15日
+**Release Date:** September 15, 2024
 
-- 大数据量列表优化，导入导出 loading
-- 列表页和导入导出页大数据量渲染优化
+- Optimization of large data list, import and export loading
+- Rendering optimization for large data volume on list pages and import/export pages
 
 ---
 
 ## v2.2.4
 
-**发布日期：** 2024年9月10日
+**Release Date:** September 10, 2024
 
-- contextMenus 更新
+- Context menus updated
 
 ---
 
 ## v2.2.3
 
-**发布日期：** 2024年9月10日
+**Release Date:** September 10, 2024
 
-- 修复 GitHub API 同步问题
+- Fixed GitHub API sync issue
 
 ---
 
 ## v2.2.2
 
-**发布日期：** 2024年9月7日
+**Release Date:** September 7, 2024
 
-- 远程同步错误处理
+- Remote sync error handling
 
 ---
 
 ## v2.2.1
 
-**发布日期：** 2024年9月7日
+**Release Date:** September 7, 2024
 
-- 功能和样式优化
+- Feature and style optimizations
 
 ---
 
 ## v2.2.0
 
-**发布日期：** 2024年9月3日
+**Release Date:** September 3, 2024
 
-- 升级 WXT 版本
-- 完整支持亮色/暗黑主题切换
-- 更新效果截图
+- Upgraded WXT version
+- Fully supports for light/dark theme switching
+- Updated feature screenshots
 
 ---
 
 ## v2.1.0
 
-**发布日期：** 2024年8月25日
+**Release Date:** August 25, 2024
 
-- 远程同步覆盖确认提示
-- 复制标签组内标签页链接功能
-- 标签页标题 hover 显示标题和链接
+- Overwrite confirmation reminder for remote sync 
+- Copy links within tab group
+- Hover to display title and link for tabs
+

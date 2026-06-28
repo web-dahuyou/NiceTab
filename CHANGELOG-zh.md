@@ -1,6 +1,6 @@
 # 变更日志
 
-本文档记录 NiceTab 的版本更新历史。
+本文档记录 NiceTab 的版本更新日志。
 
 详细的更新记录请参阅 [GitHub Releases](https://github.com/web-dahuyou/NiceTab/releases)。
 
@@ -371,7 +371,6 @@
 
 - EN 的 locale 文件更新
 - 发送标签页支持选择指定目录
-- Locale update nov 24
 - 调整 stopPropagation 位置
 
 ---
