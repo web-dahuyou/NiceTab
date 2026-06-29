@@ -16,7 +16,7 @@ import DndComponent, {
 } from '~/entrypoints/common/components/DndComponent';
 import ActionBtnList, {
   type ActionOptionItem,
-} from '@/entrypoints/common/components/ActionBtnList';
+} from '~/entrypoints/common/components/ActionBtnList';
 import TabItem, { type TabItemProps, type TabActions, QuickSelectFunc } from './TabItem';
 import { StyledGroupWrapper } from './OpenedTabs.styled';
 import { dndKeys } from '../constants';

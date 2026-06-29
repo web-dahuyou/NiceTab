@@ -3,7 +3,7 @@ import type { FormItemProps, FormInstance } from 'antd';
 import type { SettingsProps } from '~/entrypoints/types';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
-import useTooltipOption from '@/entrypoints/common/hooks/tooltipOption';
+import useTooltipOption from '~/entrypoints/common/hooks/tooltipOption';
 import QuickActions from './components/QuickActions';
 
 const {

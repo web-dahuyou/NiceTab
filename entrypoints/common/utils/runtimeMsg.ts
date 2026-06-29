@@ -1,5 +1,5 @@
-import { RuntimeMsgType, SendRuntimeMessageParams } from '@/entrypoints/types';
-import { pageContextTypes } from '@/entrypoints/common/constants';
+import { RuntimeMsgType, SendRuntimeMessageParams } from '~/entrypoints/types';
+import { pageContextTypes } from '~/entrypoints/common/constants';
 
 // 向插件发送消息
 export async function sendRuntimeMessage<T extends RuntimeMsgType>({

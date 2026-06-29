@@ -37,6 +37,7 @@ import {
   RollbackOutlined,
   SearchOutlined,
   ReadOutlined,
+  HistoryOutlined,
   ToTopOutlined,
 } from '@ant-design/icons';
 import styled, { ThemeProvider } from 'styled-components';
@@ -52,7 +53,7 @@ import {
 } from '~/entrypoints/common/constants';
 import { actionHandler } from '../common/contextMenus';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
-import useMenus from '@/entrypoints/common/hooks/menu';
+import useMenus from '~/entrypoints/common/hooks/menu';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import useUpdate from '~/entrypoints/common/hooks/update';
 import usePermission from '~/entrypoints/common/hooks/getPermission';
@@ -69,6 +70,7 @@ import {
   saveOpenedTabsAsSnapshot,
   restoreOpenedTabsSnapshot,
   openUserGuide,
+  openChangelog,
 } from '~/entrypoints/common/tabs';
 import {
   StyledActionIconBtn,
@@ -308,6 +310,11 @@ function AppLayout() {
           label: $fmt('common.userGuide'),
         },
         {
+          key: 'changelog',
+          icon: <HistoryOutlined />,
+          label: $fmt('common.changelog'),
+        },
+        {
           key: 'bindShortcuts',
           icon: <KeyOutlined />,
           label: $fmt('common.bindShortcuts'),
@@ -336,6 +343,8 @@ function AppLayout() {
       browser.runtime.reload();
     } else if (key === 'userGuide') {
       openUserGuide();
+    } else if (key === 'changelog') {
+      openChangelog();
     } else if (key === 'bindShortcuts') {
       openNewTab(SHORTCUTS_PAGE_URL, {
         active: true,

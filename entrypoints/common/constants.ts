@@ -298,6 +298,13 @@ export const USER_GUIDE_URL_MAP: Record<LanguageTypes, string> = {
   'en-US': '/docs/GUIDE.html',
 };
 
+// 更新日志页面链接
+export const CHANGELOG_URL_MAP: Record<LanguageTypes, string> = {
+  'zh-CN': '/docs/CHANGELOG-zh.html',
+  'zh-TW': '/docs/CHANGELOG-zh.html',
+  'en-US': '/docs/CHANGELOG.html',
+};
+
 export default {
   ENUM_COLORS,
   THEME_COLORS,
@@ -313,4 +320,5 @@ export default {
   UNNAMED_TAG,
   UNNAMED_GROUP,
   USER_GUIDE_URL_MAP,
+  CHANGELOG_URL_MAP,
 };

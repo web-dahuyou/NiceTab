@@ -48,7 +48,7 @@ export const formatTypeOptions: FormatTypeOptionItem[] = [
 export const importModeOptions: BaseOptionItem[] = [
   { type: 'append', label: 'Append' },
   { type: 'merge', label: 'Merge' },
-  { type: 'override', label: 'Override' },
+  { type: 'overwrite', label: 'Overwrite' },
 ];
 
 export default {

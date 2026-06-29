@@ -13,7 +13,7 @@ import {
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import ActionBtnList, {
   type ActionOptionItem,
-} from '@/entrypoints/common/components/ActionBtnList';
+} from '~/entrypoints/common/components/ActionBtnList';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import type { RightPanelLayoutProps } from '../../components/RightPanelLayout';
 import { StyledRightPanelWrapper } from '../Home.styled';

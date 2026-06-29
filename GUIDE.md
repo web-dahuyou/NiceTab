@@ -28,6 +28,11 @@ On first launch, since no tabs have been saved, the list will be empty. You can 
 
 NiceTab also supports keyboard shortcuts. You can view the corresponding shortcuts in the right-click menu, or go to the keyboard shortcuts settings page to customize them (see [Bind Shortcuts](#bind-shortcuts) below).
 
+
+## Changelog
+
+For detailed changelog, please refer to <a href="./CHANGELOG.md">CHANGELOG</a>。
+
 ## Feature Overview
 
 NiceTab’s core function is to send browser tabs to the tab list with one click and manage them through a hierarchical structure of `Category > Tab Group > Tab`.
@@ -123,7 +128,7 @@ These two functions are located in the `Navigation Bar "Actions" dropdown option
 
 ## Management Dashboard - List
 
-The List page uses a `Category > Tab Group > Tab` hierarchical structure for tab management. It consists of a left **Directory Tree** (category and tab group directory), a tab list in the middle g (all tab groups in the currently selected category and all tabs within those tab groups) and a right list panel **Opened Tabs Panel** (the tab list of the currently opened tabs/tab groups).
+The List page uses a `Category > Tab Group > Tab` hierarchical structure for tab management. It consists of a left **Directory Tree** (category and tab group directory index), a middle **Stored Tab List** (all tab groups in the currently selected category and all tabs within those tab groups), and a right **Opened Tabs Panel** (the tabs and tab groups currently opened in the browser window).
 
 ### Directory Tree
 
@@ -161,17 +166,17 @@ The **Stored Tab List** presents by group. Tab groups here support renaming, del
 
 **Tab List**:
 - A tab supports removing, editing, copying, showing QR code, etc.
-- Tabs within a tab group support multi-selection and drag-and-drop sorting.
+- Tabs within a tab group support multi-selection and drag-and-drop reordering.
 - **Supports mouse moving selection for quick multi-selection of tabs**.
 - **Supports quick batch selection of all tabs between two tabs**: Hold Shift key and click one tab to highlight it, then hold Shift key and click another tab to batch select.
 - After multi-selecting tabs, you can batch remove, open, move to, batch drag-and-drop move, copy links, clone, etc.
-- **Tip**: You can also drag tabs and drop to a tab group in the left directory tree for quick moving.
+- **Tip**: You can also drag tabs onto a tab group in the left Directory Tree and drop to move them across categories quickly.
 
 ### Opened Tabs Panel
 
 The v2.9.0 version added a "Opened Tabs Panel" on the right side of the page.
 
-The collapsible panel on the right side of the page displays the opened tabs and tab groups in the current browser window. The tabs in this panel support quick and multiple selections, batch dragging and drop to the **Stored Tab List** and the tree node on the left of the page.
+The collapsible panel on the right side of the page displays the tabs and tab groups currently opened in the browser window. Tabs in this panel support quick multi-selection and batch drag-and-drop to the **Stored Tab List** or to nodes in the left **Directory Tree**. You can also drag entire tab groups directly.
 
 ## Management Dashboard - Preferences
 
@@ -209,7 +214,7 @@ The configuration items of this module significantly affect the interactive beha
 | --- | --- | --- | --- |
 | Show "Send To" modal when sending tabs? | When sending tabs, you can choose the directory (Category > Tab Group) to save. **If set to "No", tabs are sent to the tab group in the "Staging Area" category by default** | No | ★★★★★ |
 | Send pinned tabs to NiceTab when sending tabs? | Whether to send pinned tabs to NiceTab | No | ★ |
-| Exclude domains for sending tabs | Tabs from certain domains, such as blank pages, new tab, etc., that you don't want to send to the management dashboard. <br /> Regex example: `.*?\.vuejs\.org.*` <br /> Wildcard example: `*.vuejs.org*` | Blank page and new tab | ★★ |
+| Exclude domains for sending tabs | Tabs from certain domains, e.g., blank pages, new tab, etc., that you don't want to send to the management dashboard. <br /> Regex example: `.*?\.vuejs\.org.*` <br /> Wildcard example: `*.vuejs.org*` | Blank page and new tab | ★★ |
 | Open NiceTab Admin Page when sending tabs? | After successfully sending tabs, whether to open the NiceTab Admin Page. I prefer opening the dashboard to confirm or proceed other operations. | Yes | ★★★ |
 | Create a new tab group when sending a single tab? | If set to "No", the tab will be automatically sent to the first unstarred/unlocked tab group in the Staging Area. | Yes | ★★★ |
 | Automatically close tabs when sending tabs? | After successfully sending tabs, whether to automatically close the sent tabs from the browser to save memory. If you want to keep tabs in the browser after sending, set to "No". | Yes | ★★★★ |
@@ -244,7 +249,7 @@ Customize overwrite webpage titles; you can uninstall previously installed webpa
 
 | Item | Description | Default Value | Key Index |
 | --- | --- | --- | --- |
-| Page title overwrite | Rewrite page titles, supports multiple matching modes (such as **Exact**, **Starts With**, **Ends With**, **Contains**, **Regex**, **Wildcard**). <br />Regex example: `.*?\.vuejs\.org.*` <br />Wildcard example: `*.vuejs.org*` | None | ★★★★★ |
+| Page title overwrite | Rewrite page titles, supports multiple matching modes (e.g., **Exact**, **Starts With**, **Ends With**, **Contains**, **Regex**, **Wildcard**). <br />Regex example: `.*?\.vuejs\.org.*` <br />Wildcard example: `*.vuejs.org*` | None | ★★★★★ |
 
 ### Global Search
 
@@ -313,11 +318,11 @@ Currently supported extensions:
 
 ### Import Modes
 
-Currently supports three import modes: Append, Merge, Override.
+Currently supports three import modes: Append, Merge, Overwrite.
 
 - **Append**: Create new categories and tab groups, without affecting the existing ones.
 - **Merge**: Imported data merges with existing data; if imported category has same name with existing category, they are merged.
-- **Override**: Directly overwrite existing data with the imported data; original data is overwritten.
+- **Overwrite**: Directly overwrite existing data with the imported data; original data is overwritten.
 
 ### Import Sources
 

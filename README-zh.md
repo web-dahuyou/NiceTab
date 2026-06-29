@@ -200,13 +200,13 @@
 
 ## 参考链接
 - [Chrome for Developers - Extensions > API 参考](https://developer.chrome.com/docs/extensions/reference/api?hl=zh-cn)
+- [Mozilla for Developers - WebExtensions API 文档](https://developer.mozilla.org/zh-CN/docs/Mozilla/Add-ons/WebExtensions)
 - [WXT 官网](https://wxt.dev/)
 - [Ant Design](https://ant-design.antgroup.com/index-cn)
 - [React Router](https://reactrouter.com/)
 - [styled-components](https://styled-components.com/)
 - [react-intl](https://formatjs.io/docs/react-intl)
 - [pragmatic-drag-and-drop](https://atlassian.design/components/pragmatic-drag-and-drop/about)
-- [【干货】Chrome插件(扩展)开发全攻略](https://www.cnblogs.com/liuxianan/p/chrome-plugin-develop.html)
 
 
 ## 插件开发

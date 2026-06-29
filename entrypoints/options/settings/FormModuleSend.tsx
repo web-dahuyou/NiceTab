@@ -8,7 +8,7 @@ import {
   ENUM_SETTINGS_PROPS,
 } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
-import useTooltipOption from '@/entrypoints/common/hooks/tooltipOption';
+import useTooltipOption from '~/entrypoints/common/hooks/tooltipOption';
 
 const {
   OPEN_ADMIN_TAB_AFTER_SEND_TABS,

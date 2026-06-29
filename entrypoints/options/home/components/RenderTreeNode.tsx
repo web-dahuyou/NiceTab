@@ -90,6 +90,7 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
 
   const { tagMenuItems } = useTagActions({
     tagId: tagId as string,
+    isStatic: node.type === 'tag' && !!node.originData?.static,
     isLocked: node.type === 'tag' && !!node.originData?.isLocked,
     groupList: node.type === 'tag' ? node.originData?.groupList : [],
     allowTagActions: defaultTagActions,

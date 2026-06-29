@@ -108,6 +108,7 @@ const zhCN = {
   'common.aborted': '请求取消',
   'common.networkError': '网络连接异常',
   'common.userGuide': '用户指南',
+  'common.changelog': '更新日志',
   'common.itemCount': `{count}项`,
   'common.matchMode': '匹配模式',
   'common.equal': '相同',
