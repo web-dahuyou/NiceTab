@@ -6,6 +6,8 @@
   English | <a href="./README-zh.md">中文</a>
 </p>
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/web-dahuyou/NiceTab)
+
 ## Overview
 
 **Note** The extension is actively developed with ongoing updates. The screenshots below reflect history versions only. We encourage you to install the latest release for the most up-to-date experience.
@@ -111,8 +113,6 @@ Comprehensive user guide | <a href="./GUIDE.md">NiceTab User Guide</a>
 - You can quickly switch theme colors or view/close the current open tab.
 - If no popup modules are configured in preferences, clicking the extension icon sends all tabs to NiceTab by default.
 
-Screenshots of other actions are not yet updated.
-
 ![NiceTab-extension-icon-1](https://github.com/user-attachments/assets/debe19ca-cd80-4ec9-a8d3-79de6dafb5a7)
 
 ![NiceTab-extension-icon-2](https://github.com/user-attachments/assets/f441c6c5-6da3-4769-a8a7-6691c0263613)
@@ -143,8 +143,6 @@ Screenshots of other actions are not yet updated.
 - You can import `OneTab`, `Toby`, `SessionBuddy` or `KepTab` data, and parse it into `NiceTab` format.
 - You can export `NiceTab` data to local file.
 
-Screenshots are not yet updated.
-
 ![NiceTab-import-export](https://github.com/user-attachments/assets/48b6d09b-342c-448e-b235-ae54c4aae235)
 
 ### Remote Sync
@@ -156,8 +154,6 @@ Supports syncing via Gitee Gists, GitHub Gists, and WebDAV:
 **Note**:
 - For gists, token permissions only check `gists` scope.
 - Merging push sync does not perform a diff-comparison delete. It merges remote and local data, then pushes to remote, so tabs increase cumulatively. To sync deletions, remove them locally and then manually overwrite the remote.
-
-Screenshots of WebDAV sync are not yet updated.
 
 ![NiceTab-remote-sync](https://github.com/user-attachments/assets/446c6b94-55ad-46b3-a790-45e29027ee05)
 
