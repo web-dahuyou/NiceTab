@@ -29,6 +29,7 @@ const {
   RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH,
   SHOW_OPENED_TAB_COUNT,
   POPUP_MODULE_DISPLAYS,
+  NEW_TAB_DISPLAY,
 } = ENUM_SETTINGS_PROPS;
 
 // 设置插件图标徽标
@@ -139,9 +140,53 @@ async function initTabsUpdateListener() {
   browser.tabs.onRemoved.addListener(autoCreateSnapshot);
 }
 
+// 新标签页重定向监听（参考tabtab机制，不使用chrome_url_overrides）
+async function initNewTabRedirectListener() {
+  browser.tabs.onCreated.removeListener(handleNewTabCreated);
+  browser.tabs.onUpdated.removeListener(handleNewTabUpdated);
+  browser.tabs.onCreated.addListener(handleNewTabCreated);
+  browser.tabs.onUpdated.addListener(handleNewTabUpdated);
+}
+
+async function handleNewTabCreated(tab: Tabs.Tab) {
+  const url = tab.url || tab.pendingUrl || '';
+  await handleNewTabRedirect(tab.id, url);
+}
+
+async function handleNewTabUpdated(tabId: number, changeInfo: Tabs.OnUpdatedChangeInfoType) {
+  if (changeInfo.status === 'loading') {
+    const url = changeInfo.url || '';
+    await handleNewTabRedirect(tabId, url);
+  }
+}
+
+async function handleNewTabRedirect(tabId: number | undefined, url: string) {
+  if (!tabId || !url) return;
+  
+  const newTabPatterns = [
+    'chrome://newtab/',
+    'about:newtab',
+    'edge://newtab/',
+  ];
+  
+  const matches = newTabPatterns.some(pattern => url === pattern || url.startsWith(pattern));
+  if (!matches) return;
+  
+  const settings = await settingsUtils.getSettings();
+  const display = settings[NEW_TAB_DISPLAY];
+  
+  if (display === 'home-list') {
+    browser.tabs.update(tabId, { url: browser.runtime.getURL('/options.html#/home') });
+  } else if (display === 'starred-search') {
+    browser.tabs.update(tabId, { url: browser.runtime.getURL('/newtab.html') });
+  }
+  // "disabled": do nothing - let browser use default
+}
 export default defineBackground(() => {
   // console.log('Hello background!', { id: browser.runtime.id });
   initTabsUpdateListener();
+  // 初始化新标签页重定向监听
+  initNewTabRedirectListener();
   // 初始化tab事件
   initTabEventListener();
   // 初始化 popup 交互
@@ -149,6 +194,7 @@ export default defineBackground(() => {
   initSettingsStorageListener(async (settings, oldSettings) => {
     initTabEventListener();
     initPopup();
+    initNewTabRedirectListener();
     autoSyncAlarm.checkReset(settings, oldSettings);
   });
 

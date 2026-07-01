@@ -5,6 +5,7 @@ import settings from './settings';
 import importExport from './importExport';
 import sync from './sync';
 import hotkeys from './hotkeys';
+import newtab from './newtab';
 
 const getLocales = (language: LanguageTypes) => {
   return {
@@ -13,7 +14,8 @@ const getLocales = (language: LanguageTypes) => {
     ...settings[language],
     ...importExport[language],
     ...sync[language],
-    ...hotkeys[language]
+    ...hotkeys[language],
+    ...newtab[language]
   }
 }
 export const zhCN = getLocales('zh-CN');

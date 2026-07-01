@@ -7,8 +7,8 @@
   "scripts": {
     "dev": "pnpm convert:guide && wxt",
     "dev:firefox": "pnpm convert:guide && wxt --mode production -b firefox",
-    "build": "pnpm convert:guide && wxt build",
-    "build:firefox": "pnpm convert:guide && wxt build -b firefox",
+    "build": "pnpm convert:guide && wxt build && node scripts/fix-manifest.mjs",
+    "build:firefox": "pnpm convert:guide && wxt build -b firefox && node scripts/fix-manifest.mjs",
     "zip": "pnpm convert:guide && wxt zip",
     "zip:firefox": "pnpm convert:guide && wxt zip -b firefox",
     "compile": "tsc --noEmit",
@@ -52,6 +52,7 @@
     "@types/react-dom": "^18.3.0",
     "@types/yargs-parser": "^21.0.3",
     "@typescript-eslint/parser": "^8.35.0",
+    "@vitejs/plugin-react": "5.1.4",
     "@wxt-dev/module-react": "^1.1.0",
     "eslint": "^9.0.0",
     "eslint-plugin-import": "^2.32.0",

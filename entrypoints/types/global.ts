@@ -203,6 +203,7 @@ export type SettingsProps = {
   autoExpandHomeTree?: boolean; // 进入列表页时，是否自动展开全部节点
   pageWidthType?: PageWidthTypes; // 主内容区宽度设置
   showTabTitleTooltip?: boolean; // 是否显示标签页标题的tooltip
+  newTabDisplay?: 'home-list' | 'starred-search' | 'disabled'; // 新标签页显示方式
   /* 同步配置 */
   remoteSyncWithSettings?: boolean; // 偏好设置是否与列表一起同步
   autoSync?: boolean; // 是否开启自动同步

@@ -1143,6 +1143,22 @@ export default class TabListUtils {
     await this.setTagList(tagList);
   }
   // tab标签页拖拽
+
+  // 添加单个标签页到标签组
+  async addTabItem(groupId: string, tab: TabItem) {
+    const tagList = await this.getTagList();
+    for (let tag of tagList) {
+      for (let g of tag.groupList) {
+        if (g.groupId === groupId) {
+          g.tabList.push(tab);
+          await this.setTagList(tagList);
+          return;
+        }
+      }
+    }
+  }
+
+
   async onTabDrop(
     sourceGroupId: Key,
     targetGroupId: Key,
