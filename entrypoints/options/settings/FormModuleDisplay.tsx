@@ -18,6 +18,7 @@ const {
   AUTO_EXPAND_HOME_TREE,
   MAIN_CONTENT_WIDTH_TYPE,
   SHOW_TAB_TITLE_TOOLTIP,
+  NEW_TAB_DISPLAY,
 } = ENUM_SETTINGS_PROPS;
 
 export default function FormModuleDisplay(
@@ -128,6 +129,18 @@ export default function FormModuleDisplay(
         <Radio.Group>
           <Radio value={true}>{$fmt('common.yes')}</Radio>
           <Radio value={false}>{$fmt('common.no')}</Radio>
+        </Radio.Group>
+      </Form.Item>
+
+      {/* 新标签页显示方式 */}
+      <Form.Item<SettingsProps>
+        label={$fmt(`settings.${NEW_TAB_DISPLAY}`)}
+        name={NEW_TAB_DISPLAY}
+      >
+        <Radio.Group>
+          <Radio value="home-list">{$fmt(`settings.${NEW_TAB_DISPLAY}.home-list`)}</Radio>
+          <Radio value="starred-search">{$fmt(`settings.${NEW_TAB_DISPLAY}.starred-search`)}</Radio>
+          <Radio value="disabled">{$fmt(`settings.${NEW_TAB_DISPLAY}.disabled`)}</Radio>
         </Radio.Group>
       </Form.Item>
 

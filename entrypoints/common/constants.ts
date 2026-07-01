@@ -182,6 +182,7 @@ export enum ENUM_SETTINGS_PROPS {
   AUTO_EXPAND_HOME_TREE = 'autoExpandHomeTree', // 进入列表页时，是否自动展开全部节点
   MAIN_CONTENT_WIDTH_TYPE = 'pageWidthType', // 主内容区域宽度类型
   SHOW_TAB_TITLE_TOOLTIP = 'showTabTitleTooltip', // 是否显示标签页标题的tooltip
+  NEW_TAB_DISPLAY = 'newTabDisplay', // 新标签页显示方式
   /* 同步配置 */
   REMOTE_SYNC_WITH_SETTINGS = 'remoteSyncWithSettings', // 远程同步时，偏好设置是否一起同步
   AUTO_SYNC = 'autoSync', // 是否开启自动同步

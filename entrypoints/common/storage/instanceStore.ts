@@ -5,6 +5,7 @@ import RecycleBinUtils from './recycleBinUtils';
 import SyncUtils from './syncUtils';
 import SyncWebDAVUtils from './syncWebDAVUtils';
 import StateUtils from './stateUtils';
+import NewTabUtils from './newTabUtils';
 
 let _settingsUtils: SettingsUtils;
 let _themeUtils: ThemeUtils;
@@ -13,6 +14,7 @@ let _recycleBinUtils: RecycleBinUtils;
 let _syncUtils: SyncUtils;
 let _syncWebDAVUtils: SyncWebDAVUtils;
 let _stateUtils: StateUtils;
+let _newTabUtils: NewTabUtils;
 
 export default class Store {
   static get settingsUtils() {
@@ -36,6 +38,9 @@ export default class Store {
   static get stateUtils() {
     return _stateUtils;
   }
+  static get newTabUtils() {
+    return _newTabUtils;
+  }
 
   static set settingsUtils(utils: SettingsUtils) {
     _settingsUtils = utils;
@@ -57,5 +62,8 @@ export default class Store {
   }
   static set stateUtils(utils: StateUtils) {
     _stateUtils = utils;
+  }
+  static set newTabUtils(utils: NewTabUtils) {
+    _newTabUtils = utils;
   }
 }
