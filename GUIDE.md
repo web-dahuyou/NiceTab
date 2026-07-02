@@ -7,9 +7,9 @@
 
 ## Project Introduction
 
-This project is a free and open-source browser tab manager extension. It is a powerful upgraded alternative to OneTab, Toby, SessionBuddy, and similar tools, offering rich features and excellent usability.
+NiceTab is a free, open-source browser tab manager extension. It serves as a powerful, upgraded alternative to OneTab, Toby, SessionBuddy, and similar tools, delivering rich features and excellent usability.
 
-For the basic project overview, please refer to the <a href="./README.md">README</a>.
+For a project overview, see the <a href="./README.md">README</a>.
 
 ## Installation
 
@@ -20,40 +20,39 @@ For the basic project overview, please refer to the <a href="./README.md">README
 
 **Method 2: Manual installation from ZIP**
 - Download `nice-tab-<version>-chrome.zip` (for Chrome/Edge) or `nice-tab-<version>-firefox.zip` from the [Releases page](https://github.com/web-dahuyou/NiceTab/releases).
-- Search online for "how to install unpacked Chrome extension" if needed.
+- If you need to load an unpacked extension, refer to the official Chrome/Edge developer documentation, or search online for "how to install unpacked Chrome extension".
 
 After installation, we recommend **pinning the extension icon** for quick access to extension features.
 
-On first launch, since no tabs have been saved, the list will be empty. You can right-click the extension icon and select **Send all tabs** to get started.
+On first launch the list is empty because no tabs have been sent yet. Right-click the extension icon and choose **Send All Tabs** to get started quickly
 
 NiceTab also supports keyboard shortcuts. You can view the corresponding shortcuts in the right-click menu, or go to the keyboard shortcuts settings page to customize them (see [Bind Shortcuts](#bind-shortcuts) below).
 
-
 ## Changelog
 
-For detailed changelog, please refer to <a href="./CHANGELOG.md">CHANGELOG</a>。
+For the detailed changelog, see <a href="./CHANGELOG.md">CHANGELOG</a>.
 
 ## Feature Overview
 
-NiceTab’s core function is to send browser tabs to the tab list with one click and manage them through a hierarchical structure of `Category > Tab Group > Tab`.
+NiceTab's core strength is sending browser tabs to a structured list with one click and managing them via the `Category > Tab Group > Tab` hierarchy.
 
-The extension mainly consists of:
-- [Extension Right-click Menu](#extension-right-click-menu)
-- [Extension Icon Popup Panel](#extension-icon-popup-panel)
-- [Management Dashboard](#management-dashboard); Displayed as `NiceTab Admin Page`。
+The extension provides three main interfaces:
+- [Right-click Menu](#extension-right-click-menu)
+- [Icon Popup Panel](#extension-icon-popup-panel)
+- [Management Dashboard (Admin Page)](#management-dashboard); Displayed as `NiceTab Admin Page`.
 
 Try left-clicking and right-clicking the NiceTab extension icon to explore the interactions.
 
 ### Extension Right-click Menu
 
-When first installing the extension, no tabs have been sent to NiceTab, so the NiceTab list is empty. You can right-click the NiceTab extension icon to open the plugin's right-click menu and send the tabs currently open in the browser to the NiceTab management page.
+Upon first installation, the NiceTab list is empty because no tabs have been sent yet. You can right-click the NiceTab extension icon to open the plugin's right-click menu and send the tabs currently open in the browser to the NiceTab management page.
 
 Current menu items:
 - **Open NiceTab Admin Page**: Clicking this will open the NiceTab management dashboard page.
 - **Global Search**: You can globally search for tabs sent to the NiceTab Admin Page in the browser. Refer to the [Global Search](#global-search) section below.
 - **Send All Tabs**: Send all opened tabs in the current browser window to the NiceTab Admin Page.
 - **Send All Tabs (all windows)**: Send all opened tabs in all browser windows to the NiceTab Admin Page.
-- **Send Current Group**: Send the tab group containing the currently active or highlighted tab to the NiceTab Admin Page (supports multiple tabs and cross groups, browser tabs can be multi-selected and highlighted).
+- **Send Current Group**: Send the tab group containing the currently active or highlighted tab to the NiceTab Admin Page (supports multi-tab and cross-group selection).
 - **Send Current Tab**: Send the currently active or highlighted tab to the NiceTab Admin Page (supports multiple tabs, browser tabs can be multi-selected and highlighted).
 - **Send Other Tabs**: Send other tabs (excluding the currently highlighted/active tab) to the NiceTab Admin Page.
 - **Send Left Tabs**: Send left-side tabs to the NiceTab Admin Page.
@@ -62,11 +61,11 @@ Current menu items:
 - **Hibernate Other Tabs**: Hibernate tabs other than the current tab.
 
 **Notes**:
-- v2.8.4 added **Send Current Tab** to the Firefox tab context menu.
+- v2.8.4: Added **Send Current Tab** to the Firefox tab context menu.
 
 ### Extension Icon Popup Panel
 
-Left-click the icon to open the the `Popup Panel`, which includes **Extension Info**, **Go To**, **Actions**, **Theme**, and **Opened Tabs** modules.
+Left-click the extension icon to open the `Popup Panel`. It includes the following modules: **Extension Info**, **Go To**, **Actions**, **Theme**, and **Opened Tabs**.
 
 **Modules**:
 - **Extension Info**: NiceTab extension information, currently only shows extension version (more info may be added later).
@@ -80,24 +79,23 @@ Left-click the icon to open the the `Popup Panel`, which includes **Extension In
   - Hibernate Other Tabs
   - Start Sync
 - **Theme**: Switch theme colors
-- **Opened Tabs**: Displays currently opened browser tabs, supports browser groups. You can close, hibernate, click to switch tabs, etc.
+- **Opened Tabs**: Displays currently opened browser tabs and native browser tab groups. You can close, hibernate, or switch to tabs directly from this panel.
 
 **Notes**:
-- v2.8.4 added compact mode toggle button.
+- v2.8.4: Added compact mode toggle button.
 - By default, left-clicking the extension icon opens the `Popup Panel`. You can configure it in [Management Dashboard - Preferences](#management-dashboard---preferences) to send all tabs directly (OneTab-style).
 - Hibernation reduces memory usage without closing tabs. When switching to a hibernated tab, it will be reactivated.
-
 
 ### Management Dashboard
 
 The NiceTab Admin Page (also called Management Dashboard) includes **List**, **Preferences**, **Import/Export**, **Remote Sync**, and **Recycle Bin** pages.
 
 **Page Introduction**:
-- **List**: Manages all tabs sent to NiceTab using the hierarchical structure of Category > Tab Group > Tab. In addition to basic CRUD operations, it also supports **Sorting**, **Moving**, **Locking**, **Starring**, **Copying**, **Deduplication**, **Opening**, **Renaming**, **QR Code**, and many other rich features, as well as some batch operations.
+- **List**: Manages all tabs sent to NiceTab using the **hierarchical structure of Category > Tab Group > Tab**. In addition to basic CRUD operations, it also supports **Sorting**, **Moving**, **Locking**, **Starring**, **Copying**, **Deduplication**, **Opening**, **Renaming**, **QR Code**, and many other rich features, as well as some batch operations.
 - **Preferences**: For better experience and adapting to different user habits.
 - **Import/Export**: Supports import/export tab list and preferences (export to local disk, and import from local to NiceTab extension).
 - **Remote Sync**: Supports synchronizing tab list and preferences to remote storage (GitHub Gists, Gitee Gists, WebDAV), supports automatic synchronization (see [Management Dashboard - Remote Sync](#management-dashboard---remote-sync) for details).
-- **Recycle Bin**: Tabs removed from the list enter to the Recycle Bin, facilitating recovery when remove by accident (the Recycle Bin is automatically cleared daily. If accidentally removed, please recover on the same day).
+- **Recycle Bin**: Tabs removed from the list are moved to the Recycle Bin, facilitating recovery when remove by accident (the Recycle Bin is automatically cleared daily. If accidentally removed, please recover on the same day).
 
 ### Tips
 
@@ -122,9 +120,8 @@ These two functions are located in the `Navigation Bar "Actions" dropdown option
 **Scenario**: Before manually closing/restarting the browser, you can first "Create Snapshot", then after restarting the browser, manually "Restore Snapshot".
 
 **Explanation**:
-- Normally, browsers automatically save opened tabs only during browser upgrades or other official restarts, and automatically restore them after restarting. However, when manually closing/restarting the browser, there's no corresponding snapshot saving functionality.
-- The NiceTab extension actually automatically saves a snapshot in the background in real-time, and automatically restore them after restarting. The operation management interface hasn't been opened yet. This may be provided in the future if needed.
-
+- Normally, browsers save opened tabs only during browser upgrades or other official restarts, and automatically restore them after restarting. However, when manually closing or restarting the browser, there's no snapshot saving functionality.
+- NiceTab actually saves a snapshot in the background in real-time, and automatically restore them after restarting. The operation management interface hasn't been developed yet - it may be provided in future versions if needed.
 
 ## Management Dashboard - List
 
@@ -132,8 +129,7 @@ The List page uses a `Category > Tab Group > Tab` hierarchical structure for tab
 
 ### Directory Tree
 
-The left directory tree is like a folder, managing categories and tab groups, and can be freely expanded and collapsed:
-- First-level directories represent categories, second-level directories represent tab groups. The directory tree supports category and tab group search.
+The left Directory Tree functions like a file explorer, managing Categories (first level) and Tab Groups (second level). It supports search, expand/collapse, drag-and-drop reordering, locking, and cross-category moving.
 - **Staging Area**: A special category, fixed at the first position and cannot be deleted. Sent tabs are automatically added to the Staging Area. You can operate tab groups and tabs in the Staging Area as needed (edit, move, delete, etc.).
 - The categories support expanding/collapsing, deleting and locking; **the locked categories switch to read-only mode, preventing accidental operations**.
 - The categories support creating tab groups, one-click moving of tab groups from a category to other categories.
@@ -151,7 +147,7 @@ The **Stored Tab List** presents by group. Tab groups here support renaming, del
 
 **Tab Group Operations**:
 - **Rename**: Click the edit icon to rename (group name has character length limit).
-- **Delete**: Click the "Remove" button of the tab group to remove it.
+- **Remove**: Click the "Remove" button of the tab group to remove it.
 - **Open Group**: Click the "Open Group" button to open all tabs in this tab group in the browser (can be configured to automatically remove from list after opening tabs).
 - **Create Group Before**: Create a new tab group before this tab group.
 - **Create Group After**: Create a new tab group after this tab group.
@@ -167,7 +163,7 @@ The **Stored Tab List** presents by group. Tab groups here support renaming, del
 **Tab List**:
 - A tab supports removing, editing, copying, showing QR code, etc.
 - Tabs within a tab group support multi-selection and drag-and-drop reordering.
-- **Supports mouse moving selection for quick multi-selection of tabs**.
+- **Supports click-and-drag selection for quick multi-selection of tabs**.
 - **Supports quick batch selection of all tabs between two tabs**: Hold Shift key and click one tab to highlight it, then hold Shift key and click another tab to batch select.
 - After multi-selecting tabs, you can batch remove, open, move to, batch drag-and-drop move, copy links, clone, etc.
 - **Tip**: You can also drag tabs onto a tab group in the left Directory Tree and drop to move them across categories quickly.
@@ -176,7 +172,7 @@ The **Stored Tab List** presents by group. Tab groups here support renaming, del
 
 The v2.9.0 version added a "Opened Tabs Panel" on the right side of the page.
 
-The collapsible panel on the right side of the page displays the tabs and tab groups currently opened in the browser window. Tabs in this panel support quick multi-selection and batch drag-and-drop to the **Stored Tab List** or to nodes in the left **Directory Tree**. You can also drag entire tab groups directly.
+The collapsible panel on the right side of the page displays the tabs and tab groups currently opened in the browser window. Tabs in this panel support quick multi-selection and batch drag-and-drop to the **Stored Tab List** or **Directory Tree** nodes. You can also drag entire tab groups directly.
 
 ## Management Dashboard - Preferences
 
@@ -320,7 +316,7 @@ Currently supported extensions:
 
 Currently supports three import modes: Append, Merge, Overwrite.
 
-- **Append**: Create new categories and tab groups, without affecting the existing ones.
+- **Append**: Creates new categories and tab groups without modifying existing data.
 - **Merge**: Imported data merges with existing data; if imported category has same name with existing category, they are merged.
 - **Overwrite**: Directly overwrite existing data with the imported data; original data is overwritten.
 
@@ -330,7 +326,7 @@ Supports textarea and local file import.
 
 v2.7.7 version supports browser HTML bookmark file import.
 
-> Note: NiceTab does not support unlimited directory nesting; imported directories are ultimately converted to **Category > Tab Group > Tab** structure.
+> Note: NiceTab does not support unlimited directory nesting; imported directories are ultimately converted to **Category > Tab Group > Tab** structure (no unlimited nesting).
 
 ### Export
 
@@ -360,10 +356,7 @@ Based on above reasons, here are some recommended usages:
 
 **Single Device Usage**:
 - Manual sync method: Regularly manually "push data to the remote - force overwrite"
-- Automatic synchronization method: Enable the automatic synchronization function, and set the synchronization method to "Automatic Synchronization - Overwrite and Push". This ensures that the remote backup data is fully consistent with the local data
--
-- Auto Sync Method: Periodically manually "Push local data to remote (force to overwrite)".
-- Auto Sync Method: Enable auto sync, set sync method to "Automatically push local data to remote (force to overwrite)". This ensures that the remote backup data is fully consistent with the local data.
+- Auto Sync Method: Enable auto sync, set Auto Sync Type to "Autom Push (Force)". This ensures that the remote backup data is fully consistent with the local data.
 
 **Multi-Devices Usage**:
 - Manual Sync Method
@@ -375,6 +368,7 @@ Based on above reasons, here are some recommended usages:
   - If you are not satisfied with the current auto sync function, I suggest using manual sync method (I personally prefer using manual synchronization).
 
 ### Remote Disaster Recovery Backup
+
 Version 2.9.2 added a simplified remote disaster recovery backup feature. When pushing data to remote via sync, the remote data will be backed up first (with the backup directory and backup file name being customizable), and then the local data will be pushed to the remote.
 
 > The backup data is one version behind the main data. Under normal circumstances, the latest main data takes priority. If there is an issue with the main data, the previous version of the backup data may be useful.
@@ -405,13 +399,13 @@ Version 2.9.2 added a simplified remote disaster recovery backup feature. When p
 
 ## Management Dashboard - Recycle Bin
 
-The data removed from the tab list will be temporarily retained in the recycle bin. In case of accidental deletion, you can enter the recycle bin to recover the data.
+The data removed from the tab list will be temporarily retained in the Recycle Bin. In case of accidental deletion, you can enter the Recycle Bin to recover the data.
 
-The data stored in the recycle bin is not retained for long. It is auto-clears daily to avoid memory usage. Please recover the data from the recycle bin on the same day.
+The data stored in the Recycle Bin is not retained for long. The Recycle Bin is automatically cleared daily to control memory usage. Please recover any accidentally deleted items on the same day.
 
 ## Bind Shortcuts
 
-Use the browser’s built-in command system. Click "Bind Shortcuts" button to go to browser's built-in shortcut binding page.
+Use the browser's built-in command system. Click "Bind Shortcuts" button to go to browser's built-in shortcut settings page. Other shortcuts can be customized in this shortcut settings page.
 
 In Popup Panel and management dashboard, both have "Bind Shortcuts" button.
 
