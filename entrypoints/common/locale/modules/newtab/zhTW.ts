@@ -1,28 +1,16 @@
 import { LocaleKey } from './zhCN';
 
 const zhTW: Record<LocaleKey, string> = {
-  "newtab.searchPlaceholder": "搜索或输入网址",
-  "newtab.edit": "编辑",
-  "newtab.delete": "删除",
-  "newtab.add": "添加网址",
-  "newtab.addUrl": "新建网址",
-  "newtab.addUrlTitle": "网址标题（可选）",
-  "newtab.editUrl": "编辑网址",
-  "newtab.editTitle": "编辑标题",
-  "newtab.save": "保存",
-  "newtab.cancel": "取消",
-  "newtab.noGroups": "没有星标的标签组",
-  "newtab.noGroupsDesc": "请在 NiceTab 管理后台中为标签组添加星标，即可在新标签页中显示",
-  "newtab.openAdmin": "打开管理后台",
-  "newtab.confirmDelete": "确定要从新标签页中删除这个网址吗？",
-  "newtab.tabs": "个网址",
-  "newtab.manageEngines": "管理搜索引擎",
-  "newtab.engineName": "搜索引擎名称",
-  "newtab.engineUrl": "搜索网址（用 %s 代替搜索词）",
-  "newtab.deleteEngine": "确定要删除这个搜索引擎吗？",
-  "newtab.addEngine": "添加搜索引擎",
-  "newtab.defaultEngine": "默认搜索引擎",
-  "newtab.dragHint": "拖拽排序，第一个为默认搜索引擎",
+  'newtab.searchEngine': '搜尋引擎',
+  'newtab.manageEngines': '管理搜尋引擎',
+  'newtab.engineUrl': '網址格式（用 "%s" 代替搜尋詞）',
+  'newtab.removeEngine.tip': '您確定要刪除該搜尋引擎嗎？',
+  'newtab.addEngine': '添加搜尋引擎',
+  'newtab.editEngine': '編輯搜尋引擎',
+  'newtab.searchPlaceholder': '輸入搜尋詞或網址',
+  'newtab.addTab': '添加分頁',
+  'newtab.noGroups': '暫無星標的標籤組',
+  'newtab.noGroupsDesc': 'NiceTab管理後台中星標的標籤組，會在新標籤頁中顯示。',
 };
 
 export default zhTW;

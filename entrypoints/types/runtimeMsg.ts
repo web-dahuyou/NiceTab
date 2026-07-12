@@ -8,7 +8,8 @@ export type PageContextType =
   | 'background'
   | 'optionsPage'
   | 'popupPage'
-  | 'contentScriptPage';
+  | 'contentScriptPage'
+  | 'newtabPage';
 
 export type RuntimeMsgType =
   | 'setPrimaryColor'

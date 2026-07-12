@@ -25,6 +25,7 @@ import type {
   TimeRange,
   PopupModuleNames,
   PageContextType,
+  SearchEngine,
 } from '~/entrypoints/types';
 export * from './envVars';
 
@@ -182,7 +183,9 @@ export enum ENUM_SETTINGS_PROPS {
   AUTO_EXPAND_HOME_TREE = 'autoExpandHomeTree', // 进入列表页时，是否自动展开全部节点
   MAIN_CONTENT_WIDTH_TYPE = 'pageWidthType', // 主内容区域宽度类型
   SHOW_TAB_TITLE_TOOLTIP = 'showTabTitleTooltip', // 是否显示标签页标题的tooltip
+  /* 新标签页配置 */
   NEW_TAB_DISPLAY = 'newTabDisplay', // 新标签页显示方式
+  SEARCH_ENGINES = 'searchEngines', // 搜索引擎配置
   /* 同步配置 */
   REMOTE_SYNC_WITH_SETTINGS = 'remoteSyncWithSettings', // 远程同步时，偏好设置是否一起同步
   AUTO_SYNC = 'autoSync', // 是否开启自动同步
@@ -290,6 +293,7 @@ export const pageContextTypes: PageContextType[] = [
   'optionsPage',
   'popupPage',
   'contentScriptPage',
+  'newtabPage',
 ];
 
 // 用户指南页面链接
@@ -305,6 +309,19 @@ export const CHANGELOG_URL_MAP: Record<LanguageTypes, string> = {
   'zh-TW': '/docs/CHANGELOG-zh.html',
   'en-US': '/docs/CHANGELOG.html',
 };
+
+// 默认搜索引擎
+export const DEFAULT_SEARCH_ENGINES: SearchEngine[] = [
+  {
+    id: 'google',
+    name: 'Google',
+    url: 'https://www.google.com/search?q=%s',
+    default: true,
+  },
+  { id: 'bing', name: 'Bing', url: 'https://www.bing.com/search?q=%s' },
+  { id: 'baidu', name: 'Baidu', url: 'https://www.baidu.com/s?wd=%s' },
+  { id: 'duckduckgo', name: 'DuckDuckGo', url: 'https://duckduckgo.com/?q=%s' },
+];
 
 export default {
   ENUM_COLORS,
@@ -322,4 +339,5 @@ export default {
   UNNAMED_GROUP,
   USER_GUIDE_URL_MAP,
   CHANGELOG_URL_MAP,
+  DEFAULT_SEARCH_ENGINES,
 };

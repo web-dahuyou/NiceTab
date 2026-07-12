@@ -88,7 +88,7 @@ export const StyledTabItem = styled.div`
   //   height: 100%;
   //   background: ${props => props.theme.colorPrimary};
   // }
-  .tab-item-favicon {
+  .img-favicon {
     margin-right: 0;
   }
   .tab-item-title {

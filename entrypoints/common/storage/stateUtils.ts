@@ -21,6 +21,9 @@ export default class StateUtils {
       isCompact: true,
       isShowPinnedTabs: false,
     },
+    newtab: {
+      searchEngines: [],
+    },
   };
   state: StateProps = this.initialState;
 

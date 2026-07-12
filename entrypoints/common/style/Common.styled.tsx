@@ -130,7 +130,10 @@ export const GlobalStyle = createGlobalStyle`
     }
   }
 
-  ::-webkit-scrollbar,
+  ::-webkit-scrollbar {
+    width: 8px !important;
+    height: 8px !important;
+  }
   .nicetab-tree-list-scrollbar-vertical,
   .rc-virtual-list-scrollbar-vertical {
     width: 8px !important;

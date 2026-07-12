@@ -351,7 +351,7 @@ export default class TabListUtils {
   // 创建标签组 tagId: 分类id, tabGroup: 新创建的标签组数据（可空）, groupId: 标签组id, pop: before | after
   async createTabGroup(
     tagId: Key,
-    tabGroup?: GroupItem,
+    tabGroup?: Partial<GroupItem>,
     groupId?: Key,
     pos?: 'before' | 'after',
   ) {
@@ -1142,7 +1142,6 @@ export default class TabListUtils {
 
     await this.setTagList(tagList);
   }
-  // tab标签页拖拽
 
   // 添加单个标签页到标签组
   async addTabItem(groupId: string, tab: TabItem) {
@@ -1158,7 +1157,7 @@ export default class TabListUtils {
     }
   }
 
-
+  // tab标签页拖拽
   async onTabDrop(
     sourceGroupId: Key,
     targetGroupId: Key,

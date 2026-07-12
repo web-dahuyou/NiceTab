@@ -12,6 +12,8 @@ type EditTabFormProps = {
 interface ModalProps {
   visible: boolean;
   data: TabItem;
+  type?: 'edit' | 'add';
+  title?: string;
   onOk?: (newData: TabItem) => void;
   onCancel?: () => void;
 }
@@ -19,12 +21,20 @@ interface ModalProps {
 export default function TabItemEditModal({
   visible = false,
   data,
+  type = 'edit',
+  title,
   onOk,
   onCancel,
 }: ModalProps) {
   const { $fmt } = useIntlUtls();
   const [form] = Form.useForm();
   const titleInputRef = useRef<InputRef>(null);
+
+  const modalTitle = useMemo(() => {
+    if (title) return title;
+    const typeLabel = type === 'edit' ? $fmt('common.edit') : $fmt('common.add');
+    return `${typeLabel} ${$fmt('home.tab')}`;
+  }, [title, type, $fmt]);
 
   // 确认编辑
   const handleModalConfirm = useCallback(() => {
@@ -54,7 +64,7 @@ export default function TabItemEditModal({
 
   return (
     <Modal
-      title={`${$fmt('common.edit')} - ${$fmt('home.tab')}`}
+      title={modalTitle}
       width={600}
       centered
       open={visible}

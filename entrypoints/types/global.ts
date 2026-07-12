@@ -129,6 +129,8 @@ export type PopupModuleNames =
 
 export type PageWidthTypes = 'fixed' | 'responsive';
 
+export type NewTabDisplayTypes = 'homePage' | 'niceNewtab' | 'default';
+
 export type ActionBtnStyle = 'icon' | 'text';
 
 export type ContextMenuConfigItem = {
@@ -203,7 +205,9 @@ export type SettingsProps = {
   autoExpandHomeTree?: boolean; // 进入列表页时，是否自动展开全部节点
   pageWidthType?: PageWidthTypes; // 主内容区宽度设置
   showTabTitleTooltip?: boolean; // 是否显示标签页标题的tooltip
-  newTabDisplay?: 'home-list' | 'starred-search' | 'disabled'; // 新标签页显示方式
+  /* 新标签页配置 */
+  newTabDisplay?: NewTabDisplayTypes; // 新标签页显示方式
+  searchEngines?: SearchEngine[]; // 搜索引擎配置
   /* 同步配置 */
   remoteSyncWithSettings?: boolean; // 偏好设置是否与列表一起同步
   autoSync?: boolean; // 是否开启自动同步
@@ -223,5 +227,13 @@ export type HotkeyItem = HotkeyOption & {
   combo: string[];
   label?: string;
 };
+
+// 搜索引擎
+export interface SearchEngine {
+  id: string;
+  name: string;
+  url: string;
+  default?: boolean;
+}
 
 export default { name: 'global-types' };

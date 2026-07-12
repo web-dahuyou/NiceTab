@@ -140,7 +140,7 @@ async function initTabsUpdateListener() {
   browser.tabs.onRemoved.addListener(autoCreateSnapshot);
 }
 
-// 新标签页重定向监听（参考tabtab机制，不使用chrome_url_overrides）
+// 新标签页重定向监听（不使用chrome_url_overrides，根据settings配置项进行控制）
 async function initNewTabRedirectListener() {
   browser.tabs.onCreated.removeListener(handleNewTabCreated);
   browser.tabs.onUpdated.removeListener(handleNewTabUpdated);
@@ -153,7 +153,10 @@ async function handleNewTabCreated(tab: Tabs.Tab) {
   await handleNewTabRedirect(tab.id, url);
 }
 
-async function handleNewTabUpdated(tabId: number, changeInfo: Tabs.OnUpdatedChangeInfoType) {
+async function handleNewTabUpdated(
+  tabId: number,
+  changeInfo: Tabs.OnUpdatedChangeInfoType,
+) {
   if (changeInfo.status === 'loading') {
     const url = changeInfo.url || '';
     await handleNewTabRedirect(tabId, url);
@@ -162,25 +165,22 @@ async function handleNewTabUpdated(tabId: number, changeInfo: Tabs.OnUpdatedChan
 
 async function handleNewTabRedirect(tabId: number | undefined, url: string) {
   if (!tabId || !url) return;
-  
-  const newTabPatterns = [
-    'chrome://newtab/',
-    'about:newtab',
-    'edge://newtab/',
-  ];
-  
-  const matches = newTabPatterns.some(pattern => url === pattern || url.startsWith(pattern));
+
+  const newTabPatterns = ['chrome://newtab/', 'about:newtab', 'edge://newtab/'];
+
+  const matches = newTabPatterns.some(
+    pattern => url === pattern || url.startsWith(pattern),
+  );
   if (!matches) return;
-  
+
   const settings = await settingsUtils.getSettings();
   const display = settings[NEW_TAB_DISPLAY];
-  
-  if (display === 'home-list') {
+
+  if (display === 'homePage') {
     browser.tabs.update(tabId, { url: browser.runtime.getURL('/options.html#/home') });
-  } else if (display === 'starred-search') {
-    browser.tabs.update(tabId, { url: browser.runtime.getURL('/newtab.html') });
+  } else if (display === 'niceNewtab') {
+    browser.tabs.update(tabId, { url: browser.runtime.getURL('/nice-newtab.html') });
   }
-  // "disabled": do nothing - let browser use default
 }
 export default defineBackground(() => {
   // console.log('Hello background!', { id: browser.runtime.id });
