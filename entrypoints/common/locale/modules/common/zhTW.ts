@@ -32,6 +32,7 @@ const zhTW: Record<LocaleKey, string> = {
   "common.more": "更多",
   "common.delete": "刪除",
   "common.remove": "刪除",
+  'common.add': '添加',
   "common.edit": "編輯",
   "common.extensionInfo": "擴充功能信息",
   "common.view": "檢視",
@@ -132,6 +133,7 @@ const zhTW: Record<LocaleKey, string> = {
   "common.locked": "已鎖定",
   "common.starred": "已加星號",
   'common.tips': '小貼士',
+  'common.setAsDefault': '設為默認選項',
 };
 
 export default zhTW;

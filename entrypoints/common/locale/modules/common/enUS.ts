@@ -32,6 +32,7 @@ const enUS: Record<LocaleKey, string> = {
   'common.more': 'More',
   'common.delete': 'Delete',
   'common.remove': 'Remove',
+  'common.add': 'Add',
   'common.edit': 'Edit',
   'common.extensionInfo': 'Extension Info',
   'common.view': 'View',
@@ -141,6 +142,7 @@ const enUS: Record<LocaleKey, string> = {
   'common.locked': 'Locked',
   'common.starred': 'Starred',
   'common.tips': 'Tips',
+  'common.setAsDefault': 'Set as Default',
 };
 
 export default enUS;

@@ -398,6 +398,7 @@ export default function App() {
                             onClick: item.onClick,
                           }}
                           placement="bottomLeft"
+                          destroyPopupOnHide
                         >
                           <Button type="text" icon={getActionIcon(item.key)} />
                         </Dropdown>

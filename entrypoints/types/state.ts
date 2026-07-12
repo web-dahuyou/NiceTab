@@ -1,3 +1,4 @@
+import type { SearchEngine } from '~/entrypoints/types';
 import type { SnapshotItem } from './tabList';
 
 export interface PermissionActionsProps {
@@ -33,11 +34,16 @@ export interface PopupStateProps {
   isCompact?: boolean; // 是否显示精简/紧凑模式
   isShowPinnedTabs?: boolean; // 是否显示固定标签页
 }
+// newtab 页面状态
+export interface NewtabStateProps {
+  searchEngines?: SearchEngine[];
+}
 
 export interface StateProps {
   global: GlobalStateProps;
   home: HomeStateProps;
   popup: PopupStateProps;
+  newtab: NewtabStateProps;
 }
 
 export type StateModuleProps<K extends keyof StateProps = 'global'> = StateProps[K];

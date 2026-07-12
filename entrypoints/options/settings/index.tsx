@@ -31,6 +31,7 @@ import FormModulePageTitle from './FormModulePageTitleConfig';
 import FormModuleGlobalSearch from './FormModuleGlobalSearch';
 import FormModuleOtherActions from './FormModuleOtherActions';
 import FormModuleDisplay from './FormModuleDisplay';
+import FormModuleNewtab from './FormModuleNewtab';
 import FormModuleSync from './FormModuleSync';
 import {
   StyledSidebarWrapper,
@@ -68,48 +69,46 @@ export default function Settings() {
 
   const [currModule, setCurrModule] = useState<string>('common');
   const blockModuleOptions: MenuItem[] = useMemo(() => {
-    return [
+    const _options: MenuItem[] = [
       {
         key: 'common',
         label: $fmt('settings.block.common'),
-        icon: <SettingOutlined />,
       },
       {
         key: 'sendTabs',
         label: $fmt('settings.block.sendTabs'),
-        icon: <SettingOutlined />,
       },
       {
         key: 'openTabs',
         label: $fmt('settings.block.openTabs'),
-        icon: <SettingOutlined />,
       },
       {
         key: 'pageTitleConfig',
         label: $fmt('settings.block.pageTitleConfig'),
-        icon: <SettingOutlined />,
-      },
-      {
-        key: 'globalSearch',
-        label: $fmt('settings.block.globalSearch'),
-        icon: <SettingOutlined />,
       },
       {
         key: 'otherActions',
         label: $fmt('settings.block.otherActions'),
-        icon: <SettingOutlined />,
       },
       {
         key: 'display',
         label: $fmt('settings.block.display'),
-        icon: <SettingOutlined />,
+      },
+      {
+        key: 'newtab',
+        label: $fmt('settings.block.newtab'),
       },
       {
         key: 'sync',
         label: $fmt('settings.block.sync'),
-        icon: <SettingOutlined />,
+      },
+      {
+        key: 'globalSearch',
+        label: $fmt('settings.block.globalSearch'),
       },
     ];
+
+    return _options.map(item => ({ ...item, icon: <SettingOutlined /> }) as MenuItem);
   }, [$fmt]);
 
   const onModuleChange: MenuProps['onClick'] = e => {
@@ -287,6 +286,9 @@ export default function Settings() {
 
             {/* ******************* 展示相关设置 ******************* */}
             <FormModuleDisplay hidden={currModule !== 'display'} form={form} />
+
+            {/* ******************* 新标签页相关设置 ******************* */}
+            <FormModuleNewtab hidden={currModule !== 'newtab'} form={form} />
 
             {/* ******************* 远程同步相关设置 ******************* */}
             <FormModuleSync hidden={currModule !== 'sync'} form={form} />
