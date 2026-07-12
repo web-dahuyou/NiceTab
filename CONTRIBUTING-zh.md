@@ -43,6 +43,7 @@
 ### 文件导入路径别名
 
 项目统一采用 `~` 别名导入 `entrypoints` 文件夹下的文件（虽然使用 `@` 也能生效）。
+
 ```ts
 import { something } from '~/entrypoints/common/utils';
 ```
@@ -50,6 +51,7 @@ import { something } from '~/entrypoints/common/utils';
 ### 指定浏览器可执行文件路径
 
 默认情况下，`wxt` 会自动识别 `Chrome/Firefox` 的安装路径，并启动对应的浏览器。如果启动项目报错找不到浏览器安装路径
+
 ```
 ERROR  No Chrome installations found.  
 ```
@@ -71,6 +73,7 @@ export default defineRunnerConfig({
 ### 持久化存储用户数据
 
 如果希望每次启动项目时，都使用上次保存的用户数据，可以参考 [官方文档-persist-data](https://wxt.dev/guide/essentials/config/browser-startup.html#persist-data) 进行持久化存储即可。
+
 ```js
 // <rootDir>/web-ext.config.ts
 

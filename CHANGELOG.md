@@ -2,7 +2,7 @@
 
 This document records the version update logs.
 
-For detailed update records, please refer to [GitHub Releases](https://github.com/web-dahuyou/NiceTab/releases).
+For the most detailed and up-to-date release notes, see [GitHub Releases](https://github.com/web-dahuyou/NiceTab/releases).
 
 ---
 
@@ -11,7 +11,7 @@ For detailed update records, please refer to [GitHub Releases](https://github.co
 **Release Date:** June 25, 2026
 
 - Added remote disaster recovery backup feature
-- Left sidebar and right panel support drag-and-resize to adjust width
+- Left sidebar (Directory Tree) and right panel (Opened Tabs Panel) now support drag-to-resize for width adjustment
 - Added dropdown menus for categories and tab groups in the left directory tree
 
 ---
@@ -20,7 +20,7 @@ For detailed update records, please refer to [GitHub Releases](https://github.co
 
 **Release Date:** June 12, 2026
 
-- Multilingual adjustments, added Shift multi-select operation tips
+- Improved multilingual support and added Shift key multi-selection tips
 
 ---
 
@@ -39,11 +39,11 @@ For detailed update records, please refer to [GitHub Releases](https://github.co
 
 **Release Date:** April 27, 2026
 
-- Fixed issue where `Send All Tabs` overwrites existing tab groups
+- Fixed an issue where `Send All Tabs` would overwrite existing tab groups
 - Added `confirmBeforeDeletingGroups` setting
 - Page title overwrite and domain exclusion configurations support wildcard patterns
 - Added independent auto-sync switches for Gist and WebDAV
-- Added persistent storage for pinned tabs switch in Popup Panel.
+- Added persistent storage for pinned tabs switch in Popup Panel
 
 ---
 
@@ -51,10 +51,10 @@ For detailed update records, please refer to [GitHub Releases](https://github.co
 
 **Release Date:** April 9, 2026
 
-- The tab list supports Shift key for multi-selection.
+- Tab list now supports multi-selection using the Shift key
 - Added new configuration option: `Create a new tab group when sending a single tab?`
-- Added pinned tabs switch in Popup Panel.
-- Added action buttons for tab groups.
+- Added pinned tabs switch in Popup Panel
+- Added action buttons for tab groups
 
 ---
 
@@ -91,7 +91,7 @@ For detailed update records, please refer to [GitHub Releases](https://github.co
 
 **Release Date:** December 11, 2025
 
-- Firefox native tab groups API support.
+- Firefox native tab groups API support
 
 ---
 
@@ -108,9 +108,9 @@ For detailed update records, please refer to [GitHub Releases](https://github.co
 
 **Release Date:** October 20, 2025
 
-- The tabs support multi-select and drag-and-drop.
+- The tabs support multi-select and drag-and-drop
 - Added page title customization feature
-- added context menu item: `Hibernate Other Tabs`.
+- added context menu item: `Hibernate Other Tabs`
 - Added configuration option: `Sync preferences along with list data?`
 
 ---
@@ -119,8 +119,8 @@ For detailed update records, please refer to [GitHub Releases](https://github.co
 
 **Release Date:** September 29, 2025
 
-- Added configuration options (with customization support) for context menu.
-- Close **Global Search Panel** when pressing `ESC`.
+- Added configuration options (with customization support) for context menu
+- Close **Global Search Panel** when pressing `ESC`
 - Updated `User Guide`
 
 ---
@@ -156,7 +156,7 @@ For detailed update records, please refer to [GitHub Releases](https://github.co
 
 - Added category locking feature
 - Global search supports multi-select operations
-- Added configuration option: `Position for inserting tab groups when moving or inserting them into the target category:` (top/bottom).
+- Added configuration option: `Position for inserting tab groups when moving or inserting them into the target category:` (top/bottom)
 - Send tabs target selection modal remembers last selected category and tab group
 - Removed virtual scrolling threshold configuration
 - Fixed default selecting issue when first entering settings page
@@ -192,8 +192,8 @@ For detailed update records, please refer to [GitHub Releases](https://github.co
 
 - Added **Global Search** modal and keyboard shortcuts
 - Added copy feature for tab group and tabs
-- Added configuration option: `Position for inserting tabs when moving or inserting them into the target tab group:` (top/bottom).
-- Tabs support multi-selection
+- Added configuration option: `Position for inserting tabs when moving or inserting them into the target tab group:` (top/bottom)
+- Tabs now support multi-selection and batch operations
 
 ---
 
@@ -201,9 +201,9 @@ For detailed update records, please refer to [GitHub Releases](https://github.co
 
 **Release Date:** April 16, 2025
 
-- SessionBuddy extension data adaptation.
-- Split modules for Settings page form, added menu navigation.
-- adjusted the responseType to `text` for gist raw_url request.
+- SessionBuddy extension data adaptation
+- Split modules for Settings page form, added menu navigation
+- Adjusted the responseType to `text` for gist raw_url request
 
 ---
 
@@ -211,11 +211,11 @@ For detailed update records, please refer to [GitHub Releases](https://github.co
 
 **Release Date:** April 3, 2025
 
-- English localization updates.
-- Fixed issue where tabs are not automatically closed after sending in popup panel.
-- Removed repositioning when removing selected tab groups, maintaining original position.
-- Save and restore currently selected category or tab group (stored independently per window).
-- interaction and style scope control optimization for shadowDOM in ContentScript.
+- English localization updates
+- Fixed issue where tabs are not automatically closed after sending in popup panel
+- Removed repositioning when removing selected tab groups, maintaining original position
+- Save and restore currently selected category or tab group (stored independently per window)
+- Interaction and style scope control optimization for shadowDOM in ContentScript
 
 ---
 
@@ -261,7 +261,7 @@ For detailed update records, please refer to [GitHub Releases](https://github.co
 **Release Date:** February 18, 2025
 
 - Send tabs action buttons optimization for Popup panel
-- format auto-detects for import data
+- Format auto-detects for import data
 - Context menus logic adjustment
 - Added Toby extension data format
 
@@ -342,7 +342,7 @@ For detailed update records, please refer to [GitHub Releases](https://github.co
 - Auto-confirm on `Enter` key in tab info modal
 - Display "Expand All" button in list page
 - Added URL exclusion and configuration for Sending tabs
-- fixed issue for tab removing in Popup panel
+- Fixed issue for tab removing in Popup panel
 
 ---
 
@@ -368,7 +368,7 @@ For detailed update records, please refer to [GitHub Releases](https://github.co
 **Release Date:** November 18, 2024
 
 - English localization updates
-- supports selecting specific directory for Sending tabs
+- Supports selecting specific directory for Sending tabs
 - Adjusted stopPropagation
 
 ---
