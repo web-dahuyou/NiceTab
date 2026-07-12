@@ -24,7 +24,7 @@ For a project overview, see the <a href="./README.md">README</a>.
 
 After installation, we recommend **pinning the extension icon** for quick access to extension features.
 
-On first launch the list is empty because no tabs have been sent yet. Right-click the extension icon and choose **Send All Tabs** to get started quickly
+On first launch the list is empty because no tabs have been sent yet. Right-click the extension icon and choose **Send All Tabs** to get started quickly.
 
 NiceTab also supports keyboard shortcuts. You can view the corresponding shortcuts in the right-click menu, or go to the keyboard shortcuts settings page to customize them (see [Bind Shortcuts](#bind-shortcuts) below).
 
@@ -356,7 +356,7 @@ Based on above reasons, here are some recommended usages:
 
 **Single Device Usage**:
 - Manual sync method: Regularly manually "push data to the remote - force overwrite"
-- Auto Sync Method: Enable auto sync, set Auto Sync Type to "Autom Push (Force)". This ensures that the remote backup data is fully consistent with the local data.
+- Auto Sync Method: Enable auto sync, set Auto Sync Type to "Auto Push (Force)". This ensures that the remote backup data is fully consistent with the local data.
 
 **Multi-Devices Usage**:
 - Manual Sync Method
