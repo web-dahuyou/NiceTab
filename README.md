@@ -48,6 +48,7 @@ Comprehensive user guide | <a href="./GUIDE.md">NiceTab User Guide</a>
 - Supports browser command shortcuts (open the NiceTab-Admin-Page, send all tabs, send the current tab, etc.).
 - Preferences support.
 - Offers **import** in multiple formats, with local file saving supported. Currently supports for `NiceTab`, `OneTab`, `Toby`, `SessionBuddy` and `KepTab`. More formats can be added later as needed.
+- Supports custom **Newtab page**.
 - **Remote sync**.
 - Supports manual switch for **Light/Dark** themes.
 - Supports **Theme color switch**, currently with several preset theme colors(More can be added later as needed).
@@ -57,6 +58,7 @@ Comprehensive user guide | <a href="./GUIDE.md">NiceTab User Guide</a>
 
 ### List Management
 
+- More features can be found in the `User Guide`.
 - Manage categories, tab groups, and tabs. Includes easy saving, restoring, starring (favorites), locking, adding, deleting, editing, searching, and drag-and-drop reordering, etc.
 - Supports global search for tab and URL, and jump straight to the result.
 - Supports category locking, preventing accidental operations.
@@ -70,30 +72,7 @@ Comprehensive user guide | <a href="./GUIDE.md">NiceTab User Guide</a>
 
 ### Preferences
 
-- Option to **Open NiceTab Admin Page after launching the browser**.
-- Option to **Pin the NiceTab Admin Page**.
-- Option to **Send pinned tabs to NiceTab when sending tabs**.
-- Option to **Open NiceTab Admin Page when sending tabs**.
-- Option to **Automatically close tabs when sending tabs**.
-- Option to **Retain duplicate groups when sending tabs**.
-- Option to **Retain duplicate tabs when sending tabs**.
-- "**Staging Area**" category is fixed at the top; tabs/tab groups sent will be automatically save to the category.
-- Option to **Show "Send To" modal when sending tabs**. You can send tabs to a specified category or tab group.
-- Configurable **Exclude domains for sending tabs** (regex supported) so certain sites or pages are never sent to NiceTab.
-- Option to **Open tab group in a new window when opening**.
-- Option to **Remove tabs when opening tabs or tab group**.
-- Option to **Auto-hibernate when opening multiple tabs**.
-- Option to **Restore the unnamed group as a browser tab group**.
-- Configurable **Modifier key for opening a tab silently (in background)**.
-- Configurable **Modifier key for opening a tab in foreground**.
-- Option to **Remove empty groups when clearing tabs**.
-- Option to **Confirm before removing tabs**.
-- Configurable **Copy links format template for tab groups**.
-- Option to **Display the number of open tabs on the extension icon**.
-- Option to **Display ContextMenu on your webpage**.
-- Configurable **popup panel modules**: you can configure which modules to display in the popup. If none are selected, clicking the extension icon sends all tabs to NiceTab by default.
-- Option to **Automatically expand the tree list on Home Page**.
-- ...More settings can be found in extension `NiceTab Admin Page > Settings` or refer to the user guide.
+- More settings can be found in extension `NiceTab Admin Page > Settings` or refer to the `User Guide`.
 
 ### Remote Sync
 

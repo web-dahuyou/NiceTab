@@ -6,6 +6,14 @@ For the most detailed and up-to-date release notes, see [GitHub Releases](https:
 
 ---
 
+## v3.0.0
+
+**Release Date:** July 13, 2026
+
+- Added a new feature and configuration item to customize the browser's newtab page
+
+---
+
 ## v2.9.2
 
 **Release Date:** June 25, 2026
@@ -143,8 +151,8 @@ For the most detailed and up-to-date release notes, see [GitHub Releases](https:
 - Added auto-sync time unit configuration, supporting minute-level and hour-level intervals
 - Added sync status reset button
 - Added configuration for remote sync active time ranges
-- Added keyboard shortcut for remote sync 
-- Optimized error messages for sync request 
+- Added keyboard shortcut for remote sync
+- Optimized error messages for sync request
 - Added new feature for tabs: reordering by name
 - Added lint and format configuration for project
 
@@ -328,8 +336,8 @@ For the most detailed and up-to-date release notes, see [GitHub Releases](https:
 - Feature Optimizations
 - Added tab group reordering by creation time
 - Navigate to specific tab After searching and clicking on it
-- Added action module and reload button in Popup panel 
-- Added dropdown menu with reload, send all tabs, and other operations in Admin Page 
+- Added action module and reload button in Popup panel
+- Added dropdown menu with reload, send all tabs, and other operations in Admin Page
 - Auto-clears once a day for **Recycle Bin**
 
 ---
@@ -425,7 +433,7 @@ For the most detailed and up-to-date release notes, see [GitHub Releases](https:
 
 - Added WebDAV sync
 - Nicetab-message style adjustments for Content-scripts
-- Dynamic switching for lang attribute 
+- Dynamic switching for lang attribute
 
 ---
 
@@ -530,7 +538,7 @@ For the most detailed and up-to-date release notes, see [GitHub Releases](https:
 
 **Release Date:** August 25, 2024
 
-- Overwrite confirmation reminder for remote sync 
+- Overwrite confirmation reminder for remote sync
 - Copy links within tab group
 - Hover to display title and link for tabs
 

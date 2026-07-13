@@ -29,7 +29,7 @@ export default function FormModuleNewtab(
         })}
       >
         <Radio.Group>
-          <Radio value="disabled">{$fmt(`settings.${NEW_TAB_DISPLAY}.default`)}</Radio>
+          <Radio value="default">{$fmt(`settings.${NEW_TAB_DISPLAY}.default`)}</Radio>
           <Radio value="niceNewtab">
             {$fmt(`settings.${NEW_TAB_DISPLAY}.niceNewtab`)}
           </Radio>
