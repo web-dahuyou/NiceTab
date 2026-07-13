@@ -104,6 +104,11 @@ During use, you'll find that the same operations appear in multiple places: Popu
 - Some users don't like exposing the extension icon, so they need some regular operation buttons displayed in the management dashboard page.
 - NiceTab also supports binding shortcuts to common operations. After getting used to shortcuts, efficiency is higher.
 
+### Newtab
+The version 3.0.0 added a new feature and configuration item to customize the browser's newtab page. You can replace the newtab page with `NiceTab Admin Page` or `NiceTab Newtab Page`. Set to "Default" will revert to the browser's native newtab page.
+
+You can go to the `Preferences Page` to configure it according to your preference.
+
 ## Management Dashboard - Navigation Bar Operations
 
 - **Page Switching**: Quickly switch between **List**, **Preferences**, **Import/Export**, **Remote Sync**, and **Recycle Bin** pages.
@@ -182,10 +187,11 @@ Preferences are divided into the following configuration modules:
 - **Common**: Contains general configuration
 - **Sending Tabs**: Interaction configuration related to sending tabs
 - **Opening Tabs**: Interaction configuration related to opening tabs
-- **Global Search**: Interaction configuration related to global search
 - **Other Action**: Interaction configuration related to tther actions
 - **Displays**: Display configuration related to user interface
+- **New Tab**: Custom the browser's newtab page
 - **Sync**: Configuration related to auto-sync
+- **Global Search**: Interaction configuration related to global search
 
 Next, I will explain each configuration item, and provide key indicators for reference based on a comprehensive evaluation of their common usage and degree of interaction
 
@@ -282,6 +288,15 @@ The configuration items of this module are mainly related to interface display; 
 | Automatically expand the tree list on Home Page? | When entering the list page, whether to automatically expand categories and tab groups in the tree list. | No | ★★ |
 | ~~Width of the page content area~~ | ~~`(Deprecated)`The width display mode of the main content area in the management dashboard; "Fixed" mode by default (approximately 1200 pixels, centered displayed). When set to "Responsive", will adapts to the width of the webpage, effect similar to left-aligned display.~~ | Fixed width | ★★ |
 | ~~Show a tooltip when hovering over a tab?~~ | ~~`(Deprecated)`This configuration item temporarily retains historical interaction; not recommended to enable tooltip display.~~ | No | ★ |
+
+### Newtab Page
+
+The configuration items of this module are mainly for customizing the browser's native newtab page.
+
+| Item | Description | Default Value | Key Index |
+| --- | --- | --- | --- |
+| Newtab Display | You can customize the browser's newtab page with `NiceTab Admin Page` or `NiceTab Newtab Page`. Set to "Default" will revert to the browser's native newtab page. | Default | ★★★★ |
+
 
 ### Auto Sync
 
