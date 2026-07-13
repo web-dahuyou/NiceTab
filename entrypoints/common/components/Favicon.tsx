@@ -3,20 +3,20 @@ import styled from 'styled-components';
 import { getFaviconUrl } from '~/entrypoints/common/utils/favicon';
 import faviconDefaultImage from '/icon/favicon-default.png';
 
-const StyledTabItemFavicon = styled.img<{ $bgUrl?: string }>`
-  flex: 0 0 16px;
-  width: 16px;
-  height: 16px;
-  margin-right: 8px;
-  background: url(${props => props.$bgUrl}) no-repeat center / 100% 100%;
+const StyledFavicon = styled.img<{ $size?: number }>`
+  flex: 0 0 ${props => props.$size}px;
+  width: ${props => props.$size}px;
+  height: ${props => props.$size}px;
 `;
 
 export default function Favicon({
   pageUrl,
   favIconUrl,
+  size = 16,
 }: {
   pageUrl: string;
   favIconUrl?: string;
+  size?: number;
 }) {
   const [renderUrl, setRenderUrl] = useState(faviconDefaultImage);
 
@@ -38,12 +38,13 @@ export default function Favicon({
 
   useEffect(() => {
     init();
-  }, []);
+  }, [pageUrl, favIconUrl]);
 
   return (
-    <StyledTabItemFavicon
-      className="tab-item-favicon"
+    <StyledFavicon
+      className="img-favicon"
       src={renderUrl}
+      $size={size}
       onError={handleError}
     />
   );

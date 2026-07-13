@@ -133,6 +133,7 @@ export const StyledGroupList = styled.div`
     margin-bottom: 8px;
   }
   .count-info {
+    position: relative;
     display: flex;
     align-items: center;
     padding: 0 16px;

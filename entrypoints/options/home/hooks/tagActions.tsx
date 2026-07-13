@@ -57,6 +57,7 @@ export default function useTagActions({
         label: $fmt(actionMap['remove'].labelKey),
         icon: <CloseOutlined />,
         disabled: isLocked,
+        danger: true,
         onClick: () => onAction('remove', tagId),
       },
       {

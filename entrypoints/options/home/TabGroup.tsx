@@ -137,6 +137,11 @@ function TabGroup({
   } = useMoveTo();
   const { treeDataHook } = useContext(HomeContext);
 
+  useEffect(() => {
+    const tabIds = tabList.map(item => item.tabId);
+    setSelectedTabIds(ids => ids.filter(id => tabIds.includes(id)));
+  }, [tabList]);
+
   const tag = useMemo(() => {
     return { isLocked: tagLocked };
   }, [tagLocked]);

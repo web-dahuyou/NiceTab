@@ -30,6 +30,7 @@ const zhCN = {
   'common.more': '更多',
   'common.delete': '删除',
   'common.remove': '删除',
+  'common.add': '添加',
   'common.edit': '编辑',
   'common.extensionInfo': '扩展信息',
   'common.view': '查看',
@@ -130,6 +131,7 @@ const zhCN = {
   'common.locked': '已锁定',
   'common.starred': '已星标',
   'common.tips': '提示',
+  'common.setAsDefault': '设为默认选项',
 };
 
 export type LocaleKey = keyof typeof zhCN;

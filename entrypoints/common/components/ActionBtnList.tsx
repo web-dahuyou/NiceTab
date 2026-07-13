@@ -57,7 +57,7 @@ export default function ActionBtnList({
         </ActionIconBtn>
       ))}
       {innerList.length > 0 && (
-        <Dropdown menu={{ items: innerList }}>
+        <Dropdown menu={{ items: innerList }} destroyPopupOnHide>
           <span className="action-btn">
             <ActionIconBtn
               label={$fmt('common.more')}

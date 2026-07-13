@@ -26,7 +26,6 @@ import {
   DndTabItemOnDropCallback,
 } from '../types';
 import { getTreeData } from '../utils';
-import { copyLinksToClipboard } from './groupActions';
 
 const {
   DELETE_AFTER_RESTORE,

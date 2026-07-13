@@ -132,7 +132,7 @@ export default function FlexibleBtnList({
 
       {/* 更多按钮 */}
       {overflowItems.length > 0 && (
-        <Dropdown menu={{ items: dropdownItems }} trigger={['click']}>
+        <Dropdown menu={{ items: dropdownItems }} trigger={['click']} destroyPopupOnHide>
           <div
             style={{
               flexShrink: 0,

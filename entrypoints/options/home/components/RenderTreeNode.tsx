@@ -215,7 +215,12 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
 
           <span className="tree-node-icon-group">
             {node.type === 'tag' && (
-              <Dropdown menu={{ items: tagMenuItems }} arrow trigger={['click']}>
+              <Dropdown
+                menu={{ items: tagMenuItems }}
+                arrow
+                trigger={['click']}
+                destroyPopupOnHide
+              >
                 <StyledActionIconBtn
                   className="btn-more"
                   $size="14"
@@ -228,7 +233,12 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
             )}
 
             {node.type === 'tabGroup' && (
-              <Dropdown menu={{ items: groupMenuItems }} arrow trigger={['click']}>
+              <Dropdown
+                menu={{ items: groupMenuItems }}
+                arrow
+                trigger={['click']}
+                destroyPopupOnHide
+              >
                 <StyledActionIconBtn
                   className="btn-more"
                   $size="14"

@@ -310,6 +310,7 @@ export default memo(function TabListItem({
         <Dropdown
           menu={{ items: moreItems, onClick: onMoreItemClick }}
           trigger={['click']}
+          destroyPopupOnHide
         >
           <StyledActionIconBtn
             className="tab-item-btn btn-more"

@@ -14,7 +14,7 @@
    git checkout -b dev-your-awesome-code origin/dev
    ```
 4. Commit your changes (follow [commit message conventions](https://github.com/angular/angular/blob/main/contributing-docs/commit-message-guidelines.md)).
-  Note: Before committing, it is recommended to run the `pnpm compile` command to check the typescript types.
+  Note: Before committing, it is recommended to run the `pnpm compile` command to verify TypeScript types.
 
    ```bash
    pnpm compile
@@ -45,7 +45,8 @@ Important: Each `.js .ts .tsx` file must have an `export default` statement. Oth
 
 ### Import Path Alias
 
-The project uses the `~` alias for imports from the entrypoints directory (Although using `@` also works).
+The project uses the `~` alias for imports from the `entrypoints` directory (the `@` alias also works but `~` is preferred for consistency).
+
 ```ts
 import { something } from '~/entrypoints/common/utils';
 ```
