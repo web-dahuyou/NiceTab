@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import type { StyledThemeProps } from '~/entrypoints/types';
 import { StyledEllipsisLines } from '../common/style/Common.styled';
 
-export const StyledTabCard = styled.div<{ theme: StyledThemeProps }>`
+export const StyledTabCard = styled.a<{ theme: StyledThemeProps }>`
   position: relative;
   display: flex;
   flex-direction: column;

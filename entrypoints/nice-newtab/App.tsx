@@ -10,8 +10,11 @@ import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { openAdminRoutePage } from '~/entrypoints/common/tabs';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { GlobalStyle } from '~/entrypoints/common/style/Common.styled';
+import { GlobalSearchPanel } from '~/entrypoints/common/components/BaseGlobalSearch';
+import { useGlobalSearchPanel } from '~/entrypoints/common/hooks/globalSearch';
 import EditInput from '~/entrypoints/options/components/EditInput';
 import TabItemEditModal from '~/entrypoints/options/home/TabItemEditModal';
+
 import { StyledNewTabContainer, StyledGroupHeader, StyledAddTabBtn } from './App.styled';
 import TabListItem from './TabListItem';
 import SearchEngine from './SearchEngine';
@@ -47,6 +50,8 @@ export default function App() {
   const NiceGlobalContext = useContext(GlobalContext);
   const { themeTypeConfig } = NiceGlobalContext;
   const { $fmt } = useIntlUtls();
+
+  const { globalSearchPanelRef } = useGlobalSearchPanel();
 
   const [groups, setGroups] = useState<UnionGroupItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -159,7 +164,7 @@ export default function App() {
   const handleTabModalConfirm = useCallback(
     async (newData: TabItem) => {
       if (newData.tabId) {
-        // edit existing tab
+        // 编辑标签页
         const grp = groups.find(g => g.tabList.some(t => t.tabId === newData.tabId));
         if (grp) {
           await tabListUtils.updateTab({
@@ -170,7 +175,7 @@ export default function App() {
           reloadAdminPage();
         }
       } else {
-        // create new tab
+        // 添加标签页
         await tabListUtils.addTabItem(editTabData.groupId, {
           tabId: getRandomId(),
           title: newData.title || '',
@@ -190,7 +195,7 @@ export default function App() {
     setEditTabData(resetEditTabData());
   }, []);
 
-  // ---- Group name edit ----
+  // 编辑标签组名称
   const handleGroupNameChange = useCallback(
     async (item: UnionGroupItem, newName: string) => {
       await tabListUtils.updateTabGroup({
@@ -217,15 +222,19 @@ export default function App() {
     );
   }
 
-  if (!groups.length) {
-    return (
-      <ThemeProvider theme={{ ...themeTypeConfig, ...token }}>
-        <StyledNewTabContainer className="newtab-container">
-          <GlobalStyle />
+  return (
+    <ThemeProvider theme={{ ...themeTypeConfig, ...token }}>
+      <GlobalStyle />
+      <GlobalSearchPanel
+        ref={globalSearchPanelRef}
+        pageContext="newtabPage"
+      ></GlobalSearchPanel>
 
-          {/* 搜索引擎 */}
-          <SearchEngine />
+      <StyledNewTabContainer className="newtab-container">
+        {/* 搜索引擎（吸顶） */}
+        <SearchEngine />
 
+        {!groups.length ? (
           <div className="newtab-empty">
             <p className="newtab-empty-title">{$fmt('newtab.noGroups')}</p>
             <p className="newtab-empty-desc">{$fmt('newtab.noGroupsDesc')}</p>
@@ -233,72 +242,63 @@ export default function App() {
               {$fmt('common.openAdminTab')}
             </Button>
           </div>
-          {removeContextHolder}
-        </StyledNewTabContainer>
-      </ThemeProvider>
-    );
-  }
-
-  return (
-    <ThemeProvider theme={{ ...themeTypeConfig, ...token }}>
-      <StyledNewTabContainer className="newtab-container">
-        <GlobalStyle />
-
-        {/* 搜索引擎 */}
-        <SearchEngine />
-
-        <div className="newtab-groups">
-          {groups.map(group => (
-            <div key={group.groupId} className="newtab-group-section">
-              <StyledGroupHeader>
-                {group.tagName ? (
-                  <Tag icon={<TagOutlined />} color={token.colorPrimary}>
-                    {group.tagStatic ? $fmt('home.stagingArea') : group.tagName}
-                  </Tag>
-                ) : null}
-                <EditInput
-                  value={group.groupName}
-                  maxWidth={200}
-                  onValueChange={val => val && handleGroupNameChange(group, val)}
-                />
-                <span className="newtab-group-count">
-                  {$fmt({
-                    id: 'home.tab.count',
-                    values: { count: group.tabList?.length || 0 },
-                  })}
-                </span>
-              </StyledGroupHeader>
-              <div className="newtab-grid">
-                {group.tabList.map(tab => (
-                  <TabListItem
-                    key={tab.tabId}
-                    tab={tab}
-                    groupId={group.groupId}
-                    onDelete={handleTabRemove}
-                    onEdit={handleTabEdit}
-                  />
-                ))}
-                <StyledAddTabBtn onClick={() => handleAddTabStart(group.groupId)}>
-                  <div className="add-icon-wrapper">
-                    <PlusOutlined className="add-icon-plus" />
+        ) : (
+          <>
+            <div className="newtab-groups">
+              {groups.map(group => (
+                <div key={group.groupId} className="newtab-group-section">
+                  <StyledGroupHeader>
+                    {group.tagName ? (
+                      <Tag icon={<TagOutlined />} color={token.colorPrimary}>
+                        {group.tagStatic ? $fmt('home.stagingArea') : group.tagName}
+                      </Tag>
+                    ) : null}
+                    <EditInput
+                      value={group.groupName}
+                      maxWidth={200}
+                      onValueChange={val => val && handleGroupNameChange(group, val)}
+                    />
+                    <span className="newtab-group-count">
+                      {$fmt({
+                        id: 'home.tab.count',
+                        values: { count: group.tabList?.length || 0 },
+                      })}
+                    </span>
+                  </StyledGroupHeader>
+                  <div className="newtab-grid">
+                    {group.tabList.map(tab => (
+                      <TabListItem
+                        key={tab.tabId}
+                        tab={tab}
+                        groupId={group.groupId}
+                        onDelete={handleTabRemove}
+                        onEdit={handleTabEdit}
+                      />
+                    ))}
+                    <StyledAddTabBtn onClick={() => handleAddTabStart(group.groupId)}>
+                      <div className="add-icon-wrapper">
+                        <PlusOutlined className="add-icon-plus" />
+                      </div>
+                      <span className="add-label">{$fmt('newtab.addTab')}</span>
+                    </StyledAddTabBtn>
                   </div>
-                  <span className="add-label">{$fmt('newtab.addTab')}</span>
-                </StyledAddTabBtn>
-              </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {/* 编辑标签页弹窗 */}
-        {tabModalVisible && editTabData && (
-          <TabItemEditModal
-            data={editTabData}
-            visible={tabModalVisible}
-            type={editTabData.tabId ? 'edit' : 'add'}
-            onOk={handleTabModalConfirm}
-            onCancel={handleTabModalCancel}
-          />
+            {/* 编辑标签页弹窗 */}
+            {tabModalVisible && editTabData && (
+              <TabItemEditModal
+                data={editTabData}
+                visible={tabModalVisible}
+                type={editTabData.tabId ? 'edit' : 'add'}
+                onOk={handleTabModalConfirm}
+                onCancel={handleTabModalCancel}
+              />
+            )}
+          </>
         )}
+
         {removeContextHolder}
       </StyledNewTabContainer>
     </ThemeProvider>

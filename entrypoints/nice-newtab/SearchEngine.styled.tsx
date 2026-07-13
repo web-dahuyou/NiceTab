@@ -3,8 +3,7 @@ import type { StyledThemeProps } from '~/entrypoints/types';
 import { StyledEllipsis } from '../common/style/Common.styled';
 
 export const StyledSearchEngineBox = styled.div<{ theme: StyledThemeProps }>`
-  width: 100%;
-  max-width: 600px;
+  width: 600px;
   margin-bottom: 48px;
   .newtab-search {
     position: relative;

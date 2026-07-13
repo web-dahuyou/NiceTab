@@ -22,22 +22,13 @@ export default function TabListItem({
   const { $fmt } = useIntlUtls();
   const displayTitle = tab.title || tab.url || 'Untitled';
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     if (!tab.url) return;
     openNewTab(tab.url, {
       active: true,
       openToNext: true,
     });
-  };
-
-  const handleMiddleClick = (e: React.MouseEvent) => {
-    if (e.button === 1 && tab.url) {
-      e.preventDefault();
-      openNewTab(tab.url, {
-        active: false,
-        openToNext: true,
-      });
-    }
   };
 
   const actionItems: MenuProps['items'] = [
@@ -63,16 +54,15 @@ export default function TabListItem({
   ];
 
   return (
-    <StyledTabCard
-      onClick={handleClick}
-      onMouseDown={handleMiddleClick}
-      title={displayTitle}
-    >
+    <StyledTabCard href={tab.url} title={displayTitle} onClick={handleClick}>
       <Dropdown menu={{ items: actionItems }} placement="bottomRight" destroyPopupOnHide>
         <StyledActionIconBtn
           className="tab-card-menu-btn"
           $size={16}
-          onClick={e => e.stopPropagation()}
+          onClick={e => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
         >
           <MoreOutlined />
         </StyledActionIconBtn>

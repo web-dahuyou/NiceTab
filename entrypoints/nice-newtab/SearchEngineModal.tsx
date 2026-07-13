@@ -25,6 +25,12 @@ interface SearchEngineModalProps {
   onCancel?: () => void;
 }
 
+interface EngineFormProps {
+  editData: SearchEngine;
+  onOk: (values: { name: string; url: string }) => void;
+  onCancel: () => void;
+}
+
 const resetEditEngineData = () => {
   return {
     id: '',
@@ -34,6 +40,76 @@ const resetEditEngineData = () => {
   };
 };
 
+function EngineForm({ editData, onOk, onCancel }: EngineFormProps) {
+  const { $fmt } = useIntlUtls();
+  const [form] = Form.useForm();
+  const nameInputRef = useRef<InputRef>(null);
+
+  useEffect(() => {
+    form.setFieldsValue({
+      name: editData.name,
+      url: editData.url,
+    });
+    setTimeout(() => {
+      nameInputRef.current?.focus();
+    }, 30);
+  }, [editData, form]);
+
+  useEffect(() => {
+    return () => {
+      form.resetFields();
+    };
+  }, [form]);
+
+  const handleOk = () => {
+    form
+      .validateFields()
+      .then(() => {
+        const { name, url } = form.getFieldsValue();
+        onOk({ name, url });
+      })
+      .catch(() => {
+        console.log('必填项校验失败');
+      });
+  };
+
+  return (
+    <Modal
+      title={editData.id ? $fmt('newtab.editEngine') : $fmt('newtab.addEngine')}
+      open
+      onOk={handleOk}
+      onCancel={onCancel}
+      okText={$fmt('common.save')}
+      cancelText={$fmt('common.cancel')}
+    >
+      <Form
+        form={form}
+        name="edit-engine-form"
+        initialValues={{ name: editData.name, url: editData.url }}
+        layout="vertical"
+        autoComplete="off"
+        onFinish={onOk}
+      >
+        <Form.Item label={$fmt('common.name')} name="name" rules={[{ required: true }]}>
+          <Input ref={nameInputRef} />
+        </Form.Item>
+        <Form.Item
+          label={$fmt('newtab.engineUrl')}
+          name="url"
+          rules={[{ required: true }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item style={{ display: 'none' }}>
+          <Button type="primary" htmlType="submit">
+            {$fmt('common.save')}
+          </Button>
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
+}
+
 export default function SearchEngineModal({
   visible = false,
   data,
@@ -42,8 +118,6 @@ export default function SearchEngineModal({
 }: SearchEngineModalProps) {
   const { $fmt } = useIntlUtls();
   const { token } = theme.useToken();
-  const [form] = Form.useForm();
-  const nameInputRef = useRef<InputRef>(null);
 
   const [editEngineData, setEditEngineData] =
     useState<SearchEngine>(resetEditEngineData());
@@ -59,66 +133,37 @@ export default function SearchEngineModal({
     }
   }, [visible, data]);
 
-  useEffect(() => {
-    if (formVisible) {
-      setTimeout(() => {
-        nameInputRef.current?.focus();
-      }, 30);
-    } else {
+  const handleEngineEdit = useCallback((engine: SearchEngine) => {
+    setEditEngineData(engine);
+    setFormVisible(true);
+  }, []);
+
+  const handleEngineSaveEdit = useCallback(
+    (values: { name: string; url: string }) => {
+      if (editEngineData.id) {
+        // 编辑搜索引擎
+        const newEngines = engines.map(e =>
+          e.id === editEngineData.id
+            ? { ...e, name: values.name.trim(), url: values.url.trim() }
+            : e,
+        );
+        setEngines(newEngines);
+      } else {
+        // 添加搜索引擎
+        setEngines([
+          ...engines,
+          {
+            id: `custom_${getRandomId(6)}`,
+            name: values.name.trim(),
+            url: values.url.trim(),
+          },
+        ]);
+      }
       setEditEngineData(resetEditEngineData());
-      resetFormValues();
-    }
-  }, [formVisible]);
-
-  const resetFormValues = useCallback(
-    (values?: SearchEngine) => {
-      form.setFieldsValue({
-        name: values?.name || editEngineData.name,
-        url: values?.url || editEngineData.url,
-      });
+      setFormVisible(false);
     },
-    [form, editEngineData],
+    [editEngineData, engines],
   );
-
-  const handleEngineEdit = useCallback(
-    (engine: SearchEngine) => {
-      setEditEngineData(engine);
-      resetFormValues(engine);
-      setFormVisible(true);
-    },
-    [resetFormValues],
-  );
-
-  const handleEngineSaveEdit = useCallback(() => {
-    form
-      .validateFields()
-      .then(() => {
-        const { name, url } = form.getFieldsValue();
-        if (editEngineData.id) {
-          // 编辑搜索引擎
-          const newEngines = engines.map(e =>
-            e.id === editEngineData.id ? { ...e, name: name.trim(), url: url.trim() } : e,
-          );
-          setEngines(newEngines);
-        } else {
-          // 添加搜索引擎
-          setEngines([
-            ...engines,
-            {
-              id: `custom_${getRandomId(6)}`,
-              name: name.trim(),
-              url: url.trim(),
-            },
-          ]);
-        }
-        setEditEngineData(resetEditEngineData());
-        resetFormValues();
-        setFormVisible(false);
-      })
-      .catch(() => {
-        console.log('必填项校验失败');
-      });
-  }, [editEngineData, engines, form, resetFormValues]);
 
   const handleEngineRemove = useCallback(
     async (id: string) => {
@@ -126,10 +171,9 @@ export default function SearchEngineModal({
       const newList = engines.filter(e => e.id !== id);
       setEngines(newList);
       setEditEngineData(resetEditEngineData());
-      resetFormValues();
       setFormVisible(false);
     },
-    [engines, editEngineData, $fmt, resetFormValues],
+    [engines],
   );
 
   const handleSetAsDefault = useCallback(
@@ -145,15 +189,13 @@ export default function SearchEngineModal({
 
   const handleAddEngine = useCallback(() => {
     setEditEngineData(resetEditEngineData());
-    resetFormValues();
     setFormVisible(true);
-  }, [resetFormValues]);
+  }, []);
 
   const handleFormCancel = useCallback(() => {
     setEditEngineData(resetEditEngineData());
-    resetFormValues();
     setFormVisible(false);
-  }, [resetFormValues]);
+  }, []);
 
   const handleOk = useCallback(() => {
     onOk?.(engines);
@@ -239,43 +281,11 @@ export default function SearchEngineModal({
       </Button>
 
       {formVisible && (
-        <Modal
-          title={editEngineData.id ? $fmt('newtab.editEngine') : $fmt('newtab.addEngine')}
-          open={formVisible}
+        <EngineForm
+          editData={editEngineData}
           onOk={handleEngineSaveEdit}
           onCancel={handleFormCancel}
-          okText={$fmt('common.save')}
-          cancelText={$fmt('common.cancel')}
-        >
-          <Form
-            form={form}
-            name="edit-engine-form"
-            initialValues={{ name: editEngineData.name, url: editEngineData.url }}
-            layout="vertical"
-            autoComplete="off"
-            onFinish={handleEngineSaveEdit}
-          >
-            <Form.Item
-              label={$fmt('common.name')}
-              name="name"
-              rules={[{ required: true }]}
-            >
-              <Input ref={nameInputRef} />
-            </Form.Item>
-            <Form.Item
-              label={$fmt('newtab.engineUrl')}
-              name="url"
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item style={{ display: 'none' }}>
-              <Button type="primary" htmlType="submit">
-                {$fmt('common.save')}
-              </Button>
-            </Form.Item>
-          </Form>
-        </Modal>
+        />
       )}
     </Drawer>
   );
