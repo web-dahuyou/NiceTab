@@ -6,6 +6,8 @@
   English | <a href="./README-zh.md">中文</a>
 </p>
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/web-dahuyou/NiceTab)
+
 ## Overview
 
 **Note** The extension is actively developed with ongoing updates. The screenshots below reflect history versions only. We encourage you to install the latest release for the most up-to-date experience.
@@ -46,6 +48,7 @@ Comprehensive user guide | <a href="./GUIDE.md">NiceTab User Guide</a>
 - Supports browser command shortcuts (open the NiceTab-Admin-Page, send all tabs, send the current tab, etc.).
 - Preferences support.
 - Offers **import** in multiple formats, with local file saving supported. Currently supports for `NiceTab`, `OneTab`, `Toby`, `SessionBuddy` and `KepTab`. More formats can be added later as needed.
+- Supports custom **Newtab page**.
 - **Remote sync**.
 - Supports manual switch for **Light/Dark** themes.
 - Supports **Theme color switch**, currently with several preset theme colors(More can be added later as needed).
@@ -55,6 +58,7 @@ Comprehensive user guide | <a href="./GUIDE.md">NiceTab User Guide</a>
 
 ### List Management
 
+- More features can be found in the `User Guide`.
 - Manage categories, tab groups, and tabs. Includes easy saving, restoring, starring (favorites), locking, adding, deleting, editing, searching, and drag-and-drop reordering, etc.
 - Supports global search for tab and URL, and jump straight to the result.
 - Supports category locking, preventing accidental operations.
@@ -68,30 +72,7 @@ Comprehensive user guide | <a href="./GUIDE.md">NiceTab User Guide</a>
 
 ### Preferences
 
-- Option to **Open NiceTab Admin Page after launching the browser**.
-- Option to **Pin the NiceTab Admin Page**.
-- Option to **Send pinned tabs to NiceTab when sending tabs**.
-- Option to **Open NiceTab Admin Page when sending tabs**.
-- Option to **Automatically close tabs when sending tabs**.
-- Option to **Retain duplicate groups when sending tabs**.
-- Option to **Retain duplicate tabs when sending tabs**.
-- "**Staging Area**" category is fixed at the top; tabs/tab groups sent will be automatically save to the category.
-- Option to **Show "Send To" modal when sending tabs**. You can send tabs to a specified category or tab group.
-- Configurable **Exclude domains for sending tabs** (regex supported) so certain sites or pages are never sent to NiceTab.
-- Option to **Open tab group in a new window when opening**.
-- Option to **Remove tabs when opening tabs or tab group**.
-- Option to **Auto-hibernate when opening multiple tabs**.
-- Option to **Restore the unnamed group as a browser tab group**.
-- Configurable **Modifier key for opening a tab silently (in background)**.
-- Configurable **Modifier key for opening a tab in foreground**.
-- Option to **Remove empty groups when clearing tabs**.
-- Option to **Confirm before removing tabs**.
-- Configurable **Copy links format template for tab groups**.
-- Option to **Display the number of open tabs on the extension icon**.
-- Option to **Display ContextMenu on your webpage**.
-- Configurable **popup panel modules**: you can configure which modules to display in the popup. If none are selected, clicking the extension icon sends all tabs to NiceTab by default.
-- Option to **Automatically expand the tree list on Home Page**.
-- ...More settings can be found in extension `NiceTab Admin Page > Settings` or refer to the user guide.
+- More settings can be found in extension `NiceTab Admin Page > Settings` or refer to the `User Guide`.
 
 ### Remote Sync
 
@@ -110,8 +91,6 @@ Comprehensive user guide | <a href="./GUIDE.md">NiceTab User Guide</a>
 - By default, clicking the `NiceTab` extension icon opens a popup panel where you can quickly access the list page, settings page, import/export page, sync page and recycle bin page.
 - You can quickly switch theme colors or view/close the current open tab.
 - If no popup modules are configured in preferences, clicking the extension icon sends all tabs to NiceTab by default.
-
-Screenshots of other actions are not yet updated.
 
 ![NiceTab-extension-icon-1](https://github.com/user-attachments/assets/debe19ca-cd80-4ec9-a8d3-79de6dafb5a7)
 
@@ -143,8 +122,6 @@ Screenshots of other actions are not yet updated.
 - You can import `OneTab`, `Toby`, `SessionBuddy` or `KepTab` data, and parse it into `NiceTab` format.
 - You can export `NiceTab` data to local file.
 
-Screenshots are not yet updated.
-
 ![NiceTab-import-export](https://github.com/user-attachments/assets/48b6d09b-342c-448e-b235-ae54c4aae235)
 
 ### Remote Sync
@@ -156,8 +133,6 @@ Supports syncing via Gitee Gists, GitHub Gists, and WebDAV:
 **Note**:
 - For gists, token permissions only check `gists` scope.
 - Merging push sync does not perform a diff-comparison delete. It merges remote and local data, then pushes to remote, so tabs increase cumulatively. To sync deletions, remove them locally and then manually overwrite the remote.
-
-Screenshots of WebDAV sync are not yet updated.
 
 ![NiceTab-remote-sync](https://github.com/user-attachments/assets/446c6b94-55ad-46b3-a790-45e29027ee05)
 

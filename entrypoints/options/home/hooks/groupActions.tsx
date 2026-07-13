@@ -14,7 +14,7 @@ import {
 import copyToClipboard from 'copy-to-clipboard';
 import { LuFolderUp, LuFolderDown } from 'react-icons/lu';
 import { IconRepeat } from '~/entrypoints/common/components/icon/CustomIcon';
-import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
+import { ENUM_SETTINGS_PROPS, ENUM_COLORS } from '~/entrypoints/common/constants';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
 import { type ActionOptionItem } from '~/entrypoints/common/components/ActionBtnList';
@@ -93,6 +93,8 @@ export default function useGroupActions({
         label: $fmt(actionMap['remove'].labelKey),
         icon: <CloseOutlined />,
         disabled: tagLocked || isLocked,
+        hoverColor: ENUM_COLORS.red,
+        danger: true,
         onClick: () => onAction('remove', groupId),
       },
       {

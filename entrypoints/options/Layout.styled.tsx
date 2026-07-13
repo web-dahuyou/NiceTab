@@ -17,6 +17,8 @@ export const StyledBaseSidebarWrapper = styled.div<{
     transition: transform 0.2s ease-in-out;
     transform: translateX(0);
     border-right: 1px solid ${props => props.theme.colorBorder || 'rgba(5, 5, 5, 0.06)'};
+    background: var(--bg-color);
+    z-index: 10;
 
     &.collapsed {
       .sidebar-inner-content {
@@ -67,6 +69,7 @@ export const StyledBaseMainWrapper = styled.div`
     auto
     var(--right-panel-grid-col, ${defaultRightPanelWidth}px);
   transition: grid-template-columns 0.2s ease-in-out;
+  // overflow-x: hidden;
 
   /* 拖拽期间禁用 transition，避免布局滞后于鼠标 */
   body.dragging-resize & {
@@ -94,6 +97,7 @@ export const StyledBaseRightPanelWrapper = styled.div<{
     transform: translateX(0);
     border-left: 1px solid ${props => props.theme.colorBorder || 'rgba(5, 5, 5, 0.06)'};
     background: var(--bg-color);
+    z-index: 10;
 
     &.collapsed {
       .right-panel-inner-content {

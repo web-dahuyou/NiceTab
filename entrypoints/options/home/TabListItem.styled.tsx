@@ -28,14 +28,9 @@ export const StyledTabItemWrapper = styled.div<{ $bgColor?: string }>`
       pointer-eventes: unset;
     }
   }
-`;
-
-export const StyledTabItemFavicon = styled.i<{ $bgUrl?: string }>`
-  flex: 0 0 16px;
-  width: 16px;
-  height: 16px;
-  margin-right: 8px;
-  background: url(${props => props.$bgUrl}) no-repeat center / 100% 100%;
+  .img-favicon {
+    margin-right: 8px;
+  }
 `;
 
 export const StyledTabTitle = styled.span`
