@@ -10,7 +10,7 @@ const enUS: Record<LocaleKey, string> = {
   'newtab.searchPlaceholder': 'Type search term or URL',
   'newtab.addTab': 'Add Tab',
   'newtab.noGroups': 'No starred groups',
-  'newtab.noGroupsDesc': 'The starred tab groups in "NiceTab Admin Page" will be displayed in the new tab page.',
+  'newtab.noGroupsDesc': 'Starred tab groups in the "NiceTab Admin Page". They will be displayed on the new tab page.',
 };
 
 export default enUS;
