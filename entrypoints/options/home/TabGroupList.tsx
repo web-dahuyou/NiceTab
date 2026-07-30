@@ -30,7 +30,7 @@ const ListItem = memo(
       handleTabGroupRestore,
     } = treeDataHook;
 
-    const settings = settingsUtils.settings || {};
+    // const settings = settingsUtils.settings || {};
 
     // 移动单个标签组
     const handleTabGroupMoveTo = async ({

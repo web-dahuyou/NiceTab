@@ -18,7 +18,12 @@ import type {
   SettingsProps,
   PageWidthTypes,
 } from '~/entrypoints/types';
-import { themeUtils, settingsUtils } from '~/entrypoints/common/storage';
+import {
+  themeUtils,
+  settingsUtils,
+  initSettingsStorageListener,
+  initThemeStorageListener,
+} from '~/entrypoints/common/storage';
 import { updateAdminPageUrlDebounced } from '~/entrypoints/common/tabs';
 
 export default function Root({
@@ -115,6 +120,18 @@ export default function Root({
     initData();
     getManifest();
     browser.runtime.onMessage.addListener(messageListener);
+
+    const settingsUnwatch = initSettingsStorageListener(() => {
+      initData();
+    });
+    const themeUnwatch = initThemeStorageListener(() => {
+      initData();
+    });
+
+    return () => {
+      settingsUnwatch();
+      themeUnwatch();
+    };
   }, []);
 
   return (

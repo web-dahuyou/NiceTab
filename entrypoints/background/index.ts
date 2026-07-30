@@ -6,7 +6,8 @@ import contextMenusRegister, {
 } from '~/entrypoints/common/contextMenus';
 import commandsRegister from '~/entrypoints/common/commands';
 import tabUtils from '~/entrypoints/common/tabs';
-import initSettingsStorageListener, {
+import {
+  initSettingsStorageListener,
   initTabListStorageListener,
   themeUtils,
   settingsUtils,
@@ -166,7 +167,13 @@ async function handleNewTabUpdated(
 async function handleNewTabRedirect(tabId: number | undefined, url: string) {
   if (!tabId || !url) return;
 
-  const newTabPatterns = ['chrome://newtab/', 'about:newtab', 'edge://newtab/'];
+  const newTabPatterns = [
+    'chrome://newtab/',
+    'edge://newtab/',
+    'about:blank',
+    'about:newtab',
+    'about:privatebrowsing',
+  ];
 
   const matches = newTabPatterns.some(
     pattern => url === pattern || url.startsWith(pattern),
