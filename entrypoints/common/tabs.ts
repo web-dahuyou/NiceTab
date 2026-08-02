@@ -215,7 +215,7 @@ export async function getFilteredTabs(
   validator?: (tab: Tabs.Tab) => boolean,
 ) {
   const { tab: adminTab } = await getAdminTabInfo();
-  return tabs.filter(tab => {
+  const result = tabs.filter(tab => {
     if (!tab?.id) return false;
     if (adminTab && adminTab.id === tab.id) return false;
     // 如果设置不允许发送固定标签页，则过滤掉固定标签页
@@ -223,8 +223,9 @@ export async function getFilteredTabs(
       return false;
     }
     const excludeDomainsString = settings[EXCLUDE_DOMAINS_FOR_SENDING] || '';
-    if (tab.url && excludeDomainsString) {
-      const isAllowed = isDomainAllowed(tab.url, excludeDomainsString);
+    const _url = tab.pendingUrl || tab.url;
+    if (_url && excludeDomainsString) {
+      const isAllowed = isDomainAllowed(_url, excludeDomainsString);
       if (!isAllowed) {
         return false;
       }
@@ -234,6 +235,15 @@ export async function getFilteredTabs(
       return validator(tab);
     }
     return true;
+  });
+
+  // 如果发送标签页时，标签页还在加载中，则保存标签页的pendingUrl，此时可能没有title
+  return result.map(tab => {
+    if (tab.pendingUrl) {
+      return { ...tab, url: tab.pendingUrl, title: tab.pendingUrl };
+    } else {
+      return tab;
+    }
   });
 }
 // 取消标签页高亮
