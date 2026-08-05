@@ -10,6 +10,14 @@ export const StyledGroupWrapper = styled.div<{ $bgColor?: string }>`
   border-radius: 8px;
   background: ${props => props.$bgColor || '#fff'};
 `;
+export const StyledGroupStickyHeader = styled.div<{ $bgColor?: string }>`
+  position: sticky;
+  top: 60px;
+  z-index: 3;
+  padding-bottom: 4px;
+  background: ${props => props.$bgColor || '#fff'};
+`;
+
 export const StyledGroupHeader = styled.div<{ theme: StyledThemeProps }>`
   padding: 0 8px;
   gap: 12px;
@@ -74,7 +82,7 @@ export const StyledTabActions = styled.div<{ theme: StyledThemeProps }>`
   align-items: center;
   gap: 24px;
   height: 26px;
-  margin: 8px 0;
+  margin-top: 8px;
   padding: 0 30px;
   font-size: 12px;
   user-select: none;
@@ -100,7 +108,7 @@ export const StyledTabActions = styled.div<{ theme: StyledThemeProps }>`
 
 export const StyledTabListWrapper = styled.div`
   min-height: 24px;
-  margin-top: 8px;
+  margin-top: 4px;
   // margin-left: 24px;
   .tab-list-checkbox-group {
     width: 100%;
