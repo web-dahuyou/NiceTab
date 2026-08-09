@@ -36,6 +36,7 @@ import ActionBtnList, {
 import TabListItem, { type QuickSelectFunc } from './TabListItem';
 import {
   StyledGroupWrapper,
+  StyledGroupStickyHeader,
   StyledGroupHeader,
   StyledTabActions,
   StyledTabListWrapper,
@@ -529,75 +530,83 @@ function TabGroup({
         $bgColor={selected ? token.colorPrimaryBg : token.colorBgContainer}
         ref={groupRef}
       >
-        {/* 标签组 header 展示、操作区域 */}
-        <StyledGroupHeader className="group-header select-none">
-          <div className="group-header-top">
-            {(isLocked || isStarred) && (
-              <div className="group-status-wrapper">
-                {isLocked && (
-                  <LockFilled
-                    style={{ fontSize: '22px', color: token.colorPrimaryHover }}
-                  />
-                )}
-                {isStarred && (
-                  <StarFilled
-                    style={{ fontSize: '22px', color: token.colorPrimaryHover }}
-                  />
-                )}
+        {/* 标签组 header + tab 操作区域（sticky 置顶） */}
+        <StyledGroupStickyHeader
+          $bgColor={selected ? token.colorPrimaryBg : token.colorBgContainer}
+        >
+          <StyledGroupHeader className="group-header select-none">
+            <div className="group-header-top">
+              {(isLocked || isStarred) && (
+                <div className="group-status-wrapper">
+                  {isLocked && (
+                    <LockFilled
+                      style={{ fontSize: '22px', color: token.colorPrimaryHover }}
+                    />
+                  )}
+                  {isStarred && (
+                    <StarFilled
+                      style={{ fontSize: '22px', color: token.colorPrimaryHover }}
+                    />
+                  )}
+                </div>
+              )}
+              <div className="group-name-wrapper">
+                <EditInput
+                  value={groupName || UNNAMED_GROUP}
+                  disabled={
+                    !allowGroupActions.includes('rename') || tagLocked || isLocked
+                  }
+                  maxWidth={240}
+                  fontSize={20}
+                  iconSize={16}
+                  onValueChange={value =>
+                    onChange?.({ groupName: value || UNNAMED_GROUP })
+                  }
+                ></EditInput>
               </div>
-            )}
-            <div className="group-name-wrapper">
-              <EditInput
-                value={groupName || UNNAMED_GROUP}
-                disabled={!allowGroupActions.includes('rename') || tagLocked || isLocked}
-                maxWidth={240}
-                fontSize={20}
-                iconSize={16}
-                onValueChange={value => onChange?.({ groupName: value || UNNAMED_GROUP })}
-              ></EditInput>
+              <div className="group-info">
+                <span className="tab-count" style={{ color: ENUM_COLORS.volcano }}>
+                  {$fmt({
+                    id: 'home.tab.count',
+                    values: { count: tabList?.length || 0 },
+                  })}
+                </span>
+                <span className="group-create-time">{createTime || ''}</span>
+              </div>
             </div>
-            <div className="group-info">
-              <span className="tab-count" style={{ color: ENUM_COLORS.volcano }}>
-                {$fmt({
-                  id: 'home.tab.count',
-                  values: { count: tabList?.length || 0 },
-                })}
-              </span>
-              <span className="group-create-time">{createTime || ''}</span>
-            </div>
-          </div>
-          <ActionBtnList
-            actionBtnStyle={actionBtnStyle}
-            {...groupActions}
-          ></ActionBtnList>
-        </StyledGroupHeader>
+            <ActionBtnList
+              actionBtnStyle={actionBtnStyle}
+              {...groupActions}
+            ></ActionBtnList>
+          </StyledGroupHeader>
 
-        {/* tab 选择、操作区域 */}
-        {tabList?.length > 0 && (
-          <StyledTabActions>
-            <div className="checkall-wrapper">
-              <Checkbox
-                checked={isAllChecked}
-                indeterminate={checkAllIndeterminate}
-                disabled={tagLocked || isLocked}
-                onChange={handleSelectAll}
-              ></Checkbox>
-              <span
-                className="selected-count-text"
-                style={{ color: ENUM_COLORS.volcano }}
-              >
-                {`${selectedTabIds.length} / ${tabList?.length}`}
-              </span>
-            </div>
-            {selectedTabIds.length > 0 && (
-              <ActionBtnList
-                actionBtnStyle={actionBtnStyle}
-                outerList={selectedTabsActions}
-                iconSize={14}
-              ></ActionBtnList>
-            )}
-          </StyledTabActions>
-        )}
+          {/* tab 选择、操作区域 */}
+          {tabList?.length > 0 && (
+            <StyledTabActions>
+              <div className="checkall-wrapper">
+                <Checkbox
+                  checked={isAllChecked}
+                  indeterminate={checkAllIndeterminate}
+                  disabled={tagLocked || isLocked}
+                  onChange={handleSelectAll}
+                ></Checkbox>
+                <span
+                  className="selected-count-text"
+                  style={{ color: ENUM_COLORS.volcano }}
+                >
+                  {`${selectedTabIds.length} / ${tabList?.length}`}
+                </span>
+              </div>
+              {selectedTabIds.length > 0 && (
+                <ActionBtnList
+                  actionBtnStyle={actionBtnStyle}
+                  outerList={selectedTabsActions}
+                  iconSize={14}
+                ></ActionBtnList>
+              )}
+            </StyledTabActions>
+          )}
+        </StyledGroupStickyHeader>
 
         {/* tab 列表 */}
         <DropComponent

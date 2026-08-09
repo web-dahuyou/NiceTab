@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Tooltip } from 'antd';
+import { isURL } from 'validator';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import type { SearchEngine } from '~/entrypoints/types';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -41,8 +42,10 @@ export default function SearchEngine() {
     e.preventDefault();
     if (!searchQuery.trim()) return;
     const query = searchQuery.trim();
-    if (query.indexOf('.') > -1 && query.indexOf(' ') === -1) {
-      openNewTab(query.indexOf('http') === 0 ? query : 'https://' + query, {
+    const isUrl = isURL(query, { protocols: ['http', 'https', 'ftp', 'file'] });
+
+    if (isUrl) {
+      openNewTab(/:\/\//i.test(query) ? query : 'https://' + query, {
         active: true,
         openToNext: true,
       });
@@ -88,7 +91,6 @@ export default function SearchEngine() {
             placeholder={$fmt('newtab.searchPlaceholder')}
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            autoFocus={true}
           />
         </form>
       </StyledSearchEngineBox>

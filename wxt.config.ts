@@ -30,6 +30,7 @@ export default defineConfig({
     homepage_url: 'https://github.com/web-dahuyou/NiceTab',
     host_permissions: ['<all_urls>'],
     default_locale: 'zh_CN',
+    incognito: isFirefox ? 'spanning' : 'split',
     content_security_policy: isFirefox
       ? {
           extension_pages: "script-src 'self'; object-src 'self';",

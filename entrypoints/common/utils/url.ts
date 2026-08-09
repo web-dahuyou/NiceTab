@@ -219,6 +219,25 @@ export function isContentMatched(
   }
 }
 
+/**
+ * @description: 判断字符串是否为有效的URL
+ * @param {string} str 待检测的字符串
+ * @return {boolean} 是否为URL
+ */
+export function isUrl(str: string): boolean {
+  try {
+    new URL(str);
+    return true;
+  } catch {
+    try {
+      new URL('https://' + str);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}
+
 export default {
   handleUrlWidthParams,
   getUrlParams,
@@ -226,4 +245,5 @@ export default {
   getOrigin,
   getBaseDomain,
   isSameUrl,
+  isUrl,
 };

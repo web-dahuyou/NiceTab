@@ -2,8 +2,11 @@
   "name": "nice-tab",
   "description": "开源的标签页管理器，OneTab、Toby、SessionBuddy 等扩展的升级替代品，功能丰富易用 | A nice, convenient, powerful tab manager (open source)",
   "private": true,
-  "version": "3.0.0",
+  "version": "3.0.1",
   "type": "module",
+  "engines": {
+    "node": ">=18.20.0"
+  },
   "scripts": {
     "postinstall": "wxt prepare",
     "dev": "pnpm convert:guide && wxt",
@@ -26,6 +29,7 @@
     "@atlaskit/pragmatic-drag-and-drop": "^1.1.7",
     "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.0.3",
     "@atlaskit/pragmatic-drag-and-drop-react-drop-indicator": "^1.1.1",
+    "@types/validator": "^13.15.10",
     "antd": "5.23.4",
     "compare-versions": "^6.1.1",
     "copy-to-clipboard": "^3.3.3",
@@ -43,6 +47,7 @@
     "react-router-dom": "^6.23.0",
     "react-virtuoso": "^4.10.4",
     "styled-components": "^6.1.8",
+    "validator": "^13.15.35",
     "vite-plugin-svgr": "^4.3.0",
     "webdav": "^5.7.1"
   },
@@ -53,7 +58,6 @@
     "@types/react-dom": "^18.3.0",
     "@types/yargs-parser": "^21.0.3",
     "@typescript-eslint/parser": "^8.35.0",
-    "@vitejs/plugin-react": "5.1.4",
     "@wxt-dev/module-react": "^1.1.0",
     "eslint": "^9.0.0",
     "eslint-plugin-import": "^2.32.0",

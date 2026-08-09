@@ -29,7 +29,7 @@ export const stateUtils = Store.stateUtils;
 export const newTabUtils = Store.newTabUtils;
 
 // 监听settings storage变化
-export default function initSettingsStorageListener(
+export function initSettingsStorageListener(
   callback: (settings: SettingsProps, oldSettings: SettingsProps) => void,
 ) {
   return storage.watch<SettingsProps>(
@@ -97,6 +97,13 @@ export function initSyncStorageListener(callback: () => void) {
 // 监听state storage变化
 export function initStateStorageListener(callback: () => void) {
   return storage.watch(stateUtils.storageKey, () => {
+    callback();
+  });
+}
+
+// 监听theme storage变化
+export function initThemeStorageListener(callback: () => void) {
+  return storage.watch(themeUtils.storageKey, () => {
     callback();
   });
 }

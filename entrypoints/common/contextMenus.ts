@@ -13,7 +13,8 @@ import {
 import tabUtils from '~/entrypoints/common/tabs';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import type { SendTargetProps, SettingsProps } from '~/entrypoints/types';
-import initSettingsStorageListener, {
+import {
+  initSettingsStorageListener,
   settingsUtils,
   syncUtils,
   syncWebDAVUtils,
