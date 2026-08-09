@@ -4,6 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Nice New Tab</title>
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('nicetab-theme-type');
+          var dark =
+            t === 'dark' ||
+            (t !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+
+          if (dark) {
+            var el = document.documentElement;
+            el.style.setProperty('--bg-color', '#2f2f2f');
+            el.style.backgroundColor = '#2f2f2f';
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

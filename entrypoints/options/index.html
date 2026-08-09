@@ -8,6 +8,22 @@
     <meta name="manifest.open_in_tab" content="true" />
     <meta name="manifest.browser_style" content="true" />
     <link rel="icon" href="/icon/48.png" type="image/png" />
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('nicetab-theme-type');
+          var dark =
+            t === 'dark' ||
+            (t !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+
+          if (dark) {
+            var el = document.documentElement;
+            el.style.setProperty('--bg-color', '#2f2f2f');
+            el.style.backgroundColor = '#2f2f2f';
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

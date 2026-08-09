@@ -97,6 +97,14 @@ export function useCustomLocale() {
   return { messages, locale, changeLocale };
 }
 
+const THEME_TYPE_STORAGE_KEY = 'nicetab-theme-type';
+
+function syncThemeTypeToLocalStorage(type: ThemeTypes) {
+  try {
+    localStorage.setItem(THEME_TYPE_STORAGE_KEY, type);
+  } catch (e) {}
+}
+
 // theme type (light | dark | auto)
 export function useThemeTypeConfig() {
   const [themeType, setThemeType] = useState<ThemeTypes>(defaultThemeType);
@@ -118,6 +126,7 @@ export function useThemeTypeConfig() {
     }
 
     setThemeTypeConfig({ ...config });
+    syncThemeTypeToLocalStorage(type);
   };
 
   const changeThemeType = async (themeType: ThemeTypes = defaultThemeType) => {
