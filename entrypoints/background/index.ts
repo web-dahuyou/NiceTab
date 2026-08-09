@@ -170,7 +170,6 @@ async function handleNewTabRedirect(tabId: number | undefined, url: string) {
   const newTabPatterns = [
     'chrome://newtab/',
     'edge://newtab/',
-    'about:blank',
     'about:newtab',
     'about:privatebrowsing',
   ];
