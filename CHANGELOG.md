@@ -6,6 +6,18 @@ For the most detailed and up-to-date release notes, see [GitHub Releases](https:
 
 ---
 
+## v3.0.1
+
+**Release Date:** August 9, 2026
+
+- Tab group header now supports sticky scroll behavior
+- Optimized URL detection logic in the search box
+- Optimized the logic for sending loading tabs
+- Added support for browser's incognito mode
+- Multilingual adjustment
+
+---
+
 ## v3.0.0
 
 **Release Date:** July 13, 2026
