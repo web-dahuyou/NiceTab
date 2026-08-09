@@ -140,6 +140,7 @@ const StyledPageContainer = styled.div<{
   }
   .float-button-box {
     position: fixed;
+    z-index: 10;
     bottom: 24px;
     right: 30px;
     display: flex;
