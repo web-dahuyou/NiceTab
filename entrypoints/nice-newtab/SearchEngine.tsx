@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Tooltip } from 'antd';
 import { isURL } from 'validator';
 import { settingsUtils } from '~/entrypoints/common/storage';
