@@ -6,6 +6,14 @@ For the most detailed and up-to-date release notes, see [GitHub Releases](https:
 
 ---
 
+## Unreleased
+
+- Added window-level snapshot management with manual history and the latest automatic snapshot
+- Snapshots now preserve tab order, native group structure, and pinned state
+- Added snapshot content editing and restore-to-new-window or replace-current-window modes
+
+---
+
 ## v3.0.1
 
 **Release Date:** August 9, 2026
@@ -553,4 +561,3 @@ For the most detailed and up-to-date release notes, see [GitHub Releases](https:
 - Overwrite confirmation reminder for remote sync
 - Copy links within tab group
 - Hover to display title and link for tabs
-

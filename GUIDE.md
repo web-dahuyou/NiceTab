@@ -111,22 +111,27 @@ You can go to the `Preferences Page` to configure it according to your preferenc
 
 ## Management Dashboard - Navigation Bar Operations
 
-- **Page Switching**: Quickly switch between **List**, **Preferences**, **Import/Export**, **Remote Sync**, and **Recycle Bin** pages.
+- **Page Switching**: Quickly switch between **List**, **Snapshots**, **Preferences**, **Import/Export**, **Remote Sync**, and **Recycle Bin** pages.
 - **Version Information Display**: Normally displays current version information. When updates are available, displays the latest upgradeable version; click to update immediately.
 - **Theme Color Settings**: Preset multiple theme colors, freely switchable (theme colors are currently limited to several preset colors; dark theme colors and theme color extensions may be optimized later).
 - **Light/Dark Theme**: Freely switch between light/dark themes.
 - **Language Switch**: Switch languages, currently supports Chinese/English switching.
 - **Other Operation Items**: Other functions are folded into dropdown options; these functions are also practical.
 
-### Create Snapshot and Restore Snapshot
+### Window Snapshots
 
-These two functions are located in the `Navigation Bar "Actions" dropdown options`. You can save currently opened tabs as a temporary snapshot, then use "Restore Snapshot" to restore the previously saved temporary snapshot to the browser.
+Select **Create Snapshot** from the navigation bar's Actions menu to save the complete workspace of the **current window** in one step. A snapshot contains tab order, pinned state, the tab to activate after restoration, and each native tab group's name, color, and collapsed state. Different Chrome windows are captured separately instead of being merged.
 
-**Scenario**: Before manually closing/restarting the browser, you can first "Create Snapshot", then after restarting the browser, manually "Restore Snapshot".
+The management dashboard now includes a **Snapshots** page:
 
-**Explanation**:
-- Normally, browsers save opened tabs only during browser upgrades or other official restarts, and automatically restore them after restarting. However, when manually closing or restarting the browser, there's no snapshot saving functionality.
-- NiceTab actually saves a snapshot in the background in real-time, and automatically restore them after restarting. The operation management interface hasn't been developed yet - it may be provided in future versions if needed.
+- Manual snapshots are named from their creation time and retain up to 50 entries. At the limit, you can delete the oldest snapshot and continue.
+- One latest automatic snapshot is retained separately for browser startup recovery and does not count toward the manual limit.
+- Snapshots can be renamed or deleted. Their tabs can be added, edited, removed, reordered, dragged between groups, pinned, or selected as the active tab after restoration.
+- Groups can be added, renamed, recolored, marked as collapsed, reordered, and deleted.
+- Restore into a **new window** to keep the current workspace, or choose **replace current window** to close its existing tabs and restore the snapshot in place.
+- If browser security restrictions prevent an individual URL from opening, NiceTab continues restoring the remaining tabs and reports the success and failure counts.
+
+Pinned tabs cannot belong to native Chrome tab groups. Pinning a grouped snapshot tab automatically moves it to the top-level ungrouped area. Separate Chrome profiles and devices cannot directly read one another's window tabs, and snapshots are not included in Gist/WebDAV synchronization.
 
 ## Management Dashboard - List
 
