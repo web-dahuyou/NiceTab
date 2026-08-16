@@ -198,4 +198,4 @@
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=web-dahuyou/NiceTab&type=Date)](https://www.star-history.com/#web-dahuyou/NiceTab&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=web-dahuyou/NiceTab&type=Date)](https://star-history.dera.page/#web-dahuyou/NiceTab&Date)
