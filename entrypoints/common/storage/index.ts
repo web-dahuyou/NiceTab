@@ -9,6 +9,7 @@ import SyncUtils from './syncUtils';
 import SyncWebDAVUtils from './syncWebDAVUtils';
 import StateUtils from './stateUtils';
 import NewTabUtils from './newTabUtils';
+import SnapshotUtils from './snapshotUtils';
 
 Store.settingsUtils = new SettingsUtils();
 Store.themeUtils = new ThemeUtils();
@@ -18,6 +19,7 @@ Store.syncUtils = new SyncUtils();
 Store.syncWebDAVUtils = new SyncWebDAVUtils();
 Store.stateUtils = new StateUtils();
 Store.newTabUtils = new NewTabUtils();
+Store.snapshotUtils = new SnapshotUtils();
 
 export const settingsUtils = Store.settingsUtils;
 export const themeUtils = Store.themeUtils;
@@ -27,6 +29,7 @@ export const syncUtils = Store.syncUtils;
 export const syncWebDAVUtils = Store.syncWebDAVUtils;
 export const stateUtils = Store.stateUtils;
 export const newTabUtils = Store.newTabUtils;
+export const snapshotUtils = Store.snapshotUtils;
 
 // 监听settings storage变化
 export function initSettingsStorageListener(
@@ -97,6 +100,12 @@ export function initSyncStorageListener(callback: () => void) {
 // 监听state storage变化
 export function initStateStorageListener(callback: () => void) {
   return storage.watch(stateUtils.storageKey, () => {
+    callback();
+  });
+}
+
+export function initSnapshotStorageListener(callback: () => void) {
+  return storage.watch(snapshotUtils.storageKey, () => {
     callback();
   });
 }
