@@ -327,7 +327,7 @@ export const USER_GUIDE_URL_MAP: Record<LanguageTypes, string> = {
   'zh-CN': '/docs/GUIDE-zh.html',
   'zh-TW': '/docs/GUIDE-zh.html',
   'en-US': '/docs/GUIDE.html',
-  'ru-RU': '/docs/GUIDE.html',
+  'ru-RU': '/docs/GUIDE-ru.html',
 };
 
 // 更新日志页面链接

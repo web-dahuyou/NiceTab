@@ -3,7 +3,7 @@
 ![NiceTab](https://github.com/user-attachments/assets/6099f21e-fc0a-4bb5-8280-e497be3fb0ae)
 
 <p>
-  中文 | <a href="./README.md">English</a>
+  中文 | <a href="./README.md">English</a> | <a href="./README-ru.md">Русский</a>
 </p>
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/web-dahuyou/NiceTab)
@@ -46,7 +46,7 @@
 - 支持**远程同步功能**。
 - 支持手动切换**亮色/暗黑主题**。
 - 支持**皮肤主题切换**，目前暂时设置了有限的几种主题色提供选择，后续可根据需求扩大选择范围。
-- 支持**多语言**，目前暂时支持简体中文、繁体中文、英文。
+- 支持**多语言**，目前暂时支持简体中文、繁体中文、英文、俄文。
 - 支持**回收站功能**，回收站中的标签页可还原到标签列表或者彻底删除。标签列表和回收站支持根据分类和标签组归类合并，方便管理。
 - 支持手动休眠标签页来释放内存（休眠中的标签页仍会显示在标签栏中，并会在激活后重新加载）。
 

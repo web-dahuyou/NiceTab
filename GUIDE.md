@@ -2,7 +2,7 @@
 # NiceTab User Guide
 
 <p>
-  English | <a href="./GUIDE-zh.md">中文</a>
+  English | <a href="./GUIDE-zh.md">中文</a> | <a href="./GUIDE-ru.md">Русский</a>
 </p>
 
 ## Project Introduction
@@ -115,7 +115,7 @@ You can go to the `Preferences Page` to configure it according to your preferenc
 - **Version Information Display**: Normally displays current version information. When updates are available, displays the latest upgradeable version; click to update immediately.
 - **Theme Color Settings**: Preset multiple theme colors, freely switchable (theme colors are currently limited to several preset colors; dark theme colors and theme color extensions may be optimized later).
 - **Light/Dark Theme**: Freely switch between light/dark themes.
-- **Language Switch**: Switch languages, currently supports Chinese/English switching.
+- **Language Switch**: Switch languages, currently supports Chinese, English, and Russian.
 - **Other Operation Items**: Other functions are folded into dropdown options; these functions are also practical.
 
 ### Create Snapshot and Restore Snapshot
@@ -201,7 +201,7 @@ General configuration items are easy to understand.
 
 | Item | Description | Default Value | Key Index |
 | --- | --- | --- | --- |
-| Language | Set extension's display language (Chinese/English) | Automatically set based on system language, fallback to English | ★★ |
+| Language | Set extension's display language (Chinese/English/Russian) | Automatically set based on system language, fallback to English | ★★ |
 | Theme Mode | Set light/dark mode, or follow system | Light | ★★ |
 | Open NiceTab Admin Page after launching the browser? | Literal meaning | Automatically open | ★★ |
 | Open the NiceTab Admin Page when a new window is created? | Literal meaning | No | ★★ |

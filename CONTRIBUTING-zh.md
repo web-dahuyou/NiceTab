@@ -1,5 +1,9 @@
 # 贡献指南
 
+<p>
+  中文 | <a href="./CONTRIBUTING.md">English</a> | <a href="./CONTRIBUTING-ru.md">Русский</a>
+</p>
+
 ## 提交代码
 
 1. [Fork](https://github.com/web-dahuyou/NiceTab/fork) 仓库。
