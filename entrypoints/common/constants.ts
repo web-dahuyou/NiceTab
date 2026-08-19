@@ -224,9 +224,35 @@ export const LANGUAGE_OPTIONS: Array<{
   { key: 'zh-CN', locale: 'zh-CN', label: '简体中文' },
   { key: 'zh-TW', locale: 'zh-TW', label: '繁體中文' },
   { key: 'en-US', locale: 'en-US', label: 'English' },
+  { key: 'ru-RU', locale: 'ru-RU', label: 'Русский' },
 ];
 
 export const defaultLanguage: LanguageTypes = 'en-US';
+
+const LANGUAGE_PREFIX_MAP: Record<string, LanguageTypes> = {
+  zh: 'zh-CN',
+  en: 'en-US',
+  ru: 'ru-RU',
+};
+
+// 将浏览器语言（如 ru、zh-TW）映射到扩展支持的语言
+export function resolveLanguage(language?: string): LanguageTypes {
+  if (!language) return defaultLanguage;
+  const lower = language.toLowerCase();
+  const exact = LANGUAGE_OPTIONS.find(option => option.key.toLowerCase() === lower);
+  if (exact) return exact.key;
+  if (
+    lower.startsWith('zh') &&
+    (lower.includes('tw') ||
+      lower.includes('hk') ||
+      lower.includes('mo') ||
+      lower.includes('hant'))
+  ) {
+    return 'zh-TW';
+  }
+  const prefix = lower.split('-')[0];
+  return LANGUAGE_PREFIX_MAP[prefix] || defaultLanguage;
+}
 
 export const UNNAMED_TAG = 'Unnamed Tag';
 export const UNNAMED_GROUP = 'Unnamed Group';
@@ -301,6 +327,7 @@ export const USER_GUIDE_URL_MAP: Record<LanguageTypes, string> = {
   'zh-CN': '/docs/GUIDE-zh.html',
   'zh-TW': '/docs/GUIDE-zh.html',
   'en-US': '/docs/GUIDE.html',
+  'ru-RU': '/docs/GUIDE-ru.html',
 };
 
 // 更新日志页面链接
@@ -308,6 +335,7 @@ export const CHANGELOG_URL_MAP: Record<LanguageTypes, string> = {
   'zh-CN': '/docs/CHANGELOG-zh.html',
   'zh-TW': '/docs/CHANGELOG-zh.html',
   'en-US': '/docs/CHANGELOG.html',
+  'ru-RU': '/docs/CHANGELOG.html',
 };
 
 // 默认搜索引擎
@@ -334,6 +362,7 @@ export default {
   TAB_GROUP_EVENTS,
   LANGUAGE_OPTIONS,
   defaultLanguage,
+  resolveLanguage,
   defaultAutoSyncType,
   UNNAMED_TAG,
   UNNAMED_GROUP,

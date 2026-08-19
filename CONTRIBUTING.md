@@ -1,5 +1,9 @@
 # Contributing Guide
 
+<p>
+  English | <a href="./CONTRIBUTING-zh.md">中文</a> | <a href="./CONTRIBUTING-ru.md">Русский</a>
+</p>
+
 ## Submitting Code
 
 1. [Fork](https://github.com/web-dahuyou/NiceTab/fork) the repository.

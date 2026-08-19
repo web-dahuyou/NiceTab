@@ -1,0 +1,35 @@
+{
+  "action_openAdminTab": {
+    "message": "Открыть панель NiceTab"
+  },
+  "action_sendAllTabs": {
+    "message": "Отправить все вкладки"
+  },
+  "action_sendAllWindowsTabs": {
+    "message": "Отправить вкладки всех окон"
+  },
+  "action_sendCurrentGroup": {
+    "message": "Отправить текущую группу"
+  },
+  "action_sendCurrentTab": {
+    "message": "Отправить текущую вкладку"
+  },
+  "action_sendOtherTabs": {
+    "message": "Отправить другие вкладки"
+  },
+  "action_sendLeftTabs": {
+    "message": "Отправить вкладки слева"
+  },
+  "action_sendRightTabs": {
+    "message": "Отправить вкладки справа"
+  },
+  "action_globalSearch": {
+    "message": "Глобальный поиск"
+  },
+  "action_startSync": {
+    "message": "Начать синхронизацию"
+  },
+  "action_hibernateTabs": {
+    "message": "Усыпить другие вкладки"
+  }
+}
