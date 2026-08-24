@@ -32,6 +32,7 @@ const zhTW: Record<SnapshotLocaleKey, string> = {
   'snapshots.saved': '快照已儲存',
   'snapshots.created': '快照已建立',
   'snapshots.invalidUrl': '請輸入有效網址',
+  'snapshots.rename': '重新命名快照',
 };
 
 export default zhTW;

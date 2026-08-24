@@ -1,15 +1,39 @@
 import styled from 'styled-components';
+import { StyledBaseMainWrapper } from '~/entrypoints/options/Layout.styled';
 
-export const StyledSnapshotsPage = styled.div`
-  width: min(1120px, 100%);
-  margin: 0 auto;
+const StyledSnapshotsPage = styled(StyledBaseMainWrapper)`
+  --sidebar-grid-col: var(--snapshot-sidebar-width, 240px);
+  --right-panel-grid-col: 0px;
+
+  .snapshot-sidebar {
+    .sidebar-inner-box {
+      top: 100px;
+    }
+    .sidebar-inner-content {
+      overflow: auto;
+      padding-right: 10px;
+    }
+    .nicetab-menu-vertical {
+      border-inline-end: none !important;
+    }
+  }
+
+  .sidebar-label {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .snapshot-main {
+    box-sizing: border-box;
+    min-width: 0;
+    width: min(1120px, 100%);
+    margin: 0 auto;
+    padding: 0 60px;
+  }
 
   .snapshot-toolbar,
-  .section-title,
-  .snapshot-header,
-  .editor-toolbar,
-  .group-header,
-  .tab-row {
+  .snapshot-record {
     display: flex;
     align-items: center;
   }
@@ -24,24 +48,24 @@ export const StyledSnapshotsPage = styled.div`
     background: ${props => props.theme.colorBgContainer};
   }
 
-  .snapshot-section + .snapshot-section {
-    margin-top: 28px;
+  .snapshot-list {
+    display: grid;
+    gap: 10px;
   }
 
-  .section-title {
-    justify-content: space-between;
-    margin-bottom: 12px;
-  }
-
-  .snapshot-header {
-    min-width: 0;
+  .snapshot-record {
     justify-content: space-between;
     gap: 16px;
-    width: 100%;
+    min-width: 0;
+    padding: 14px 16px;
+    border: 1px solid ${props => props.theme.colorBorderSecondary};
+    border-radius: 6px;
+    background: ${props => props.theme.colorBgContainer};
   }
 
   .snapshot-heading {
     min-width: 0;
+    flex: 1;
   }
 
   .snapshot-name {
@@ -61,126 +85,21 @@ export const StyledSnapshotsPage = styled.div`
     flex: 0 0 auto;
   }
 
-  .snapshot-editor {
-    min-width: 0;
-    padding: 8px 0 4px;
+  @media (max-width: 840px) {
+    --sidebar-grid-col: 0px;
+
+    .snapshot-main {
+      padding: 0 32px;
+    }
   }
 
-  .editor-toolbar {
-    position: sticky;
-    top: 124px;
-    z-index: 6;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 10px 0;
-    background: ${props => props.theme.colorBgContainer};
-  }
+  @media (max-width: 620px) {
+    .snapshot-main {
+      padding: 0 16px;
+    }
 
-  .snapshot-name-input {
-    width: min(420px, 100%);
-  }
-
-  .snapshot-items {
-    display: grid;
-    min-width: 0;
-    gap: 10px;
-    margin-top: 8px;
-  }
-
-  .snapshot-items > div,
-  .group-tabs > div {
-    min-width: 0;
-    max-width: 100%;
-  }
-
-  .snapshot-group {
-    overflow: hidden;
-    box-sizing: border-box;
-    min-width: 0;
-    width: 100%;
-    border: 1px solid ${props => props.theme.colorBorderSecondary};
-    border-radius: 6px;
-  }
-
-  .group-header {
-    min-width: 0;
-    justify-content: space-between;
-    gap: 12px;
-    min-height: 44px;
-    padding: 6px 10px;
-    background: ${props => props.theme.colorFillQuaternary};
-  }
-
-  .group-title {
-    display: flex;
-    align-items: center;
-    min-width: 0;
-    gap: 8px;
-    font-weight: 600;
-  }
-
-  .group-tabs {
-    display: grid;
-    gap: 1px;
-    padding: 4px 8px 8px;
-  }
-
-  .tab-row {
-    box-sizing: border-box;
-    min-width: 0;
-    width: 100%;
-    gap: 8px;
-    min-height: 42px;
-    padding: 5px 8px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    transition:
-      background-color 160ms ease,
-      border-color 160ms ease;
-  }
-
-  .tab-row:hover,
-  .tab-row:focus-within {
-    border-color: ${props => props.theme.colorBorderSecondary};
-    background: ${props => props.theme.colorFillQuaternary};
-  }
-
-  .drag-handle {
-    color: ${props => props.theme.colorTextTertiary};
-    cursor: grab;
-  }
-
-  .tab-content {
-    min-width: 0;
-    flex: 1;
-  }
-
-  .tab-title,
-  .tab-url {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .tab-url {
-    color: ${props => props.theme.colorTextSecondary};
-    font-size: 12px;
-  }
-
-  .drop-target {
-    min-height: 30px;
-    padding: 6px 10px;
-    border: 1px dashed ${props => props.theme.colorBorder};
-    border-radius: 4px;
-    color: ${props => props.theme.colorTextTertiary};
-    font-size: 12px;
-    text-align: center;
-  }
-
-  @media (max-width: 720px) {
     .snapshot-toolbar,
-    .editor-toolbar,
-    .snapshot-header {
+    .snapshot-record {
       align-items: stretch;
       flex-direction: column;
     }
@@ -188,16 +107,52 @@ export const StyledSnapshotsPage = styled.div`
     .snapshot-actions {
       align-self: flex-end;
     }
+  }
+`;
 
-    .snapshot-name-input {
-      width: 100%;
-    }
+export const StyledSnapshotDrawerContent = styled.div`
+  .detail-group-row,
+  .detail-tab-row {
+    box-sizing: border-box;
+    min-width: 0;
+    width: 100%;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .tab-row {
-      transition: none;
-    }
+  .detail-group-row {
+    min-height: 44px;
+    padding: 8px 10px;
+    border-bottom: 1px solid ${props => props.theme.colorBorderSecondary};
+    background: ${props => props.theme.colorFillQuaternary};
+  }
+
+  .detail-tab-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 6px 10px;
+    border-bottom: 1px solid ${props => props.theme.colorBorderSecondary};
+  }
+
+  .detail-tab-row.grouped {
+    padding-left: 28px;
+  }
+
+  .detail-tab-content {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .detail-tab-title,
+  .detail-tab-url {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .detail-tab-url {
+    color: ${props => props.theme.colorTextSecondary};
+    font-size: 12px;
   }
 `;
 
