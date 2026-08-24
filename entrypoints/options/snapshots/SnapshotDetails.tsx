@@ -1,6 +1,6 @@
 import { PushpinFilled, StarFilled } from '@ant-design/icons';
 import { Space, Tag, Typography } from 'antd';
-import { Virtuoso } from 'react-virtuoso';
+import VirtualList from 'rc-virtual-list';
 import Favicon from '~/entrypoints/common/components/Favicon';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import type {
@@ -11,16 +11,28 @@ import type {
 import { StyledSnapshotDrawerContent } from './Snapshots.styled';
 
 type DetailRow =
-  | { type: 'group'; group: WindowSnapshotGroup }
-  | { type: 'tab'; tab: WindowSnapshotTab; group?: WindowSnapshotGroup };
+  | { type: 'group'; key: string; group: WindowSnapshotGroup }
+  | {
+      type: 'tab';
+      key: string;
+      tab: WindowSnapshotTab;
+      group?: WindowSnapshotGroup;
+    };
 
 function flattenRecord(record: SnapshotRecord): DetailRow[] {
   return record.items.reduce<DetailRow[]>((rows, item) => {
     if (item.type === 'group') {
-      rows.push({ type: 'group', group: item });
-      rows.push(...item.tabs.map(tab => ({ type: 'tab' as const, tab, group: item })));
+      rows.push({ type: 'group', key: `group-${item.id}`, group: item });
+      rows.push(
+        ...item.tabs.map(tab => ({
+          type: 'tab' as const,
+          key: `group-${item.id}-tab-${tab.id}`,
+          tab,
+          group: item,
+        })),
+      );
     } else {
-      rows.push({ type: 'tab', tab: item });
+      rows.push({ type: 'tab', key: `tab-${item.id}`, tab: item });
     }
     return rows;
   }, []);
@@ -32,11 +44,13 @@ export default function SnapshotDetails({ record }: { record: SnapshotRecord }) 
 
   return (
     <StyledSnapshotDrawerContent className="snapshot-details">
-      <Virtuoso
+      <VirtualList
         data={rows}
-        style={{ height: 'calc(100vh - 150px)' }}
-        overscan={12}
-        itemContent={(_index, row) => {
+        height={Math.min(720, window.innerHeight - 150)}
+        itemHeight={48}
+        itemKey="key"
+      >
+        {row => {
           if (row.type === 'group') {
             return (
               <div className="detail-group-row">
@@ -71,7 +85,7 @@ export default function SnapshotDetails({ record }: { record: SnapshotRecord }) 
             </div>
           );
         }}
-      />
+      </VirtualList>
     </StyledSnapshotDrawerContent>
   );
 }

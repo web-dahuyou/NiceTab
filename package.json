@@ -45,7 +45,6 @@
     "react-icons": "^5.5.0",
     "react-intl": "^6.6.8",
     "react-router-dom": "^6.23.0",
-    "react-virtuoso": "^4.10.4",
     "styled-components": "^6.1.8",
     "validator": "^13.15.35",
     "vite-plugin-svgr": "^4.3.0",

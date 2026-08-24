@@ -104,6 +104,10 @@ const StyledSnapshotsPage = styled(StyledBaseMainWrapper)`
       flex-direction: column;
     }
 
+    .snapshot-toolbar {
+      padding-top: 64px;
+    }
+
     .snapshot-actions {
       align-self: flex-end;
     }
