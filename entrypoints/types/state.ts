@@ -1,5 +1,5 @@
 import type { SearchEngine } from '~/entrypoints/types';
-import type { SnapshotItem } from './tabList';
+import type { SnapshotItem, SnapshotRecord } from './tabList';
 
 export interface PermissionActionsProps {
   tabGroups: boolean;
@@ -11,7 +11,7 @@ export interface GlobalStateProps {
   permissionActions?: PermissionActionsProps;
   snapshotStatus?: 'on' | 'off';
   openedTabsManualSave?: SnapshotItem[];
-  openedTabsAutoSave?: SnapshotItem[];
+  openedTabsAutoSave?: SnapshotItem[] | SnapshotRecord;
   lastSelectedTargetValue?: string[];
 }
 

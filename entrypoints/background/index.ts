@@ -12,6 +12,7 @@ import {
   themeUtils,
   settingsUtils,
   stateUtils,
+  snapshotUtils,
 } from '~/entrypoints/common/storage';
 import { autoSyncAlarm, autoSaveOpenedTabsAlarm } from '~/entrypoints/common/alarms';
 import {
@@ -275,9 +276,10 @@ export default defineBackground(() => {
     const settings = await settingsUtils.getSettings();
     const restoreSnapshotAfterBrowserLaunch =
       settings[RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH];
+    const autoSnapshot = await snapshotUtils.promoteAutoBuffer();
 
-    if (restoreSnapshotAfterBrowserLaunch) {
-      await tabUtils.restoreOpenedTabsSnapshot();
+    if (restoreSnapshotAfterBrowserLaunch && autoSnapshot) {
+      await tabUtils.restoreOpenedTabsSnapshot('autoSave', autoSnapshot);
     }
     await stateUtils.setStateByModule('global', { snapshotStatus: 'on' });
 

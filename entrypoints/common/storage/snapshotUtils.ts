@@ -77,6 +77,17 @@ function createLegacyRecord(
   };
 }
 
+function isSnapshotRecord(
+  value: SnapshotItem[] | SnapshotRecord | undefined,
+): value is SnapshotRecord {
+  return !!value && !Array.isArray(value) && Array.isArray(value.items);
+}
+
+function normalizeAutoBuffer(value: SnapshotItem[] | SnapshotRecord | undefined) {
+  if (isSnapshotRecord(value)) return value;
+  return value?.length ? createLegacyRecord('auto', value) : undefined;
+}
+
 export default class SnapshotUtils {
   storageKey: `local:${string}` = 'local:snapshots';
   store: SnapshotStore = initialStore;
@@ -89,6 +100,17 @@ export default class SnapshotUtils {
         ...stored,
         manual: stored.manual || [],
       };
+      const globalState = await Store.stateUtils.getState('global');
+      const autoBuffer = normalizeAutoBuffer(globalState.openedTabsAutoSave);
+      if (!autoBuffer && this.store.auto) {
+        await Store.stateUtils.setStateByModule('global', {
+          openedTabsAutoSave: this.store.auto,
+        });
+      } else if (autoBuffer && autoBuffer !== globalState.openedTabsAutoSave) {
+        await Store.stateUtils.setStateByModule('global', {
+          openedTabsAutoSave: autoBuffer,
+        });
+      }
       return this.store;
     }
 
@@ -108,18 +130,18 @@ export default class SnapshotUtils {
   async migrateLegacySnapshots() {
     const globalState = await Store.stateUtils.getState('global');
     const manualItems = globalState.openedTabsManualSave || [];
-    const autoItems = globalState.openedTabsAutoSave || [];
+    const autoRecord = normalizeAutoBuffer(globalState.openedTabsAutoSave);
     const migrated: SnapshotStore = {
       ...initialStore,
       manual: manualItems.length ? [createLegacyRecord('manual', manualItems)] : [],
-      auto: autoItems.length ? createLegacyRecord('auto', autoItems) : undefined,
+      auto: autoRecord,
     };
 
     await this.setStore(migrated);
-    if (manualItems.length || autoItems.length) {
+    if (manualItems.length || autoRecord) {
       await Store.stateUtils.setStateByModule('global', {
         openedTabsManualSave: undefined,
-        openedTabsAutoSave: undefined,
+        openedTabsAutoSave: autoRecord,
       });
     }
     return migrated;
@@ -141,6 +163,28 @@ export default class SnapshotUtils {
   async setAuto(record: SnapshotRecord) {
     const store = await this.getStore();
     return await this.setStore({ ...store, auto: record });
+  }
+
+  async setAutoBuffer(record: SnapshotRecord) {
+    await Store.stateUtils.setStateByModule('global', { openedTabsAutoSave: record });
+    return record;
+  }
+
+  async promoteAutoBuffer() {
+    const store = await this.getStore();
+    const globalState = await Store.stateUtils.getState('global');
+    const record = normalizeAutoBuffer(globalState.openedTabsAutoSave);
+    if (!record?.items.length) return store.auto;
+    const promoted = {
+      ...record,
+      source: 'auto' as const,
+      updatedAt: newCreateTime(),
+    };
+    await this.setStore({ ...store, auto: promoted });
+    if (record !== globalState.openedTabsAutoSave) {
+      await Store.stateUtils.setStateByModule('global', { openedTabsAutoSave: promoted });
+    }
+    return promoted;
   }
 
   async update(record: SnapshotRecord) {

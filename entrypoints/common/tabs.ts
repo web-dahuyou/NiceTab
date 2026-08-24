@@ -706,7 +706,7 @@ export const saveOpenedTabsAsSnapshot = async (
   if (!record) return { saved: false as const, empty: true as const };
 
   if (source === 'auto') {
-    await snapshotUtils.setAuto(record);
+    await snapshotUtils.setAutoBuffer(record);
     return { saved: true as const, record };
   }
   const result = await snapshotUtils.addManual(record, options.removeOldest);
@@ -823,9 +823,10 @@ export async function restoreSnapshotRecord(
 // 兼容原有自动恢复入口
 export const restoreOpenedTabsSnapshot = async (
   type: 'autoSave' | 'manualSave' = 'autoSave',
+  recordOverride?: SnapshotRecord,
 ) => {
   const store = await snapshotUtils.getStore();
-  const record = type === 'autoSave' ? store.auto : store.manual[0];
+  const record = recordOverride || (type === 'autoSave' ? store.auto : store.manual[0]);
   if (!record) return { created: 0, failed: 0 };
   return await restoreSnapshotRecord(
     record,
