@@ -10,7 +10,9 @@ For the most detailed and up-to-date release notes, see [GitHub Releases](https:
 
 - Added window-level snapshot management with manual history and the latest automatic snapshot
 - Snapshots now preserve tab order, native group structure, and pinned state
-- Added snapshot content editing and restore-to-new-window or replace-current-window modes
+- Automatic recovery now uses a live crash buffer promoted to a read-only record at browser startup
+- The Snapshots page now uses sidebar navigation, a lightweight list, and on-demand details drawers
+- Added optional advanced editing for manual snapshots and restore-to-new-window or replace-current-window modes
 
 ---
 
