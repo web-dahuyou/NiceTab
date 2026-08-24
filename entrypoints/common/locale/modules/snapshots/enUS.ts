@@ -35,6 +35,8 @@ const enUS: Record<SnapshotLocaleKey, string> = {
   'snapshots.created': 'Snapshot created',
   'snapshots.invalidUrl': 'Enter a valid URL',
   'snapshots.rename': 'Rename Snapshot',
+  'snapshots.editStructure': 'Edit Structure',
+  'snapshots.viewDetails': 'View Details',
 };
 
 export default enUS;

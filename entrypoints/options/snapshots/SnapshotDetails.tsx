@@ -45,7 +45,9 @@ export default function SnapshotDetails({ record }: { record: SnapshotRecord }) 
                   <Typography.Text strong>
                     {row.group.title || $fmt('snapshots.ungrouped')}
                   </Typography.Text>
-                  <Typography.Text type="secondary">{row.group.tabs.length}</Typography.Text>
+                  <Typography.Text type="secondary">
+                    {row.group.tabs.length}
+                  </Typography.Text>
                   {row.group.collapsed && (
                     <Typography.Text type="secondary">
                       {$fmt('snapshots.groupCollapsed')}

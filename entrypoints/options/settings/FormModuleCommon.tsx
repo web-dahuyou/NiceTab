@@ -12,6 +12,7 @@ const {
   OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED,
   AUTO_PIN_ADMIN_TAB,
   RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH,
+  ALLOW_EDIT_MANUAL_SNAPSHOTS,
   AUTO_CREATE_SNAPSHOT_INTERVAL,
 } = ENUM_SETTINGS_PROPS;
 
@@ -101,6 +102,16 @@ export default function FormModuleCommon(
       <Form.Item<SettingsProps>
         label={$fmt(`settings.${RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH}`)}
         name={RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH}
+      >
+        <Radio.Group>
+          <Radio value={true}>{$fmt(`common.yes`)}</Radio>
+          <Radio value={false}>{$fmt(`common.no`)}</Radio>
+        </Radio.Group>
+      </Form.Item>
+
+      <Form.Item<SettingsProps>
+        label={$fmt(`settings.${ALLOW_EDIT_MANUAL_SNAPSHOTS}`)}
+        name={ALLOW_EDIT_MANUAL_SNAPSHOTS}
       >
         <Radio.Group>
           <Radio value={true}>{$fmt(`common.yes`)}</Radio>

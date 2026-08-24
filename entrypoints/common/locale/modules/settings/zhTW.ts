@@ -24,6 +24,7 @@ const zhTW: Record<LocaleKey, string> = {
   "settings.autoPinAdminTab.yes": "自動釘選NiceTab管理後台（推薦）",
   "settings.autoPinAdminTab.no": "不自動釘選NiceTab管理後台",
   "settings.restoreSnapshotAfterBrowserLaunch": "啟動瀏覽器時是否自動恢復之前開啟的分頁？",
+  "settings.allowEditManualSnapshots": "是否允許編輯手動快照中的分頁和群組？",
   "settings.autoCreateSnapshotInterval": "自動創建快照的時間間隔（分鐘）：",
   "settings.showSendTargetModal": "傳送分頁時-是否顯示指定目錄選擇框：",
   "settings.showSendTargetModal.tooltip": "若選擇否，則直接傳送到中繼站（某些特殊頁面無法觸發談窗，也會直接傳送到中繼站）",

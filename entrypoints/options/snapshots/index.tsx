@@ -20,18 +20,26 @@ import {
   EyeOutlined,
   HistoryOutlined,
 } from '@ant-design/icons';
-import { initSnapshotStorageListener, snapshotUtils } from '~/entrypoints/common/storage';
+import {
+  initSettingsStorageListener,
+  initSnapshotStorageListener,
+  settingsUtils,
+  snapshotUtils,
+} from '~/entrypoints/common/storage';
 import {
   restoreSnapshotRecord,
   saveOpenedTabsAsSnapshot,
 } from '~/entrypoints/common/tabs';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
-import type { SnapshotRecord, SnapshotStore } from '~/entrypoints/types';
+import type { SettingsProps, SnapshotRecord, SnapshotStore } from '~/entrypoints/types';
+import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import SidebarLayout from '~/entrypoints/options/components/SidebarLayout';
 import SnapshotDetails from './SnapshotDetails';
-import StyledSnapshotsPage from './Snapshots.styled';
+import SnapshotEditor from './SnapshotEditor';
+import StyledSnapshotsPage, { StyledSnapshotEditorDrawer } from './Snapshots.styled';
 
 const emptyStore: SnapshotStore = { version: 2, manual: [] };
+const { ALLOW_EDIT_MANUAL_SNAPSHOTS } = ENUM_SETTINGS_PROPS;
 
 function getStats(record: SnapshotRecord) {
   let tabs = 0;
@@ -58,6 +66,8 @@ export default function SnapshotsPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(240);
   const [detailRecord, setDetailRecord] = useState<SnapshotRecord>();
+  const [settings, setSettings] = useState<SettingsProps>({});
+  const [editing, setEditing] = useState(false);
 
   const loadStore = useCallback(async () => {
     setStore({ ...(await snapshotUtils.getStore()) });
@@ -70,6 +80,11 @@ export default function SnapshotsPage() {
   }, [loadStore]);
 
   useEffect(() => {
+    settingsUtils.getSettings().then(setSettings);
+    return initSettingsStorageListener(value => setSettings(value));
+  }, []);
+
+  useEffect(() => {
     if (window.matchMedia('(max-width: 840px)').matches) setSidebarCollapsed(true);
   }, []);
 
@@ -79,8 +94,10 @@ export default function SnapshotsPage() {
       detailRecord.source === 'auto'
         ? store.auto
         : store.manual.find(item => item.id === detailRecord.id);
-    if (!record) setDetailRecord(undefined);
-    else if (record.updatedAt !== detailRecord.updatedAt) setDetailRecord(record);
+    if (!record) {
+      setDetailRecord(undefined);
+      setEditing(false);
+    } else if (record.updatedAt !== detailRecord.updatedAt) setDetailRecord(record);
   }, [store, detailRecord]);
 
   const createSnapshot = useCallback(
@@ -175,13 +192,20 @@ export default function SnapshotsPage() {
         </div>
         <Space className="snapshot-actions" wrap>
           {record.source === 'auto' && <Tag color="blue">{$fmt('common.auto')}</Tag>}
-          <Button icon={<EyeOutlined />} onClick={() => setDetailRecord(record)}>
+          <Button
+            icon={<EyeOutlined />}
+            onClick={() => {
+              setEditing(false);
+              setDetailRecord(record);
+            }}
+          >
             {$fmt('common.view')}
           </Button>
           <Dropdown
             menu={{
               items: restoreItems,
-              onClick: ({ key }) => restore(record, key as 'newWindow' | 'replaceCurrent'),
+              onClick: ({ key }) =>
+                restore(record, key as 'newWindow' | 'replaceCurrent'),
             }}
           >
             <Button icon={<HistoryOutlined />}>
@@ -258,7 +282,9 @@ export default function SnapshotsPage() {
               {$fmt(module === 'manual' ? 'snapshots.manual' : 'snapshots.auto')}
             </Typography.Title>
             {module === 'manual' && (
-              <Typography.Text type="secondary">{store.manual.length} / 50</Typography.Text>
+              <Typography.Text type="secondary">
+                {store.manual.length} / 50
+              </Typography.Text>
             )}
           </div>
           {module === 'manual' && (
@@ -277,7 +303,9 @@ export default function SnapshotsPage() {
             records.map(renderRecord)
           ) : (
             <Empty
-              description={$fmt(module === 'manual' ? 'snapshots.empty' : 'snapshots.autoEmpty')}
+              description={$fmt(
+                module === 'manual' ? 'snapshots.empty' : 'snapshots.autoEmpty',
+              )}
             />
           )}
         </div>
@@ -287,9 +315,37 @@ export default function SnapshotsPage() {
         width={720}
         open={!!detailRecord}
         destroyOnClose
-        onClose={() => setDetailRecord(undefined)}
+        extra={
+          detailRecord?.source === 'manual' && settings[ALLOW_EDIT_MANUAL_SNAPSHOTS] ? (
+            <Button
+              icon={editing ? <EyeOutlined /> : <EditOutlined />}
+              onClick={() => setEditing(value => !value)}
+            >
+              {$fmt(editing ? 'snapshots.viewDetails' : 'snapshots.editStructure')}
+            </Button>
+          ) : undefined
+        }
+        onClose={() => {
+          setDetailRecord(undefined);
+          setEditing(false);
+        }}
       >
-        {detailRecord && <SnapshotDetails record={detailRecord} />}
+        {detailRecord &&
+          (editing ? (
+            <StyledSnapshotEditorDrawer>
+              <SnapshotEditor
+                record={detailRecord}
+                onSave={async value => {
+                  await snapshotUtils.update(value);
+                  setDetailRecord(value);
+                  setEditing(false);
+                  $message.success($fmt('snapshots.saved'));
+                }}
+              />
+            </StyledSnapshotEditorDrawer>
+          ) : (
+            <SnapshotDetails record={detailRecord} />
+          ))}
       </Drawer>
     </StyledSnapshotsPage>
   );
