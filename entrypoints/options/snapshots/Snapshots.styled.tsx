@@ -156,4 +156,130 @@ export const StyledSnapshotDrawerContent = styled.div`
   }
 `;
 
+export const StyledSnapshotEditorDrawer = styled.div`
+  .snapshot-editor {
+    min-width: 0;
+  }
+
+  .editor-toolbar,
+  .group-header,
+  .tab-row {
+    display: flex;
+    align-items: center;
+  }
+
+  .editor-toolbar {
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 0 12px;
+  }
+
+  .snapshot-name-input {
+    width: min(340px, 100%);
+  }
+
+  .snapshot-items {
+    display: grid;
+    min-width: 0;
+    gap: 10px;
+  }
+
+  .snapshot-items > div,
+  .group-tabs > div {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .snapshot-group {
+    overflow: hidden;
+    box-sizing: border-box;
+    min-width: 0;
+    width: 100%;
+    border: 1px solid ${props => props.theme.colorBorderSecondary};
+    border-radius: 6px;
+  }
+
+  .group-header {
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 44px;
+    padding: 6px 10px;
+    background: ${props => props.theme.colorFillQuaternary};
+  }
+
+  .group-title {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: 8px;
+    font-weight: 600;
+  }
+
+  .group-tabs {
+    display: grid;
+    gap: 1px;
+    padding: 4px 8px 8px;
+  }
+
+  .tab-row {
+    box-sizing: border-box;
+    min-width: 0;
+    width: 100%;
+    gap: 8px;
+    min-height: 42px;
+    padding: 5px 8px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+  }
+
+  .tab-row:hover,
+  .tab-row:focus-within {
+    border-color: ${props => props.theme.colorBorderSecondary};
+    background: ${props => props.theme.colorFillQuaternary};
+  }
+
+  .drag-handle {
+    color: ${props => props.theme.colorTextTertiary};
+    cursor: grab;
+  }
+
+  .tab-content {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .tab-title,
+  .tab-url {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tab-url {
+    color: ${props => props.theme.colorTextSecondary};
+    font-size: 12px;
+  }
+
+  .drop-target {
+    min-height: 30px;
+    padding: 6px 10px;
+    border: 1px dashed ${props => props.theme.colorBorder};
+    border-radius: 4px;
+    color: ${props => props.theme.colorTextTertiary};
+    font-size: 12px;
+    text-align: center;
+  }
+
+  @media (max-width: 620px) {
+    .editor-toolbar {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .snapshot-name-input {
+      width: 100%;
+    }
+  }
+`;
+
 export default StyledSnapshotsPage;

@@ -31,6 +31,8 @@ const zhCN = {
   'snapshots.created': '快照已创建',
   'snapshots.invalidUrl': '请输入有效网址',
   'snapshots.rename': '重命名快照',
+  'snapshots.editStructure': '编辑结构',
+  'snapshots.viewDetails': '查看详情',
 };
 
 export type SnapshotLocaleKey = keyof typeof zhCN;
