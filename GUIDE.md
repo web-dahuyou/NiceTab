@@ -125,13 +125,14 @@ Select **Create Snapshot** from the navigation bar's Actions menu to save the co
 The management dashboard now includes a **Snapshots** page:
 
 - Manual snapshots are named from their creation time and retain up to 50 entries. At the limit, you can delete the oldest snapshot and continue.
-- One latest automatic snapshot is retained separately for browser startup recovery and does not count toward the manual limit.
-- Snapshots can be renamed or deleted. Their tabs can be added, edited, removed, reordered, dragged between groups, pinned, or selected as the active tab after restoration.
-- Groups can be added, renamed, recolored, marked as collapsed, reordered, and deleted.
+- Tab and group changes are written continuously to a crash-recovery buffer. On the next browser startup, NiceTab promotes that buffer to one read-only automatic snapshot and restores it only when the startup restore preference is enabled.
+- The Snapshots page uses a **Manual / Automatic** sidebar. The main list renders only names, timestamps, and counts; tabs and groups are loaded on demand in a virtualized details drawer so large workspaces do not slow down the list.
+- Manual snapshots can be renamed or deleted. The **Allow editing tabs and groups in manual snapshots** preference is disabled by default. When enabled, the details drawer can switch to an editor for adding, editing, removing, reordering, and moving tabs, as well as updating pinned/active states and group properties.
+- The automatic snapshot is view-and-restore only. It cannot be renamed, edited, or deleted and is replaced from the latest recovery buffer on the next browser startup.
 - Restore into a **new window** to keep the current workspace, or choose **replace current window** to close its existing tabs and restore the snapshot in place.
 - If browser security restrictions prevent an individual URL from opening, NiceTab continues restoring the remaining tabs and reports the success and failure counts.
 
-Pinned tabs cannot belong to native Chrome tab groups. Pinning a grouped snapshot tab automatically moves it to the top-level ungrouped area. Separate Chrome profiles and devices cannot directly read one another's window tabs, and snapshots are not included in Gist/WebDAV synchronization.
+Pinned tabs cannot belong to native Chrome tab groups. With advanced editing enabled, pinning a grouped snapshot tab automatically moves it to the top-level ungrouped area. Separate Chrome profiles and devices cannot directly read one another's window tabs, and snapshots are not included in Gist/WebDAV synchronization.
 
 ## Management Dashboard - List
 
