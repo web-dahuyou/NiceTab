@@ -111,22 +111,28 @@ You can go to the `Preferences Page` to configure it according to your preferenc
 
 ## Management Dashboard - Navigation Bar Operations
 
-- **Page Switching**: Quickly switch between **List**, **Preferences**, **Import/Export**, **Remote Sync**, and **Recycle Bin** pages.
+- **Page Switching**: Quickly switch between **List**, **Snapshots**, **Preferences**, **Import/Export**, **Remote Sync**, and **Recycle Bin** pages.
 - **Version Information Display**: Normally displays current version information. When updates are available, displays the latest upgradeable version; click to update immediately.
 - **Theme Color Settings**: Preset multiple theme colors, freely switchable (theme colors are currently limited to several preset colors; dark theme colors and theme color extensions may be optimized later).
 - **Light/Dark Theme**: Freely switch between light/dark themes.
 - **Language Switch**: Switch languages, currently supports Chinese/English switching.
 - **Other Operation Items**: Other functions are folded into dropdown options; these functions are also practical.
 
-### Create Snapshot and Restore Snapshot
+### Window Snapshots
 
-These two functions are located in the `Navigation Bar "Actions" dropdown options`. You can save currently opened tabs as a temporary snapshot, then use "Restore Snapshot" to restore the previously saved temporary snapshot to the browser.
+Select **Create Snapshot** from the navigation bar's Actions menu to save the complete workspace of the **current window** in one step. A snapshot contains tab order, pinned state, the tab to activate after restoration, and each native tab group's name, color, and collapsed state. Different Chrome windows are captured separately instead of being merged.
 
-**Scenario**: Before manually closing/restarting the browser, you can first "Create Snapshot", then after restarting the browser, manually "Restore Snapshot".
+The management dashboard now includes a **Snapshots** page:
 
-**Explanation**:
-- Normally, browsers save opened tabs only during browser upgrades or other official restarts, and automatically restore them after restarting. However, when manually closing or restarting the browser, there's no snapshot saving functionality.
-- NiceTab actually saves a snapshot in the background in real-time, and automatically restore them after restarting. The operation management interface hasn't been developed yet - it may be provided in future versions if needed.
+- Manual snapshots are named from their creation time and retain up to 50 entries. At the limit, you can delete the oldest snapshot and continue.
+- Tab and group changes are written continuously to a crash-recovery buffer. On the next browser startup, NiceTab promotes that buffer to one read-only automatic snapshot and restores it only when the startup restore preference is enabled.
+- The Snapshots page uses a **Manual / Automatic** sidebar. The main list renders only names, timestamps, and counts; tabs and groups are loaded on demand in a virtualized details drawer so large workspaces do not slow down the list.
+- Manual snapshots can be renamed or deleted. The **Allow editing tabs and groups in manual snapshots** preference is disabled by default. When enabled, the details drawer can switch to an editor for adding, editing, removing, reordering, and moving tabs, as well as updating pinned/active states and group properties.
+- The automatic snapshot is view-and-restore only. It cannot be renamed, edited, or deleted and is replaced from the latest recovery buffer on the next browser startup.
+- Restore into a **new window** to keep the current workspace, or choose **replace current window** to close its existing tabs and restore the snapshot in place.
+- If browser security restrictions prevent an individual URL from opening, NiceTab continues restoring the remaining tabs and reports the success and failure counts.
+
+Pinned tabs cannot belong to native Chrome tab groups. With advanced editing enabled, pinning a grouped snapshot tab automatically moves it to the top-level ungrouped area. Separate Chrome profiles and devices cannot directly read one another's window tabs, and snapshots are not included in Gist/WebDAV synchronization.
 
 ## Management Dashboard - List
 

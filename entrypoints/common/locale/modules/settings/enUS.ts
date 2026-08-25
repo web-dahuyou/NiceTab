@@ -24,6 +24,7 @@ const enUS: Record<LocaleKey, string> = {
   'settings.autoPinAdminTab.yes': 'Automatically pin (recommended)',
   'settings.autoPinAdminTab.no': 'Do not',
   'settings.restoreSnapshotAfterBrowserLaunch': 'Restore previously opened tabs after launching the browser?',
+  'settings.allowEditManualSnapshots': 'Allow editing tabs and groups in manual snapshots?',
   'settings.autoCreateSnapshotInterval': 'Auto-Create-Snapshot interval (Minutes):',
 
   /* 发送标签页配置 */

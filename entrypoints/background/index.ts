@@ -12,6 +12,7 @@ import {
   themeUtils,
   settingsUtils,
   stateUtils,
+  snapshotUtils,
 } from '~/entrypoints/common/storage';
 import { autoSyncAlarm, autoSaveOpenedTabsAlarm } from '~/entrypoints/common/alarms';
 import {
@@ -127,18 +128,33 @@ async function initTabsUpdateListener() {
   browser.tabs.onUpdated.addListener(adminPageLimitControl);
 
   // 页面更新时自动创建快照
-  const autoCreateSnapshot = debounce(async () => {
+  const saveSnapshotDebounced = debounce(async (windowId?: number) => {
     const globalState = await stateUtils.getState('global');
     if (globalState.snapshotStatus === 'on') {
-      tabUtils.saveOpenedTabsAsSnapshot();
+      tabUtils.saveOpenedTabsAsSnapshot('autoSave', { windowId });
     }
   }, 2000);
-  browser.tabs.onUpdated.removeListener(autoCreateSnapshot);
-  browser.tabs.onUpdated.addListener(autoCreateSnapshot);
-  browser.tabs.onMoved.removeListener(autoCreateSnapshot);
-  browser.tabs.onMoved.addListener(autoCreateSnapshot);
-  browser.tabs.onRemoved.removeListener(autoCreateSnapshot);
-  browser.tabs.onRemoved.addListener(autoCreateSnapshot);
+  const autoCreateSnapshot = async (windowId?: number) => {
+    const globalState = await stateUtils.getState('global');
+    if (globalState.snapshotStatus === 'on') {
+      saveSnapshotDebounced(windowId);
+    }
+  };
+  browser.tabs.onUpdated.addListener((_tabId, _changeInfo, tab) => {
+    autoCreateSnapshot(tab.windowId);
+  });
+  browser.tabs.onMoved.addListener((_tabId, moveInfo) => {
+    autoCreateSnapshot(moveInfo.windowId);
+  });
+  browser.tabs.onRemoved.addListener((_tabId, removeInfo) => {
+    if (!removeInfo.isWindowClosing) autoCreateSnapshot(removeInfo.windowId);
+  });
+  browser.tabGroups?.onUpdated?.addListener(group => {
+    autoCreateSnapshot(group.windowId);
+  });
+  browser.tabGroups?.onMoved?.addListener(group => {
+    autoCreateSnapshot(group.windowId);
+  });
 }
 
 // 新标签页重定向监听（不使用chrome_url_overrides，根据settings配置项进行控制）
@@ -260,9 +276,10 @@ export default defineBackground(() => {
     const settings = await settingsUtils.getSettings();
     const restoreSnapshotAfterBrowserLaunch =
       settings[RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH];
+    const autoSnapshot = await snapshotUtils.promoteAutoBuffer();
 
-    if (restoreSnapshotAfterBrowserLaunch) {
-      await tabUtils.restoreOpenedTabsSnapshot();
+    if (restoreSnapshotAfterBrowserLaunch && autoSnapshot) {
+      await tabUtils.restoreOpenedTabsSnapshot('autoSave', autoSnapshot);
     }
     await stateUtils.setStateByModule('global', { snapshotStatus: 'on' });
 
@@ -283,7 +300,6 @@ export default defineBackground(() => {
     if (!windows.length) {
       stateUtils.setStateByModule('global', { snapshotStatus: 'off' });
     }
-    await tabUtils.saveOpenedTabsAsSnapshot();
   });
 
   // 监听浏览器关闭事件
