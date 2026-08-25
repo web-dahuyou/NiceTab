@@ -1,30 +1,12 @@
 import type { ReactNode } from 'react';
-import { PiSplitHorizontal } from 'react-icons/pi';
-import styled from 'styled-components';
-import type { StyledThemeProps } from '~/entrypoints/types';
 import {
   StyledBaseSidebarWrapper,
   defaultSidebarWidth,
+  StyledHandle,
 } from '~/entrypoints/options/Layout.styled';
 import { classNames } from '~/entrypoints/common/utils';
 import ToggleSidebarBtn from './ToggleSidebarBtn';
 import useDragResize from '~/entrypoints/options/common/hooks/useDragResize';
-
-const StyledHandle = styled.div<{ theme: StyledThemeProps; $visible?: boolean }>`
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translate(50%, -50%);
-  font-size: 20px;
-  cursor: col-resize;
-  z-index: 10;
-  visibility: ${props => (props.$visible ? 'visible' : 'hidden')};
-
-  &:hover {
-    transform: translate(50%, -50%) scale(1.2);
-    color: ${props => props.theme.colorPrimary || '#fff'};
-  }
-`;
 
 interface SidebarLayoutProps {
   /** 是否折叠 */
@@ -58,11 +40,12 @@ export default function SidebarLayout({
   onCollapseChange,
   onWidthChange,
 }: SidebarLayoutProps) {
-  const { width, onMouseDown, dragHandleRef } = useDragResize({
+  const { width, dragging, onMouseDown, dragHandleRef } = useDragResize({
     initialWidth: initialWidth || defaultSidebarWidth,
     currWidth: sidebarWidth || defaultSidebarWidth,
     minWidth: 240,
     position: 'left',
+    canDrag: !collapsed,
     onWidthChange,
   });
 
@@ -72,9 +55,13 @@ export default function SidebarLayout({
       style={{ '--sidebar-width': `${width}px` } as React.CSSProperties}
     >
       <div className={classNames('sidebar-inner-box', collapsed && 'collapsed')}>
-        <StyledHandle ref={dragHandleRef} $visible={!collapsed} onMouseDown={onMouseDown}>
-          <PiSplitHorizontal />
-        </StyledHandle>
+        <StyledHandle
+          ref={dragHandleRef}
+          $position="right"
+          $canDrag={!collapsed}
+          $dragging={dragging}
+          onMouseDown={onMouseDown}
+        />
         <div className="sidebar-action-box">
           {showCollapseBtn && (
             <ToggleSidebarBtn collapsed={collapsed} onCollapseChange={onCollapseChange} />

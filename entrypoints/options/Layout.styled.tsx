@@ -1,8 +1,54 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import type { StyledThemeProps } from '~/entrypoints/types';
 
 export const defaultSidebarWidth = 280;
 export const defaultRightPanelWidth = 400;
+
+const handleHoverStyles = (position: 'left' | 'right', theme: StyledThemeProps) => css`
+  width: 3px;
+  ${position}: -1px;
+  background-color: ${theme.colorPrimary || '#1677ff'};
+`;
+
+export const StyledHandle = styled.div<{
+  theme: StyledThemeProps;
+  $position: 'left' | 'right';
+  $canDrag?: boolean;
+  $dragging?: boolean;
+}>`
+  position: absolute;
+  ${props => props.$position}: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: ${props => props.theme.colorBorder || 'rgba(5, 5, 5, 0.06)'};
+  z-index: 10;
+  transition:
+    width 0.2s,
+    background-color 0.2s,
+    ${props => props.$position} 0.2s;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -2px;
+    right: -2px;
+  }
+
+  ${props =>
+    props.$canDrag &&
+    css`
+      cursor: col-resize;
+
+      &:hover {
+        ${handleHoverStyles(props.$position, props.theme)}
+      }
+
+      ${props.$dragging && handleHoverStyles(props.$position, props.theme)}
+    `}
+`;
 
 export const StyledBaseSidebarWrapper = styled.div<{
   theme: StyledThemeProps;
@@ -16,7 +62,6 @@ export const StyledBaseSidebarWrapper = styled.div<{
     top: 100px;
     transition: transform 0.2s ease-in-out;
     transform: translateX(0);
-    border-right: 1px solid ${props => props.theme.colorBorder || 'rgba(5, 5, 5, 0.06)'};
     background: var(--bg-color);
     z-index: 10;
 
@@ -95,7 +140,6 @@ export const StyledBaseRightPanelWrapper = styled.div<{
     right: 32px;
     transition: transform 0.2s ease-in-out;
     transform: translateX(0);
-    border-left: 1px solid ${props => props.theme.colorBorder || 'rgba(5, 5, 5, 0.06)'};
     background: var(--bg-color);
     z-index: 10;
 

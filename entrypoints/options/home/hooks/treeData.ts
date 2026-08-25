@@ -254,7 +254,6 @@ export function useTreeData() {
     [treeData],
   );
 
-
   // 删除标签组
   const handleTabGroupRemove = useCallback(
     async (tabGroup: TreeDataNodeTabGroup) => {

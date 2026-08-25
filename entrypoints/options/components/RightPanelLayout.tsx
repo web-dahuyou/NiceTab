@@ -1,30 +1,12 @@
 import type { ReactNode } from 'react';
-import { PiSplitHorizontal } from 'react-icons/pi';
-import styled from 'styled-components';
-import type { StyledThemeProps } from '~/entrypoints/types';
 import {
   StyledBaseRightPanelWrapper,
   defaultRightPanelWidth,
+  StyledHandle,
 } from '~/entrypoints/options/Layout.styled';
 import { classNames } from '~/entrypoints/common/utils';
 import ToggleSidebarBtn from './ToggleSidebarBtn';
 import useDragResize from '~/entrypoints/options/common/hooks/useDragResize';
-
-const StyledHandle = styled.div<{ theme: StyledThemeProps; $visible?: boolean }>`
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 20px;
-  cursor: col-resize;
-  z-index: 10;
-  visibility: ${props => (props.$visible ? 'visible' : 'hidden')};
-
-  &:hover {
-    transform: translate(-50%, -50%) scale(1.2);
-    color: ${props => props.theme.colorPrimary || '#fff'};
-  }
-`;
 
 export interface RightPanelLayoutProps {
   /** 是否折叠 */
@@ -58,11 +40,12 @@ export default function RightPanelLayout({
   onCollapseChange,
   onWidthChange,
 }: RightPanelLayoutProps) {
-  const { width, onMouseDown, dragHandleRef } = useDragResize({
+  const { width, dragging, onMouseDown, dragHandleRef } = useDragResize({
     initialWidth: initialWidth || defaultRightPanelWidth,
     currWidth: panelWidth || defaultRightPanelWidth,
     minWidth: defaultRightPanelWidth - 100,
     position: 'right',
+    canDrag: !collapsed,
     onWidthChange,
   });
 
@@ -72,9 +55,13 @@ export default function RightPanelLayout({
       style={{ '--panel-width': `${width}px` } as React.CSSProperties}
     >
       <div className={classNames('right-panel-inner-box', collapsed && 'collapsed')}>
-        <StyledHandle ref={dragHandleRef} $visible={!collapsed} onMouseDown={onMouseDown}>
-          <PiSplitHorizontal />
-        </StyledHandle>
+        <StyledHandle
+          ref={dragHandleRef}
+          $position="left"
+          $canDrag={!collapsed}
+          $dragging={dragging}
+          onMouseDown={onMouseDown}
+        />
         <div className="right-panel-action-box">
           {showCollapseBtn && (
             <ToggleSidebarBtn
