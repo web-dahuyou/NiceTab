@@ -43,7 +43,7 @@ export interface GlobalContextProps {
 }
 
 // 语言
-export type LanguageTypes = 'zh-CN' | 'zh-TW' | 'en-US';
+export type LanguageTypes = 'zh-CN' | 'zh-TW' | 'en-US' | 'ru-RU';
 // react-intl formatMessage 参数
 export type IntlForamtMessageParams = MessageDescriptor & {
   id?: LocaleKeys;

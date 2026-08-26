@@ -3,7 +3,7 @@
 ![NiceTab](https://github.com/user-attachments/assets/6099f21e-fc0a-4bb5-8280-e497be3fb0ae)
 
 <p>
-  English | <a href="./README-zh.md">中文</a>
+  English | <a href="./README-zh.md">中文</a> | <a href="./README-ru.md">Русский</a>
 </p>
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/web-dahuyou/NiceTab)
@@ -52,7 +52,7 @@ Comprehensive user guide | <a href="./GUIDE.md">NiceTab User Guide</a>
 - **Remote sync**.
 - Supports manual switch for **Light/Dark** themes.
 - Supports **Theme color switch**, currently with several preset theme colors(More can be added later as needed).
-- **Multilingual support**, currently Chinese and English (contributions for more natural English or additional languages are welcome).
+- **Multilingual support**, currently Chinese, English, and Russian (contributions for more natural wording or additional languages are welcome).
 - Supports **Recycle Bin** feature: deleted tabs, tab groups, and categories go to a recycle bin where you can restore or permanently delete them.
 - Supports manually hibernate inactive tabs from memory. Hibernated tabs are still visible on the tab strip and will automatically reload when activated.
 
@@ -150,7 +150,7 @@ Light and dark themes are available, which can be toggled in the management dash
 
 ### Language Switching
 
-Switch between Chinese and English in the management dashboard.
+Switch between Chinese, English, and Russian in the management dashboard.
 
 ![NiceTab-language-switch](https://github.com/user-attachments/assets/ce9a7a2d-8b71-400a-98dd-e76cb565c021)
 

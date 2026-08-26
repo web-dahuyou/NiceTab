@@ -1,3 +1,7 @@
+<p>
+  English | <a href="./ARCHITECTURE-ru.md">Русский</a>
+</p>
+
 ## Architecture
 
 ### Extension Structure
@@ -38,7 +42,7 @@ The hierarchy: TagItem (Category) → GroupItem (Tab Group) → TabItem (Tab)
 ### Internationalization
 
 Uses `react-intl` for i18n:
-- Supports Chinese Simplified (zh-CN), Chinese Traditional(zh-TW) and English (en-US)
+- Supports Chinese Simplified (zh-CN), Chinese Traditional (zh-TW), English (en-US), and Russian (ru-RU)
 - Locale modules in `entrypoints/common/locale/modules/`
 - Ant Design locale integration via `antdMap`
 
