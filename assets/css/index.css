@@ -17,13 +17,13 @@ html, body {
   background: var(--bg-color, #fff);
   color: var(--text-color, rgba(0, 0, 0, 0.88));
 }
-/* @media (prefers-color-scheme: light) {
+@media (prefers-color-scheme: light) {
   :root {
-    --bg-color: #ffffff;
+    --bg-color: #fff;
   }
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-color: #434343;
+    --bg-color: #2f2f2f;
   }
-} */
+}

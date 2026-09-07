@@ -7,6 +7,7 @@ interface UseDragResizeOptions {
   maxWidth?: number;
   /** 面板位置，决定拖拽方向 */
   position?: 'left' | 'right';
+  canDrag?: boolean;
   onWidthChange?: (width: number) => void;
 }
 
@@ -16,6 +17,7 @@ export default function useDragResize({
   minWidth = 240,
   maxWidth = 600,
   position = 'left',
+  canDrag = true,
   onWidthChange,
 }: UseDragResizeOptions) {
   const [width, setWidth] = useState(currWidth);
@@ -31,6 +33,8 @@ export default function useDragResize({
   const onMouseDown = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
+      if (!canDrag) return;
+
       dragStateRef.current = { startX: e.clientX, startWidth: width };
       setDragging(true);
 
@@ -61,7 +65,7 @@ export default function useDragResize({
       document.addEventListener('mousemove', onMouseMove);
       document.addEventListener('mouseup', onMouseUp);
     },
-    [width, position, minWidth, maxWidth],
+    [width, position, minWidth, maxWidth, canDrag],
   );
 
   useEffect(() => {

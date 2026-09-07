@@ -1,6 +1,5 @@
 // import { storage } from 'wxt/storage';
 import type {
-  LanguageTypes,
   SettingsProps,
   PageWidthTypes,
   ActionBtnStyle,
@@ -13,6 +12,7 @@ import {
   ENUM_SETTINGS_PROPS,
   POPUP_MODULE_NAMES,
   defaultLanguage,
+  resolveLanguage,
   defaultThemeType,
   DEFAULT_EXCLUDE_DOMAINS,
   defaultContextmenuConfigList,
@@ -157,12 +157,13 @@ export default class SettingsUtils {
   async getSettings() {
     const settings = await storage.getItem<SettingsProps>(this.storageKey);
     const _savedBefore = !!settings;
+    const language = resolveLanguage(settings?.language || navigator?.language);
     this.settings = {
       ...this.initialSettings,
-      language: (navigator?.language as LanguageTypes) || defaultLanguage,
       ...settings,
+      language,
     };
-    if (!_savedBefore) {
+    if (!_savedBefore || settings?.language !== language) {
       this.setSettings(this.settings);
     }
     return this.settings;
