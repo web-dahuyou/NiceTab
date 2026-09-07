@@ -6,7 +6,17 @@ For the most detailed and up-to-date release notes, see [GitHub Releases](https:
 
 ---
 
-## v3.0.1
+## v3.0.3
+
+**Release Date:** September 7, 2026
+
+- Added Russian language support
+- Adjusted drag interaction of the sidebar in Admin Page
+- Adjusted z-index of the floating button group in the bottom-right corner of the home page
+
+---
+
+## v3.0.2
 
 **Release Date:** August 9, 2026
 
