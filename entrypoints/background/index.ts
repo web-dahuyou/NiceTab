@@ -127,12 +127,18 @@ async function initTabsUpdateListener() {
   browser.tabs.onUpdated.addListener(adminPageLimitControl);
 
   // 页面更新时自动创建快照
-  const autoCreateSnapshot = debounce(async (windowId?: number) => {
+  const saveSnapshotDebounced = debounce(async (windowId?: number) => {
     const globalState = await stateUtils.getState('global');
     if (globalState.snapshotStatus === 'on') {
       tabUtils.saveOpenedTabsAsSnapshot('autoSave', { windowId });
     }
   }, 2000);
+  const autoCreateSnapshot = async (windowId?: number) => {
+    const globalState = await stateUtils.getState('global');
+    if (globalState.snapshotStatus === 'on') {
+      saveSnapshotDebounced(windowId);
+    }
+  };
   browser.tabs.onUpdated.addListener((_tabId, _changeInfo, tab) => {
     autoCreateSnapshot(tab.windowId);
   });

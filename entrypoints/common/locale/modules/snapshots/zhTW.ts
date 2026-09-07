@@ -1,0 +1,37 @@
+import type { SnapshotLocaleKey } from './zhCN';
+
+const zhTW: Record<SnapshotLocaleKey, string> = {
+  'snapshots.title': '快照',
+  'snapshots.manual': '手動快照',
+  'snapshots.auto': '最新自動快照',
+  'snapshots.create': '建立目前視窗快照',
+  'snapshots.empty': '暫無快照',
+  'snapshots.autoEmpty': '尚未產生自動快照',
+  'snapshots.stats': '{tabs} 個分頁 · {groups} 個群組 · {pinned} 個釘選分頁',
+  'snapshots.restoreNewWindow': '在新視窗還原',
+  'snapshots.restoreCurrentWindow': '取代目前視窗',
+  'snapshots.restoreCurrentConfirm': '目前視窗中的原有分頁將被關閉，是否繼續？',
+  'snapshots.restoreResult': '已還原 {created} 個分頁，{failed} 個失敗',
+  'snapshots.limitTitle': '手動快照已達上限',
+  'snapshots.limitContent': '最多儲存 50 份手動快照。是否刪除最舊快照並繼續？',
+  'snapshots.deleteConfirm': '確定刪除這個快照嗎？',
+  'snapshots.deleteGroupConfirm': '確定刪除這個群組及其中全部分頁嗎？',
+  'snapshots.snapshotName': '快照名稱',
+  'snapshots.addTab': '新增分頁',
+  'snapshots.addGroup': '新增群組',
+  'snapshots.editTab': '編輯分頁',
+  'snapshots.editGroup': '編輯群組',
+  'snapshots.groupName': '群組名稱',
+  'snapshots.groupColor': '群組顏色',
+  'snapshots.groupCollapsed': '還原時收合',
+  'snapshots.pinned': '釘選分頁',
+  'snapshots.active': '還原後啟用',
+  'snapshots.ungrouped': '未分組分頁',
+  'snapshots.dropHere': '拖動分頁到這裡',
+  'snapshots.unsaved': '有未儲存的修改',
+  'snapshots.saved': '快照已儲存',
+  'snapshots.created': '快照已建立',
+  'snapshots.invalidUrl': '請輸入有效網址',
+};
+
+export default zhTW;
