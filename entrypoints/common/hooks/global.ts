@@ -127,6 +127,12 @@ export function useThemeTypeConfig() {
 
     setThemeTypeConfig({ ...config });
     syncThemeTypeToLocalStorage(type);
+
+    const el = document.documentElement;
+    if (el) {
+      el.style.setProperty('--bg-color', config.bgColor);
+      el.style.backgroundColor = config.bgColor;
+    }
   };
 
   const changeThemeType = async (themeType: ThemeTypes = defaultThemeType) => {
