@@ -1,7 +1,7 @@
 import { defineConfig, type UserManifest } from 'wxt';
 import svgr from 'vite-plugin-svgr';
 import yargsParser from 'yargs-parser';
-import { injectBgColorPlugin } from './scripts/inject-bg-color-plugin';
+// import { injectBgColorPlugin } from './scripts/inject-bg-color-plugin';
 
 const args = yargsParser(process.argv.slice(2));
 
@@ -12,7 +12,7 @@ export default defineConfig({
   // extensionApi: 'chrome',
   modules: ['@wxt-dev/module-react'],
   vite: () => ({
-    plugins: [svgr({ svgrOptions: { icon: true } }), injectBgColorPlugin()],
+    plugins: [svgr({ svgrOptions: { icon: true } }), /* injectBgColorPlugin() */],
   }),
   manifest: {
     name: 'Nice Tab Manager',
