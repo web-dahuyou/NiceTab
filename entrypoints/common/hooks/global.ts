@@ -8,6 +8,7 @@ import type {
   LanguageTypes,
   ThemeTypeConfig,
   IntlForamtMessageParams,
+  PageContextType,
   ThemeTypes,
 } from '~/entrypoints/types';
 import { settingsUtils, themeUtils } from '~/entrypoints/common/storage';
@@ -106,7 +107,7 @@ function syncThemeTypeToLocalStorage(type: ThemeTypes) {
 }
 
 // theme type (light | dark | auto)
-export function useThemeTypeConfig() {
+export function useThemeTypeConfig(pageContext?: PageContextType) {
   const [themeType, setThemeType] = useState<ThemeTypes>(defaultThemeType);
   const [themeTypeConfig, setThemeTypeConfig] = useState<ThemeTypeConfig>(
     THEME_TYPE_CONFIG.light,
@@ -127,6 +128,8 @@ export function useThemeTypeConfig() {
 
     setThemeTypeConfig({ ...config });
     syncThemeTypeToLocalStorage(type);
+
+    if (pageContext === 'contentScriptPage') return;
 
     const el = document.documentElement;
     if (el) {

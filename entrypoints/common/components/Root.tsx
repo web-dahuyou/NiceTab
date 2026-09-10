@@ -41,7 +41,7 @@ export default function Root({
     changeLocale: changeLocaleCustom,
     messages,
   } = useCustomLocale();
-  const { themeTypeConfig, themeType, changeThemeType } = useThemeTypeConfig();
+  const { themeTypeConfig, themeType, changeThemeType } = useThemeTypeConfig(pageContext);
   const [hasReady, setHasReady] = useState(false);
   const [primaryColor, setPrimaryColor] = useState(PRIMARY_COLOR);
   const [pageWidthType, setPageWidthType] = useState<PageWidthTypes>('responsive');
