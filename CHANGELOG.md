@@ -11,8 +11,8 @@ For the most detailed and up-to-date release notes, see [GitHub Releases](https:
 **Release Date:** September 7, 2026
 
 - Added Russian language support
-- Adjusted drag interaction of the sidebar in Admin Page
-- Adjusted z-index of the floating button group in the bottom-right corner of the home page
+- Adjusted the sidebar drag interaction on the Admin Page
+- Adjusted the z-index of the floating button group in the bottom-right corner of the home page
 
 ---
 
