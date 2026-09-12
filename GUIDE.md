@@ -111,28 +111,13 @@ You can go to the `Preferences Page` to configure it according to your preferenc
 
 ## Management Dashboard - Navigation Bar Operations
 
-- **Page Switching**: Quickly switch between **List**, **Snapshots**, **Preferences**, **Import/Export**, **Remote Sync**, and **Recycle Bin** pages.
+- **Page Switching**: Quickly switch between **List**, **Preferences**, **Snapshots**, **Import/Export**, **Remote Sync**, and **Recycle Bin** pages.
 - **Version Information Display**: Normally displays current version information. When updates are available, displays the latest upgradeable version; click to update immediately.
 - **Theme Color Settings**: Preset multiple theme colors, freely switchable (theme colors are currently limited to several preset colors; dark theme colors and theme color extensions may be optimized later).
 - **Light/Dark Theme**: Freely switch between light/dark themes.
-- **Language Switch**: Switch languages, currently supports Chinese, English, and Russian.
+- **Language Switch**: Switch languages, currently supports Chinese, English, Traditional Chinese, and Russian.
 - **Other Operation Items**: Other functions are folded into dropdown options; these functions are also practical.
 
-### Window Snapshots
-
-Select **Create Snapshot** from the navigation bar's Actions menu to save the complete workspace of the **current window** in one step. A snapshot contains tab order, pinned state, the tab to activate after restoration, and each native tab group's name, color, and collapsed state. Different Chrome windows are captured separately instead of being merged.
-
-The management dashboard now includes a **Snapshots** page:
-
-- Manual snapshots are named from their creation time and retain up to 50 entries. At the limit, you can delete the oldest snapshot and continue.
-- Tab and group changes are written continuously to a crash-recovery buffer. On the next browser startup, NiceTab promotes that buffer to one read-only automatic snapshot and restores it only when the startup restore preference is enabled.
-- The Snapshots page uses a **Manual / Automatic** sidebar. The main list renders only names, timestamps, and counts; tabs and groups are loaded on demand in a virtualized details drawer so large workspaces do not slow down the list.
-- Manual snapshots can be renamed or deleted. The **Allow editing tabs and groups in manual snapshots** preference is disabled by default. When enabled, the details drawer can switch to an editor for adding, editing, removing, reordering, and moving tabs, as well as updating pinned/active states and group properties.
-- The automatic snapshot is view-and-restore only. It cannot be renamed, edited, or deleted and is replaced from the latest recovery buffer on the next browser startup.
-- Restore into a **new window** to keep the current workspace, or choose **replace current window** to close its existing tabs and restore the snapshot in place.
-- If browser security restrictions prevent an individual URL from opening, NiceTab continues restoring the remaining tabs and reports the success and failure counts.
-
-Pinned tabs cannot belong to native Chrome tab groups. With advanced editing enabled, pinning a grouped snapshot tab automatically moves it to the top-level ungrouped area. Separate Chrome profiles and devices cannot directly read one another's window tabs, and snapshots are not included in Gist/WebDAV synchronization.
 
 ## Management Dashboard - List
 
@@ -317,6 +302,20 @@ The configuration items of this module are mainly related to auto sync.
 | Auto sync method | Sync method used during auto sync; options: `Auto Push (Force)`, `Auto Pull (Force)`, `Auto Push (Merge)`. | Auto Push (Merge) | ★★★★ |
 
 **Notes**: [Management Dashboard - Remote Sync](#management-dashboard---remote-sync)
+
+## Window Snapshots
+
+Clicking "Create Snapshot" in the "Operation" menu of the navigation bar allows you to save the complete working environment of the **current window** with one click. A snapshot contains the tab order, pinned state, activated tabs after restoration, as well as the name, color, and collapsed state of the native tab groups.
+
+The "Snapshot" page has been added to the management dashboard:
+
+- Snapshots are named based on their creation time and support renaming and deletion. Clicking the "View" button allows you to view the tab groups and tabs within a snapshot.
+- To restore a snapshot, you can choose "Restore in New Window" to preserve the current window state, or select "Replace Current Window", which will overwrite the current window with the snapshot content.
+- A maximum of 50 manual snapshots can be retained. When the limit is reached, you can confirm the deletion of the oldest snapshot and continue to create new ones.
+- Changes to tabs and tab groups are written into a crash-recovery buffer in real time. The next time the browser starts, NiceTab saves this buffer as an automatic snapshot and determines whether to automatically recover based on the setting of "Restore previously opened tabs after launching the browser?".
+- When certain websites cannot be opened due to browser security restrictions, NiceTab will continue to restore other tabs and display the number of successes and failures.
+
+Snapshots are not included in Gist/WebDAV synchronization.
 
 ## Management Dashboard - Import/Export
 

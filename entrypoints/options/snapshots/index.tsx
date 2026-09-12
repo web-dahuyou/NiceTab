@@ -4,42 +4,39 @@ import {
   Drawer,
   Dropdown,
   Empty,
-  Input,
   Menu,
   Modal,
   Space,
-  Tag,
   Typography,
+  Tooltip,
+  theme,
   type MenuProps,
 } from 'antd';
 import {
   CameraOutlined,
   DeleteOutlined,
   DownOutlined,
-  EditOutlined,
-  EyeOutlined,
   HistoryOutlined,
+  QuestionCircleOutlined,
 } from '@ant-design/icons';
-import {
-  initSettingsStorageListener,
-  initSnapshotStorageListener,
-  settingsUtils,
-  snapshotUtils,
-} from '~/entrypoints/common/storage';
+import { initSnapshotStorageListener, snapshotUtils } from '~/entrypoints/common/storage';
 import {
   restoreSnapshotRecord,
   saveOpenedTabsAsSnapshot,
 } from '~/entrypoints/common/tabs';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
-import type { SettingsProps, SnapshotRecord, SnapshotStore } from '~/entrypoints/types';
-import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
-import SidebarLayout from '~/entrypoints/options/components/SidebarLayout';
+import type { SnapshotRecord, SnapshotStore } from '~/entrypoints/types';
+import { classNames } from '~/entrypoints/common/utils';
+import { MAX_MANUAL_SNAPSHOTS } from '~/entrypoints/common/storage/snapshotUtils';
+import EditInput from '~/entrypoints/options/components/EditInput';
 import SnapshotDetails from './SnapshotDetails';
-import SnapshotEditor from './SnapshotEditor';
-import StyledSnapshotsPage, { StyledSnapshotEditorDrawer } from './Snapshots.styled';
+import {
+  StyledMainWrapper,
+  StyledSidebarWrapper,
+  StyledSnapshotContent,
+} from './Snapshots.styled';
 
 const emptyStore: SnapshotStore = { version: 2, manual: [] };
-const { ALLOW_EDIT_MANUAL_SNAPSHOTS } = ENUM_SETTINGS_PROPS;
 
 function getStats(record: SnapshotRecord) {
   let tabs = 0;
@@ -60,14 +57,14 @@ function getStats(record: SnapshotRecord) {
 export default function SnapshotsPage() {
   const { $fmt } = useIntlUtls();
   const { $message } = useContext(GlobalContext);
+  const { token } = theme.useToken();
+  const [modal, contextHolder] = Modal.useModal();
   const [store, setStore] = useState<SnapshotStore>(emptyStore);
   const [loading, setLoading] = useState(true);
   const [module, setModule] = useState<'manual' | 'auto'>('manual');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(240);
   const [detailRecord, setDetailRecord] = useState<SnapshotRecord>();
-  const [settings, setSettings] = useState<SettingsProps>({});
-  const [editing, setEditing] = useState(false);
 
   const loadStore = useCallback(async () => {
     setStore({ ...(await snapshotUtils.getStore()) });
@@ -80,50 +77,34 @@ export default function SnapshotsPage() {
   }, [loadStore]);
 
   useEffect(() => {
-    settingsUtils.getSettings().then(setSettings);
-    return initSettingsStorageListener(value => setSettings(value));
-  }, []);
-
-  useEffect(() => {
     if (window.matchMedia('(max-width: 840px)').matches) setSidebarCollapsed(true);
   }, []);
 
   useEffect(() => {
     if (!detailRecord) return;
+
     const record =
       detailRecord.source === 'auto'
         ? store.auto
         : store.manual.find(item => item.id === detailRecord.id);
+
     if (!record) {
       setDetailRecord(undefined);
-      setEditing(false);
     } else if (record.updatedAt !== detailRecord.updatedAt) setDetailRecord(record);
   }, [store, detailRecord]);
 
-  const createSnapshot = useCallback(
-    async (removeOldest = false) => {
-      const result = await saveOpenedTabsAsSnapshot('manualSave', { removeOldest });
-      if (result && 'limitReached' in result && result.limitReached) {
-        Modal.confirm({
-          title: $fmt('snapshots.limitTitle'),
-          content: $fmt('snapshots.limitContent'),
-          onOk: () => createSnapshot(true),
-        });
-        return;
-      }
-      if (result?.saved) $message.success($fmt('snapshots.created'));
-    },
-    [$fmt, $message],
-  );
+  const createSnapshot = useCallback(async () => {
+    const result = await saveOpenedTabsAsSnapshot('manualSave');
+    if (result?.saved) $message.success($fmt('snapshots.created'));
+  }, [$fmt, $message]);
 
   const restore = useCallback(
     async (record: SnapshotRecord, mode: 'newWindow' | 'replaceCurrent') => {
       const execute = async () => {
-        const result = await restoreSnapshotRecord(record, mode);
-        $message.info($fmt({ id: 'snapshots.restoreResult', values: result }));
+        restoreSnapshotRecord(record, mode);
       };
       if (mode === 'replaceCurrent') {
-        Modal.confirm({
+        modal.confirm({
           title: $fmt('common.confirmReminder'),
           content: $fmt('snapshots.restoreCurrentConfirm'),
           onOk: execute,
@@ -137,7 +118,7 @@ export default function SnapshotsPage() {
 
   const remove = useCallback(
     (record: SnapshotRecord) => {
-      Modal.confirm({
+      modal.confirm({
         title: $fmt('common.confirmReminder'),
         content: $fmt('snapshots.deleteConfirm'),
         onOk: () => snapshotUtils.remove(record.id, record.source),
@@ -147,87 +128,62 @@ export default function SnapshotsPage() {
   );
 
   const rename = useCallback(
-    (record: SnapshotRecord) => {
-      let name = record.name;
-      Modal.confirm({
-        title: $fmt('snapshots.rename'),
-        content: (
-          <Input
-            defaultValue={record.name}
-            maxLength={80}
-            autoFocus
-            onChange={event => {
-              name = event.target.value;
-            }}
-          />
-        ),
-        onOk: async () => {
-          const normalized = name.trim();
-          if (!normalized) return Promise.reject();
-          await snapshotUtils.update({ ...record, name: normalized });
-          $message.success($fmt('snapshots.saved'));
-        },
-      });
+    async (record: SnapshotRecord, newName: string) => {
+      const normalized = newName.trim();
+      if (!normalized || normalized === record.name) return;
+      await snapshotUtils.update({ ...record, name: normalized });
     },
-    [$fmt, $message],
+    [$fmt],
   );
 
   const renderRecord = (record: SnapshotRecord) => {
     const stats = getStats(record);
     const restoreItems: MenuProps['items'] = [
-      { key: 'newWindow', label: $fmt('snapshots.restoreNewWindow') },
+      {
+        key: 'newWindow',
+        label: $fmt('snapshots.restoreNewWindow'),
+        onClick: () => restore(record, 'newWindow'),
+      },
       {
         key: 'replaceCurrent',
         label: $fmt('snapshots.restoreCurrentWindow'),
         danger: true,
+        onClick: () => restore(record, 'replaceCurrent'),
       },
     ];
     return (
       <div className="snapshot-record" key={record.id}>
         <div className="snapshot-heading">
-          <div className="snapshot-name">{record.name}</div>
+          <div className="snapshot-name">
+            {record.source === 'manual' ? (
+              <EditInput
+                value={record.name}
+                maxLength={80}
+                onValueChange={value => rename(record, value || '')}
+              />
+            ) : (
+              record.name
+            )}
+          </div>
           <div className="snapshot-meta">
             {record.updatedAt} · {$fmt({ id: 'snapshots.stats', values: stats })}
           </div>
         </div>
         <Space className="snapshot-actions" wrap>
-          {record.source === 'auto' && <Tag color="blue">{$fmt('common.auto')}</Tag>}
-          <Button
-            icon={<EyeOutlined />}
-            onClick={() => {
-              setEditing(false);
-              setDetailRecord(record);
-            }}
-          >
-            {$fmt('common.view')}
-          </Button>
-          <Dropdown
-            menu={{
-              items: restoreItems,
-              onClick: ({ key }) =>
-                restore(record, key as 'newWindow' | 'replaceCurrent'),
-            }}
-          >
+          <Button onClick={() => setDetailRecord(record)}>{$fmt('common.view')}</Button>
+          <Dropdown menu={{ items: restoreItems }}>
             <Button icon={<HistoryOutlined />}>
               {$fmt('home.restoreSnapshot')} <DownOutlined />
             </Button>
           </Dropdown>
           {record.source === 'manual' && (
-            <>
-              <Button
-                type="text"
-                icon={<EditOutlined />}
-                title={$fmt('snapshots.rename')}
-                onClick={() => rename(record)}
-              />
-              <Button
-                danger
-                type="text"
-                icon={<DeleteOutlined />}
-                title={$fmt('common.delete')}
-                onClick={() => remove(record)}
-              />
-            </>
+            <Button
+              danger
+              type="text"
+              icon={<DeleteOutlined />}
+              title={$fmt('common.delete')}
+              onClick={() => remove(record)}
+            />
           )}
         </Space>
       </div>
@@ -237,30 +193,25 @@ export default function SnapshotsPage() {
   const records = module === 'manual' ? store.manual : store.auto ? [store.auto] : [];
   const sidebarItems: MenuProps['items'] = useMemo(
     () => [
-      {
-        key: 'manual',
-        label: (
-          <span className="sidebar-label">
-            <span>{$fmt('snapshots.manual')}</span>
-            <Typography.Text type="secondary">{store.manual.length}</Typography.Text>
-          </span>
-        ),
-      },
+      { key: 'manual', label: $fmt('snapshots.manual') },
       { key: 'auto', label: $fmt('snapshots.auto') },
     ],
-    [$fmt, store.manual.length],
+    [$fmt],
   );
 
   return (
-    <StyledSnapshotsPage
+    <StyledMainWrapper
+      className={classNames('snapshot-page', sidebarCollapsed && 'collapsed')}
       style={
         {
-          '--snapshot-sidebar-width': `${sidebarCollapsed ? 0 : sidebarWidth}px`,
+          '--sidebar-grid-col': `${sidebarCollapsed ? 0 : sidebarWidth}px`,
+          '--right-panel-grid-col': '0px',
         } as React.CSSProperties
       }
     >
-      <SidebarLayout
-        className="snapshot-sidebar"
+      {contextHolder}
+      <StyledSidebarWrapper
+        className="sidebar"
         collapsed={sidebarCollapsed}
         sidebarWidth={sidebarWidth}
         initialWidth={240}
@@ -275,18 +226,24 @@ export default function SnapshotsPage() {
           />
         }
       />
-      <main className="snapshot-main">
-        <div className="snapshot-toolbar">
-          <div>
-            <Typography.Title level={3} style={{ margin: 0 }}>
+      <StyledSnapshotContent className="main-content-wrapper">
+        <div className="snapshot-header">
+          <Space align="center">
+            <Typography.Title level={5} style={{ margin: 0 }}>
               {$fmt(module === 'manual' ? 'snapshots.manual' : 'snapshots.auto')}
             </Typography.Title>
+
             {module === 'manual' && (
-              <Typography.Text type="secondary">
-                {store.manual.length} / 50
-              </Typography.Text>
+              <Tooltip
+                color={token.colorBgElevated}
+                placement="bottom"
+                destroyTooltipOnHide
+                title={<Typography.Text>{$fmt('snapshots.tip.list')}</Typography.Text>}
+              >
+                <QuestionCircleOutlined />
+              </Tooltip>
             )}
-          </div>
+          </Space>
           {module === 'manual' && (
             <Button
               type="primary"
@@ -306,47 +263,20 @@ export default function SnapshotsPage() {
               description={$fmt(
                 module === 'manual' ? 'snapshots.empty' : 'snapshots.autoEmpty',
               )}
+              styles={{ root: { paddingTop: '80px' } }}
             />
           )}
         </div>
-      </main>
+      </StyledSnapshotContent>
       <Drawer
         title={detailRecord?.name}
         width={720}
         open={!!detailRecord}
         destroyOnClose
-        extra={
-          detailRecord?.source === 'manual' && settings[ALLOW_EDIT_MANUAL_SNAPSHOTS] ? (
-            <Button
-              icon={editing ? <EyeOutlined /> : <EditOutlined />}
-              onClick={() => setEditing(value => !value)}
-            >
-              {$fmt(editing ? 'snapshots.viewDetails' : 'snapshots.editStructure')}
-            </Button>
-          ) : undefined
-        }
-        onClose={() => {
-          setDetailRecord(undefined);
-          setEditing(false);
-        }}
+        onClose={() => setDetailRecord(undefined)}
       >
-        {detailRecord &&
-          (editing ? (
-            <StyledSnapshotEditorDrawer>
-              <SnapshotEditor
-                record={detailRecord}
-                onSave={async value => {
-                  await snapshotUtils.update(value);
-                  setDetailRecord(value);
-                  setEditing(false);
-                  $message.success($fmt('snapshots.saved'));
-                }}
-              />
-            </StyledSnapshotEditorDrawer>
-          ) : (
-            <SnapshotDetails record={detailRecord} />
-          ))}
+        {detailRecord && <SnapshotDetails record={detailRecord} />}
       </Drawer>
-    </StyledSnapshotsPage>
+    </StyledMainWrapper>
   );
 }

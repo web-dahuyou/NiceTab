@@ -39,7 +39,6 @@ import {
   SearchOutlined,
   ReadOutlined,
   HistoryOutlined,
-  CameraFilled,
   ToTopOutlined,
 } from '@ant-design/icons';
 import styled, { ThemeProvider } from 'styled-components';
@@ -196,18 +195,18 @@ const navsTemplate: NavProps[] = [
     element: <Home />,
   },
   {
-    key: 'snapshots',
-    label: 'snapshots.title',
-    path: '/snapshots',
-    icon: <CameraFilled />,
-    element: <SnapshotsPage />,
-  },
-  {
     key: 'settings',
     label: 'common.settings',
     path: '/settings',
     icon: <SettingOutlined />,
     element: <Settings />,
+  },
+  {
+    key: 'snapshots',
+    label: 'snapshots.title',
+    path: '/snapshots',
+    icon: <CameraOutlined />,
+    element: <SnapshotsPage />,
   },
   {
     key: 'import-export',
@@ -381,16 +380,7 @@ function AppLayout() {
       discardOtherTabs();
     } else if (key === 'createSnapshot') {
       const result = await saveOpenedTabsAsSnapshot('manualSave');
-      if (result && 'limitReached' in result && result.limitReached) {
-        Modal.confirm({
-          title: $fmt('snapshots.limitTitle'),
-          content: $fmt('snapshots.limitContent'),
-          onOk: async () => {
-            await saveOpenedTabsAsSnapshot('manualSave', { removeOldest: true });
-            $message.success($fmt('snapshots.created'));
-          },
-        });
-      } else if (result?.saved) {
+      if (result?.saved) {
         $message.success($fmt('snapshots.created'));
       }
     } else if (key === 'restoreSnapshot') {

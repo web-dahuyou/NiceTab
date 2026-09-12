@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useCallback, memo } from 'react';
 import { theme, Dropdown } from 'antd';
 import { CloseOutlined, MenuOutlined, MoreOutlined } from '@ant-design/icons';
+import { omit } from 'lodash-es';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { ENUM_COLORS, UNNAMED_TAG, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
@@ -9,6 +10,7 @@ import DropComponent from '~/entrypoints/common/components/DropComponent';
 import { dndKeys, defaultGroupActions, defaultTagActions } from '../constants';
 import type { RenderTreeNodeProps, TagActionName, GroupActionName } from '../types';
 import useGroupActions from '../hooks/groupActions';
+import { type ActionOptionItem } from '~/entrypoints/common/components/ActionBtnList';
 import useTagActions from '../hooks/tagActions';
 import { StyledTreeNodeItem } from '../Home.styled';
 import { type TreeDataHookProps } from '../hooks/treeData';
@@ -64,13 +66,19 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
   });
 
   const groupMenuItems = useMemo(() => {
-    const items = [...groupActions.outerList];
+    const items = groupActions.outerList?.map(item =>
+      omit(item, ['hoverColor']),
+    ) as ActionOptionItem[];
+    const innerList = groupActions.innerList?.map(item =>
+      omit(item, ['hoverColor']),
+    ) as ActionOptionItem[];
+
     if (groupActions.innerList.length > 0) {
       items.push({
         key: 'more',
         label: $fmt('common.more'),
         icon: <MoreOutlined />,
-        children: groupActions.innerList,
+        children: innerList,
       });
     }
     return items;

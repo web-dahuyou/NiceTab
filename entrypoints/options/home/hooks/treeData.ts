@@ -34,6 +34,7 @@ const {
   NAMED_GROUP_RESTORE_AS_GROUP,
   AUTO_EXPAND_HOME_TREE,
   TAB_INSERT_POSITION,
+  RESTORE_IN_NEW_WINDOW,
 } = ENUM_SETTINGS_PROPS;
 
 export type TreeDataHookProps = ReturnType<typeof useTreeData>;
@@ -227,19 +228,30 @@ export function useTreeData() {
       const deleteAfterRestore = settings?.[DELETE_AFTER_RESTORE];
 
       // let hasDeletedGroups = false;
+      let newWindow;
+      if (settings?.[RESTORE_IN_NEW_WINDOW]) {
+        newWindow = await browser.windows.create({ focused: true });
+      }
 
       for (const tabGroup of (tag.children || []) as TreeDataNodeTabGroup[]) {
         const { groupName, tabList = [], isLocked } = tabGroup?.originData || {};
+
+        if (!tabList.length) continue;
 
         const asGroup =
           (groupName === UNNAMED_GROUP && settings?.[UNNAMED_GROUP_RESTORE_AS_GROUP]) ||
           (groupName !== UNNAMED_GROUP && settings?.[NAMED_GROUP_RESTORE_AS_GROUP]);
 
-        openNewGroup(
+        const result = await openNewGroup(
           groupName,
           tabList.map(tab => tab.url),
-          { discard, asGroup },
+          { discard, asGroup, windowId: newWindow?.id },
         );
+
+        if (newWindow?.id && !result) {
+          browser.windows.remove(newWindow.id);
+          return;
+        }
 
         if (deleteAfterRestore && !isLocked) {
           await tabListUtils.removeTabGroup(tagId, tabGroup.key);
@@ -354,7 +366,7 @@ export function useTreeData() {
       openNewGroup(
         groupName,
         tabList.map(tab => tab.url),
-        { discard, asGroup },
+        { discard, asGroup, newWindow: settings?.[RESTORE_IN_NEW_WINDOW] },
       );
 
       if (settings?.[DELETE_AFTER_RESTORE] && !isLocked) {
@@ -384,7 +396,7 @@ export function useTreeData() {
         openNewGroup(
           groupName,
           tabs.map(tab => tab.url),
-          { discard, asGroup },
+          { discard, asGroup, newWindow: settings?.[RESTORE_IN_NEW_WINDOW] },
         );
       }
       const settings = await settingsUtils.getSettings();

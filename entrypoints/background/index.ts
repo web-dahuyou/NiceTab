@@ -62,7 +62,10 @@ async function setPageTitleOnUpdated(
   changeInfo: Tabs.OnUpdatedChangeInfoType,
   tab: Tabs.Tab,
 ) {
-  if (changeInfo.status === 'complete' || tab.status === 'complete') {
+  if (
+    changeInfo.status === 'complete' ||
+    (tab.status === 'complete' && tab.index !== -1)
+  ) {
     tabUtils.setPageTitle({ windowId: tab.windowId, tabId: tab.id });
   }
 }
@@ -128,33 +131,22 @@ async function initTabsUpdateListener() {
   browser.tabs.onUpdated.addListener(adminPageLimitControl);
 
   // 页面更新时自动创建快照
-  const saveSnapshotDebounced = debounce(async (windowId?: number) => {
+  const autoCreateSnapshot = debounce(async () => {
     const globalState = await stateUtils.getState('global');
     if (globalState.snapshotStatus === 'on') {
-      tabUtils.saveOpenedTabsAsSnapshot('autoSave', { windowId });
+      tabUtils.saveOpenedTabsAsSnapshot();
     }
-  }, 2000);
-  const autoCreateSnapshot = async (windowId?: number) => {
-    const globalState = await stateUtils.getState('global');
-    if (globalState.snapshotStatus === 'on') {
-      saveSnapshotDebounced(windowId);
-    }
-  };
-  browser.tabs.onUpdated.addListener((_tabId, _changeInfo, tab) => {
-    autoCreateSnapshot(tab.windowId);
-  });
-  browser.tabs.onMoved.addListener((_tabId, moveInfo) => {
-    autoCreateSnapshot(moveInfo.windowId);
-  });
-  browser.tabs.onRemoved.addListener((_tabId, removeInfo) => {
-    if (!removeInfo.isWindowClosing) autoCreateSnapshot(removeInfo.windowId);
-  });
-  browser.tabGroups?.onUpdated?.addListener(group => {
-    autoCreateSnapshot(group.windowId);
-  });
-  browser.tabGroups?.onMoved?.addListener(group => {
-    autoCreateSnapshot(group.windowId);
-  });
+  }, 1000);
+  browser.tabs.onUpdated.removeListener(autoCreateSnapshot);
+  browser.tabs.onUpdated.addListener(autoCreateSnapshot);
+  browser.tabs.onMoved.removeListener(autoCreateSnapshot);
+  browser.tabs.onMoved.addListener(autoCreateSnapshot);
+  browser.tabs.onRemoved.removeListener(autoCreateSnapshot);
+  browser.tabs.onRemoved.addListener(autoCreateSnapshot);
+  browser.tabGroups?.onUpdated?.removeListener(autoCreateSnapshot);
+  browser.tabGroups?.onUpdated?.addListener(autoCreateSnapshot);
+  browser.tabGroups?.onMoved?.removeListener(autoCreateSnapshot);
+  browser.tabGroups?.onMoved?.addListener(autoCreateSnapshot);
 }
 
 // 新标签页重定向监听（不使用chrome_url_overrides，根据settings配置项进行控制）
@@ -272,21 +264,25 @@ export default defineBackground(() => {
     autoSaveOpenedTabsAlarm.clearAlarm();
 
     await stateUtils.setStateByModule('global', { snapshotStatus: 'off' });
+    try {
+      const settings = await settingsUtils.getSettings();
+      const restoreSnapshotAfterBrowserLaunch =
+        settings[RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH];
+      const autoSnapshot = await snapshotUtils.promoteAutoBuffer();
 
-    const settings = await settingsUtils.getSettings();
-    const restoreSnapshotAfterBrowserLaunch =
-      settings[RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH];
-    const autoSnapshot = await snapshotUtils.promoteAutoBuffer();
-
-    if (restoreSnapshotAfterBrowserLaunch && autoSnapshot) {
-      await tabUtils.restoreOpenedTabsSnapshot('autoSave', autoSnapshot);
+      if (restoreSnapshotAfterBrowserLaunch && autoSnapshot) {
+        await tabUtils.restoreOpenedTabsSnapshot('autoSave', autoSnapshot);
+      }
+    } catch (error) {
+      console.warn('Failed to restore snapshot on startup', error);
+    } finally {
+      await stateUtils.setStateByModule('global', { snapshotStatus: 'on' });
     }
-    await stateUtils.setStateByModule('global', { snapshotStatus: 'on' });
 
     startup();
   });
   browser.windows.onCreated.addListener(async () => {
-    console.log('browser.windows.onCreated');
+    // console.log('browser.windows.onCreated');
     const settings = await settingsUtils.getSettings();
     if (settings[OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED]) {
       tabUtils.openAdminRoutePage({ path: '/home' });
@@ -294,7 +290,7 @@ export default defineBackground(() => {
   });
 
   browser.windows.onRemoved.addListener(async windowId => {
-    console.log('browser.windows.onRemoved--windowId', windowId);
+    // console.log('browser.windows.onRemoved--windowId', windowId);
     stateUtils.clearSelectedKeysOfInvalidWindows();
     const windows = await browser.windows.getAll();
     if (!windows.length) {

@@ -559,6 +559,7 @@ function TabGroup({
                   maxWidth={240}
                   fontSize={20}
                   iconSize={16}
+                  height={30}
                   onValueChange={value =>
                     onChange?.({ groupName: value || UNNAMED_GROUP })
                   }

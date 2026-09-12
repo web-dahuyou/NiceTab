@@ -7,36 +7,20 @@ const enUS: Record<SnapshotLocaleKey, string> = {
   'snapshots.create': 'Snapshot Current Window',
   'snapshots.empty': 'No snapshots',
   'snapshots.autoEmpty': 'No automatic snapshot yet',
-  'snapshots.stats': '{tabs} tabs · {groups} groups · {pinned} pinned',
+  'snapshots.tip.list': 'Snapshots list only retains the last 50 records.',
+  'snapshots.stats': `{tabs, plural,
+    one {1 tab}
+    other {# tabs}
+  } · {groups, plural,
+    one {1 group}
+    other {# groups}
+  } · {pinned} pinned`,
   'snapshots.restoreNewWindow': 'Restore in New Window',
   'snapshots.restoreCurrentWindow': 'Replace Current Window',
-  'snapshots.restoreCurrentConfirm':
-    'The existing tabs in this window will be closed. Continue?',
-  'snapshots.restoreResult': 'Restored {created} tabs; {failed} failed',
-  'snapshots.limitTitle': 'Manual Snapshot Limit Reached',
-  'snapshots.limitContent':
-    'You can keep up to 50 manual snapshots. Delete the oldest and continue?',
-  'snapshots.deleteConfirm': 'Delete this snapshot?',
-  'snapshots.deleteGroupConfirm': 'Delete this group and all of its tabs?',
-  'snapshots.snapshotName': 'Snapshot Name',
-  'snapshots.addTab': 'Add Tab',
-  'snapshots.addGroup': 'Add Group',
-  'snapshots.editTab': 'Edit Tab',
-  'snapshots.editGroup': 'Edit Group',
-  'snapshots.groupName': 'Group Name',
-  'snapshots.groupColor': 'Group Color',
-  'snapshots.groupCollapsed': 'Restore Collapsed',
-  'snapshots.pinned': 'Pinned Tab',
-  'snapshots.active': 'Activate After Restore',
-  'snapshots.ungrouped': 'Ungrouped Tabs',
-  'snapshots.dropHere': 'Drop tabs here',
-  'snapshots.unsaved': 'Unsaved changes',
-  'snapshots.saved': 'Snapshot saved',
+  'snapshots.restoreCurrentConfirm': 'The existing tabs in the current window will be overwritten by this snapshot. Continue?',
+  'snapshots.deleteConfirm': 'Are you sure you want to remove this snapshot?',
+  'snapshots.pinned': 'Pinned',
   'snapshots.created': 'Snapshot created',
-  'snapshots.invalidUrl': 'Enter a valid URL',
-  'snapshots.rename': 'Rename Snapshot',
-  'snapshots.editStructure': 'Edit Structure',
-  'snapshots.viewDetails': 'View Details',
 };
 
 export default enUS;

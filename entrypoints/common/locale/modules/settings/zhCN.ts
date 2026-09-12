@@ -22,7 +22,6 @@ const zhCN = {
   'settings.autoPinAdminTab.yes': '自动固定NiceTab管理后台（推荐）',
   'settings.autoPinAdminTab.no': '不自动固定NiceTab管理后台',
   'settings.restoreSnapshotAfterBrowserLaunch': '启动浏览器时是否自动恢复之前打开的标签页？',
-  'settings.allowEditManualSnapshots': '是否允许编辑手动快照中的标签页和分组？',
   'settings.autoCreateSnapshotInterval': '自动创建快照的时间间隔（分钟）：',
 
   /* 发送标签页配置 */

@@ -38,7 +38,7 @@ function convertLegacyItems(items: SnapshotItem[]): WindowSnapshotItem[] {
         type: 'group' as const,
         id: group.groupId || getRandomId(12),
         title: group.groupName || '',
-        color: 'grey' as const,
+        color: 'grey',
         collapsed: false,
         tabs: (group.tabList || []).map(tab =>
           legacyTabToSnapshot({ ...tab, type: 'tab' }),
@@ -147,17 +147,15 @@ export default class SnapshotUtils {
     return migrated;
   }
 
-  async addManual(record: SnapshotRecord, removeOldest = false) {
+  async addManual(record: SnapshotRecord, removeOldest = true) {
     const store = await this.getStore();
-    if (store.manual.length >= MAX_MANUAL_SNAPSHOTS && !removeOldest) {
-      return { saved: false as const, limitReached: true as const, store };
-    }
 
     const manual = removeOldest
       ? [record, ...store.manual.slice(0, MAX_MANUAL_SNAPSHOTS - 1)]
       : [record, ...store.manual];
+
     await this.setStore({ ...store, manual });
-    return { saved: true as const, limitReached: false as const, store: this.store };
+    return { saved: true as const, store: this.store };
   }
 
   async setAuto(record: SnapshotRecord) {

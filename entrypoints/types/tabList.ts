@@ -131,16 +131,6 @@ export type SnapshotTabItem = TabItem & { type: 'tab' };
 export type SnapshotItem = SnapshotGroupItem | SnapshotTabItem;
 
 export type SnapshotSource = 'manual' | 'auto';
-export type SnapshotGroupColor =
-  | 'grey'
-  | 'blue'
-  | 'red'
-  | 'yellow'
-  | 'green'
-  | 'pink'
-  | 'purple'
-  | 'cyan'
-  | 'orange';
 
 export interface WindowSnapshotTab {
   type: 'tab';
@@ -156,7 +146,7 @@ export interface WindowSnapshotGroup {
   type: 'group';
   id: string;
   title: string;
-  color: SnapshotGroupColor;
+  color: string;
   collapsed: boolean;
   tabs: WindowSnapshotTab[];
 }
@@ -176,11 +166,6 @@ export interface SnapshotStore {
   version: 2;
   manual: SnapshotRecord[];
   auto?: SnapshotRecord;
-}
-
-export interface SnapshotRestoreResult {
-  created: number;
-  failed: number;
 }
 
 export default { name: 'tabList-types' };

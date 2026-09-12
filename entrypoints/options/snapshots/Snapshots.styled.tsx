@@ -1,44 +1,36 @@
 import styled from 'styled-components';
 import { StyledBaseMainWrapper } from '~/entrypoints/options/Layout.styled';
+import SidebarLayout from '~/entrypoints/options/components/SidebarLayout';
 
-const StyledSnapshotsPage = styled(StyledBaseMainWrapper)`
-  --sidebar-grid-col: var(--snapshot-sidebar-width, 240px);
-  --right-panel-grid-col: 0px;
+export const StyledMainWrapper = StyledBaseMainWrapper;
 
-  .snapshot-sidebar {
-    .sidebar-inner-box {
-      top: 100px;
-    }
-    .sidebar-inner-content {
-      overflow: auto;
-      padding-right: 10px;
-    }
-    .nicetab-menu-vertical {
-      border-inline-end: none !important;
-    }
+export const StyledSidebarWrapper = styled(SidebarLayout)<{
+  collapsed?: boolean;
+  sidebarWidth?: number;
+}>`
+  .sidebar-inner-box {
+    top: 100px;
   }
-
-  .sidebar-label {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
+  .sidebar-inner-content {
+    overflow: auto;
+    padding-right: 10px;
   }
-
-  .snapshot-main {
-    box-sizing: border-box;
-    min-width: 0;
-    width: min(1120px, 100%);
-    margin: 0 auto;
-    padding: 0 60px;
+  .nicetab-menu-vertical {
+    border-inline-end: none !important;
   }
+`;
 
-  .snapshot-toolbar,
+export const StyledSnapshotContent = styled.div`
+  box-sizing: border-box;
+  min-width: 0;
+
+  .snapshot-header,
   .snapshot-record {
     display: flex;
     align-items: center;
   }
 
-  .snapshot-toolbar {
+  .snapshot-header {
     position: sticky;
     top: 60px;
     z-index: 8;
@@ -55,11 +47,15 @@ const StyledSnapshotsPage = styled(StyledBaseMainWrapper)`
 
   .snapshot-record {
     justify-content: space-between;
-    gap: 16px;
+    gap: 24px;
     min-width: 0;
     padding: 14px 16px;
-    border: 1px solid ${props => props.theme.colorBorderSecondary};
-    border-radius: 6px;
+    border: 1px solid
+      ${props =>
+        props.theme.type === 'light'
+          ? props.theme.colorBorderSecondary
+          : props.theme.colorBorder};
+    border-radius: 8px;
     background: ${props => props.theme.colorBgContainer};
   }
 
@@ -77,7 +73,7 @@ const StyledSnapshotsPage = styled(StyledBaseMainWrapper)`
 
   .snapshot-meta {
     margin-top: 3px;
-    color: ${props => props.theme.colorTextSecondary};
+    color: ${props => props.theme.colorTextTertiary || '#999'};
     font-size: 12px;
   }
 
@@ -86,25 +82,19 @@ const StyledSnapshotsPage = styled(StyledBaseMainWrapper)`
   }
 
   @media (max-width: 840px) {
-    --sidebar-grid-col: 0px;
-
-    .snapshot-main {
-      padding: 0 32px;
-    }
+    padding: 0 32px;
   }
 
   @media (max-width: 620px) {
-    .snapshot-main {
-      padding: 0 16px;
-    }
+    padding: 0 16px;
 
-    .snapshot-toolbar,
+    .snapshot-header,
     .snapshot-record {
       align-items: stretch;
       flex-direction: column;
     }
 
-    .snapshot-toolbar {
+    .snapshot-header {
       padding-top: 64px;
     }
 
@@ -114,176 +104,118 @@ const StyledSnapshotsPage = styled(StyledBaseMainWrapper)`
   }
 `;
 
-export const StyledSnapshotDrawerContent = styled.div`
-  .detail-group-row,
-  .detail-tab-row {
-    box-sizing: border-box;
-    min-width: 0;
-    width: 100%;
+export const StyledGroupItem = styled.div`
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
+  margin-bottom: 4px;
+  &.collapsed {
+    .detail-tab-list {
+      display: none;
+    }
   }
 
-  .detail-group-row {
-    min-height: 44px;
-    padding: 8px 10px;
-    border-bottom: 1px solid ${props => props.theme.colorBorderSecondary};
-    background: ${props => props.theme.colorFillQuaternary};
-  }
-
-  .detail-tab-row {
+  .detail-group-header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    min-height: 48px;
-    padding: 6px 10px;
-    border-bottom: 1px solid ${props => props.theme.colorBorderSecondary};
+    gap: 6px;
+    cursor: pointer;
+    padding: 8px 0;
+    font-size: 14px;
+    color: ${props => props.theme.colorTextSecondary || '#666'};
+    user-select: none;
+
+    &:hover {
+      color: ${props => props.theme.colorText || '#000'};
+    }
   }
 
-  .detail-tab-row.grouped {
-    padding-left: 28px;
+  .detail-collapse-icon {
+    display: flex;
+    align-items: center;
+    width: 16px;
+    flex-shrink: 0;
   }
+
+  .detail-group-color {
+    display: inline-block;
+    width: 24px;
+    height: 16px;
+    margin-right: 8px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .detail-group-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .detail-tab-list {
+    display: block;
+    .detail-tab-item {
+      display: flex;
+      align-items: center;
+      position: relative;
+      padding-left: 36px;
+      font-size: 14px;
+      gap: 8px;
+      user-select: none;
+      .detail-tab-color {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+    }
+  }
+`;
+
+export const StyledTabRow = styled.div`
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
+  min-height: 36px;
+  padding: 8px 0;
+  gap: 8px;
+  border-bottom: 1px solid
+    ${props =>
+      props.theme.type === 'light'
+        ? props.theme.colorBorderSecondary
+        : props.theme.colorBorder};
 
   .detail-tab-content {
     min-width: 0;
     flex: 1;
   }
 
-  .detail-tab-title,
+  .detail-tab-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+  }
+
   .detail-tab-url {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: ${props => props.theme.colorTextTertiary || '#999'};
+    font-size: 12px;
   }
 
-  .detail-tab-url {
-    color: ${props => props.theme.colorTextSecondary};
-    font-size: 12px;
+  .detail-tab-icon {
+    flex-shrink: 0;
+    font-size: 14px;
+    color: ${props => props.theme.colorTextSecondary || '#666'};
   }
 `;
 
-export const StyledSnapshotEditorDrawer = styled.div`
-  .snapshot-editor {
-    min-width: 0;
-  }
-
-  .editor-toolbar,
-  .group-header,
-  .tab-row {
-    display: flex;
-    align-items: center;
-  }
-
-  .editor-toolbar {
-    justify-content: space-between;
-    gap: 12px;
-    padding: 0 0 12px;
-  }
-
-  .snapshot-name-input {
-    width: min(340px, 100%);
-  }
-
-  .snapshot-items {
-    display: grid;
-    min-width: 0;
-    gap: 10px;
-  }
-
-  .snapshot-items > div,
-  .group-tabs > div {
-    min-width: 0;
-    max-width: 100%;
-  }
-
-  .snapshot-group {
-    overflow: hidden;
-    box-sizing: border-box;
-    min-width: 0;
-    width: 100%;
-    border: 1px solid ${props => props.theme.colorBorderSecondary};
-    border-radius: 6px;
-  }
-
-  .group-header {
-    justify-content: space-between;
-    gap: 12px;
-    min-height: 44px;
-    padding: 6px 10px;
-    background: ${props => props.theme.colorFillQuaternary};
-  }
-
-  .group-title {
-    display: flex;
-    align-items: center;
-    min-width: 0;
-    gap: 8px;
-    font-weight: 600;
-  }
-
-  .group-tabs {
-    display: grid;
-    gap: 1px;
-    padding: 4px 8px 8px;
-  }
-
-  .tab-row {
-    box-sizing: border-box;
-    min-width: 0;
-    width: 100%;
-    gap: 8px;
-    min-height: 42px;
-    padding: 5px 8px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-  }
-
-  .tab-row:hover,
-  .tab-row:focus-within {
-    border-color: ${props => props.theme.colorBorderSecondary};
-    background: ${props => props.theme.colorFillQuaternary};
-  }
-
-  .drag-handle {
-    color: ${props => props.theme.colorTextTertiary};
-    cursor: grab;
-  }
-
-  .tab-content {
-    min-width: 0;
-    flex: 1;
-  }
-
-  .tab-title,
-  .tab-url {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .tab-url {
-    color: ${props => props.theme.colorTextSecondary};
-    font-size: 12px;
-  }
-
-  .drop-target {
-    min-height: 30px;
-    padding: 6px 10px;
-    border: 1px dashed ${props => props.theme.colorBorder};
-    border-radius: 4px;
-    color: ${props => props.theme.colorTextTertiary};
-    font-size: 12px;
-    text-align: center;
-  }
-
-  @media (max-width: 620px) {
-    .editor-toolbar {
-      align-items: stretch;
-      flex-direction: column;
-    }
-
-    .snapshot-name-input {
-      width: 100%;
-    }
-  }
-`;
-
-export default StyledSnapshotsPage;
+export default StyledMainWrapper;

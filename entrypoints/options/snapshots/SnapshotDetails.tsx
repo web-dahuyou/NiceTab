@@ -1,91 +1,73 @@
-import { PushpinFilled, StarFilled } from '@ant-design/icons';
-import { Space, Tag, Typography } from 'antd';
-import VirtualList from 'rc-virtual-list';
-import Favicon from '~/entrypoints/common/components/Favicon';
+import { useCallback, useState } from 'react';
+import { RightOutlined, DownOutlined, PushpinFilled } from '@ant-design/icons';
+import { classNames } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import type {
   SnapshotRecord,
   WindowSnapshotGroup,
   WindowSnapshotTab,
 } from '~/entrypoints/types';
-import { StyledSnapshotDrawerContent } from './Snapshots.styled';
+import Favicon from '~/entrypoints/common/components/Favicon';
+import { StyledGroupItem, StyledTabRow } from './Snapshots.styled';
 
-type DetailRow =
-  | { type: 'group'; key: string; group: WindowSnapshotGroup }
-  | {
-      type: 'tab';
-      key: string;
-      tab: WindowSnapshotTab;
-      group?: WindowSnapshotGroup;
-    };
+function TabRow({ tab }: { tab: WindowSnapshotTab }) {
+  const { $fmt } = useIntlUtls();
+  return (
+    <StyledTabRow>
+      <Favicon pageUrl={tab.url} favIconUrl={tab.favIconUrl} />
+      <div className="detail-tab-content">
+        <div className="detail-tab-title">{tab.title || tab.url}</div>
+        <div className="detail-tab-url" title={tab.url}>
+          {tab.url}
+        </div>
+      </div>
+      {tab.pinned && (
+        <PushpinFilled className="detail-tab-icon" title={$fmt('snapshots.pinned')} />
+      )}
+    </StyledTabRow>
+  );
+}
 
-function flattenRecord(record: SnapshotRecord): DetailRow[] {
-  return record.items.reduce<DetailRow[]>((rows, item) => {
-    if (item.type === 'group') {
-      rows.push({ type: 'group', key: `group-${item.id}`, group: item });
-      rows.push(
-        ...item.tabs.map(tab => ({
-          type: 'tab' as const,
-          key: `group-${item.id}-tab-${tab.id}`,
-          tab,
-          group: item,
-        })),
-      );
-    } else {
-      rows.push({ type: 'tab', key: `tab-${item.id}`, tab: item });
-    }
-    return rows;
+function GroupItem({ group }: { group: WindowSnapshotGroup }) {
+  const { $fmt } = useIntlUtls();
+  const [collapsed, setCollapsed] = useState(group.collapsed);
+
+  const onToggle = useCallback(() => {
+    setCollapsed(value => !value);
   }, []);
+
+  return (
+    <StyledGroupItem className={classNames(collapsed && 'collapsed')}>
+      <div className="detail-group-header" onClick={onToggle}>
+        <div className="detail-collapse-icon">
+          {collapsed ? <RightOutlined /> : <DownOutlined />}
+        </div>
+        <span className="detail-group-color" style={{ backgroundColor: group.color }} />
+        <span className="detail-group-title">
+          {group.title || $fmt('common.unnamed')}
+        </span>
+      </div>
+      <div className="detail-tab-list">
+        {group.tabs.map(tab => (
+          <div className="detail-tab-item" key={tab.id}>
+            <span className="detail-tab-color" style={{ backgroundColor: group.color }} />
+            <TabRow tab={tab} />
+          </div>
+        ))}
+      </div>
+    </StyledGroupItem>
+  );
 }
 
 export default function SnapshotDetails({ record }: { record: SnapshotRecord }) {
-  const { $fmt } = useIntlUtls();
-  const rows = flattenRecord(record);
-
   return (
-    <StyledSnapshotDrawerContent className="snapshot-details">
-      <VirtualList
-        data={rows}
-        height={Math.min(720, window.innerHeight - 150)}
-        itemHeight={48}
-        itemKey="key"
-      >
-        {row => {
-          if (row.type === 'group') {
-            return (
-              <div className="detail-group-row">
-                <Space size={8}>
-                  <Tag color={row.group.color}>{row.group.color}</Tag>
-                  <Typography.Text strong>
-                    {row.group.title || $fmt('snapshots.ungrouped')}
-                  </Typography.Text>
-                  <Typography.Text type="secondary">
-                    {row.group.tabs.length}
-                  </Typography.Text>
-                  {row.group.collapsed && (
-                    <Typography.Text type="secondary">
-                      {$fmt('snapshots.groupCollapsed')}
-                    </Typography.Text>
-                  )}
-                </Space>
-              </div>
-            );
-          }
-          return (
-            <div className={row.group ? 'detail-tab-row grouped' : 'detail-tab-row'}>
-              <Favicon pageUrl={row.tab.url} favIconUrl={row.tab.favIconUrl} />
-              <div className="detail-tab-content">
-                <div className="detail-tab-title">{row.tab.title || row.tab.url}</div>
-                <div className="detail-tab-url" title={row.tab.url}>
-                  {row.tab.url}
-                </div>
-              </div>
-              {row.tab.pinned && <PushpinFilled title={$fmt('snapshots.pinned')} />}
-              {row.tab.active && <StarFilled title={$fmt('snapshots.active')} />}
-            </div>
-          );
-        }}
-      </VirtualList>
-    </StyledSnapshotDrawerContent>
+    <div className="snapshot-details">
+      {record.items.map(item => {
+        if (item.type === 'group') {
+          return <GroupItem key={item.id} group={item} />;
+        }
+        return <TabRow key={item.id} tab={item} />;
+      })}
+    </div>
   );
 }

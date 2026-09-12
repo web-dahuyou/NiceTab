@@ -1,4 +1,4 @@
-import { Tabs } from 'wxt/browser';
+import { Tabs, TabGroups } from 'wxt/browser';
 import { debounce } from 'lodash-es';
 import { settingsUtils, snapshotUtils, tabListUtils, stateUtils } from './storage';
 import type {
@@ -6,9 +6,7 @@ import type {
   ActionNames,
   SendTargetProps,
   SendTabMsgEventProps,
-  SnapshotGroupColor,
   SnapshotRecord,
-  SnapshotRestoreResult,
   WindowSnapshotGroup,
   WindowSnapshotItem,
   WindowSnapshotTab,
@@ -523,7 +521,12 @@ export async function openNewTab(
     active = false,
     openToNext = false,
     discard = false,
-  }: { active?: boolean; openToNext?: boolean; discard?: boolean } = {},
+    ...createProperties
+  }: {
+    active?: boolean;
+    openToNext?: boolean;
+    discard?: boolean;
+  } & Tabs.CreateCreatePropertiesType = {},
 ) {
   if (!url?.trim()) return;
 
@@ -533,36 +536,55 @@ export async function openNewTab(
   }
 
   if (!openToNext) {
-    const tab = await browser.tabs.create({ url, active });
+    const tab = await browser.tabs.create({ ...createProperties, url, active });
     if (discard && tab.id && !active) {
       waitToDiscard(tab);
     }
-    return;
+    return tab;
   }
 
   const currentTabs = await browser.tabs.query({ active: true, currentWindow: true });
   const newTabIndex = (currentTabs?.[0]?.index || 0) + 1;
   // 注意：如果打开标签页不想 active, 则 active 必须设置默认值为 false，
   // create 方法 active参数传 undefined 也会激活 active
-  const createdTab = await browser.tabs.create({ url, active, index: newTabIndex });
+  const createdTab = await browser.tabs.create({
+    ...createProperties,
+    url,
+    active,
+    index: newTabIndex,
+  });
   if (discard && createdTab.id && !active) {
     waitToDiscard(createdTab);
   }
+
+  return createdTab;
 }
 
 // 打开标签组
 export async function openNewGroup(
   groupName: string,
   urls: Array<string | undefined>,
-  { discard = false, asGroup = true }: { discard?: boolean; asGroup?: boolean },
+  {
+    discard = false,
+    asGroup = true,
+    newWindow = false,
+    windowId,
+    ...updateProperties
+  }: {
+    discard?: boolean;
+    asGroup?: boolean;
+    newWindow?: boolean;
+    windowId?: number;
+  } & TabGroups.UpdateUpdatePropertiesType = {},
 ) {
   const settings = await settingsUtils.getSettings();
 
   let _urls = urls.filter(url => !!url?.trim()) as string[];
-  if (settings[RESTORE_IN_NEW_WINDOW]) {
+  if (newWindow) {
     const windowInfo = await browser.windows.create({ focused: true, url: _urls });
 
     const tabs = await browser.tabs.query({ windowId: windowInfo.id, pinned: false });
+    if (!tabs.length) return false;
 
     tabs
       .filter(tab => !tab.active)
@@ -572,40 +594,45 @@ export async function openNewGroup(
         }
       });
 
-    if (!isGroupSupported()) return;
-    if (!asGroup) return;
+    if (!isGroupSupported()) return true;
+    if (!asGroup) return true;
 
     const bsGroupId = await browser.tabs.group!({
       createProperties: { windowId: windowInfo.id },
       tabIds: tabs.map(tab => tab.id!),
     });
-    browser.tabGroups?.update(bsGroupId, { title: groupName });
+    browser.tabGroups?.update(bsGroupId, { title: groupName, ...updateProperties });
   } else {
+    const _windowId = windowId || (await browser.windows.getCurrent()).id;
     _urls = settings[OPENING_TABS_ORDER] === 'reverse' ? [..._urls].reverse() : _urls;
     if (!isGroupSupported() || !asGroup) {
       for (let url of _urls) {
-        openNewTab(url, { discard });
+        openNewTab(url, { discard, windowId: _windowId });
       }
       return;
     }
 
-    Promise.all(
+    const tabs = await Promise.all(
       _urls.map(url => {
-        return browser.tabs.create({ url, active: false });
+        return browser.tabs.create({ windowId: _windowId, url, active: false });
       }),
-    ).then(async tabs => {
-      const filteredTabs = tabs.filter(tab => !!tab.id);
-      filteredTabs.forEach(tab => {
-        if (discard && tab.id) {
-          waitToDiscard(tab);
-        }
-      });
-      const bsGroupId = await browser.tabs.group!({
-        tabIds: filteredTabs.map(tab => tab.id!),
-      });
-      browser.tabGroups?.update(bsGroupId, { title: groupName });
+    );
+    if (!tabs.length) return false;
+
+    const filteredTabs = tabs.filter(tab => !!tab.id);
+    filteredTabs.forEach(tab => {
+      if (discard && tab.id) {
+        waitToDiscard(tab);
+      }
     });
+    const bsGroupId = await browser.tabs.group!({
+      tabIds: filteredTabs.map(tab => tab.id!),
+      createProperties: { windowId: _windowId },
+    });
+    browser.tabGroups?.update(bsGroupId, { title: groupName, ...updateProperties });
   }
+
+  return true;
 }
 
 // 冻结当前标签页以外的标签页
@@ -641,11 +668,14 @@ export async function createWindowSnapshotRecord(
     : await browser.windows.getCurrent();
   if (!targetWindow.id) return;
 
-  const tabs = await browser.tabs.query({ windowId: targetWindow.id });
+  let tabs = await browser.tabs.query({ windowId: targetWindow.id });
+  // 自动快照保存所有窗口的标签页
+  if (source === 'auto') {
+    tabs = await browser.tabs.query({});
+  }
+
   const adminUrl = browser.runtime.getURL('/options.html');
-  const filteredTabs = tabs
-    .filter(tab => tab.id && !tab.url?.startsWith(adminUrl))
-    .sort((a, b) => a.index - b.index);
+  const filteredTabs = tabs.filter(tab => tab.id && !tab.url?.startsWith(adminUrl));
   if (!filteredTabs.length) return;
 
   const items: WindowSnapshotItem[] = [];
@@ -659,13 +689,13 @@ export async function createWindowSnapshotRecord(
 
     savedGroupIds.add(tab.groupId);
     let title = '';
-    let color: SnapshotGroupColor = 'grey';
+    let color = 'grey';
     let collapsed = false;
     if (isGroupSupported() && browser.tabGroups?.get) {
       try {
         const group = await browser.tabGroups.get(tab.groupId);
         title = group.title || '';
-        color = (group.color || 'grey') as SnapshotGroupColor;
+        color = group.color || 'grey';
         collapsed = !!group.collapsed;
       } catch (error) {
         console.warn('Unable to read tab group while creating snapshot', error);
@@ -720,12 +750,11 @@ function getSnapshotTabs(items: WindowSnapshotItem[]) {
 export async function restoreSnapshotRecord(
   record: SnapshotRecord,
   mode: 'newWindow' | 'replaceCurrent' = 'newWindow',
-): Promise<SnapshotRestoreResult> {
-  const globalState = await stateUtils.getState('global');
-  await stateUtils.setStateByModule('global', { snapshotStatus: 'off' });
+) {
+  // const globalState = await stateUtils.getState('global');
+  // await stateUtils.setStateByModule('global', { snapshotStatus: 'off' });
 
   let created = 0;
-  let failed = 0;
   try {
     const originalWindow = await browser.windows.getCurrent({ populate: true });
     const targetWindow =
@@ -738,52 +767,50 @@ export async function restoreSnapshotRecord(
       .map(tab => tab.id)
       .filter((id): id is number => id !== undefined);
     const createdTabs = new Map<string, Tabs.Tab>();
-    for (const snapshotTab of getSnapshotTabs(record.items)) {
-      if (!snapshotTab.url.trim()) {
-        failed++;
-        continue;
-      }
-      try {
-        const tab = await browser.tabs.create({
+    const snapshotTabs = getSnapshotTabs(record.items);
+
+    const tabs = await Promise.all(
+      snapshotTabs.map(item => {
+        return openNewTab(item.url, {
           windowId: targetWindow.id,
-          url: snapshotTab.url,
           active: false,
-          pinned: snapshotTab.pinned,
+          discard: false,
+          pinned: item.pinned,
         });
-        if (tab.id) {
-          createdTabs.set(snapshotTab.id, tab);
-          created++;
-        } else {
-          failed++;
-        }
-      } catch (error) {
-        console.warn(`Unable to restore tab: ${snapshotTab.url}`, error);
-        failed++;
+      }),
+    );
+    tabs.forEach((tab, index) => {
+      if (tab?.id) {
+        createdTabs.set(snapshotTabs[index].id, tab);
+        created++;
       }
-    }
+    });
 
     if (!created) {
       if (mode === 'newWindow' && targetWindow.id) {
         await browser.windows.remove(targetWindow.id);
       }
-      return { created, failed };
+      return;
     }
 
-    if (isGroupSupported() && browser.tabs.group && browser.tabGroups?.update) {
+    if (isGroupSupported() && browser.tabGroups?.update) {
       for (const item of record.items) {
         if (item.type !== 'group') continue;
+
         const tabIds = item.tabs
           .map(tab => createdTabs.get(tab.id)?.id)
           .filter((id): id is number => id !== undefined);
+
         if (!tabIds.length) continue;
         try {
           const groupId = await browser.tabs.group({
             createProperties: { windowId: targetWindow.id },
             tabIds,
           });
+
           await browser.tabGroups.update(groupId, {
             title: item.title,
-            color: item.color,
+            color: item.color as TabGroups.Color,
             collapsed: item.collapsed,
           });
         } catch (error) {
@@ -792,31 +819,39 @@ export async function restoreSnapshotRecord(
       }
     }
 
-    const activeSnapshotTab =
-      getSnapshotTabs(record.items).find(tab => tab.active) ||
-      getSnapshotTabs(record.items)[0];
+    const { tab: adminTab } = await getAdminTabInfo(targetWindow.id);
+    const removableIds = originalTabIds.filter(id => id !== adminTab?.id);
+    if (removableIds.length) {
+      try {
+        await browser.tabs.remove(removableIds);
+      } catch (error) {
+        console.warn('Unable to remove tabs', error);
+      }
+    }
+
+    const activeSnapshotTab = snapshotTabs.find(tab => tab.active) || snapshotTabs[0];
+
     const activeTabId = activeSnapshotTab
       ? createdTabs.get(activeSnapshotTab.id)?.id
       : undefined;
+
     if (activeTabId) {
-      await browser.tabs.update(activeTabId, { active: true });
+      try {
+        await browser.tabs.update(activeTabId, { active: true });
+      } catch (error) {
+        console.warn('Unable to activate tab', error);
+      }
     }
 
-    const adminUrl = browser.runtime.getURL('/options.html');
-    const adminTab = (targetWindow.tabs || []).find(tab => tab.url?.startsWith(adminUrl));
-    const removableIds = originalTabIds.filter(id => id !== adminTab?.id);
-    if (removableIds.length) {
-      await browser.tabs.remove(removableIds);
-    }
-    if (adminTab?.id && mode === 'replaceCurrent') {
-      setTimeout(() => browser.tabs.remove(adminTab.id!).catch(() => undefined), 800);
-    }
-
-    return { created, failed };
+    tabs
+      .filter(tab => tab?.id && tab.id !== activeTabId && !tab.pinned)
+      .forEach(tab => waitToDiscard(tab!));
+  } catch (error) {
+    console.error('Error restoring snapshot', error);
   } finally {
-    await stateUtils.setStateByModule('global', {
-      snapshotStatus: globalState.snapshotStatus || 'on',
-    });
+    // await stateUtils.setStateByModule('global', {
+    //   snapshotStatus: globalState.snapshotStatus || 'on',
+    // });
   }
 }
 
@@ -877,7 +912,7 @@ export const setPageTitle = async ({
         });
       }
     } catch (error) {
-      console.error('Error setting page title:', error);
+      console.warn('Error setting page title:', error);
     }
   }
 

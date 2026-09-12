@@ -132,6 +132,7 @@ const zhCN = {
   'common.starred': '已星标',
   'common.tips': '提示',
   'common.setAsDefault': '设为默认选项',
+  'common.unnamed': '未命名',
 };
 
 export type LocaleKey = keyof typeof zhCN;

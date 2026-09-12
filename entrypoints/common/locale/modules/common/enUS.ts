@@ -143,6 +143,7 @@ const enUS: Record<LocaleKey, string> = {
   'common.starred': 'Starred',
   'common.tips': 'Tips',
   'common.setAsDefault': 'Set as Default',
+  'common.unnamed': 'Unnamed',
 };
 
 export default enUS;
