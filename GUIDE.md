@@ -313,7 +313,6 @@ The "Snapshot" page has been added to the management dashboard:
 - To restore a snapshot, you can choose "Restore in New Window" to preserve the current window state, or select "Replace Current Window", which will overwrite the current window with the snapshot content.
 - A maximum of 50 manual snapshots can be retained. When the limit is reached, you can confirm the deletion of the oldest snapshot and continue to create new ones.
 - Changes to tabs and tab groups are written into a crash-recovery buffer in real time. The next time the browser starts, NiceTab saves this buffer as an automatic snapshot and determines whether to automatically recover based on the setting of "Restore previously opened tabs after launching the browser?".
-- When certain websites cannot be opened due to browser security restrictions, NiceTab will continue to restore other tabs and display the number of successes and failures.
 
 Snapshots are not included in Gist/WebDAV synchronization.
 
