@@ -37,7 +37,7 @@ const zhTW: Record<LocaleKey, string> = {
   "sync.tip.resetStatus": "状态重置",
   "sync.tip.tokenChange": "修改access token會清空本地{type}的同步歷史記錄",
   // "sync.tip.contentTooLarge": "遠程文件内容太大，返回的内容被 gist API 截斷了，取消合併到本地",
-  "sync.tip.syncHistory": "同步歷史只保留最近的50條紀錄，您還可以手動清空歷史記錄",
+  "sync.tip.syncHistory": "同步歷史只保留最近的50條紀錄，您也可以手動清空歷史記錄",
   "sync.tip.supportTip": "遠程同步已支持分頁列表和偏好設定同步，同步操作時會同時同步分頁列表和偏好設定數據，不支持分開同步。",
   "sync.getYourToken": "前往獲取/設定 token",
   "sync.syncHistory": "同步歷史記錄",

@@ -12,6 +12,7 @@ import {
   themeUtils,
   settingsUtils,
   stateUtils,
+  snapshotUtils,
 } from '~/entrypoints/common/storage';
 import { autoSyncAlarm, autoSaveOpenedTabsAlarm } from '~/entrypoints/common/alarms';
 import {
@@ -61,7 +62,10 @@ async function setPageTitleOnUpdated(
   changeInfo: Tabs.OnUpdatedChangeInfoType,
   tab: Tabs.Tab,
 ) {
-  if (changeInfo.status === 'complete' || tab.status === 'complete') {
+  if (
+    changeInfo.status === 'complete' ||
+    (tab.status === 'complete' && tab.index !== -1)
+  ) {
     tabUtils.setPageTitle({ windowId: tab.windowId, tabId: tab.id });
   }
 }
@@ -132,13 +136,17 @@ async function initTabsUpdateListener() {
     if (globalState.snapshotStatus === 'on') {
       tabUtils.saveOpenedTabsAsSnapshot();
     }
-  }, 2000);
+  }, 1000);
   browser.tabs.onUpdated.removeListener(autoCreateSnapshot);
   browser.tabs.onUpdated.addListener(autoCreateSnapshot);
   browser.tabs.onMoved.removeListener(autoCreateSnapshot);
   browser.tabs.onMoved.addListener(autoCreateSnapshot);
   browser.tabs.onRemoved.removeListener(autoCreateSnapshot);
   browser.tabs.onRemoved.addListener(autoCreateSnapshot);
+  browser.tabGroups?.onUpdated?.removeListener(autoCreateSnapshot);
+  browser.tabGroups?.onUpdated?.addListener(autoCreateSnapshot);
+  browser.tabGroups?.onMoved?.removeListener(autoCreateSnapshot);
+  browser.tabGroups?.onMoved?.addListener(autoCreateSnapshot);
 }
 
 // 新标签页重定向监听（不使用chrome_url_overrides，根据settings配置项进行控制）
@@ -256,20 +264,25 @@ export default defineBackground(() => {
     autoSaveOpenedTabsAlarm.clearAlarm();
 
     await stateUtils.setStateByModule('global', { snapshotStatus: 'off' });
+    try {
+      const settings = await settingsUtils.getSettings();
+      const restoreSnapshotAfterBrowserLaunch =
+        settings[RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH];
+      const autoSnapshot = await snapshotUtils.promoteAutoBuffer();
 
-    const settings = await settingsUtils.getSettings();
-    const restoreSnapshotAfterBrowserLaunch =
-      settings[RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH];
-
-    if (restoreSnapshotAfterBrowserLaunch) {
-      await tabUtils.restoreOpenedTabsSnapshot();
+      if (restoreSnapshotAfterBrowserLaunch && autoSnapshot) {
+        await tabUtils.restoreOpenedTabsSnapshot('autoSave', autoSnapshot);
+      }
+    } catch (error) {
+      console.warn('Failed to restore snapshot on startup', error);
+    } finally {
+      await stateUtils.setStateByModule('global', { snapshotStatus: 'on' });
     }
-    await stateUtils.setStateByModule('global', { snapshotStatus: 'on' });
 
     startup();
   });
   browser.windows.onCreated.addListener(async () => {
-    console.log('browser.windows.onCreated');
+    // console.log('browser.windows.onCreated');
     const settings = await settingsUtils.getSettings();
     if (settings[OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED]) {
       tabUtils.openAdminRoutePage({ path: '/home' });
@@ -277,13 +290,12 @@ export default defineBackground(() => {
   });
 
   browser.windows.onRemoved.addListener(async windowId => {
-    console.log('browser.windows.onRemoved--windowId', windowId);
+    // console.log('browser.windows.onRemoved--windowId', windowId);
     stateUtils.clearSelectedKeysOfInvalidWindows();
     const windows = await browser.windows.getAll();
     if (!windows.length) {
       stateUtils.setStateByModule('global', { snapshotStatus: 'off' });
     }
-    await tabUtils.saveOpenedTabsAsSnapshot();
   });
 
   // 监听浏览器关闭事件

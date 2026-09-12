@@ -134,6 +134,7 @@ const zhTW: Record<LocaleKey, string> = {
   "common.starred": "已加星號",
   'common.tips': '小貼士',
   'common.setAsDefault': '設為默認選項',
+  'common.unnamed': '未命名',
 };
 
 export default zhTW;

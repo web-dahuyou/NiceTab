@@ -12,7 +12,9 @@ import {
 const StyledWrapper = styled.div<{
   $maxWidth?: string | number;
   $fontSize?: string | number;
+  $height?: string | number;
 }>`
+  height: ${props => `${props.$height || 24}px`};
   display: flex;
   align-items: center;
   max-width: ${props => (props.$maxWidth ? `${props.$maxWidth}px` : '100%')};
@@ -30,6 +32,7 @@ type CustomStyleProps = {
   maxWidth?: string | number;
   fontSize?: string | number;
   iconSize?: string | number;
+  height?: string | number;
 };
 
 export default function EditInput({
@@ -41,6 +44,7 @@ export default function EditInput({
   maxWidth,
   fontSize = 14,
   iconSize = 16,
+  height = 24,
   onValueChange,
   stopPropagation = true,
   onEditingStatusChange,
@@ -95,6 +99,7 @@ export default function EditInput({
       className="edit-input-wrapper"
       $maxWidth={maxWidth}
       $fontSize={fontSize}
+      $height={height}
     >
       {isEditing ? (
         <Input

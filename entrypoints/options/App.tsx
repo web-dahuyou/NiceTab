@@ -14,6 +14,7 @@ import {
   Tooltip,
   Typography,
   Button,
+  Modal,
   type MenuProps,
 } from 'antd';
 import {
@@ -68,7 +69,6 @@ import {
   openNewTab,
   discardOtherTabs,
   saveOpenedTabsAsSnapshot,
-  restoreOpenedTabsSnapshot,
   openUserGuide,
   openChangelog,
 } from '~/entrypoints/common/tabs';
@@ -87,6 +87,7 @@ import Settings from './settings/index.tsx';
 import ImportExport from './importExport/index.tsx';
 import SyncPage from './sync/index.tsx';
 import RecycleBin from './recycleBin/index.tsx';
+import SnapshotsPage from './snapshots/index.tsx';
 import SendTargetActionHolder, {
   type SendTargetActionHolderProps,
 } from '~/entrypoints/options/home/SendTargetActionHolder';
@@ -134,6 +135,7 @@ const StyledPageContainer = styled.div<{
   }
   .main-content {
     position: relative;
+    box-sizing: border-box;
     width: 1200px;
     padding: 100px 32px 40px;
     margin: 0 auto;
@@ -149,6 +151,22 @@ const StyledPageContainer = styled.div<{
   @media screen and (max-width: 1199px) {
     .main-content {
       max-width: 100%;
+    }
+  }
+  @media screen and (max-width: 720px) {
+    .navbar-menu {
+      min-width: 0;
+      margin-left: 0;
+    }
+    .menu-right {
+      padding: 0 10px;
+    }
+    .header-version,
+    .header-theme,
+    .header-theme-type,
+    .header-language,
+    .header-github {
+      display: none;
     }
   }
   @media screen and (min-width: 1200px) {
@@ -182,6 +200,13 @@ const navsTemplate: NavProps[] = [
     path: '/settings',
     icon: <SettingOutlined />,
     element: <Settings />,
+  },
+  {
+    key: 'snapshots',
+    label: 'snapshots.title',
+    path: '/snapshots',
+    icon: <CameraOutlined />,
+    element: <SnapshotsPage />,
   },
   {
     key: 'import-export',
@@ -354,10 +379,12 @@ function AppLayout() {
     } else if (key === 'hibernateTabs') {
       discardOtherTabs();
     } else if (key === 'createSnapshot') {
-      await saveOpenedTabsAsSnapshot('manualSave');
-      $message.success($fmt('common.saveSuccess'));
+      const result = await saveOpenedTabsAsSnapshot('manualSave');
+      if (result?.saved) {
+        $message.success($fmt('snapshots.created'));
+      }
     } else if (key === 'restoreSnapshot') {
-      await restoreOpenedTabsSnapshot('manualSave');
+      navigate('/snapshots');
     } else if (key === 'startSync') {
       actionHandler(ENUM_ACTION_NAME.START_SYNC);
     }
@@ -421,7 +448,7 @@ function AppLayout() {
           )}
 
           <Space className="menu-right select-none" align="center" size="middle">
-            <div>
+            <div className="header-version">
               {$fmt('common.version')}: {version}
             </div>
             {/* theme */}
@@ -439,12 +466,13 @@ function AppLayout() {
               arrow={false}
               fresh
             >
-              <StyledActionIconBtn $size={18}>
+              <StyledActionIconBtn className="header-theme" $size={18}>
                 <IconTheme></IconTheme>
               </StyledActionIconBtn>
             </Tooltip>
             {/* theme type */}
             <StyledActionIconBtn
+              className="header-theme-type"
               $size={18}
               title={$fmt('common.toggleThemeType')}
               onClick={handleThemeTypeChange}
@@ -462,7 +490,7 @@ function AppLayout() {
               }}
               placement="bottomRight"
             >
-              <StyledActionIconBtn $size={18}>
+              <StyledActionIconBtn className="header-language" $size={18}>
                 <TranslationOutlined />
               </StyledActionIconBtn>
             </Dropdown>
@@ -473,12 +501,13 @@ function AppLayout() {
                 onClick: handleExtActionClick,
               }}
             >
-              <StyledActionIconBtn $size={18}>
+              <StyledActionIconBtn className="header-actions" $size={18}>
                 <MenuOutlined />
               </StyledActionIconBtn>
             </Dropdown>
             {/* github */}
             <StyledActionIconBtn
+              className="header-github"
               $size={18}
               title={$fmt('common.goToGithub')}
               onClick={() => openNewTab(GITHUB_URL, { active: true, openToNext: true })}

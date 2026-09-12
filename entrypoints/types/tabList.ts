@@ -130,4 +130,42 @@ export type SnapshotGroupItem = GroupItem & { type: 'group'; bsGroupId: number }
 export type SnapshotTabItem = TabItem & { type: 'tab' };
 export type SnapshotItem = SnapshotGroupItem | SnapshotTabItem;
 
+export type SnapshotSource = 'manual' | 'auto';
+
+export interface WindowSnapshotTab {
+  type: 'tab';
+  id: string;
+  title: string;
+  url: string;
+  favIconUrl?: string;
+  pinned: boolean;
+  active: boolean;
+}
+
+export interface WindowSnapshotGroup {
+  type: 'group';
+  id: string;
+  title: string;
+  color: string;
+  collapsed: boolean;
+  tabs: WindowSnapshotTab[];
+}
+
+export type WindowSnapshotItem = WindowSnapshotTab | WindowSnapshotGroup;
+
+export interface SnapshotRecord {
+  id: string;
+  name: string;
+  source: SnapshotSource;
+  createdAt: string;
+  updatedAt: string;
+  items: WindowSnapshotItem[];
+}
+
+export interface SnapshotStore {
+  version: 2;
+  manual: SnapshotRecord[];
+  auto?: SnapshotRecord;
+}
+
 export default { name: 'tabList-types' };

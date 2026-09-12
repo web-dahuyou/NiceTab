@@ -114,6 +114,7 @@ export type ActionNames =
 // 页面模块名称
 export type PageModuleNames =
   | 'home'
+  | 'snapshots'
   | 'settings'
   | 'import-export'
   | 'sync'

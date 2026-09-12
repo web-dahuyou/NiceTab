@@ -147,6 +147,7 @@ const ruRU: Record<LocaleKey, string> = {
   'common.starred': 'В избранном',
   'common.tips': 'Подсказки',
   'common.setAsDefault': 'Сделать вариантом по умолчанию',
+  'common.unnamed': 'Безымянный',
 };
 
 export default ruRU;

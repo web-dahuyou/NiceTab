@@ -111,22 +111,13 @@ You can go to the `Preferences Page` to configure it according to your preferenc
 
 ## Management Dashboard - Navigation Bar Operations
 
-- **Page Switching**: Quickly switch between **List**, **Preferences**, **Import/Export**, **Remote Sync**, and **Recycle Bin** pages.
+- **Page Switching**: Quickly switch between **List**, **Preferences**, **Snapshots**, **Import/Export**, **Remote Sync**, and **Recycle Bin** pages.
 - **Version Information Display**: Normally displays current version information. When updates are available, displays the latest upgradeable version; click to update immediately.
 - **Theme Color Settings**: Preset multiple theme colors, freely switchable (theme colors are currently limited to several preset colors; dark theme colors and theme color extensions may be optimized later).
 - **Light/Dark Theme**: Freely switch between light/dark themes.
-- **Language Switch**: Switch languages, currently supports Chinese, English, and Russian.
+- **Language Switch**: Switch languages, currently supports Chinese, English, Traditional Chinese, and Russian.
 - **Other Operation Items**: Other functions are folded into dropdown options; these functions are also practical.
 
-### Create Snapshot and Restore Snapshot
-
-These two functions are located in the `Navigation Bar "Actions" dropdown options`. You can save currently opened tabs as a temporary snapshot, then use "Restore Snapshot" to restore the previously saved temporary snapshot to the browser.
-
-**Scenario**: Before manually closing/restarting the browser, you can first "Create Snapshot", then after restarting the browser, manually "Restore Snapshot".
-
-**Explanation**:
-- Normally, browsers save opened tabs only during browser upgrades or other official restarts, and automatically restore them after restarting. However, when manually closing or restarting the browser, there's no snapshot saving functionality.
-- NiceTab actually saves a snapshot in the background in real-time, and automatically restore them after restarting. The operation management interface hasn't been developed yet - it may be provided in future versions if needed.
 
 ## Management Dashboard - List
 
@@ -311,6 +302,19 @@ The configuration items of this module are mainly related to auto sync.
 | Auto sync method | Sync method used during auto sync; options: `Auto Push (Force)`, `Auto Pull (Force)`, `Auto Push (Merge)`. | Auto Push (Merge) | ★★★★ |
 
 **Notes**: [Management Dashboard - Remote Sync](#management-dashboard---remote-sync)
+
+## Window Snapshots
+
+Clicking "Create Snapshot" in the "Operation" menu of the navigation bar allows you to save the complete working environment of the **current window** with one click. A snapshot contains the tab order, pinned state, activated tabs after restoration, as well as the name, color, and collapsed state of the native tab groups.
+
+The "Snapshot" page has been added to the management dashboard:
+
+- Snapshots are named based on their creation time and support renaming and deletion. Clicking the "View" button allows you to view the tab groups and tabs within a snapshot.
+- To restore a snapshot, you can choose "Restore in New Window" to preserve the current window state, or select "Replace Current Window", which will overwrite the current window with the snapshot content.
+- A maximum of 50 manual snapshots can be retained. When the limit is reached, you can confirm the deletion of the oldest snapshot and continue to create new ones.
+- Changes to tabs and tab groups are written into a crash-recovery buffer in real time. The next time the browser starts, NiceTab saves this buffer as an automatic snapshot and determines whether to automatically recover based on the setting of "Restore previously opened tabs after launching the browser?".
+
+Snapshots are not included in Gist/WebDAV synchronization.
 
 ## Management Dashboard - Import/Export
 
