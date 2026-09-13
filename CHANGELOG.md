@@ -11,6 +11,7 @@ For the most detailed and up-to-date release notes, see [GitHub Releases](https:
 **Release Date:** September 30, 2026
 
 - Added snapshot management with manual history and the latest automatic snapshot
+- Added import/export for remote sync configuration (Gists / WebDAV)
 
 ---
 

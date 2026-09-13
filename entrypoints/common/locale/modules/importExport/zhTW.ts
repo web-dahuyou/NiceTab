@@ -28,6 +28,8 @@ const zhTW: Record<LocaleKey, string> = {
   "importExport.importSuccess": "匯入成功",
   "importExport.importFailed": "匯入失敗，請檢查格式是否正確",
   "importExport.settingsModuleTitle": "偏好設定匯入匯出",
+  'importExport.syncConfigModuleTitle': `遠程同步設定匯入匯出`,
+
   "importExport.exportContent": "匯出内容：",
   "importExport.getContent": "生成内容",
   "importExport.copy": "複製到剪貼板",

@@ -23,6 +23,8 @@ const enUS: Record<LocaleKey, string> = {
   'importExport.importFromHTML': 'Import from HTML',
   'importExport.importSuccess': 'Import Successful',
   'importExport.importFailed': 'Import Failed! Please check whether the format is correct',
+  'importExport.settingsModuleTitle': `Import/Export Settings`,
+  'importExport.syncConfigModuleTitle': `Import/Export Remote Sync Config`,
 
   'importExport.exportContent': 'Content to Export:',
   'importExport.getContent': 'Get Content',
@@ -31,7 +33,6 @@ const enUS: Record<LocaleKey, string> = {
   'importExport.saveAsHtml': 'Save as HTML',
   'importExport.CopySuccess': 'Copy Successful',
   'importExport.CopyFailed': 'Copy Failed',
-  'importExport.settingsModuleTitle': `Import/Export Settings`,
 };
 
 export default enUS;

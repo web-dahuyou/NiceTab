@@ -5,7 +5,17 @@ import styled from 'styled-components';
 import dayjs from 'dayjs';
 import { saveAs } from 'file-saver';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { tabListUtils, settingsUtils } from '~/entrypoints/common/storage';
+import {
+  tabListUtils,
+  settingsUtils,
+  syncUtils,
+  syncWebDAVUtils,
+} from '~/entrypoints/common/storage';
+import type {
+  SyncConfigProps,
+  SyncConfigWebDAVProps,
+  SyncConfigItemWebDAVProps,
+} from '~/entrypoints/types';
 import {
   extContentFormatCheck,
   extContentImporter,
@@ -39,6 +49,8 @@ export default function ImportExport() {
   const [downloadLoading, setDownloadLoading] = useState(false);
   const [settingsImportLoading, setSettingsImportLoading] = useState(false);
   const [settingsDownloadLoading, setSettingsDownloadLoading] = useState(false);
+  const [syncConfigImportLoading, setSyncConfigImportLoading] = useState(false);
+  const [syncConfigDownloadLoading, setSyncConfigDownloadLoading] = useState(false);
 
   const importFileExtname = useMemo(() => {
     const option =
@@ -184,13 +196,78 @@ export default function ImportExport() {
     setSettingsDownloadLoading(true);
     setTimeout(async () => {
       const now = dayjs().format('YYYY-MM-DD_HHmmss');
-      const fileName = `export_nice-tab_settings_${now}.json`;
+      const fileName = `export_NiceTab_settings_${now}.json`;
       const settings = await settingsUtils.getSettings();
       const content = JSON.stringify(settings);
       saveAs(new Blob([content], { type: `application/json;charset=utf-8` }), fileName);
       setSettingsDownloadLoading(false);
     }, 100);
   }, [exportFormatType]);
+
+  // 导出远程同步配置
+  const handleSyncConfigDownload = useCallback(async () => {
+    setSyncConfigDownloadLoading(true);
+    setTimeout(async () => {
+      try {
+        const now = dayjs().format('YYYY-MM-DD_HHmmss');
+        const fileName = `export_NiceTab_sync-config_${now}.json`;
+        const syncConfig = await syncUtils.getConfig();
+        const syncWebDAVConfig = await syncWebDAVUtils.getConfig();
+        const content = JSON.stringify({ syncConfig, syncWebDAVConfig });
+        saveAs(new Blob([content], { type: `application/json;charset=utf-8` }), fileName);
+      } catch (err) {
+        console.error(err);
+      }
+      setSyncConfigDownloadLoading(false);
+    }, 100);
+  }, []);
+
+  // 导入远程同步配置（合并策略）
+  const handleSelectSyncConfigFile: UploadProps['beforeUpload'] = file => {
+    const reader = new FileReader();
+    reader.onload = async () => {
+      setSyncConfigImportLoading(true);
+      const content = reader.result as string;
+      try {
+        const data = JSON.parse(content);
+        // 合并 Gist 配置
+        if (data.syncConfig) {
+          const currentGistConfig = await syncUtils.getConfig();
+          const importedConfig = data.syncConfig as SyncConfigProps;
+          const mergedGistConfig: SyncConfigProps = {
+            github: { ...currentGistConfig.github, ...importedConfig.github },
+            gitee: { ...currentGistConfig.gitee, ...importedConfig.gitee },
+          };
+          await syncUtils.setConfig(mergedGistConfig);
+        }
+        // 合并 WebDAV 配置（根据 label 判断是否同一配置项）
+        if (data.syncWebDAVConfig) {
+          const currentWebDAVConfig = await syncWebDAVUtils.getConfig();
+          const importedWebDAVConfig = data.syncWebDAVConfig as SyncConfigWebDAVProps;
+          const importedList = importedWebDAVConfig.configList || [];
+          const currentList = currentWebDAVConfig.configList || [];
+          const mergedListMap = new Map<
+            SyncConfigItemWebDAVProps['label'],
+            SyncConfigItemWebDAVProps
+          >();
+          currentList.forEach(item => mergedListMap.set(item.label, item));
+          importedList.forEach(item => mergedListMap.set(item.label, item));
+          const mergedList = Array.from(mergedListMap.values());
+
+          await syncWebDAVUtils.setConfig({ configList: mergedList });
+        }
+        messageApi.success(
+          $fmt({ id: 'common.actionSuccess', values: { action: $fmt('common.import') } }),
+        );
+      } catch (err) {
+        console.error(err);
+        messageApi.error($fmt('importExport.importFailed'));
+      }
+      setSyncConfigImportLoading(false);
+    };
+    reader.readAsText(file);
+    return false;
+  };
 
   return (
     <>
@@ -321,6 +398,31 @@ export default function ImportExport() {
               type="primary"
               loading={settingsDownloadLoading}
               onClick={handleSettingsDownload}
+            >
+              {$fmt('importExport.exportToFile')}
+            </Button>
+          </Space>
+        </Form.Item>
+      </Form>
+
+      {/* 远程同步配置导入导出模块 */}
+      <Divider>{$fmt('importExport.syncConfigModuleTitle')}</Divider>
+      <Form name="syncConfigImports" layout="vertical" autoComplete="off">
+        <Form.Item>
+          <Space size={12} align="center">
+            <Upload
+              accept={'.json'}
+              showUploadList={false}
+              beforeUpload={handleSelectSyncConfigFile}
+            >
+              <Button type="primary" loading={syncConfigImportLoading}>
+                {$fmt('importExport.importFromFile')}
+              </Button>
+            </Upload>
+            <Button
+              type="primary"
+              loading={syncConfigDownloadLoading}
+              onClick={handleSyncConfigDownload}
             >
               {$fmt('importExport.exportToFile')}
             </Button>

@@ -28,6 +28,8 @@ const ruRU: Record<LocaleKey, string> = {
   'importExport.importFromHTML': 'Импорт из HTML',
   'importExport.importSuccess': 'Импорт выполнен',
   'importExport.importFailed': 'Ошибка импорта. Проверьте формат данных',
+  'importExport.settingsModuleTitle': 'Импорт и экспорт настроек',
+  'importExport.syncConfigModuleTitle': 'Импорт и экспорт конфигурации синхронизации',
 
   'importExport.exportContent': 'Содержимое для экспорта:',
   'importExport.getContent': 'Сформировать содержимое',
@@ -36,7 +38,6 @@ const ruRU: Record<LocaleKey, string> = {
   'importExport.saveAsHtml': 'Сохранить как HTML',
   'importExport.CopySuccess': 'Скопировано',
   'importExport.CopyFailed': 'Не удалось скопировать',
-  'importExport.settingsModuleTitle': 'Импорт и экспорт настроек',
 };
 
 export default ruRU;
