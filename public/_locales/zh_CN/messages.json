@@ -31,5 +31,8 @@
   },
   "action_hibernateTabs": {
     "message": "休眠其他标签页"
+  },
+  "action_createSnapshot": {
+    "message": "创建快照"
   }
 }

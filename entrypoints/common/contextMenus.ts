@@ -10,7 +10,7 @@ import {
   defaultContextmenuConfigList,
   syncTypeMap,
 } from './constants';
-import tabUtils from '~/entrypoints/common/tabs';
+import tabUtils, { saveOpenedTabsAsSnapshot } from '~/entrypoints/common/tabs';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import type { SendTargetProps, SettingsProps } from '~/entrypoints/types';
 import {
@@ -225,6 +225,16 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
     contexts,
   };
 
+  const _createSnapshot: CreateMenuPropertiesType = {
+    tag: 'common',
+    id: ENUM_ACTION_NAME.CREATE_SNAPSHOT,
+    title: getTitle(
+      customMessages['home.createSnapshot'],
+      ENUM_ACTION_NAME.CREATE_SNAPSHOT,
+    ),
+    contexts,
+  };
+
   return [
     _openAdminTab,
     _openGlobalSearch,
@@ -237,6 +247,7 @@ export const getBaseMenus = async (): Promise<CreateMenuPropertiesType[]> => {
     _sendRightTabs,
     _startSyncMenu,
     _hibernateTabs,
+    _createSnapshot,
   ];
 };
 
@@ -398,6 +409,28 @@ export async function actionHandler(
     case ENUM_ACTION_NAME.HIBERNATE_TABS:
       tabUtils.discardOtherTabs();
       break;
+    case ENUM_ACTION_NAME.CREATE_SNAPSHOT:
+      saveOpenedTabsAsSnapshot('manualSave').then(async result => {
+        if (result?.saved) {
+          const settings = await settingsUtils.getSettings();
+          const language = settings[LANGUAGE] || defaultLanguage;
+          const msgs = getCustomLocaleMessages(language);
+
+          tabUtils.openAdminRoutePage({ path: '/snapshots' });
+
+          setTimeout(() => {
+            sendRuntimeMessage({
+              msgType: 'showMessage',
+              data: {
+                type: 'success',
+                content: msgs['snapshots.created'] || 'Snapshot created',
+              },
+              targetPageContexts: ['optionsPage'],
+            });
+          }, 300);
+        }
+      });
+      break;
     case ENUM_ACTION_NAME.START_SYNC:
       tabUtils.openAdminRoutePage({ path: '/sync' });
       setTimeout(() => {
@@ -448,6 +481,7 @@ export async function strategyHandler(actionName: string, tab?: Tabs.Tab) {
       ENUM_ACTION_NAME.OPEN_ADMIN_TAB,
       ENUM_ACTION_NAME.START_SYNC,
       ENUM_ACTION_NAME.HIBERNATE_TABS,
+      ENUM_ACTION_NAME.CREATE_SNAPSHOT,
     ].includes(actionName as ENUM_ACTION_NAME)
   ) {
     actionHandler(actionName, undefined, tab);

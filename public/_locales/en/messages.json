@@ -31,5 +31,8 @@
   },
   "action_hibernateTabs": {
     "message": "Hibernate Other Tabs"
+  },
+  "action_createSnapshot": {
+    "message": "Create Snapshot"
   }
 }

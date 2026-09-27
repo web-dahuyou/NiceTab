@@ -120,6 +120,7 @@ export enum ENUM_ACTION_NAME {
   GLOBAL_SEARCH = 'action:globalSearch', // 全局搜索
   START_SYNC = 'action:startSync', // 开始同步
   HIBERNATE_TABS = 'action:hibernateTabs', // 休眠其他标签页
+  CREATE_SNAPSHOT = 'action:createSnapshot', // 创建快照
 }
 
 // action 名称枚举 (firefox)
