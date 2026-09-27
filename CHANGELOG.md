@@ -8,9 +8,10 @@ For the most detailed and up-to-date release notes, see [GitHub Releases](https:
 
 ## v3.0.4
 
-**Release Date:** September 9, 2026
+**Release Date:** September 30, 2026
 
 - Added snapshot management with manual history and the latest automatic snapshot
+- Added import/export for remote sync configuration (Gists / WebDAV)
 
 ---
 
@@ -19,13 +20,8 @@ For the most detailed and up-to-date release notes, see [GitHub Releases](https:
 **Release Date:** September 7, 2026
 
 - Added Russian language support
-- Adjusted drag interaction of the sidebar in Admin Page
-- Adjusted z-index of the floating button group in the bottom-right corner of the home page
-- Added window-level snapshot management with manual history and the latest automatic snapshot
-- Snapshots now preserve tab order, native group structure, and pinned state
-- Automatic recovery now uses a live crash buffer promoted to a read-only record at browser startup
-- The Snapshots page now uses sidebar navigation, a lightweight list, and on-demand details drawers
-- Added optional advanced editing for manual snapshots and restore-to-new-window or replace-current-window modes
+- Adjusted the sidebar drag interaction on the Admin Page
+- Adjusted the z-index of the floating button group in the bottom-right corner of the home page
 
 ---
 
