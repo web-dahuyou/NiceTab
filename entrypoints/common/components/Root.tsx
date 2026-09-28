@@ -107,6 +107,9 @@ export default function Root({
       if (data.currWindowId !== currWindow.id) {
         updateAdminPageUrlDebounced();
       }
+    } else if (msgType === 'showMessage') {
+      const { type, content } = data;
+      $message[type](content);
     }
   };
 

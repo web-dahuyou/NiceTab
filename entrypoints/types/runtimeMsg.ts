@@ -11,19 +11,6 @@ export type PageContextType =
   | 'contentScriptPage'
   | 'newtabPage';
 
-export type RuntimeMsgType =
-  | 'setPrimaryColor'
-  | 'setThemeData'
-  | 'setThemeType'
-  | 'setLocale'
-  | 'openAdminRoutePage'
-  | 'reloadAllAdminPage'
-  | 'reloadOtherAdminPage'
-  | 'sync:sync-status-change--gist'
-  | 'sync:sync-status-change--webdav'
-  | 'sendTabsActionStart'
-  | 'sendTabsActionConfirm';
-
 export interface RuntimeMsgSetPrimaryColor {
   msgType: 'setPrimaryColor';
   data: {
@@ -74,19 +61,29 @@ export interface RuntimeMsgSendTabsActionConfirm {
   msgType: 'sendTabsActionConfirm';
   data: { actionName: string; targetData: SendTargetProps; currWindowId?: number };
 }
+export interface RuntimeMsgShowMessage {
+  msgType: 'showMessage';
+  data: { type: 'success' | 'error' | 'info' | 'warning'; content: string };
+}
 
-export type RuntimeMsgBaseProps =
-  | RuntimeMsgSetPrimaryColor
-  | RuntimeMsgSetThemeData
-  | RuntimeMsgSetThemeType
-  | RuntimeMsgSetLocale
-  | RuntimeMsgOpenAdminRoutePage
-  | RuntimeMsgReloadAllAdminPage
-  | RuntimeMsgReloadOtherAdminPage
-  | RuntimeMsgSyncStatusChangeGist
-  | RuntimeMsgSyncStatusChangeWebdav
-  | RuntimeMsgSendTabsActionStart
-  | RuntimeMsgSendTabsActionConfirm;
+// msgType -> 对应消息接口的映射表，新增消息类型只需在此添加一行
+export interface RuntimeMsgMap {
+  setPrimaryColor: RuntimeMsgSetPrimaryColor;
+  setThemeData: RuntimeMsgSetThemeData;
+  setThemeType: RuntimeMsgSetThemeType;
+  setLocale: RuntimeMsgSetLocale;
+  openAdminRoutePage: RuntimeMsgOpenAdminRoutePage;
+  reloadAllAdminPage: RuntimeMsgReloadAllAdminPage;
+  reloadOtherAdminPage: RuntimeMsgReloadOtherAdminPage;
+  'sync:sync-status-change--gist': RuntimeMsgSyncStatusChangeGist;
+  'sync:sync-status-change--webdav': RuntimeMsgSyncStatusChangeWebdav;
+  sendTabsActionStart: RuntimeMsgSendTabsActionStart;
+  sendTabsActionConfirm: RuntimeMsgSendTabsActionConfirm;
+  showMessage: RuntimeMsgShowMessage;
+}
+
+export type RuntimeMsgType = keyof RuntimeMsgMap;
+export type RuntimeMsgBaseProps = RuntimeMsgMap[keyof RuntimeMsgMap];
 
 // runtime message event props
 export type RuntimeMessageEventProps = RuntimeMsgBaseProps & {
@@ -94,30 +91,7 @@ export type RuntimeMessageEventProps = RuntimeMsgBaseProps & {
 };
 
 // sendRuntimeMessage base props
-export type SendRuntimeMessageBaseProps<T extends RuntimeMsgType> =
-  T extends 'setPrimaryColor'
-    ? RuntimeMsgSetPrimaryColor
-    : T extends 'setThemeData'
-      ? RuntimeMsgSetThemeData
-      : T extends 'setThemeType'
-        ? RuntimeMsgSetThemeType
-        : T extends 'setLocale'
-          ? RuntimeMsgSetLocale
-          : T extends 'openAdminRoutePage'
-            ? RuntimeMsgOpenAdminRoutePage
-            : T extends 'reloadAllAdminPage'
-              ? RuntimeMsgReloadAllAdminPage
-              : T extends 'reloadOtherAdminPage'
-                ? RuntimeMsgReloadOtherAdminPage
-                : T extends 'sync:sync-status-change--gist'
-                  ? RuntimeMsgSyncStatusChangeGist
-                  : T extends 'sync:sync-status-change--webdav'
-                    ? RuntimeMsgSyncStatusChangeWebdav
-                    : T extends 'sendTabsActionStart'
-                      ? RuntimeMsgSendTabsActionStart
-                      : T extends 'sendTabsActionConfirm'
-                        ? RuntimeMsgSendTabsActionConfirm
-                        : never;
+export type SendRuntimeMessageBaseProps<T extends RuntimeMsgType> = RuntimeMsgMap[T];
 
 // sendRuntimeMessage params
 export type SendRuntimeMessageParams<T extends RuntimeMsgType = any> =

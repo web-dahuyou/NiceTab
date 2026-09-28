@@ -235,9 +235,16 @@ export default function ImportExport() {
           const currentGistConfig = await syncUtils.getConfig();
           const importedConfig = data.syncConfig as SyncConfigProps;
           const mergedGistConfig: SyncConfigProps = {
-            github: { ...currentGistConfig.github, ...importedConfig.github },
-            gitee: { ...currentGistConfig.gitee, ...importedConfig.gitee },
+            github: { ...currentGistConfig.github },
+            gitee: { ...currentGistConfig.gitee },
           };
+          if (importedConfig.github && importedConfig.github.accessToken) {
+            mergedGistConfig.github = { ...importedConfig.github };
+          }
+          if (importedConfig.gitee && importedConfig.gitee.accessToken) {
+            mergedGistConfig.gitee = { ...importedConfig.gitee };
+          }
+
           await syncUtils.setConfig(mergedGistConfig);
         }
         // 合并 WebDAV 配置（根据 label 判断是否同一配置项）

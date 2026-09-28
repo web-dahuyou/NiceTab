@@ -31,5 +31,8 @@
   },
   "action_hibernateTabs": {
     "message": "Усыпить другие вкладки"
+  },
+  "action_createSnapshot": {
+    "message": "Создать снимок"
   }
 }

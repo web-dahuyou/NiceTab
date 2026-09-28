@@ -382,6 +382,7 @@ function AppLayout() {
       const result = await saveOpenedTabsAsSnapshot('manualSave');
       if (result?.saved) {
         $message.success($fmt('snapshots.created'));
+        navigate('/snapshots');
       }
     } else if (key === 'restoreSnapshot') {
       navigate('/snapshots');
