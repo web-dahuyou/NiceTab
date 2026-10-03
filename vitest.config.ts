@@ -1,7 +1,9 @@
+import type { WxtViteConfig } from 'wxt';
 import { defineConfig } from 'vitest/config';
 import { WxtVitest } from 'wxt/testing';
 
 export default defineConfig({
+  // @ts-ignore
   plugins: [WxtVitest()],
   test: {
     coverage: {

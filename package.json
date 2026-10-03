@@ -16,14 +16,14 @@
     "zip": "pnpm convert:guide && wxt zip",
     "zip:firefox": "pnpm convert:guide && wxt zip -b firefox",
     "compile": "tsc --noEmit",
-    "fix-manifest": "node scripts/fix-manifest.mjs",
     "convert:guide": "node scripts/md2html.js GUIDE-zh.md",
     "lint:no-fix": "eslint entrypoints --fix=false",
     "lint": "eslint entrypoints --fix=true",
-    "verify:utf8": "node scripts/verify-utf8.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "fix-manifest": "node scripts/fix-manifest.mjs",
+    "verify:utf8": "node scripts/verify-utf8.mjs"
   },
   "dependencies": {
     "@ant-design/colors": "^7.0.2",

@@ -145,7 +145,10 @@ describe('groupBySize', () => {
   });
 
   it('handles exact division', () => {
-    expect(groupBySize([1, 2, 3, 4], 2)).toEqual([[1, 2], [3, 4]]);
+    expect(groupBySize([1, 2, 3, 4], 2)).toEqual([
+      [1, 2],
+      [3, 4],
+    ]);
   });
 
   it('handles size larger than array', () => {

@@ -164,7 +164,9 @@ describe('isSameUrl', () => {
   });
 
   it('returns true for same URL with different param order', () => {
-    expect(isSameUrl('https://example.com?a=1&b=2', 'https://example.com?b=2&a=1')).toBe(true);
+    expect(isSameUrl('https://example.com?a=1&b=2', 'https://example.com?b=2&a=1')).toBe(
+      true,
+    );
   });
 
   it('returns false for different URLs', () => {
@@ -176,7 +178,9 @@ describe('isSameUrl', () => {
   });
 
   it('returns false for different param count', () => {
-    expect(isSameUrl('https://example.com?a=1', 'https://example.com?a=1&b=2')).toBe(false);
+    expect(isSameUrl('https://example.com?a=1', 'https://example.com?a=1&b=2')).toBe(
+      false,
+    );
   });
 
   it('handles non-standard protocols', () => {
@@ -190,31 +194,45 @@ describe('isSameUrl', () => {
 
 describe('isContentMatched', () => {
   it('matches with equal mode', () => {
-    expect(isContentMatched('https://example.com', 'https://example.com', 'equal')).toBe(true);
+    expect(isContentMatched('https://example.com', 'https://example.com', 'equal')).toBe(
+      true,
+    );
   });
 
   it('matches with startsWith mode', () => {
-    expect(isContentMatched('https://example.com/path', 'https://example.com', 'startsWith')).toBe(true);
+    expect(
+      isContentMatched('https://example.com/path', 'https://example.com', 'startsWith'),
+    ).toBe(true);
   });
 
   it('matches with endsWith mode', () => {
-    expect(isContentMatched('https://example.com/page.html', '.html', 'endsWith')).toBe(true);
+    expect(isContentMatched('https://example.com/page.html', '.html', 'endsWith')).toBe(
+      true,
+    );
   });
 
   it('matches with contains mode', () => {
-    expect(isContentMatched('https://example.com/path', 'example', 'contains')).toBe(true);
+    expect(isContentMatched('https://example.com/path', 'example', 'contains')).toBe(
+      true,
+    );
   });
 
   it('matches with regex mode', () => {
-    expect(isContentMatched('https://example.com', '^https://example\\.com$', 'regex')).toBe(true);
+    expect(
+      isContentMatched('https://example.com', '^https://example\\.com$', 'regex'),
+    ).toBe(true);
   });
 
   it('matches with wildcard mode', () => {
-    expect(isContentMatched('https://example.com/path', 'https://example.com/*', 'wildcard')).toBe(true);
+    expect(
+      isContentMatched('https://example.com/path', 'https://example.com/*', 'wildcard'),
+    ).toBe(true);
   });
 
   it('returns false for non-matching regex', () => {
-    expect(isContentMatched('https://other.com', '^https://example\\.com$', 'regex')).toBe(false);
+    expect(
+      isContentMatched('https://other.com', '^https://example\\.com$', 'regex'),
+    ).toBe(false);
   });
 
   it('returns false for invalid regex', () => {
@@ -226,7 +244,9 @@ describe('isContentMatched', () => {
   });
 
   it('returns false for unknown mode', () => {
-    expect(isContentMatched('https://example.com', 'https://example.com', 'unknown' as any)).toBe(false);
+    expect(
+      isContentMatched('https://example.com', 'https://example.com', 'unknown' as any),
+    ).toBe(false);
   });
 });
 

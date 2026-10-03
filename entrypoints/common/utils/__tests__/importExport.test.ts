@@ -23,11 +23,7 @@ vi.mock('~/entrypoints/common/storage', () => ({
   },
 }));
 
-import {
-  extContentFormatCheck,
-  html2niceTab,
-  niceTab2html,
-} from '../importExport';
+import { extContentFormatCheck, html2niceTab, niceTab2html } from '../importExport';
 
 describe('extContentFormatCheck', () => {
   it('detects niceTab format (array with tagName)', () => {
@@ -75,9 +71,7 @@ describe('niceTab2html', () => {
             isStarred: false,
             isLocked: false,
             isExpanded: true,
-            tabList: [
-              { tabId: 't1', title: 'Example', url: 'https://example.com' },
-            ],
+            tabList: [{ tabId: 't1', title: 'Example', url: 'https://example.com' }],
           },
         ],
       },
@@ -101,6 +95,7 @@ describe('niceTab2html', () => {
           {
             groupId: 'g1',
             groupName: 'A & B',
+            createTime: '2024-01-01 00:00:00',
             isStarred: false,
             isLocked: false,
             isExpanded: true,

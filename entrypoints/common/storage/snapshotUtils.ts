@@ -18,10 +18,10 @@ const initialStore: SnapshotStore = {
   manual: [],
 };
 
-function legacyTabToSnapshot(tab: SnapshotTabItem): WindowSnapshotTab {
+export function legacyTabToSnapshot(tab: SnapshotTabItem): WindowSnapshotTab {
   return {
     type: 'tab',
-    id: tab.tabId || getRandomId(12),
+    id: tab?.tabId || getRandomId(12),
     title: tab.title || tab.url || '',
     url: tab.url || '',
     favIconUrl: tab.favIconUrl,
@@ -30,7 +30,7 @@ function legacyTabToSnapshot(tab: SnapshotTabItem): WindowSnapshotTab {
   };
 }
 
-function convertLegacyItems(items: SnapshotItem[]): WindowSnapshotItem[] {
+export function convertLegacyItems(items: SnapshotItem[]): WindowSnapshotItem[] {
   const result = items.map(item => {
     if (item.type === 'group') {
       const group = item as SnapshotGroupItem;
@@ -62,7 +62,7 @@ function convertLegacyItems(items: SnapshotItem[]): WindowSnapshotItem[] {
   return result;
 }
 
-function createLegacyRecord(
+export function createLegacyRecord(
   source: SnapshotRecord['source'],
   items: SnapshotItem[],
 ): SnapshotRecord {
@@ -77,13 +77,13 @@ function createLegacyRecord(
   };
 }
 
-function isSnapshotRecord(
+export function isSnapshotRecord(
   value: SnapshotItem[] | SnapshotRecord | undefined,
 ): value is SnapshotRecord {
   return !!value && !Array.isArray(value) && Array.isArray(value.items);
 }
 
-function normalizeAutoBuffer(value: SnapshotItem[] | SnapshotRecord | undefined) {
+export function normalizeAutoBuffer(value: SnapshotItem[] | SnapshotRecord | undefined) {
   if (isSnapshotRecord(value)) return value;
   return value?.length ? createLegacyRecord('auto', value) : undefined;
 }

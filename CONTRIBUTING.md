@@ -4,6 +4,43 @@
   English | <a href="./CONTRIBUTING-zh.md">中文</a> | <a href="./CONTRIBUTING-ru.md">Русский</a>
 </p>
 
+## Unit Testing
+
+The project uses [Vitest](https://vitest.dev/) as the unit testing framework.
+
+### Running Tests
+
+```bash
+# Run all tests
+pnpm test
+
+# Run tests for a specific file
+pnpm test entrypoints/common/storage/__tests__/tabListUtils.test.ts
+
+# Run tests with coverage report
+pnpm test:coverage
+```
+
+### Test File Conventions
+
+- Test files are placed in a `__tests__` directory alongside the source file, named `<module>.test.ts`.
+- Coverage scope covers utility functions and storage modules under `entrypoints/common/`.
+
+```
+entrypoints/common/storage/
+├── tabListUtils.ts
+└── __tests__/
+    └── tabListUtils.test.ts
+```
+
+### Writing Guidelines
+
+- **Mock dependencies**: Use `vi.mock()` at the top of the file to mock external dependencies (e.g., `instanceStore`, `wxt/storage`), avoiding reliance on the real environment.
+- **Mock methods**: Use `vi.spyOn()` to spy on or mock methods of the object under test. Call `vi.restoreAllMocks()` in `afterEach` to clean up state.
+- **WXT globals**: WXT auto-imported modules (like `storage`) must be mocked via `vi.mock('wxt/storage', ...)` rather than setting `globalThis`.
+- **Independent test cases**: Reset mock state in `beforeEach` to ensure test cases do not interfere with each other.
+
+
 ## Submitting Code
 
 1. [Fork](https://github.com/web-dahuyou/NiceTab/fork) the repository.
@@ -38,9 +75,9 @@
 ## Development Guidelines
 
 ### Project Setup
-- Install dependencies:  
+- Install dependencies:
   `pnpm install`
-- Start the dev server:  
+- Start the dev server:
   `pnpm run dev`
 
 ### File Export Requirement
@@ -60,7 +97,7 @@ import { something } from '~/entrypoints/common/utils';
 By default, `WXT` will try to automatically discover where `Chrome/Firefox` are installed. If you encounter an error:
 
 ```
-ERROR  No Chrome installations found.  
+ERROR  No Chrome installations found.
 ```
 
 Or you want to specify a browser executable binary.
