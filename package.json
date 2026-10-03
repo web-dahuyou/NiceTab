@@ -20,7 +20,10 @@
     "convert:guide": "node scripts/md2html.js GUIDE-zh.md",
     "lint:no-fix": "eslint entrypoints --fix=false",
     "lint": "eslint entrypoints --fix=true",
-    "verify:utf8": "node scripts/verify-utf8.mjs"
+    "verify:utf8": "node scripts/verify-utf8.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@ant-design/colors": "^7.0.2",
@@ -59,6 +62,7 @@
     "@types/webextension-polyfill": "^0.12.6",
     "@types/yargs-parser": "^21.0.3",
     "@typescript-eslint/parser": "^8.35.0",
+    "@vitest/coverage-v8": "^1.6.1",
     "@wxt-dev/module-react": "^1.1.0",
     "eslint": "^9.0.0",
     "eslint-plugin-import": "^2.32.0",
@@ -70,6 +74,7 @@
     "marked": "^16.2.1",
     "prettier": "^3.6.2",
     "typescript": "^5.5.4",
+    "vitest": "^1.6.1",
     "wxt": "^0.19.29",
     "yargs-parser": "^21.1.1"
   }
