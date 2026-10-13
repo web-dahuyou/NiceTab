@@ -63,7 +63,7 @@ export function useTreeData() {
   const [loading, setLoading] = useState<boolean>(true);
   const [countInfo, setCountInfo] = useState<CountInfo>();
   const [tagList, setTagList] = useState<TagItem[]>([]);
-  const [treeData, setTreeData] = useState([] as TreeDataNodeUnion[]);
+  const [treeData, setTreeData] = useState([] as TreeDataNodeTag[]);
   const [selectedTagKey, setSelectedTagKey] = useState<React.Key | undefined>();
   const [selectedTabGroupKey, setSelectedTabGroupKey] = useState<React.Key | undefined>();
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);

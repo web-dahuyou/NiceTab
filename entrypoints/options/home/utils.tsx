@@ -8,10 +8,15 @@ import {
 } from '@ant-design/icons';
 import { getLocaleMessages, newCreateTime } from '~/entrypoints/common/utils';
 import type { TagItem } from '~/entrypoints/types';
-import type { TreeDataNodeUnion, MoveDataProps, CascaderOption } from './types';
+import type {
+  TreeDataNodeUnion,
+  TreeDataNodeTag,
+  MoveDataProps,
+  CascaderOption,
+} from './types';
 
 // 生成treeData
-export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
+export const getTreeData = (tagList: TagItem[]): TreeDataNodeTag[] => {
   return tagList.map(tag => ({
     type: 'tag',
     key: tag.tagId,

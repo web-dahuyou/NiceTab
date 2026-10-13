@@ -1299,6 +1299,7 @@ describe('TabListUtils', () => {
       expect(tabList).toHaveLength(4);
       expect(tabList[1].tabId).not.toBe('t1');
       expect(tabList[1].url).toBe('https://a.com');
+      expect(tabList[1].title).toBe('A');
     });
   });
 
