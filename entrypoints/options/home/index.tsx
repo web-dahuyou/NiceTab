@@ -361,6 +361,7 @@ export default function Home() {
 
                   <Dropdown
                     menu={{ items: moreItems, onClick: onMoreItemClick }}
+                    trigger={['click']}
                     placement="bottomLeft"
                   >
                     <StyledActionIconBtn className="btn-more" $size="18">

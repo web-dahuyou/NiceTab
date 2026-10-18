@@ -4,6 +4,42 @@
   Русский | <a href="./CONTRIBUTING.md">English</a> | <a href="./CONTRIBUTING-zh.md">中文</a>
 </p>
 
+## Модульные тесты
+
+Проект использует [Vitest](https://vitest.dev/) в качестве фреймворка модульного тестирования.
+
+### Запуск тестов
+
+```bash
+# Запуск всех тестов
+pnpm test
+
+# Запуск тестов для конкретного файла
+pnpm test entrypoints/common/storage/__tests__/tabListUtils.test.ts
+
+# Запуск тестов с отчётом о покрытии
+pnpm test:coverage
+```
+
+### Соглашения о файлах тестов
+
+- Файлы тестов размещаются в каталоге `__tests__` рядом с исходным файлом, именуются `<модуль>.test.ts`.
+- Покрытие охватывает утилиты и модули storage в `entrypoints/common/`.
+
+```
+entrypoints/common/storage/
+├── tabListUtils.ts
+└── __tests__/
+    └── tabListUtils.test.ts
+```
+
+### Правила написания
+
+- **Мокирование зависимостей**: используйте `vi.mock()` в начале файла для мокирования внешних зависимостей (например, `instanceStore`, `wxt/storage`), избегая зависимости от реального окружения.
+- **Мокирование методов**: используйте `vi.spyOn()` для слежения или мокирования методов тестируемого объекта. Вызывайте `vi.restoreAllMocks()` в `afterEach` для очистки состояния.
+- **Глобальные переменные WXT**: автоматически импортируемые WXT модули (такие как `storage`) необходимо мокировать через `vi.mock('wxt/storage', ...)`, а не через `globalThis`.
+- **Независимые тесты**: сбрасывайте состояние моков в `beforeEach`, чтобы тесты не влияли друг на друга.
+
 ## Отправка кода
 
 1. Сделайте [Fork](https://github.com/web-dahuyou/NiceTab/fork) репозитория.
@@ -38,9 +74,9 @@
 ## Правила разработки
 
 ### Настройка проекта
-- Установка зависимостей:  
+- Установка зависимостей:
   `pnpm install`
-- Запуск dev-сервера:  
+- Запуск dev-сервера:
   `pnpm run dev`
 
 ### Обязательный export
@@ -60,7 +96,7 @@ import { something } from '~/entrypoints/common/utils';
 По умолчанию `WXT` пытается сам найти установленные `Chrome/Firefox`. Если появляется ошибка:
 
 ```
-ERROR  No Chrome installations found.  
+ERROR  No Chrome installations found.
 ```
 
 или нужно указать свой исполняемый файл браузера, см. [документацию — Set Browser Binaries](https://wxt.dev/guide/essentials/config/browser-startup.html#set-browser-binaries).

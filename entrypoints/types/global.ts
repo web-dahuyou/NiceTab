@@ -143,7 +143,13 @@ export type ContextMenuConfigItem = {
 export type InsertPositions = 'top' | 'bottom';
 
 // 内容匹配模式
-export type ContentMatchMode = 'equal' | 'startsWith' | 'endsWith' | 'contains' | 'regex';
+export type ContentMatchMode =
+  | 'equal'
+  | 'startsWith'
+  | 'endsWith'
+  | 'contains'
+  | 'regex'
+  | 'wildcard';
 
 // 页面标题配置Item
 export type PageTitleConfigItem = {

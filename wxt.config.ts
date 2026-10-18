@@ -1,4 +1,4 @@
-import { defineConfig, type UserManifest } from 'wxt';
+import { defineConfig, type UserManifest, type WxtViteConfig } from 'wxt';
 import svgr from 'vite-plugin-svgr';
 import yargsParser from 'yargs-parser';
 // import { injectBgColorPlugin } from './scripts/inject-bg-color-plugin';
@@ -13,7 +13,7 @@ export default defineConfig({
   modules: ['@wxt-dev/module-react'],
   vite: () => ({
     plugins: [svgr({ svgrOptions: { icon: true } }), /* injectBgColorPlugin() */],
-  }),
+  } as WxtViteConfig),
   manifest: {
     name: 'Nice Tab Manager',
     permissions: [

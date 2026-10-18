@@ -30,3 +30,6 @@ public/docs/*
 .claude
 CLAUDE.md
 docs
+
+# Test coverage
+coverage/

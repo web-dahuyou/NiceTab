@@ -4,6 +4,43 @@
   中文 | <a href="./CONTRIBUTING.md">English</a> | <a href="./CONTRIBUTING-ru.md">Русский</a>
 </p>
 
+## 单元测试
+
+项目使用 [Vitest](https://vitest.dev/) 作为单元测试框架。
+
+### 运行测试
+
+```bash
+# 运行全部测试
+pnpm test
+
+# 运行指定文件的测试
+pnpm test entrypoints/common/storage/__tests__/tabListUtils.test.ts
+
+# 运行测试并查看覆盖率报告
+pnpm test:coverage
+```
+
+### 测试文件约定
+
+- 测试文件放在源文件同级的 `__tests__` 目录下，命名为 `<模块名>.test.ts`。
+- 覆盖率范围主要为 `entrypoints/common/` 下的工具函数和 storage 模块。
+
+```
+entrypoints/common/storage/
+├── tabListUtils.ts
+└── __tests__/
+    └── tabListUtils.test.ts
+```
+
+### 编写规范
+
+- **Mock 依赖模块**：使用 `vi.mock()` 在文件顶部 mock 外部依赖（如 `instanceStore`、`wxt/storage` 等），避免测试依赖真实环境。
+- **Mock 方法**：使用 `vi.spyOn()` 对被测对象的方法进行 spy 或 mock，`afterEach` 中调用 `vi.restoreAllMocks()` 清理状态。
+- **WXT 全局变量**：WXT 自动导入的模块（如 `storage`）需要通过 `vi.mock('wxt/storage', ...)` 进行 mock，而不是设置 `globalThis`。
+- **每个测试用例独立**：在 `beforeEach` 中重置 mock 状态，确保用例之间互不影响。
+```
+
 ## 提交代码
 
 1. [Fork](https://github.com/web-dahuyou/NiceTab/fork) 仓库。
@@ -57,7 +94,7 @@ import { something } from '~/entrypoints/common/utils';
 默认情况下，`wxt` 会自动识别 `Chrome/Firefox` 的安装路径，并启动对应的浏览器。如果启动项目报错找不到浏览器安装路径
 
 ```
-ERROR  No Chrome installations found.  
+ERROR  No Chrome installations found.
 ```
 
 或者想自定义浏览器可执行文件，可以参考 [官方文档-Set Browser Binaries](https://wxt.dev/guide/essentials/config/browser-startup.html#set-browser-binaries)，手动配置浏览器可执行文件的路径即可。

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { LoadingOutlined } from '@ant-design/icons';
 import { getFaviconUrl } from '~/entrypoints/common/utils/favicon';
 import faviconDefaultImage from '/icon/favicon-default.png';
 
@@ -18,7 +19,7 @@ export default function Favicon({
   favIconUrl?: string;
   size?: number;
 }) {
-  const [renderUrl, setRenderUrl] = useState(faviconDefaultImage);
+  const [renderUrl, setRenderUrl] = useState('');
 
   const handleError = () => {
     // console.log('handleError');
@@ -39,6 +40,10 @@ export default function Favicon({
   useEffect(() => {
     init();
   }, [pageUrl, favIconUrl]);
+
+  if (!renderUrl) {
+    return <LoadingOutlined className="img-favicon" style={{ fontSize: `${size}px` }} />;
+  }
 
   return (
     <StyledFavicon

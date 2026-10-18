@@ -2,7 +2,7 @@
   "name": "nice-tab",
   "description": "开源的标签页管理器，OneTab、Toby、SessionBuddy 等扩展的升级替代品，功能丰富易用 | A nice, convenient, powerful tab manager (open source)",
   "private": true,
-  "version": "3.0.4",
+  "version": "3.0.5",
   "type": "module",
   "engines": {
     "node": ">=18.20.0"
@@ -16,10 +16,13 @@
     "zip": "pnpm convert:guide && wxt zip",
     "zip:firefox": "pnpm convert:guide && wxt zip -b firefox",
     "compile": "tsc --noEmit",
-    "fix-manifest": "node scripts/fix-manifest.mjs",
     "convert:guide": "node scripts/md2html.js GUIDE-zh.md",
     "lint:no-fix": "eslint entrypoints --fix=false",
     "lint": "eslint entrypoints --fix=true",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "fix-manifest": "node scripts/fix-manifest.mjs",
     "verify:utf8": "node scripts/verify-utf8.mjs"
   },
   "dependencies": {
@@ -52,6 +55,8 @@
     "webdav": "^5.7.1"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
     "@types/file-saver": "^2.0.7",
     "@types/lodash-es": "^4.17.12",
     "@types/react": "^18.3.3",
@@ -59,6 +64,7 @@
     "@types/webextension-polyfill": "^0.12.6",
     "@types/yargs-parser": "^21.0.3",
     "@typescript-eslint/parser": "^8.35.0",
+    "@vitest/coverage-v8": "^1.6.1",
     "@wxt-dev/module-react": "^1.1.0",
     "eslint": "^9.0.0",
     "eslint-plugin-import": "^2.32.0",
@@ -67,9 +73,11 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "github-markdown-css": "^5.8.1",
     "github-slugger": "^2.0.0",
+    "happy-dom": "^20.14.5",
     "marked": "^16.2.1",
     "prettier": "^3.6.2",
     "typescript": "^5.5.4",
+    "vitest": "^1.6.1",
     "wxt": "^0.19.29",
     "yargs-parser": "^21.1.1"
   }

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useContext } from 'react';
+import { useEffect, useState, useCallback, useContext, useRef } from 'react';
 import { theme, Modal, Button, Tag, Spin } from 'antd';
 import { PlusOutlined, TagOutlined } from '@ant-design/icons';
 import { ThemeProvider } from 'styled-components';
@@ -8,10 +8,13 @@ import { getRandomId, pick, sendRuntimeMessage } from '~/entrypoints/common/util
 import { initFaviconApiData } from '~/entrypoints/common/utils/favicon';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { openAdminRoutePage } from '~/entrypoints/common/tabs';
-import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
+import { ENUM_SETTINGS_PROPS, ENUM_ACTION_NAME } from '~/entrypoints/common/constants';
 import { GlobalStyle } from '~/entrypoints/common/style/Common.styled';
 import { GlobalSearchPanel } from '~/entrypoints/common/components/BaseGlobalSearch';
 import { useGlobalSearchPanel } from '~/entrypoints/common/hooks/globalSearch';
+import SendTargetActionHolder, {
+  type SendTargetActionHolderProps,
+} from '~/entrypoints/options/home/SendTargetActionHolder';
 import EditInput from '~/entrypoints/options/components/EditInput';
 import TabItemEditModal from '~/entrypoints/options/home/TabItemEditModal';
 
@@ -52,6 +55,7 @@ export default function App() {
   const { $fmt } = useIntlUtls();
 
   const { globalSearchPanelRef } = useGlobalSearchPanel();
+  const sendTargetActionRef = useRef<SendTargetActionHolderProps>();
 
   const [groups, setGroups] = useState<UnionGroupItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -229,6 +233,10 @@ export default function App() {
         ref={globalSearchPanelRef}
         pageContext="newtabPage"
       ></GlobalSearchPanel>
+      <SendTargetActionHolder
+        ref={sendTargetActionRef}
+        pageContext="newtabPage"
+      ></SendTargetActionHolder>
 
       <StyledNewTabContainer className="newtab-container">
         {/* 搜索引擎（吸顶） */}

@@ -23,6 +23,12 @@ export default defineContentScript({
       // append: "first",
       onMount: (container, shadow, shadowHost) => {
         shadowHost.style.zIndex = '99999';
+        /*
+        在 onMount 中给 shadowHost 添加 visibility: visible。
+        原因：某些网站 (如 reddit.com 页面的 CSS 设置了类似 visibility: hidden 的样式，<nicetab-message> 作为自定义元素继承了这个属性。WXT 的 applyPosition 函数没有设置 visibility，所以继承值导致整个内容脚本 UI 不可见。
+        通过内联样式 visibility: visible 显式覆盖继承值。内联样式的优先级高于继承值和外部 CSS，确保 shadowHost 始终可见。
+        */
+        shadowHost.style.visibility = 'visible';
         const wrapper = document.createElement('div');
         wrapper.id = 'nicetab-shadow-root-wrapper';
         container.append(wrapper);

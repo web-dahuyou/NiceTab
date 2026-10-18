@@ -1,44 +1,151 @@
 import { handleUrlWidthParams, getOrigin } from './url';
 
-const testPageUrl = 'https://favicon.nicetab.com';
-const storageKey = 'session_faviconStore';
-let testFaviconBase64 = '';
+const testPageUrl = 'https://favicon-test.nicetab.com';
+const storageKey = 'local_faviconStore';
 
-// 将 favicon 保存到 sessionStorage 中
+const defaultFaviconUrl = browser.runtime.getURL('/icon/favicon-default.png');
+
+// ========== 状态区分 ==========
+// null = 未初始化, '' = 初始化失败, 非空 = 有效值
+const testFaviconBase64Map = new Map<FaviconSource, string | null>();
+let initPromise: Promise<void> | null = null;
+
+function getTestBase64(source: FaviconSource): string | null {
+  return testFaviconBase64Map.get(source) ?? null;
+}
+
+// ========== 两级缓存 ==========
+type FaviconSource = 'ext' | 'gstatic' | 'ddg' | 'bonjourr' | 'ico' | 'default';
+interface CacheEntry {
+  url: string;
+  timestamp: number;
+  source: FaviconSource;
+}
+
+const memoryCache = new Map<string, CacheEntry>();
+const CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 7天
+const MAX_CACHE_SIZE = 2000;
+
+// 并发请求去重
+const pendingRequests = new Map<string, Promise<string>>();
+
+// 复用 canvas
+let sharedCanvas: HTMLCanvasElement | null = null;
+let sharedCtx: CanvasRenderingContext2D | null = null;
+
+// ========== 缓存操作 ==========
+
+function saveToMemoryCache(origin: string, url: string, source: FaviconSource) {
+  // LRU 淘汰：删除最早的条目
+  if (memoryCache.size >= MAX_CACHE_SIZE) {
+    const oldest = memoryCache.keys().next().value;
+    if (oldest !== undefined) memoryCache.delete(oldest);
+  }
+  memoryCache.set(origin, { url, timestamp: Date.now(), source });
+}
+
+function getFromMemoryCache(origin: string): string | null {
+  const entry = memoryCache.get(origin);
+  if (!entry) return null;
+  if (Date.now() - entry.timestamp > CACHE_TTL) {
+    memoryCache.delete(origin);
+    return null;
+  }
+  // 刷新 LRU 顺序：删除后重新插入
+  memoryCache.delete(origin);
+  memoryCache.set(origin, entry);
+  return entry.url;
+}
+
+// 将 favicon 保存到 localStorage 中（带时间戳）
 function saveFaviconToStore(origin: string, faviconUrl: string) {
-  const faviconStoreContent = sessionStorage.getItem(storageKey) || '{}';
-  const faviconStore = JSON.parse(faviconStoreContent);
-  faviconStore[origin] = faviconUrl;
-  sessionStorage.setItem(storageKey, JSON.stringify(faviconStore));
-}
-// 从 sessionStorage 中获取 favicon
-function getFaviconFromStore(origin: string) {
-  const faviconStoreContent = sessionStorage.getItem(storageKey) || '{}';
-  const faviconStore = JSON.parse(faviconStoreContent);
-  return faviconStore[origin];
+  try {
+    const faviconStoreContent = localStorage.getItem(storageKey) || '{}';
+    const faviconStore = JSON.parse(faviconStoreContent);
+    faviconStore[origin] = { url: faviconUrl, timestamp: Date.now() };
+    localStorage.setItem(storageKey, JSON.stringify(faviconStore));
+  } catch {
+    // 数据损坏时清除
+    localStorage.removeItem(storageKey);
+  }
 }
 
-// 初始化 _favicon api 兜底图base64值（在 dom 环境中调用）
+// 从 localStorage 中获取 favicon（带 TTL 校验）
+function getFaviconFromStore(origin: string): string | null {
+  try {
+    const faviconStoreContent = localStorage.getItem(storageKey) || '{}';
+    const faviconStore = JSON.parse(faviconStoreContent);
+    const entry = faviconStore[origin];
+    if (!entry) return null;
+
+    // 兼容旧格式（纯字符串）
+    if (typeof entry === 'string') return entry;
+
+    // 新格式：带时间戳
+    if (Date.now() - entry.timestamp > CACHE_TTL) return null;
+    return entry.url;
+  } catch {
+    return null;
+  }
+}
+
+// ========== 核心函数 ==========
+
+// base64 对比检测的来源
+const base64CheckSources: FaviconSource[] = ['ext', 'bonjourr'];
+// fetch 状态码检测的来源
+const fetchCheckSources: FaviconSource[] = ['gstatic', 'ddg', 'ico'];
+
+// 初始化各来源的兜底图base64值（在 dom 环境中调用）
 export async function initFaviconApiData() {
-  const testFaviconUrl = getFaviconByExtApi(testPageUrl);
-  testFaviconBase64 = await getBase64Value(testFaviconUrl);
+  if (initPromise) return initPromise;
+  if (testFaviconBase64Map.size > 0) return; // 已初始化
+
+  initPromise = (async () => {
+    try {
+      const [extBase64, bonjourrBase64] = await Promise.all([
+        getBase64Value(getFaviconByExtApi(testPageUrl)),
+        getBase64Value(getBonjourrUrl(testPageUrl)),
+      ]);
+      testFaviconBase64Map.set('ext', extBase64 || '');
+      testFaviconBase64Map.set('bonjourr', bonjourrBase64 || '');
+    } catch {
+      testFaviconBase64Map.set('ext', '');
+      testFaviconBase64Map.set('bonjourr', '');
+    } finally {
+      initPromise = null;
+    }
+  })();
+
+  return initPromise;
 }
 
-// 获取图片链接对应的base64值
+// 获取图片链接对应的base64值（复用 canvas + 超时）
 export async function getBase64Value(imageUrl: string): Promise<string> {
   return new Promise(resolve => {
+    const timeout = setTimeout(() => resolve(''), 5000);
     const image = new Image();
     image.onload = () => {
-      let canvas = document.createElement('canvas');
-      canvas.width = 32;
-      canvas.height = 32;
-      canvas.getContext('2d')?.drawImage(image, 0, 0, 32, 32);
-      const base64 = canvas
-        .toDataURL('image/png')
-        .replace(/^data:image\/png;base64,/, '');
-      resolve(base64);
+      clearTimeout(timeout);
+      if (!sharedCanvas) {
+        sharedCanvas = document.createElement('canvas');
+        sharedCanvas.width = 32;
+        sharedCanvas.height = 32;
+        sharedCtx = sharedCanvas.getContext('2d');
+      }
+      sharedCtx?.clearRect(0, 0, 32, 32);
+      sharedCtx?.drawImage(image, 0, 0, 32, 32);
+      try {
+        const base64 = sharedCanvas
+          .toDataURL('image/png')
+          .replace(/^data:image\/png;base64,/, '');
+        resolve(base64);
+      } catch {
+        resolve('');
+      }
     };
     image.onerror = () => {
+      clearTimeout(timeout);
       resolve('');
     };
     image.src = imageUrl;
@@ -50,28 +157,179 @@ export function getFaviconByExtApi(pageUrl: string, size: number = 32) {
   const apiUrl = browser.runtime.getURL('/_favicon/');
   return handleUrlWidthParams(apiUrl, { pageUrl, size });
 }
+
 // 通过 t3.gstatic.com/faviconV2 获取网站图标
 export function getGstaticURL(pageUrl: string, size: number = 32) {
   return `https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${pageUrl}&size=${size}`;
 }
-// 获取网站图标
-export async function getFaviconUrl(pageUrl: string, size: number = 32) {
-  const origin = getOrigin(pageUrl);
-  const faviconFromStore = getFaviconFromStore(origin);
-  if (faviconFromStore) return faviconFromStore;
+// 通过 {origin}/favicon.ico 获取网站图标
+export function getFaviconIcoUrl(pageUrl: string) {
+  try {
+    const origin = getOrigin(pageUrl);
+    return `${origin}/favicon.ico`;
+  } catch {
+    return '';
+  }
+}
+// 通过 DuckDuckGo 获取网站图标
+export function getDuckDuckGoUrl(domain: string) {
+  return `https://icons.duckduckgo.com/ip3/${domain}.ico`;
+}
+// 通过 bonjourr 获取网站图标
+export function getBonjourrUrl(origin: string) {
+  return `https://services.bonjourr.fr/favicon/blob/${origin}`;
+}
+// fetch 状态码检测（通过 HEAD 请求判断资源是否有效）
+async function checkFetchStatus(imageUrl: string): Promise<boolean> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    const resp = await fetch(imageUrl, {
+      method: 'HEAD',
+      signal: controller.signal,
+      mode: 'no-cors',
+    });
 
-  if (!testFaviconBase64) {
-    await initFaviconApiData();
+    clearTimeout(timeout);
+    // no-cors 模式下 opaque response status 为 0，也算可访问
+    return resp.status === 0 || (resp.status >= 200 && resp.status < 400);
+  } catch {
+    return false;
+  }
+}
+
+// 轻量级图片加载检测（仅检测能否加载成功，不做 canvas 转换）
+function checkImageLoadable(imageUrl: string): Promise<boolean> {
+  return new Promise(resolve => {
+    const timeout = setTimeout(() => resolve(false), 5000);
+    const image = new Image();
+    image.onload = () => {
+      clearTimeout(timeout);
+      resolve(true);
+    };
+    image.onerror = (e) => {
+      clearTimeout(timeout);
+      resolve(false);
+    };
+    image.src = imageUrl;
+  });
+}
+
+// 尝试保存并返回 URL
+// - ext/bonjourr: base64 对比检测（有兜底图基准）
+// - gstatic/ddg: fetch 状态码检测
+// - ico: 轻量 loadable 检测
+async function tryFaviconSource(
+  origin: string,
+  imgUrl: string,
+  source: FaviconSource,
+): Promise<string | null> {
+  let valid = false;
+
+  if (base64CheckSources.includes(source)) {
+    const testBase64 = getTestBase64(source);
+    if (testBase64 !== null) {
+      const base64 = await getBase64Value(imgUrl);
+      valid = !!base64 && base64 !== testBase64;
+    }
+  } else if (fetchCheckSources.includes(source)) {
+    valid = await checkFetchStatus(imgUrl);
+  } else {
+    valid = await checkImageLoadable(imgUrl);
   }
 
-  const _faviconUrlByExt = getFaviconByExtApi(pageUrl, size);
-  const base64 = await getBase64Value(_faviconUrlByExt);
+  if (!valid) return null;
+  saveFaviconToStore(origin, imgUrl);
+  saveToMemoryCache(origin, imgUrl, source);
+  return imgUrl;
+}
 
-  if (base64 !== testFaviconBase64) {
-    saveFaviconToStore(origin, _faviconUrlByExt);
-    return _faviconUrlByExt;
-  } else {
-    return getGstaticURL(pageUrl, size);
+// 实际的网络请求逻辑（fallback 链路：_favicon → gstatic → ddg → bonjourr → favicon.ico）
+async function fetchFavicon(
+  pageUrl: string,
+  origin: string,
+  size: number,
+): Promise<string> {
+  try {
+    if (!origin || origin === 'null') {
+      saveToMemoryCache(origin, defaultFaviconUrl, 'default');
+      return defaultFaviconUrl;
+    }
+
+    // 1. _favicon 扩展 API（base64 对比检测兜底图）
+    if (getTestBase64('ext') !== '') {
+      const extUrl = getFaviconByExtApi(pageUrl, size);
+      const extResult = await tryFaviconSource(origin, extUrl, 'ext');
+      if (extResult) return extResult;
+    }
+
+    // 2. gstatic（fetch 状态码检测）
+    const gstaticUrl = getGstaticURL(pageUrl, size);
+    const gstaticResult = await tryFaviconSource(origin, gstaticUrl, 'gstatic');
+    if (gstaticResult) return gstaticResult;
+
+    // 3. DuckDuckGo（fetch 状态码检测）
+    try {
+      const domain = new URL(pageUrl).hostname;
+      const ddgUrl = getDuckDuckGoUrl(domain);
+      const ddgResult = await tryFaviconSource(origin, ddgUrl, 'ddg');
+      if (ddgResult) return ddgResult;
+    } catch {}
+
+    // 4. bonjourr（第三方兜底）
+    const bonjourrUrl = getBonjourrUrl(origin);
+    const bonjourrResult = await tryFaviconSource(origin, bonjourrUrl, 'bonjourr');
+    if (bonjourrResult) return bonjourrResult;
+
+    // 5. {origin}/favicon.ico（同源兜底）
+    const icoUrl = getFaviconIcoUrl(pageUrl);
+    if (icoUrl) {
+      const icoResult = await tryFaviconSource(origin, icoUrl, 'ico');
+      if (icoResult) return icoResult;
+    }
+
+    // 6. 最终兜底：返回 defaultFaviconUrl 兜底图
+    saveFaviconToStore(origin, defaultFaviconUrl);
+    saveToMemoryCache(origin, defaultFaviconUrl, 'default');
+    return defaultFaviconUrl;
+  } catch {
+    saveFaviconToStore(origin, defaultFaviconUrl);
+    saveToMemoryCache(origin, defaultFaviconUrl, 'default');
+    return defaultFaviconUrl;
+  }
+}
+
+// 获取网站图标（try-catch + 并发去重 + 两级缓存）
+export async function getFaviconUrl(pageUrl: string, size: number = 32): Promise<string> {
+  try {
+    const origin = getOrigin(pageUrl);
+
+    // 1. 内存缓存
+    const memHit = getFromMemoryCache(origin);
+    if (memHit) return memHit;
+
+    // 2. localStorage 缓存
+    const storeHit = getFaviconFromStore(origin);
+    if (storeHit) {
+      saveToMemoryCache(origin, storeHit, 'ext');
+      return storeHit;
+    }
+
+    await initFaviconApiData();
+
+    // 3. 并发去重
+    const pending = pendingRequests.get(origin);
+    if (pending) return pending;
+
+    const promise = fetchFavicon(pageUrl, origin, size).finally(() => {
+      pendingRequests.delete(origin);
+    });
+    pendingRequests.set(origin, promise);
+    return promise;
+  } catch {
+    saveFaviconToStore(origin, defaultFaviconUrl);
+    saveToMemoryCache(origin, defaultFaviconUrl, 'default');
+    return defaultFaviconUrl;
   }
 }
 
