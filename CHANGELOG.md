@@ -6,6 +6,15 @@ For the most detailed and up-to-date release notes, see [GitHub Releases](https:
 
 ---
 
+## v3.0.5
+**Release Date:** October 18, 2026
+
+- Optimized favicon retrieval logic
+- Style changed of the send-target-modal
+- Added unit test cases
+
+---
+
 ## v3.0.4
 
 **Release Date:** September 30, 2026
