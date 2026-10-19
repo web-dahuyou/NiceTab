@@ -253,9 +253,20 @@ export default defineBackground(() => {
       tabUtils.openAdminRoutePage({ path: '/home' });
     }
   }
-  browser.runtime.onInstalled.addListener(async () => {
-    console.log('browser.runtime.onInstalled');
+  browser.runtime.onInstalled.addListener(async details => {
+    console.log('browser.runtime.onInstalled---', details.reason);
     await stateUtils.setStateByModule('global', { snapshotStatus: 'on' });
+
+    if (details.reason === 'update') {
+      setTimeout(async () => {
+        const tabs = await browser.tabs.query({});
+        const adminUrl = browser.runtime.getURL('/options.html');
+        const filteredTabs = tabs.filter(tab => tab.id && !tab.url?.startsWith(adminUrl));
+        for (const tab of filteredTabs) {
+          browser.tabs.reload(tab.id);
+        }
+      }, 200);
+    }
 
     startup();
   });
