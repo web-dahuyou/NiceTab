@@ -5,6 +5,14 @@
 详细的更新记录请参阅 [GitHub Releases](https://github.com/web-dahuyou/NiceTab/releases)。
 
 ---
+## v3.0.6
+**发布日期：** 2026年10月25日
+
+- 标签页favicon缓存方式改为indexedDB
+- 右侧面板标签页事件监听优化
+- 添加firefox浏览器滚动条样式
+
+---
 
 ## v3.0.5
 **发布日期：** 2026年10月18日

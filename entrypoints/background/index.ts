@@ -1,5 +1,3 @@
-import { Tabs } from 'wxt/browser';
-import { debounce } from 'lodash-es';
 import contextMenusRegister, {
   strategyHandler,
   handleSendTabsAction,
@@ -17,185 +15,27 @@ import {
 import { autoSyncAlarm, autoSaveOpenedTabsAlarm } from '~/entrypoints/common/alarms';
 import {
   PRIMARY_COLOR,
-  // TAB_EVENTS,
   ENUM_SETTINGS_PROPS,
   POPUP_MODULE_NAMES,
   ENUM_ACTION_NAME,
   BROWSER_ACTION_API_NAME,
 } from '~/entrypoints/common/constants';
 import type { RuntimeMessageEventProps } from '~/entrypoints/types';
+import {
+  initPopup,
+  initTabEventListener,
+  initTabsUpdateListener,
+  initNewTabRedirectListener,
+  setBadge,
+} from './handler';
 
 const {
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
   OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED,
   RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH,
-  SHOW_OPENED_TAB_COUNT,
   POPUP_MODULE_DISPLAYS,
-  NEW_TAB_DISPLAY,
 } = ENUM_SETTINGS_PROPS;
 
-// 设置插件图标徽标
-async function setBadge() {
-  const settings = await settingsUtils.getSettings();
-  const themeData = await themeUtils.getThemeData();
-  const tabs = await tabUtils.getAllTabs();
-  if (!settings[SHOW_OPENED_TAB_COUNT]) {
-    browser[BROWSER_ACTION_API_NAME].setBadgeText?.({ text: '' });
-  } else {
-    browser[BROWSER_ACTION_API_NAME].setBadgeText({ text: String(tabs.length || 0) });
-  }
-  browser[BROWSER_ACTION_API_NAME].setBadgeTextColor({ color: '#fff' });
-  browser[BROWSER_ACTION_API_NAME].setBadgeBackgroundColor({
-    color: themeData?.colorPrimary || PRIMARY_COLOR,
-  });
-}
-
-// 页面创建后设置页面标题
-async function setPageTitleOnCreated(tab: Tabs.Tab) {
-  if (tab.status === 'complete') {
-    tabUtils.setPageTitle({ windowId: tab.windowId, tabId: tab.id });
-  }
-}
-// 页面更新时设置页面标题
-async function setPageTitleOnUpdated(
-  tabId: number,
-  changeInfo: Tabs.OnUpdatedChangeInfoType,
-  tab: Tabs.Tab,
-) {
-  if (
-    changeInfo.status === 'complete' ||
-    (tab.status === 'complete' && tab.index !== -1)
-  ) {
-    tabUtils.setPageTitle({ windowId: tab.windowId, tabId: tab.id });
-  }
-}
-
-async function initTabEventListener() {
-  function handler() {
-    setBadge();
-    tabUtils.setPageTitle();
-  }
-
-  handler();
-
-  browser.tabs.onCreated.removeListener(setBadge);
-  browser.tabs.onRemoved.removeListener(setBadge);
-  browser.tabs.onActivated.removeListener(setBadge);
-  browser.runtime.onInstalled.removeListener(setBadge);
-  browser.tabs.onCreated.addListener(setBadge);
-  browser.tabs.onRemoved.addListener(setBadge);
-  browser.tabs.onActivated.addListener(setBadge);
-  browser.runtime.onInstalled.addListener(setBadge);
-  // TAB_EVENTS.forEach((event) => browser.tabs[event]?.addListener(handler));
-
-  browser.tabs.onCreated.removeListener(setPageTitleOnCreated);
-  browser.tabs.onCreated.addListener(setPageTitleOnCreated);
-  browser.tabs.onUpdated.removeListener(setPageTitleOnUpdated);
-  browser.tabs.onUpdated.addListener(setPageTitleOnUpdated);
-}
-
-// 初始化 popup 交互
-async function initPopup() {
-  const settings = await settingsUtils.getSettings();
-  const modules = settings[POPUP_MODULE_DISPLAYS] || POPUP_MODULE_NAMES;
-  if (modules.length > 0) {
-    console.log('配置了popup模块, 点击图标显示popup面板');
-    browser[BROWSER_ACTION_API_NAME].setPopup({ popup: 'popup.html' });
-  } else {
-    console.log('没有配置popup模块, 点击图标不显示popup面板， 直接发送所有标签页');
-    browser[BROWSER_ACTION_API_NAME].setPopup({ popup: '' });
-  }
-}
-
-// 限制最多可固定一个NiceTab管理页面
-async function adminPageLimitControl(tabId: number) {
-  const adminTabUrl = browser.runtime.getURL('/options.html');
-  const tabs = await browser.tabs.query({
-    url: `${adminTabUrl}*`,
-    currentWindow: true,
-  });
-  let pinnedAdminPageCount = 0;
-  for (let tab of tabs) {
-    if (tab.pinned) {
-      pinnedAdminPageCount++;
-    }
-    if (pinnedAdminPageCount > 1) {
-      browser.tabs.remove(tabId);
-    }
-  }
-}
-
-// 初始化监听 tabs 更新
-async function initTabsUpdateListener() {
-  browser.tabs.onUpdated.removeListener(adminPageLimitControl);
-  browser.tabs.onUpdated.addListener(adminPageLimitControl);
-
-  // 页面更新时自动创建快照
-  const autoCreateSnapshot = debounce(async () => {
-    const globalState = await stateUtils.getState('global');
-    if (globalState.snapshotStatus === 'on') {
-      tabUtils.saveOpenedTabsAsSnapshot();
-    }
-  }, 1000);
-  browser.tabs.onUpdated.removeListener(autoCreateSnapshot);
-  browser.tabs.onUpdated.addListener(autoCreateSnapshot);
-  browser.tabs.onMoved.removeListener(autoCreateSnapshot);
-  browser.tabs.onMoved.addListener(autoCreateSnapshot);
-  browser.tabs.onRemoved.removeListener(autoCreateSnapshot);
-  browser.tabs.onRemoved.addListener(autoCreateSnapshot);
-  browser.tabGroups?.onUpdated?.removeListener(autoCreateSnapshot);
-  browser.tabGroups?.onUpdated?.addListener(autoCreateSnapshot);
-  browser.tabGroups?.onMoved?.removeListener(autoCreateSnapshot);
-  browser.tabGroups?.onMoved?.addListener(autoCreateSnapshot);
-}
-
-// 新标签页重定向监听（不使用chrome_url_overrides，根据settings配置项进行控制）
-async function initNewTabRedirectListener() {
-  browser.tabs.onCreated.removeListener(handleNewTabCreated);
-  browser.tabs.onUpdated.removeListener(handleNewTabUpdated);
-  browser.tabs.onCreated.addListener(handleNewTabCreated);
-  browser.tabs.onUpdated.addListener(handleNewTabUpdated);
-}
-
-async function handleNewTabCreated(tab: Tabs.Tab) {
-  const url = tab.url || tab.pendingUrl || '';
-  await handleNewTabRedirect(tab.id, url);
-}
-
-async function handleNewTabUpdated(
-  tabId: number,
-  changeInfo: Tabs.OnUpdatedChangeInfoType,
-) {
-  if (changeInfo.status === 'loading') {
-    const url = changeInfo.url || '';
-    await handleNewTabRedirect(tabId, url);
-  }
-}
-
-async function handleNewTabRedirect(tabId: number | undefined, url: string) {
-  if (!tabId || !url) return;
-
-  const newTabPatterns = [
-    'chrome://newtab/',
-    'edge://newtab/',
-    'about:newtab',
-    'about:privatebrowsing',
-  ];
-
-  const matches = newTabPatterns.some(
-    pattern => url === pattern || url.startsWith(pattern),
-  );
-  if (!matches) return;
-
-  const settings = await settingsUtils.getSettings();
-  const display = settings[NEW_TAB_DISPLAY];
-
-  if (display === 'homePage') {
-    browser.tabs.update(tabId, { url: browser.runtime.getURL('/options.html#/home') });
-  } else if (display === 'niceNewtab') {
-    browser.tabs.update(tabId, { url: browser.runtime.getURL('/nice-newtab.html') });
-  }
-}
 export default defineBackground(() => {
   // console.log('Hello background!', { id: browser.runtime.id });
   initTabsUpdateListener();
@@ -253,9 +93,20 @@ export default defineBackground(() => {
       tabUtils.openAdminRoutePage({ path: '/home' });
     }
   }
-  browser.runtime.onInstalled.addListener(async () => {
-    console.log('browser.runtime.onInstalled');
+  browser.runtime.onInstalled.addListener(async details => {
+    console.log('browser.runtime.onInstalled---', details.reason);
     await stateUtils.setStateByModule('global', { snapshotStatus: 'on' });
+
+    if (details.reason === 'update') {
+      setTimeout(async () => {
+        const tabs = await browser.tabs.query({});
+        const adminUrl = browser.runtime.getURL('/options.html');
+        const filteredTabs = tabs.filter(tab => tab.id && !tab.url?.startsWith(adminUrl));
+        for (const tab of filteredTabs) {
+          browser.tabs.reload(tab.id);
+        }
+      }, 200);
+    }
 
     startup();
   });

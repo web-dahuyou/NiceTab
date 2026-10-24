@@ -28,7 +28,7 @@ export const StyledTabItemWrapper = styled.div<{ $bgColor?: string }>`
       pointer-eventes: unset;
     }
   }
-  .img-favicon {
+  .favicon-box {
     margin-right: 8px;
   }
 `;

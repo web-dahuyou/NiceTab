@@ -1,7 +1,14 @@
 import { handleUrlWidthParams, getOrigin } from './url';
+import {
+  getFavicon,
+  putFavicon,
+  pruneFavicons,
+  MAX_DATA_URL_LENGTH,
+  type FaviconRecord,
+  type FaviconSource,
+} from './faviconDb';
 
 const testPageUrl = 'https://favicon-test.nicetab.com';
-const storageKey = 'local_faviconStore';
 
 const defaultFaviconUrl = browser.runtime.getURL('/icon/favicon-default.png');
 
@@ -15,7 +22,6 @@ function getTestBase64(source: FaviconSource): string | null {
 }
 
 // ========== 两级缓存 ==========
-type FaviconSource = 'ext' | 'gstatic' | 'ddg' | 'bonjourr' | 'ico' | 'default';
 interface CacheEntry {
   url: string;
   timestamp: number;
@@ -57,36 +63,54 @@ function getFromMemoryCache(origin: string): string | null {
   return entry.url;
 }
 
-// 将 favicon 保存到 localStorage 中（带时间戳）
-function saveFaviconToStore(origin: string, faviconUrl: string) {
+// 将 favicon 保存到 IndexedDB 中（带时间戳）
+async function saveFaviconToStore(
+  origin: string,
+  faviconUrl: string,
+  source: FaviconSource,
+) {
+  if (!origin || origin === 'null') return;
+  // data:image 的图标体积不可控，超过上限的不落盘，交给兜底图
+  if (faviconUrl.startsWith('data:') && faviconUrl.length > MAX_DATA_URL_LENGTH) {
+    return;
+  }
   try {
-    const faviconStoreContent = localStorage.getItem(storageKey) || '{}';
-    const faviconStore = JSON.parse(faviconStoreContent);
-    faviconStore[origin] = { url: faviconUrl, timestamp: Date.now() };
-    localStorage.setItem(storageKey, JSON.stringify(faviconStore));
+    // 兜底图不覆盖已经缓存的真实图标
+    if (source === 'default') {
+      const existing = await getFavicon(origin);
+      if (existing?.url && existing.url !== defaultFaviconUrl) return;
+    }
+    await putFavicon({ origin, url: faviconUrl, timestamp: Date.now(), source });
   } catch {
-    // 数据损坏时清除
-    localStorage.removeItem(storageKey);
+    // 缓存写入失败不影响主流程
   }
 }
 
-// 从 localStorage 中获取 favicon（带 TTL 校验）
-function getFaviconFromStore(origin: string): string | null {
+// 从 IndexedDB 中获取 favicon（带 TTL 校验）
+async function getFaviconFromStore(origin: string): Promise<FaviconRecord | null> {
   try {
-    const faviconStoreContent = localStorage.getItem(storageKey) || '{}';
-    const faviconStore = JSON.parse(faviconStoreContent);
-    const entry = faviconStore[origin];
-    if (!entry) return null;
-
-    // 兼容旧格式（纯字符串）
-    if (typeof entry === 'string') return entry;
-
-    // 新格式：带时间戳
-    if (Date.now() - entry.timestamp > CACHE_TTL) return null;
-    return entry.url;
+    const record = await getFavicon(origin);
+    if (!record) return null;
+    if (Date.now() - record.timestamp > CACHE_TTL) return null;
+    return record;
   } catch {
     return null;
   }
+}
+
+// 首次读取前清理过期/超量记录，整个页面生命周期只执行一次
+let storePrunedPromise: Promise<void> | null = null;
+function ensureStorePruned(): Promise<void> {
+  storePrunedPromise ??= (async () => {
+    // 迁移清理：旧版本 localStorage 缓存已废弃，数据已迁移到 IndexedDB
+    try {
+      localStorage.removeItem('local_faviconStore');
+    } catch {
+      // background 等无 localStorage 环境忽略
+    }
+    await pruneFavicons({ ttl: CACHE_TTL, max: MAX_CACHE_SIZE });
+  })();
+  return storePrunedPromise;
 }
 
 // ========== 核心函数 ==========
@@ -207,7 +231,7 @@ function checkImageLoadable(imageUrl: string): Promise<boolean> {
       clearTimeout(timeout);
       resolve(true);
     };
-    image.onerror = (e) => {
+    image.onerror = () => {
       clearTimeout(timeout);
       resolve(false);
     };
@@ -239,8 +263,9 @@ async function tryFaviconSource(
   }
 
   if (!valid) return null;
-  saveFaviconToStore(origin, imgUrl);
+  // 先写内存缓存保证立即命中，IndexedDB 落盘异步执行，不阻塞图标返回
   saveToMemoryCache(origin, imgUrl, source);
+  saveFaviconToStore(origin, imgUrl, source);
   return imgUrl;
 }
 
@@ -289,30 +314,31 @@ async function fetchFavicon(
     }
 
     // 6. 最终兜底：返回 defaultFaviconUrl 兜底图
-    saveFaviconToStore(origin, defaultFaviconUrl);
     saveToMemoryCache(origin, defaultFaviconUrl, 'default');
+    saveFaviconToStore(origin, defaultFaviconUrl, 'default');
     return defaultFaviconUrl;
   } catch {
-    saveFaviconToStore(origin, defaultFaviconUrl);
     saveToMemoryCache(origin, defaultFaviconUrl, 'default');
+    saveFaviconToStore(origin, defaultFaviconUrl, 'default');
     return defaultFaviconUrl;
   }
 }
 
 // 获取网站图标（try-catch + 并发去重 + 两级缓存）
 export async function getFaviconUrl(pageUrl: string, size: number = 32): Promise<string> {
-  try {
-    const origin = getOrigin(pageUrl);
+  const origin = getOrigin(pageUrl);
 
+  try {
     // 1. 内存缓存
     const memHit = getFromMemoryCache(origin);
     if (memHit) return memHit;
 
-    // 2. localStorage 缓存
-    const storeHit = getFaviconFromStore(origin);
+    // 2. IndexedDB 缓存
+    await ensureStorePruned();
+    const storeHit = await getFaviconFromStore(origin);
     if (storeHit) {
-      saveToMemoryCache(origin, storeHit, 'ext');
-      return storeHit;
+      saveToMemoryCache(origin, storeHit.url, storeHit.source);
+      return storeHit.url;
     }
 
     await initFaviconApiData();
@@ -327,8 +353,8 @@ export async function getFaviconUrl(pageUrl: string, size: number = 32): Promise
     pendingRequests.set(origin, promise);
     return promise;
   } catch {
-    saveFaviconToStore(origin, defaultFaviconUrl);
     saveToMemoryCache(origin, defaultFaviconUrl, 'default');
+    saveFaviconToStore(origin, defaultFaviconUrl, 'default');
     return defaultFaviconUrl;
   }
 }

@@ -130,6 +130,17 @@ export const GlobalStyle = createGlobalStyle`
     }
   }
 
+  /* Firefox 全局滚动条样式 */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: ${props => {
+      const thumbColor = props.theme.type === 'light' ? '#d9d9d9' : '#555';
+      const trackColor = props.theme.colorBgContainer || '#fff';
+      return `${thumbColor} ${trackColor}`;
+    }};
+  }
+
+  /* Chrome/Safari 滚动条样式 */
   ::-webkit-scrollbar {
     width: 8px !important;
     height: 8px !important;

@@ -3,6 +3,7 @@ import { browser, Tabs } from 'wxt/browser';
 import { Empty, Checkbox, Tooltip, Typography, theme } from 'antd';
 import type { CheckboxProps } from 'antd';
 import { CloseOutlined, CoffeeOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { debounce } from 'lodash-es';
 import { isGroupSupported } from '~/entrypoints/common/utils';
 import { getAdminTabInfo } from '~/entrypoints/common/tabs';
 import {
@@ -238,24 +239,29 @@ export default function RightPanel(rightPanelProps: RightPanelLayoutProps) {
     [setDraggableState, setDraggingTabItem],
   );
 
-  useEffect(() => {
-    initTabs();
+  const initTabsDebounce = useMemo(() => debounce(initTabs, 300), [initTabs]);
 
+  useEffect(() => {
     TAB_EVENTS.forEach(event => {
-      browser.tabs[event]?.addListener(initTabs);
+      browser.tabs[event]?.addListener(initTabsDebounce);
     });
     TAB_GROUP_EVENTS.forEach(event => {
-      browser.tabGroups?.[event]?.addListener(initTabs);
+      browser.tabGroups?.[event]?.addListener(initTabsDebounce);
     });
 
     return () => {
       TAB_EVENTS.forEach(event => {
-        browser.tabs[event]?.removeListener(initTabs);
+        browser.tabs[event]?.removeListener(initTabsDebounce);
       });
       TAB_GROUP_EVENTS.forEach(event => {
-        browser.tabGroups?.[event]?.removeListener(initTabs);
+        browser.tabGroups?.[event]?.removeListener(initTabsDebounce);
       });
+      initTabsDebounce.cancel();
     };
+  }, [initTabs, initTabsDebounce]);
+
+  useEffect(() => {
+    initTabs();
   }, []);
 
   return (
