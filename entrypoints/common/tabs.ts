@@ -323,8 +323,9 @@ async function sendAllTabs(
       browser.tabs.remove(filteredTabs.map(t => t.id as number).filter(Boolean));
     }, 30);
   } else {
+    const openAdminTabAfterSendTabs = settings[OPEN_ADMIN_TAB_AFTER_SEND_TABS];
     // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
-    cancelHighlightTabs(filteredTabs);
+    openAdminTabAfterSendTabs && cancelHighlightTabs(filteredTabs);
   }
 }
 // 发送当前选中的标签页所在的标签组（支持多选）
@@ -351,8 +352,9 @@ async function sendCurrentGroup(targetData: SendTargetProps = {}, tab?: Tabs.Tab
   ) {
     browser.tabs.remove(filteredTabs.map(t => t.id as number).filter(Boolean));
   } else {
+    const openAdminTabAfterSendTabs = settings[OPEN_ADMIN_TAB_AFTER_SEND_TABS];
     // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
-    cancelHighlightTabs(filteredTabs);
+    openAdminTabAfterSendTabs && cancelHighlightTabs(filteredTabs);
   }
 }
 // 发送当前选中的标签页（支持多选）
@@ -398,8 +400,9 @@ async function sendCurrentTab(targetData: SendTargetProps = {}, tab?: Tabs.Tab) 
   ) {
     browser.tabs.remove(filteredTabs.map(t => t.id as number).filter(Boolean));
   } else {
+    const openAdminTabAfterSendTabs = settings[OPEN_ADMIN_TAB_AFTER_SEND_TABS];
     // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
-    cancelHighlightTabs(filteredTabs);
+    openAdminTabAfterSendTabs && cancelHighlightTabs(filteredTabs);
   }
 }
 async function sendOtherTabs(targetData: SendTargetProps = {}) {

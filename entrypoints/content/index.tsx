@@ -37,7 +37,7 @@ export default defineContentScript({
         // root.render(<App />);
         root.render(
           <StyleProvider container={container}>
-            <Root pageContext="contentScriptPage">
+            <Root pageContext="contentScriptPage" messageContainer={container}>
               <StyleSheetManager target={container}>
                 <ContentGlobalContext.Provider value={{ rootWrapper: wrapper }}>
                   <App />

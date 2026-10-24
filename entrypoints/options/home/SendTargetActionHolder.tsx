@@ -1,5 +1,6 @@
-import { useEffect, forwardRef, useImperativeHandle } from 'react';
+import { useEffect, forwardRef, useContext, useImperativeHandle } from 'react';
 import { message } from 'antd';
+import { ContentGlobalContext } from '~/entrypoints/content/context';
 import { sendRuntimeMessage } from '~/entrypoints/common/utils';
 import type {
   SendTabMsgEventProps,
@@ -15,7 +16,12 @@ export interface SendTargetActionHolderProps {
 
 export default forwardRef(
   ({ pageContext = 'optionsPage' }: { pageContext?: PageContextType }, ref) => {
-    const [messageApi, contextHolder] = message.useMessage();
+    const contentContext = useContext(ContentGlobalContext);
+    // content script 中的 antd 样式被限制在 shadow root 内，
+    // message 默认 portal 到 document.body 会拿不到样式（提示不可见），因此挂载到 shadow root 内
+    const [messageApi, contextHolder] = message.useMessage({
+      getContainer: () => contentContext.rootWrapper || document.body,
+    });
     const [sendTargetModalVisible, setSendTargetModalVisible] = useState(false);
     const [actionName, setActionName] = useState<string>('');
 

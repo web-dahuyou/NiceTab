@@ -43,12 +43,16 @@ const darkPinnedAlgorithm = (seed: Parameters<typeof theme.darkAlgorithm>[0]) =>
 
 export default function Root({
   pageContext = 'optionsPage',
+  messageContainer,
   children,
 }: {
   pageContext: PageContextType;
+  messageContainer?: HTMLElement;
   children: React.ReactNode;
 }) {
-  const [$message, messageContextHolder] = message.useMessage();
+  const [$message, messageContextHolder] = message.useMessage({
+    getContainer: () => messageContainer || document.body,
+  });
   const [version, setVersion] = useState('');
   const { locale: localeAntd, changeLocale: changeLocaleAntd } = useAntdLocale();
   const {
