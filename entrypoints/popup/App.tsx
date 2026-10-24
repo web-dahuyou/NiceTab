@@ -30,15 +30,15 @@ import {
 import { getMenus } from '~/entrypoints/common/contextMenus';
 import { settingsUtils, stateUtils } from '~/entrypoints/common/storage';
 import { TAB_EVENTS, SHORTCUTS_PAGE_URL } from '~/entrypoints/common/constants';
-import type { PopupModuleNames } from '~/entrypoints/types';
+import type { ColorItem, PopupModuleNames } from '~/entrypoints/types';
 import {
   GITHUB_URL,
-  THEME_COLORS,
   ENUM_SETTINGS_PROPS,
   ENUM_ACTION_NAME,
   POPUP_MODULE_NAMES,
 } from '~/entrypoints/common/constants';
 import ColorList from '~/entrypoints/common/components/ColorList.tsx';
+import useThemeColors from '~/entrypoints/common/hooks/themeColors';
 import { GlobalStyle } from '~/entrypoints/common/style/Common.styled';
 import TabGroupItem, { type GroupListItem } from './TabGroupItem';
 import { type TabActions } from './TabItem';
@@ -68,7 +68,8 @@ export default function App() {
   const { token } = theme.useToken();
   const NiceGlobalContext = useContext(GlobalContext);
   const { $fmt, locale } = useIntlUtls();
-  const { version, themeTypeConfig } = NiceGlobalContext;
+  const { version, themeTypeConfig, colorName } = NiceGlobalContext;
+  const { THEME_COLORS } = useThemeColors();
   const [tabs, setTabs] = useState<Tabs.Tab[]>([]);
   const [tabGroupList, setTabGroupList] = useState<GroupListItem[]>([]);
   const [modules, setModules] = useState<PopupModuleNames[]>([]);
@@ -172,8 +173,8 @@ export default function App() {
   };
 
   // 切换主题
-  const handleThemeChange = (color: string) => {
-    const themeData = { colorPrimary: color };
+  const handleThemeChange = (item: ColorItem) => {
+    const themeData = { colorName: item.key };
     NiceGlobalContext.setThemeData(themeData);
     sendRuntimeMessage({ msgType: 'setPrimaryColor', data: themeData });
   };
@@ -508,7 +509,11 @@ export default function App() {
               {modules.includes('theme') && (
                 <div className="block theme-colors">
                   <span className="block-title">{$fmt('common.theme')}：</span>
-                  <ColorList colors={THEME_COLORS} onItemClick={handleThemeChange} />
+                  <ColorList
+                    colors={THEME_COLORS}
+                    activeKey={colorName}
+                    onItemClick={handleThemeChange}
+                  />
                 </div>
               )}
               {modules.includes('openedTabs') && (

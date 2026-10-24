@@ -5,6 +5,15 @@
 详细的更新记录请参阅 [GitHub Releases](https://github.com/web-dahuyou/NiceTab/releases)。
 
 ---
+
+## v3.0.7
+**发布日期：** 待定
+
+- 暗色模式的主题色列表调整
+- 暗色模式主题 token 调整
+
+---
+
 ## v3.0.6
 **发布日期：** 2026年10月25日
 

@@ -1,4 +1,5 @@
 import { Tabs } from 'wxt/browser';
+import type { ThemeConfig } from 'antd';
 import {
   blue,
   cyan,
@@ -60,12 +61,69 @@ export const THEME_COLOR_NAMES: ThemeColors[] = [
 ];
 // 主色
 export const PRIMARY_COLOR = ENUM_COLORS.blue;
+// 默认主题色名
+export const defaultThemeColorName: ThemeColors = 'blue';
 export const THEME_COLORS: ColorItem[] = THEME_COLOR_NAMES.map(name => {
   return {
     key: name,
     color: ENUM_COLORS?.[name],
   };
 });
+// 暗色主题色列表（为暗色背景调优，对比度均在3:1以上；亮色列表为 @ant-design/colors 的 primary 值）
+export const THEME_COLORS_DARK_MAP: Record<ThemeColors, string> = {
+  blue: '#3c89e8',
+  cyan: '#33bcb7',
+  volcano: '#e87040',
+  orange: '#e89a3c',
+  red: '#e84749',
+  green: '#6abe39',
+  purple: '#a069e8',
+  magenta: '#e0529c',
+  gold: '#e8b339',
+  lime: '#a9d134',
+};
+// 按主题模式获取主题色值
+export function getThemeColorHex(
+  colorName: ThemeColors,
+  themeMode: 'light' | 'dark' = 'light',
+) {
+  return themeMode === 'dark' ? THEME_COLORS_DARK_MAP[colorName] : ENUM_COLORS[colorName];
+}
+// 按主题模式获取主题色列表
+export function getThemeColorList(themeMode: 'light' | 'dark' = 'light'): ColorItem[] {
+  return THEME_COLOR_NAMES.map(name => {
+    return {
+      key: name,
+      color: getThemeColorHex(name, themeMode),
+    };
+  });
+}
+// 根据主题色值反查色名（旧数据 colorPrimary hex 迁移用），找不到精确匹配时返回最近邻
+export function getColorNameFromHex(hex?: string): ThemeColors {
+  if (!hex) return defaultThemeColorName;
+  const target = hex.toLowerCase();
+  const exactHit = THEME_COLOR_NAMES.find(
+    name => ENUM_COLORS[name].toLowerCase() === target,
+  );
+  if (exactHit) return exactHit;
+
+  const toRgb = (color: string) => {
+    const c = color.replace('#', '');
+    return [0, 2, 4].map(i => parseInt(c.slice(i, i + 2), 16));
+  };
+  const [tr, tg, tb] = toRgb(target);
+  let best: ThemeColors = THEME_COLOR_NAMES[0];
+  let minDistance = Infinity;
+  for (const name of THEME_COLOR_NAMES) {
+    const [r, g, b] = toRgb(ENUM_COLORS[name]);
+    const distance = (r - tr) ** 2 + (g - tg) ** 2 + (b - tb) ** 2;
+    if (distance < minDistance) {
+      minDistance = distance;
+      best = name;
+    }
+  }
+  return best;
+}
 
 // 主题类型
 export const THEME_TYPE_CONFIG: Record<ThemeTypes, ThemeTypeConfig> = {
@@ -87,6 +145,16 @@ export const THEME_TYPE_CONFIG: Record<ThemeTypes, ThemeTypeConfig> = {
 };
 // 默认主题类型
 export const defaultThemeType: ThemeTypes = 'light';
+
+// 暗色模式中性色token覆盖：antd默认中性色族是相对其默认底色 #141414 派生的，
+// 与项目自定义暗色背景 #2f2f2f 脱节（弹层背景会比页面更暗、弱分割线不可见），
+// 以 #2f2f2f 为基准手工调优一条层次链：container < elevated < spotlight
+export const THEME_DARK_TOKEN_OVERRIDES: ThemeConfig['token'] = {
+  colorBgElevated: '#3a3a3a', // Modal/Dropdown/Select/message 等弹层背景
+  colorBgSpotlight: '#454545', // Tooltip 背景
+  colorBorder: '#4a4a4a', // 边框
+  colorBorderSecondary: '#3a3a3a', // 弱分割线
+};
 
 // 发送标签页操作名称
 export const SEND_TAB_ACTION_NAMES = [

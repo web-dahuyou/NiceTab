@@ -14,7 +14,7 @@ import type {
 import { settingsUtils, themeUtils } from '~/entrypoints/common/storage';
 import { capitalize } from '~/entrypoints/common/utils';
 import {
-  PRIMARY_COLOR,
+  defaultThemeColorName,
   THEME_TYPE_CONFIG,
   defaultThemeType,
   defaultLanguage,
@@ -25,7 +25,7 @@ export const eventEmitter = mitt<EventsEmitterProps>();
 // global context
 export const GlobalContext = createContext<GlobalContextProps>({
   version: '888.888.888',
-  colorPrimary: PRIMARY_COLOR,
+  colorName: defaultThemeColorName,
   themeTypeConfig: THEME_TYPE_CONFIG[defaultThemeType],
   themeType: defaultThemeType,
   pageWidthType: 'responsive',

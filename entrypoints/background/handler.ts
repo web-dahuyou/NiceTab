@@ -5,7 +5,8 @@ import { themeUtils, settingsUtils, stateUtils } from '~/entrypoints/common/stor
 
 import { putFavicon, MAX_DATA_URL_LENGTH } from '~/entrypoints/common/utils/faviconDb';
 import {
-  PRIMARY_COLOR,
+  defaultThemeColorName,
+  getThemeColorHex,
   // TAB_EVENTS,
   ENUM_SETTINGS_PROPS,
   POPUP_MODULE_NAMES,
@@ -40,7 +41,8 @@ export async function setBadge() {
   }
   browser[BROWSER_ACTION_API_NAME].setBadgeTextColor({ color: '#fff' });
   browser[BROWSER_ACTION_API_NAME].setBadgeBackgroundColor({
-    color: themeData?.colorPrimary || PRIMARY_COLOR,
+    // 徽标在浏览器工具条上，不跟随页面主题，固定使用亮色主题色
+    color: getThemeColorHex(themeData?.colorName || defaultThemeColorName, 'light'),
   });
 }
 

@@ -2,7 +2,12 @@ import type { Runtime } from 'wxt/browser';
 import React, { useEffect, useState } from 'react';
 import { ConfigProvider, theme, message } from 'antd';
 import { IntlProvider } from 'react-intl';
-import { PRIMARY_COLOR, defaultLanguage } from '../constants';
+import {
+  defaultLanguage,
+  defaultThemeColorName,
+  getThemeColorHex,
+  THEME_DARK_TOKEN_OVERRIDES,
+} from '../constants';
 import {
   GlobalContext,
   useAntdLocale,
@@ -13,6 +18,7 @@ import type {
   PageContextType,
   RuntimeMessageEventProps,
   ThemeProps,
+  ThemeColors,
   LanguageTypes,
   ThemeTypes,
   SettingsProps,
@@ -25,6 +31,15 @@ import {
   initThemeStorageListener,
 } from '~/entrypoints/common/storage';
 import { updateAdminPageUrlDebounced } from '~/entrypoints/common/tabs';
+
+// 暗色主题算法：衍生token（hover/active/背景等）仍走antd dark算法，
+// 但主色钉住为精选值（antd dark算法会把主色加深约14%，在暗色背景下会发暗发闷）
+const darkPinnedAlgorithm = (seed: Parameters<typeof theme.darkAlgorithm>[0]) => {
+  return {
+    ...theme.darkAlgorithm(seed),
+    colorPrimary: seed.colorPrimary,
+  };
+};
 
 export default function Root({
   pageContext = 'optionsPage',
@@ -43,8 +58,11 @@ export default function Root({
   } = useCustomLocale();
   const { themeTypeConfig, themeType, changeThemeType } = useThemeTypeConfig(pageContext);
   const [hasReady, setHasReady] = useState(false);
-  const [primaryColor, setPrimaryColor] = useState(PRIMARY_COLOR);
+  const [colorName, setColorName] = useState<ThemeColors>(defaultThemeColorName);
   const [pageWidthType, setPageWidthType] = useState<PageWidthTypes>('responsive');
+
+  const themeMode = themeTypeConfig.type === 'dark' ? 'dark' : 'light';
+  const primaryColor = getThemeColorHex(colorName, themeMode);
 
   const handleLocaleChange = async (language?: LanguageTypes) => {
     changeLocaleAntd(language);
@@ -55,7 +73,7 @@ export default function Root({
   };
   const handleThemeChange = async (themeData: Partial<ThemeProps>) => {
     const theme = await themeUtils.setThemeData(themeData);
-    setPrimaryColor(theme.colorPrimary);
+    setColorName(theme.colorName || defaultThemeColorName);
   };
   const handlePageWidthTypeChange = async (type: PageWidthTypes) => {
     setPageWidthType(type);
@@ -76,7 +94,7 @@ export default function Root({
     const settings = await settingsUtils.getSettings();
     handleSettingsChange(settings);
     const theme = await themeUtils.getThemeData();
-    setPrimaryColor(theme.colorPrimary);
+    setColorName(theme.colorName || defaultThemeColorName);
     setHasReady(true);
   };
 
@@ -90,9 +108,9 @@ export default function Root({
     if (targetPageContext && targetPageContext !== pageContext) return;
 
     if (msgType === 'setPrimaryColor') {
-      const colorPrimary = data.colorPrimary || PRIMARY_COLOR;
-      await themeUtils.setThemeData({ colorPrimary });
-      handleThemeChange({ colorPrimary });
+      const colorName = data.colorName || defaultThemeColorName;
+      await themeUtils.setThemeData({ colorName });
+      handleThemeChange({ colorName });
     } else if (msgType === 'setThemeData') {
       await themeUtils.setThemeData(data);
       handleThemeChange(data);
@@ -146,11 +164,12 @@ export default function Root({
           cssVar: { key: 'css-var-token-nicetab' },
           hashed: false,
 
-          algorithm: theme[themeTypeConfig.algorithm],
+          algorithm: themeMode === 'dark' ? darkPinnedAlgorithm : theme.defaultAlgorithm,
           token: {
             motion: false,
-            colorPrimary: primaryColor || PRIMARY_COLOR,
+            colorPrimary: primaryColor,
             colorBgContainer: themeTypeConfig.bgColor || '#fff',
+            ...(themeMode === 'dark' ? THEME_DARK_TOKEN_OVERRIDES : {}),
           },
           components: {
             Tree: {
@@ -163,7 +182,7 @@ export default function Root({
         <GlobalContext.Provider
           value={{
             version,
-            colorPrimary: primaryColor,
+            colorName,
             themeTypeConfig,
             themeType,
             pageWidthType,
