@@ -26,6 +26,14 @@ export interface TagItem {
   isStarred?: boolean;
 }
 
+// NiceTab数据结构
+export interface NiceTabListData {
+  version: number;
+  dataSource: 'nicetab';
+  lastSyncTime?: string;
+  data: TagItem[];
+}
+
 /* keptab 格式相关  */
 export interface KepTabItem {
   url: string;
@@ -163,7 +171,7 @@ export interface SnapshotRecord {
 }
 
 export interface SnapshotStore {
-  version: 2;
+  version: number;
   manual: SnapshotRecord[];
   auto?: SnapshotRecord;
 }
