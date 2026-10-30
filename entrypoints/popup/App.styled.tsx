@@ -206,6 +206,9 @@ export const StyledTabItem = styled.div`
   //   height: 100%;
   //   background: ${props => props.theme.colorPrimary};
   // }
+  .favicon-box {
+    margin-right: 8px;
+  }
   .tab-item-title {
     flex: 1;
     overflow: hidden;
