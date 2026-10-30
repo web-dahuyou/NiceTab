@@ -6,6 +6,14 @@ For the most detailed and up-to-date release notes, see [GitHub Releases](https:
 
 ---
 
+## v3.0.7
+**Release Date:** October 31, 2026
+
+- Adjusted the theme color list for Dark Mode
+- Adjusted the theme tokens for Dark Mode
+
+---
+
 ## v3.0.6
 **Release Date:** October 25, 2026
 

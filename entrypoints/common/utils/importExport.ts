@@ -9,6 +9,7 @@ import type {
   TobyGroup,
   TobyData,
   SessionBuddyData,
+  NiceTabListData,
 } from '~/entrypoints/types';
 import { tabListUtils } from '~/entrypoints/common/storage';
 import type {
@@ -19,10 +20,30 @@ import type {
 import { getRandomId, newCreateTime } from '~/entrypoints/common/utils';
 import { UNNAMED_TAG, UNNAMED_GROUP } from '../constants';
 
+// 判断是否为 v2 版本的数据结构：{ version: 2, data: TagItem[], dataSource: 'nicetab' }
+export const isNiceTabDataV2 = (value: unknown): value is NiceTabListData => {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const data = value as Partial<NiceTabListData>;
+  return data.version === 2 && data.dataSource === 'nicetab' && Array.isArray(data.data);
+};
+
+// 解析标签列表内容，兼容 v1（TagItem[]）和 v2（{ version: 2, data: TagItem[], dataSource: 'nicetab' }）
+export const parseTagListContent = (content: string): TagItem[] => {
+  const parsed = JSON.parse(content || '[]');
+  if (isNiceTabDataV2(parsed)) {
+    return parsed.data;
+  }
+  return Array.isArray(parsed) ? (parsed as TagItem[]) : [];
+};
+
 // 识别内容格式
 export const extContentFormatCheck = (content: string): ExtContentParserFuncName => {
   try {
     const contentValue = JSON.parse(content.trim());
+    // 兼容 v2 版本的同步数据结构
+    if (isNiceTabDataV2(contentValue)) {
+      return 'niceTab';
+    }
     if (Array.isArray(contentValue)) {
       const firstItem = contentValue[0];
       if (firstItem?.tagName) {
@@ -83,7 +104,8 @@ export const extContentImporter: ExtContentImporterProps = {
     return [newTag];
   },
   niceTab(content: string): TagItem[] {
-    const tagList = JSON.parse(content || '[]') as TagItem[];
+    // 兼容 v1（TagItem[]）与 v2（{ version: 2, data: TagItem[] }）两种数据结构
+    const tagList = parseTagListContent(content);
     const createTime = newCreateTime();
     tagList.forEach(tag => {
       tag.tagId = tag.static ? '0' : getRandomId();

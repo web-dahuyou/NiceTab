@@ -1,5 +1,5 @@
 import type { MessageArgsProps } from 'antd';
-import type { ThemeProps, ThemeTypes, LanguageTypes } from './global';
+import type { ThemeProps, ThemeTypes, ThemeColors, LanguageTypes } from './global';
 import type { SyncRemoteType, SyncStatus } from './sync';
 import type { SendTargetProps } from './tabList';
 
@@ -14,7 +14,7 @@ export type PageContextType =
 export interface RuntimeMsgSetPrimaryColor {
   msgType: 'setPrimaryColor';
   data: {
-    colorPrimary: string;
+    colorName: ThemeColors;
   };
 }
 export interface RuntimeMsgSetThemeData {

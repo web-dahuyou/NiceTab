@@ -29,7 +29,7 @@ export type EventsEmitterProps = {
 // 全局 Context
 export interface GlobalContextProps {
   version: string;
-  colorPrimary: string;
+  colorName: ThemeColors;
   themeTypeConfig: ThemeTypeConfig;
   themeType: ThemeTypes;
   pageWidthType: PageWidthTypes;
@@ -65,8 +65,9 @@ export interface ThemeTypeConfig {
 
 // 主题token
 export interface ThemeProps {
-  colorPrimary: string;
-  colorBgContainer: string;
+  colorName: ThemeColors; // 主题色名（亮色/暗色模式下各自解析为对应的色值）
+  colorPrimary?: string; // 旧数据兼容字段（仅迁移时读取）
+  colorBgContainer?: string;
 }
 
 export type ThemeColors =

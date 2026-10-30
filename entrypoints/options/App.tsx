@@ -62,9 +62,9 @@ import useUrlParams from '~/entrypoints/common/hooks/urlParams';
 import {
   GITHUB_URL,
   LANGUAGE_OPTIONS,
-  THEME_COLORS,
   defaultThemeType,
 } from '~/entrypoints/common/constants';
+import useThemeColors from '~/entrypoints/common/hooks/themeColors';
 import {
   openNewTab,
   discardOtherTabs,
@@ -78,6 +78,7 @@ import {
 } from '~/entrypoints/common/style/Common.styled';
 import type {
   StyledThemeProps,
+  ColorItem,
   PageModuleNames,
   PageWidthTypes,
   ThemeTypes,
@@ -260,7 +261,9 @@ function AppLayout() {
   const { isFirefoxTabGroupSupported, hasTabGroupsPermission, getTabGroupsPermission } =
     usePermission();
 
-  const { version, themeTypeConfig, pageWidthType, $message } = NiceGlobalContext;
+  const { version, themeTypeConfig, pageWidthType, $message, colorName } =
+    NiceGlobalContext;
+  const { THEME_COLORS } = useThemeColors();
   const navs = useMemo(() => {
     return navsTemplate.map(item => {
       return { ...item, label: $fmt(item.label) };
@@ -288,8 +291,8 @@ function AppLayout() {
     sendRuntimeMessage({ msgType: 'setThemeType', data: { themeType } });
   };
   // 切换主题
-  const handleThemeChange = (color: string) => {
-    const themeData = { colorPrimary: color };
+  const handleThemeChange = (item: ColorItem) => {
+    const themeData = { colorName: item.key };
     NiceGlobalContext.setThemeData(themeData);
     sendRuntimeMessage({ msgType: 'setPrimaryColor', data: themeData });
   };
@@ -459,6 +462,7 @@ function AppLayout() {
               title={
                 <ColorList
                   colors={THEME_COLORS}
+                  activeKey={colorName}
                   gap={12}
                   style={{ padding: '6px' }}
                   onItemClick={handleThemeChange}

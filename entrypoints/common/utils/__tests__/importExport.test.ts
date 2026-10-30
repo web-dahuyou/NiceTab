@@ -23,7 +23,38 @@ vi.mock('~/entrypoints/common/storage', () => ({
   },
 }));
 
-import { extContentFormatCheck, html2niceTab, niceTab2html } from '../importExport';
+import {
+  extContentFormatCheck,
+  extContentImporter,
+  html2niceTab,
+  isNiceTabDataV2,
+  niceTab2html,
+} from '../importExport';
+import mockTabListJson from '~/mock/mock_tabList.json';
+
+// 基于 v1 mock 数据补充 v2 外层结构
+const mockTabListV2 = {
+  version: 2,
+  dataSource: 'nicetab',
+  lastSyncTime: '1793333935032',
+  data: mockTabListJson,
+};
+const mockTabListV2Content = JSON.stringify(mockTabListV2);
+
+describe('isNiceTabDataV2', () => {
+  it('accepts v2 data with dataSource nicetab', () => {
+    expect(isNiceTabDataV2(mockTabListV2)).toBe(true);
+  });
+
+  it('rejects objects missing version, dataSource or data', () => {
+    expect(isNiceTabDataV2(null)).toBe(false);
+    expect(isNiceTabDataV2([])).toBe(false);
+    expect(isNiceTabDataV2({ version: 2, data: [] })).toBe(false);
+    expect(isNiceTabDataV2({ version: 2, dataSource: 'other', data: [] })).toBe(false);
+    expect(isNiceTabDataV2({ version: 2, dataSource: 'nicetab' })).toBe(false);
+    expect(isNiceTabDataV2({ version: 1, dataSource: 'nicetab', data: [] })).toBe(false);
+  });
+});
 
 describe('extContentFormatCheck', () => {
   it('detects niceTab format (array with tagName)', () => {
@@ -53,6 +84,57 @@ describe('extContentFormatCheck', () => {
   it('defaults to niceTab for unknown JSON array', () => {
     const content = JSON.stringify([{ unknown: 'data' }]);
     expect(extContentFormatCheck(content)).toBe('niceTab');
+  });
+
+  it('detects v2 sync data structure', () => {
+    expect(extContentFormatCheck(mockTabListV2Content)).toBe('niceTab');
+  });
+});
+
+describe('extContentImporter.niceTab', () => {
+  const v2Content = mockTabListV2Content;
+
+  it('parses v2 structure and regenerates ids', () => {
+    const result = extContentImporter.niceTab(v2Content);
+    const allGroups = result.flatMap(tag => tag.groupList);
+    const allTabs = allGroups.flatMap(group => group.tabList);
+
+    expect(result).toHaveLength(mockTabListJson.length);
+    // 中转站固定为 '0'，其余节点重新生成 ID
+    expect(result[0].tagId).toBe('0');
+    expect(result[1].tagId).toBeTruthy();
+    expect(allGroups.every(group => !!group.groupId)).toBe(true);
+    expect(allTabs.every(tab => !!tab.tabId)).toBe(true);
+    // 数据内容保持与 mock 文件一致
+    expect(result[1].tagName).toBe(mockTabListJson[1].tagName);
+    expect(result[1].groupList[0].groupName).toBe(
+      mockTabListJson[1].groupList[0].groupName,
+    );
+  });
+
+  it('parses v1 array and generates ids', () => {
+    const result = extContentImporter.niceTab(
+      JSON.stringify([
+        {
+          tagName: 'Category',
+          groupList: [{ groupName: 'Group', tabList: [{ url: 'https://example.com' }] }],
+        },
+      ]),
+    );
+
+    expect(result[0].tagId).toBeTruthy();
+    expect(result[0].groupList[0].groupId).toBeTruthy();
+    expect(result[0].groupList[0].tabList[0].tabId).toBeTruthy();
+  });
+
+  it('returns an empty list for unexpected content instead of throwing', () => {
+    expect(extContentImporter.niceTab('')).toEqual([]);
+    expect(extContentImporter.niceTab('{"version":2}')).toEqual([]);
+    expect(extContentImporter.niceTab('{"foo":"bar"}')).toEqual([]);
+    // 缺少 dataSource 标识时不按 v2 数据结构解析
+    expect(
+      extContentImporter.niceTab(JSON.stringify({ version: 2, data: mockTabListJson })),
+    ).toEqual([]);
   });
 });
 

@@ -14,7 +14,7 @@ import {
 } from '~/entrypoints/common/storage';
 import { autoSyncAlarm, autoSaveOpenedTabsAlarm } from '~/entrypoints/common/alarms';
 import {
-  PRIMARY_COLOR,
+  defaultThemeColorName,
   ENUM_SETTINGS_PROPS,
   POPUP_MODULE_NAMES,
   ENUM_ACTION_NAME,
@@ -164,10 +164,10 @@ export default defineBackground(() => {
     } = (msg || {}) as RuntimeMessageEventProps;
 
     if (msgType === 'setPrimaryColor') {
-      const colorPrimary = data?.colorPrimary || PRIMARY_COLOR;
-      await themeUtils.setThemeData({ colorPrimary });
+      const colorName = data?.colorName || defaultThemeColorName;
+      await themeUtils.setThemeData({ colorName });
       if (targetPageContext === 'contentScriptPage') {
-        tabUtils.sendTabMessage({ msgType: 'setThemeData', data: { colorPrimary } });
+        tabUtils.sendTabMessage({ msgType: 'setThemeData', data: { colorName } });
       }
       setBadge();
     } else if (msgType === 'setThemeData') {
