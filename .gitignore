@@ -29,6 +29,8 @@ public/docs/*
 *.sw?
 .claude
 CLAUDE.md
+.agents
+AGENTS.md
 docs
 
 # Test coverage

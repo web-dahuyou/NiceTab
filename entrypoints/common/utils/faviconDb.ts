@@ -125,10 +125,56 @@ export function getFavicon(origin: string): Promise<FaviconRecord | null> {
 }
 
 // 保存单个 favicon（带时间戳），background 和页面都调用这里
-export function putFavicon(record: FaviconRecord): Promise<void> {
+export function putFavicon(
+  record: FaviconRecord,
+  shouldWrite: () => boolean = () => true,
+): Promise<void> {
   return withRetry(async () => {
     const db = await getDB();
+    if (!shouldWrite()) return;
+    if (record.source === 'default') {
+      await new Promise<void>((resolve, reject) => {
+        const transaction = db.transaction(FAVICON_STORE_NAME, 'readwrite');
+        const store = transaction.objectStore(FAVICON_STORE_NAME);
+        const request = store.get(record.origin);
+        request.onsuccess = () => {
+          const existing = request.result as FaviconRecord | undefined;
+          // 检查与写入必须在同一事务中，避免覆盖后台刚写入的真实图标。
+          if (shouldWrite() && (!existing || existing.source === 'default')) {
+            store.put(record);
+          }
+        };
+        request.onerror = () => reject(request.error);
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error);
+        transaction.onabort = () => reject(transaction.error);
+      });
+      return;
+    }
     await runRequest(db, 'readwrite', store => store.put(record));
+  });
+}
+
+// 核对和删除在同一事务内完成，避免误删后台刚更新的其他图标。
+export function invalidateFavicon(
+  origin: string,
+  failedUrls: readonly string[],
+): Promise<void> {
+  return withRetry(async () => {
+    const db = await getDB();
+    await new Promise<void>((resolve, reject) => {
+      const transaction = db.transaction(FAVICON_STORE_NAME, 'readwrite');
+      const store = transaction.objectStore(FAVICON_STORE_NAME);
+      const request = store.get(origin);
+      request.onsuccess = () => {
+        const record = request.result as FaviconRecord | undefined;
+        if (record && failedUrls.includes(record.url)) store.delete(origin);
+      };
+      request.onerror = () => reject(request.error);
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error);
+      transaction.onabort = () => reject(transaction.error);
+    });
   });
 }
 
@@ -203,5 +249,6 @@ export async function pruneFavicons({
 export default {
   getFavicon,
   putFavicon,
+  invalidateFavicon,
   pruneFavicons,
 };
