@@ -364,12 +364,15 @@ function TabGroup({
     [draggingTabItem, selectedTabIds, setSelectedTabIds],
   );
 
-  const handleTabsSort = useCallback((sortType: string) => {
-    eventEmitter.emit('home:treeDataHook', {
-      action: 'handleTabsSort',
-      params: [{ tagId: tagId!, groupId: group.groupId, sortType }],
-    });
-  }, []);
+  const handleTabsSort = useCallback(
+    (sortType: string, sortBy: 'name' | 'domain' = 'name') => {
+      eventEmitter.emit('home:treeDataHook', {
+        action: 'handleTabsSort',
+        params: [{ tagId: tagId!, groupId, sortType, sortBy }],
+      });
+    },
+    [tagId, groupId],
+  );
 
   const handleGroupAction = useCallback(
     (actionName: GroupActionName, actionGroupId: string) => {
@@ -400,6 +403,8 @@ function TabGroup({
         handleTabsSort('ascending');
       } else if (actionName === 'tabsSortDesc') {
         handleTabsSort('descending');
+      } else if (actionName === 'tabsSortByDomain') {
+        handleTabsSort('ascending', 'domain');
       }
     },
     [

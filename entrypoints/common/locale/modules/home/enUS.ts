@@ -50,6 +50,7 @@ const enUS: Record<LocaleKey, string> = {
   'home.tabGroup.addGroupAfter': 'Create Group After',
   'home.tabGroup.tabsSortAsc': 'Title Ascending',
   'home.tabGroup.tabsSortDesc': 'Title Descending',
+  'home.tabGroup.tabsSortByDomain': 'Sort by Domain',
 
   'home.tabGroup.count': `{count, plural,
     =0 {No Groups}

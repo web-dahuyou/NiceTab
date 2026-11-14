@@ -50,6 +50,7 @@ const zhTW: Record<LocaleKey, string> = {
   "home.tabGroup.addGroupAfter": "在下方新建標籤組",
   "home.tabGroup.tabsSortAsc": "標籤名稱遞增",
   "home.tabGroup.tabsSortDesc": "標籤名稱遞減",
+  "home.tabGroup.tabsSortByDomain": "按網域排序",
   "home.tabGroup.count": "{count}個分頁群組",
   "home.tabGroup.name": "標籤組名稱",
   "home.tabGroup.createTime": "創建時間",

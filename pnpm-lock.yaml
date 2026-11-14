@@ -48,6 +48,7 @@ specifiers:
   react-router-dom: ^6.23.0
   react-virtuoso: ^4.10.4
   styled-components: ^6.1.8
+  tldts: ^7.5.2
   typescript: ^5.5.4
   validator: ^13.15.35
   vite-plugin-svgr: ^4.3.0
@@ -81,6 +82,7 @@ dependencies:
   react-router-dom: 6.30.2_nnrd3gsncyragczmpvfhocinkq
   react-virtuoso: 4.18.13_nnrd3gsncyragczmpvfhocinkq
   styled-components: 6.1.19_nnrd3gsncyragczmpvfhocinkq
+  tldts: 7.5.2
   validator: 13.15.35
   vite-plugin-svgr: 4.5.0_typescript@5.9.3
   webdav: 5.8.0
@@ -7146,6 +7148,17 @@ packages:
     resolution: {integrity: sha512-KYad6Vy5VDWV4GH3fjpseMQ/XU2BhIYP7Vzd0LG44qRWm/Yt2WCOTicFdvmgo6gWaqooMQCawTtILVQJupKu7A==}
     engines: {node: '>=14.0.0'}
     dev: true
+
+  /tldts-core/7.5.2:
+    resolution: {integrity: sha512-8W1topazDwhMKbm2I83IPa57Ow5VUxFgLbXv42+vSILnv8FY5OHvdEY/tS6WoWeMbxkHZQhra5cmeFHriKptSQ==}
+    dev: false
+
+  /tldts/7.5.2:
+    resolution: {integrity: sha512-p+JwEdxIWQx033pMvW9ULBbyC1Eg6JtWo2Mo0jbC8TVSjp2QrHFE+WKs8JpMGc3ECMsmBpU2RH/25NgX3k1ulg==}
+    hasBin: true
+    dependencies:
+      tldts-core: 7.5.2
+    dev: false
 
   /tmp/0.2.5:
     resolution: {integrity: sha512-voyz6MApa1rQGUxT3E+BK7/ROe8itEx7vD8/HEvt4xwXucvQ5G5oeEiHkmHZJuBO21RpOf+YYm9MOivj709jow==}

@@ -494,12 +494,18 @@ export function useTreeData() {
     tagId,
     groupId,
     sortType,
+    sortBy = 'name',
   }: {
     tagId: string;
     groupId: string;
     sortType: string;
+    sortBy?: 'name' | 'domain';
   }) => {
-    await tabListUtils.tabsSortbyName(sortType, groupId, tagId);
+    if (sortBy === 'domain') {
+      await tabListUtils.tabsSortbyDomain(groupId, tagId);
+    } else {
+      await tabListUtils.tabsSortbyName(sortType, groupId, tagId);
+    }
     refreshTreeData();
   };
 
@@ -552,6 +558,13 @@ export function useTreeData() {
               tagId: (node as TreeDataNodeTabGroup).parentKey,
               groupId: node.key as string,
               sortType: 'ascending',
+            }),
+          tabsSortByDomain: () =>
+            handleTabsSort({
+              tagId: (node as TreeDataNodeTabGroup).parentKey,
+              groupId: node.key as string,
+              sortType: 'ascending',
+              sortBy: 'domain',
             }),
           tabsSortDesc: () =>
             handleTabsSort({

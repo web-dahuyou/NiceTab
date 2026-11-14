@@ -2,6 +2,7 @@ import { Key } from 'react';
 import { Tabs } from 'wxt/browser';
 // import { storage } from 'wxt/storage';
 import dayjs from 'dayjs';
+import { getDomain } from 'tldts';
 import {
   // attachInstruction,
   extractInstruction,
@@ -1547,6 +1548,39 @@ export default class TabListUtils {
         }
       }
     }
+
+    await this.setTagList(tagList);
+  }
+
+  // 标签页先按主域名、再按子域名升序排序，同域名保留原顺序，无域名的链接排在末尾
+  async tabsSortbyDomain(groupId: Key, tagId: Key) {
+    const tagList = await this.getTagList();
+    const tag = tagList.find(item => item.tagId === tagId);
+    const group = tag?.groupList?.find(item => item.groupId === groupId);
+    if (!group || tag?.isLocked || group.isLocked) return;
+
+    group.tabList = group.tabList
+      ?.map(tab => {
+        let domain = '';
+        try {
+          domain = new URL(tab.url || '').hostname.toLowerCase();
+        } catch {
+          // 无效 URL 与无域名的链接统一排在末尾
+        }
+        const baseDomain = domain ? getDomain(domain) || domain : '';
+        const subdomain =
+          domain === baseDomain ? '' : domain.slice(0, -(baseDomain.length + 1));
+        return { tab, domain, baseDomain, subdomain };
+      })
+      .sort((a, b) => {
+        if (!a.domain) return b.domain ? 1 : 0;
+        if (!b.domain) return -1;
+        return (
+          a.baseDomain.localeCompare(b.baseDomain) ||
+          a.subdomain.localeCompare(b.subdomain)
+        );
+      })
+      .map(item => item.tab);
 
     await this.setTagList(tagList);
   }

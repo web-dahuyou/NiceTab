@@ -10,6 +10,7 @@ import {
   BlockOutlined,
   SortAscendingOutlined,
   SortDescendingOutlined,
+  GlobalOutlined,
 } from '@ant-design/icons';
 import copyToClipboard from 'copy-to-clipboard';
 import { LuFolderUp, LuFolderDown } from 'react-icons/lu';
@@ -170,6 +171,13 @@ export default function useGroupActions({
         icon: <SortDescendingOutlined />,
         disabled: tagLocked || isLocked,
         onClick: () => onAction('tabsSortDesc', groupId),
+      },
+      {
+        key: 'tabsSortByDomain',
+        label: $fmt(actionMap['tabsSortByDomain'].labelKey),
+        icon: <GlobalOutlined />,
+        disabled: tagLocked || isLocked,
+        onClick: () => onAction('tabsSortByDomain', groupId),
       },
     ];
 

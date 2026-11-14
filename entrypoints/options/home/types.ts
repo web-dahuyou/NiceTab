@@ -125,6 +125,7 @@ export type GroupActionName =
   | 'moveTo'
   | 'tabsSortAsc'
   | 'tabsSortDesc'
+  | 'tabsSortByDomain'
   | 'addGroupBefore'
   | 'addGroupAfter';
 

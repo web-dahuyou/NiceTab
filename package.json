@@ -51,6 +51,7 @@
     "react-router-dom": "^6.23.0",
     "react-virtuoso": "^4.10.4",
     "styled-components": "^6.1.8",
+    "tldts": "^7.5.2",
     "validator": "^13.15.35",
     "vite-plugin-svgr": "^4.3.0",
     "webdav": "^5.7.1"

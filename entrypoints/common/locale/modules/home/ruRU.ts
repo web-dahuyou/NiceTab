@@ -50,6 +50,7 @@ const ruRU: Record<LocaleKey, string> = {
   'home.tabGroup.addGroupAfter': 'Создать группу ниже',
   'home.tabGroup.tabsSortAsc': 'По названию (А→Я)',
   'home.tabGroup.tabsSortDesc': 'По названию (Я→А)',
+  'home.tabGroup.tabsSortByDomain': 'По домену',
 
   'home.tabGroup.count': `{count, plural,
     =0 {Нет групп}

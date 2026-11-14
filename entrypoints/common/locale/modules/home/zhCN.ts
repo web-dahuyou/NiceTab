@@ -48,6 +48,7 @@ const zhCN = {
   'home.tabGroup.addGroupAfter': '在下方新建标签组',
   'home.tabGroup.tabsSortAsc': '标签名称升序',
   'home.tabGroup.tabsSortDesc': '标签名称降序',
+  'home.tabGroup.tabsSortByDomain': '按域名排序',
 
   'home.tabGroup.count': '{count}个标签组',
   'home.tabGroup.name': '标签组名称',
