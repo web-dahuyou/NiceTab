@@ -8,6 +8,7 @@ import {
   extractInstruction,
   type Instruction,
 } from '@atlaskit/pragmatic-drag-and-drop-hitbox/tree-item';
+
 import type {
   SendTargetProps,
   TagItem,
@@ -21,6 +22,7 @@ import type {
 } from '~/entrypoints/types';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import type { DragData } from '~/entrypoints/common/components/DndComponent';
+
 import { ENUM_SETTINGS_PROPS, UNNAMED_TAG, UNNAMED_GROUP } from '../constants';
 import {
   isGroupSupported,
@@ -32,6 +34,7 @@ import {
   getMergedList,
 } from '../utils';
 import { openNewTab } from '../tabs';
+
 import Store from './instanceStore';
 import { requestTabListRepair } from './batchRemoval';
 
@@ -1100,7 +1103,11 @@ export default class TabListUtils {
     }
   }
   // 删除标签页: filterFlag 是否过滤空分类、标签组 (列表页保留空分类、标签组；回收站中不保留)
-  async removeTabs(groupId: Key, tabs: TabItem[], filterFlag = false) {
+  async removeTabs(
+    groupId: Key,
+    tabs: TabItem[],
+    options: boolean | { skipLocked: true } = false,
+  ) {
     const tagList = await this.getTagList();
     const tabIds = tabs.map(tab => tab.tabId);
     let tag = undefined,
@@ -1112,6 +1119,12 @@ export default class TabListUtils {
       for (let i = 0; i < t.groupList?.length; i++) {
         const g = t.groupList[i];
         if (g.groupId === groupId) {
+          if (
+            typeof options === 'object' &&
+            options.skipLocked &&
+            (t.isLocked || g.isLocked)
+          )
+            return;
           tag = t;
           group = g;
           g.tabList = g.tabList?.filter(tab => !tabIds.includes(tab.tabId));
@@ -1128,7 +1141,7 @@ export default class TabListUtils {
       }
     }
 
-    await this.setTagList(filterFlag ? this.getFilteredTagList(tagList) : tagList);
+    await this.setTagList(options === true ? this.getFilteredTagList(tagList) : tagList);
 
     if (this.constructor === TabListUtils) {
       if (!tag || !group) return;

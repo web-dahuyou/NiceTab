@@ -1,3 +1,10 @@
+import {
+  OPEN_SAVED_TABS_PORT,
+  openTabs,
+  tabTarget,
+  type SearchOpenRequest,
+  type OpenResult,
+} from '~/entrypoints/common/openUtils';
 import contextMenusRegister, {
   strategyHandler,
   handleSendTabsAction,
@@ -21,8 +28,9 @@ import {
   ENUM_ACTION_NAME,
   BROWSER_ACTION_API_NAME,
 } from '~/entrypoints/common/constants';
-import { initBatchRemoval } from './batchRemoval';
 import type { RuntimeMessageEventProps } from '~/entrypoints/types';
+
+import { initBatchRemoval } from './batchRemoval';
 import {
   initPopup,
   initTabEventListener,
@@ -45,6 +53,39 @@ export default defineBackground(() => {
       tabListUtils.removeTabGroups(ids),
     );
   }
+  browser.runtime.onConnect.addListener(port => {
+    if (port.name !== OPEN_SAVED_TABS_PORT) return;
+    port.onMessage.addListener(async message => {
+      const request = message as SearchOpenRequest;
+      let result: OpenResult = { processedIds: [], failed: true };
+      try {
+        // 网页内搜索只传保存条目的 ID，由后台读取 URL，并使用发起操作的窗口。
+        const sourceWindowId = port.sender?.tab?.windowId;
+        if (sourceWindowId === undefined) throw new Error('Missing source window');
+        const tags = await tabListUtils.getTagList();
+        const saved = new Map(
+          tags.flatMap(tag =>
+            tag.groupList.flatMap(group =>
+              group.tabList.map(tab => [tab.tabId, tab] as const),
+            ),
+          ),
+        );
+        const targets = request.tabs.flatMap(({ id, active, discard }) => {
+          const tab = saved.get(id);
+          return tab ? [tabTarget(tab, { active, discard })] : [];
+        });
+        result = await openTabs(targets, request.mode, sourceWindowId, true);
+        if (targets.length !== request.tabs.length) result.failed = true;
+      } catch (error) {
+        console.warn('Unable to open search results', error);
+      }
+      try {
+        port.postMessage(result);
+      } catch (error) {
+        console.warn('Search page disconnected', error);
+      }
+    });
+  });
   initTabsUpdateListener();
   // 初始化新标签页重定向监听
   initNewTabRedirectListener();

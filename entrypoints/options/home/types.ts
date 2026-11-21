@@ -1,4 +1,6 @@
 import type { TreeDataNode } from 'antd';
+
+import type { OpenMode } from '~/entrypoints/common/openUtils';
 import { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
 import type { DragData } from '~/entrypoints/common/components/DndComponent';
 
@@ -23,6 +25,7 @@ export type TreeDataNodeUnion = TreeDataNodeTag | TreeDataNodeTabGroup;
 
 export type RenderTreeNodeActionProps = {
   actionType: 'tag' | 'tabGroup';
+  mode?: OpenMode;
   node: TreeDataNodeUnion;
   actionName: TagActionName | GroupActionName;
   data?: Partial<TagItem | GroupItem>;

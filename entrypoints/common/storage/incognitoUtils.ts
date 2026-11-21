@@ -1,9 +1,11 @@
 // 无痕窗口打开标签组的临时任务存储
 // Chrome 的 split 无痕模式下，普通环境的 windows.create 拿不到无痕窗口对象，
 // 因此由无痕环境中的辅助页面读取任务、执行打开，并通过临时存储回传结果
+import type { OpenTarget } from '../openUtils';
+
 export interface IncognitoOpenTask {
   id: string;
-  groupIds: string[];
+  targets: OpenTarget[];
   createdAt: number;
 }
 

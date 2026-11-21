@@ -1,6 +1,6 @@
 import { Tabs, TabGroups } from 'wxt/browser';
 import { debounce } from 'lodash-es';
-import { settingsUtils, snapshotUtils, tabListUtils, stateUtils } from './storage';
+
 import type {
   SettingsProps,
   ActionNames,
@@ -11,12 +11,14 @@ import type {
   WindowSnapshotItem,
   WindowSnapshotTab,
 } from '~/entrypoints/types';
+
+import { settingsUtils, snapshotUtils, tabListUtils, stateUtils } from './storage';
 import {
   ENUM_SETTINGS_PROPS,
   defaultLanguage,
   USER_GUIDE_URL_MAP,
   CHANGELOG_URL_MAP,
-} from '~/entrypoints/common/constants';
+} from './constants';
 import {
   objectToUrlParams,
   setUrlParams,
@@ -26,8 +28,8 @@ import {
   isDomainAllowed,
   isContentMatched,
   sendRuntimeMessage,
-} from '~/entrypoints/common/utils';
-import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
+} from './utils';
+import { getCustomLocaleMessages } from './locale';
 
 const {
   LANGUAGE,
@@ -572,12 +574,14 @@ export async function openNewGroup(
     asGroup = true,
     newWindow = false,
     windowId,
+    onTabCreated,
     ...updateProperties
   }: {
     discard?: boolean;
     asGroup?: boolean;
     newWindow?: boolean;
     windowId?: number;
+    onTabCreated?: (index: number) => void;
   } & TabGroups.UpdateUpdatePropertiesType = {},
 ) {
   const settings = await settingsUtils.getSettings();
@@ -608,10 +612,14 @@ export async function openNewGroup(
     await browser.tabGroups?.update(bsGroupId, { title: groupName, ...updateProperties });
   } else {
     const _windowId = windowId || (await browser.windows.getCurrent()).id;
-    _urls = settings[OPENING_TABS_ORDER] === 'reverse' ? [..._urls].reverse() : _urls;
+    const reverse = settings[OPENING_TABS_ORDER] === 'reverse';
+    if (reverse) _urls.reverse();
+    const recordCreated = (index: number) =>
+      onTabCreated?.(reverse ? _urls.length - 1 - index : index);
     if (!isGroupSupported() || !asGroup) {
-      for (let url of _urls) {
+      for (const [index, url] of _urls.entries()) {
         await openNewTab(url, { discard, windowId: _windowId });
+        recordCreated(index);
       }
       return true;
     }
@@ -620,6 +628,9 @@ export async function openNewGroup(
     const results = await Promise.allSettled(
       _urls.map(url => browser.tabs.create({ windowId: _windowId, url, active: false })),
     );
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled') recordCreated(index);
+    });
     const tabs = results.map(result => {
       if (result.status === 'rejected') throw result.reason;
       return result.value;

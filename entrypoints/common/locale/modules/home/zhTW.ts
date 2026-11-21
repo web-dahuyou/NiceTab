@@ -8,8 +8,8 @@ const zhTW: Record<LocaleKey, string> = {
   'home.treeNodeBatch.open.newWindow': '在新視窗開啟',
   'home.treeNodeBatch.open.incognito': '在新無痕視窗開啟',
   'home.treeNodeBatch.incognitoPermission': '請先在擴充功能管理中允許 NiceTab 在無痕視窗執行',
-  'home.treeNodeBatch.failed': '操作未完成，未處理的標籤群組已保留，請重試',
-  'home.treeNodeBatch.opening': '正在開啟標籤群組…',
+  'home.treeNodeBatch.failed': '操作未完成，未處理的項目已保留，請重試',
+  'home.treeNodeBatch.opening': '正在開啟分頁…',
   'home.treeNodeBatch.helperNoTask': '沒有待處理的開啟任務，可以直接關閉此頁面。',
 
   "home.tag": "分類",

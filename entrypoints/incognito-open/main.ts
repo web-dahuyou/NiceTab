@@ -1,20 +1,7 @@
-import { requestTabGroupRemoval } from '~/entrypoints/common/storage/batchRemoval';
-import type { GroupItem, TagItem } from '~/entrypoints/types';
-import { ENUM_SETTINGS_PROPS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
-import {
-  incognitoUtils,
-  settingsUtils,
-  tabListUtils,
-} from '~/entrypoints/common/storage';
-import { openNewGroup } from '~/entrypoints/common/tabs';
+import { openInTargetWindow } from '~/entrypoints/common/openUtils';
+import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
+import { incognitoUtils, settingsUtils } from '~/entrypoints/common/storage';
 import { getLocaleMessages } from '~/entrypoints/common/utils';
-
-const {
-  DELETE_AFTER_RESTORE,
-  DISCARD_WHEN_OPEN_TABS,
-  NAMED_GROUP_RESTORE_AS_GROUP,
-  UNNAMED_GROUP_RESTORE_AS_GROUP,
-} = ENUM_SETTINGS_PROPS;
 
 // 关闭当前辅助页（无痕窗口中唯一的初始标签页）
 async function closeCurrentTab() {
@@ -36,20 +23,6 @@ async function waitForDiscarded(windowId?: number) {
     if (!pending.length) return;
     await new Promise(resolve => setTimeout(resolve, 500));
   }
-}
-
-function getGroupsByIds(tagList: TagItem[], groupIds: string[]) {
-  return tagList.reduce<Array<{ tag: TagItem; group: GroupItem }>>((result, tag) => {
-    tag.groupList?.forEach(group => {
-      if (
-        groupIds.includes(group.groupId) &&
-        group.tabList.some(tab => tab.url?.trim())
-      ) {
-        result.push({ tag, group });
-      }
-    });
-    return result;
-  }, []);
 }
 
 async function main() {
@@ -74,10 +47,9 @@ async function main() {
   }
   await incognitoUtils.removeTask(task.id);
 
-  const processedIds: string[] = [];
+  let processedIds: string[] = [];
   let failed = false;
   let discardEnabled = false;
-  let deleteAfterRestore = false;
 
   try {
     const messages = await getLocaleMessages();
@@ -86,48 +58,17 @@ async function main() {
     }
 
     const settings = await settingsUtils.getSettings();
-    deleteAfterRestore = !!settings[DELETE_AFTER_RESTORE];
-    discardEnabled = !!settings[DISCARD_WHEN_OPEN_TABS];
-    const tagList = await tabListUtils.getTagList();
-    const groups = getGroupsByIds(tagList, task.groupIds);
-
-    for (const { group } of groups) {
-      const asGroup =
-        settings[
-          group.groupName === UNNAMED_GROUP
-            ? UNNAMED_GROUP_RESTORE_AS_GROUP
-            : NAMED_GROUP_RESTORE_AS_GROUP
-        ];
-      const opened = await openNewGroup(
-        group.groupName,
-        group.tabList.map(tab => tab.url),
-        {
-          windowId: currentWindow.id,
-          asGroup,
-          discard: discardEnabled,
-        },
-      );
-      if (!opened) {
-        failed = true;
-        break;
-      }
-
-      processedIds.push(group.groupId);
-    }
+    discardEnabled = task.targets.some(target =>
+      'groupName' in target
+        ? settings[ENUM_SETTINGS_PROPS.DISCARD_WHEN_OPEN_TABS]
+        : target.discard,
+    );
+    const result = await openInTargetWindow(task.targets, currentWindow.id);
+    processedIds = result.processedIds;
+    failed = result.failed;
   } catch (error) {
     console.error('Incognito batch open failed', error);
     failed = true;
-  }
-
-  if (deleteAfterRestore && processedIds.length) {
-    try {
-      await requestTabGroupRemoval(processedIds);
-    } catch (error) {
-      // 删除未提交，管理页保留本次勾选。
-      console.error('Incognito batch removal failed', error);
-      processedIds.length = 0;
-      failed = true;
-    }
   }
 
   // 先回传结果，再等待休眠完成，避免主页面一直处于忙碌状态

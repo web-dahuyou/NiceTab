@@ -5,8 +5,10 @@ import {
   VirtuosoHandle,
   type FlatIndexLocationWithAlign,
 } from 'react-virtuoso';
+
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { settingsUtils } from '~/entrypoints/common/storage';
+
 import type { TreeDataNodeTag, TreeDataNodeTabGroup, MoveToCallbackProps } from './types';
 import { StyledGroupList } from './Home.styled';
 import TabGroup from './TabGroup';
@@ -82,7 +84,7 @@ const ListItem = memo(
         onChange={data => handleTabGroupChange(tabGroup, data)}
         onRemove={() => handleTabGroupRemove(tabGroup)}
         onCreate={handleTabGroupCreate}
-        onRestore={() => handleTabGroupRestore(tabGroup)}
+        onRestore={mode => handleTabGroupRestore(tabGroup, mode)}
         onStarredChange={isStarred => handleTabGroupStarredChange(tabGroup, isStarred)}
         onDedup={() => handleTabGroupDedup(tabGroup)}
         onCopy={handleTabGroupCopy}

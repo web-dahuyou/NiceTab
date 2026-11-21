@@ -1,11 +1,17 @@
 import { Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
 import { MoreOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+
+import { tabTarget, type OpenMode } from '~/entrypoints/common/openUtils';
+import {
+  openModeItems,
+  useOpenSavedTabs,
+} from '~/entrypoints/common/components/OpenModeMenu';
 import type { TabItem } from '~/entrypoints/types';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
-import { openNewTab } from '~/entrypoints/common/tabs';
 import Favicon from '~/entrypoints/common/components/Favicon';
+
 import { StyledTabCard, StyledTabCardTitle } from './TabListItem.styled';
 
 export default function TabListItem({
@@ -22,16 +28,16 @@ export default function TabListItem({
   const { $fmt } = useIntlUtls();
   const displayTitle = tab.title || tab.url || 'Untitled';
 
+  const openSaved = useOpenSavedTabs();
+  const open = (mode: OpenMode = 'current') =>
+    openSaved([tabTarget(tab, { active: true, openToNext: mode === 'current' })], mode);
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (!tab.url) return;
-    openNewTab(tab.url, {
-      active: true,
-      openToNext: true,
-    });
+    open();
   };
 
   const actionItems: MenuProps['items'] = [
+    ...openModeItems($fmt, open),
     {
       key: 'edit',
       label: $fmt('common.edit'),

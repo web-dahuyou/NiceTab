@@ -17,21 +17,26 @@ import {
   MenuOutlined,
   CopyOutlined,
 } from '@ant-design/icons';
+
+import { tabTarget, type OpenMode } from '~/entrypoints/common/openUtils';
+import {
+  openModeItems,
+  useOpenSavedTabs,
+} from '~/entrypoints/common/components/OpenModeMenu';
 import { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
 import type { ModifierKeys } from '~/entrypoints/common/utils/click';
-import { classNames } from '~/entrypoints/common/utils';
-import { openNewTab } from '~/entrypoints/common/tabs';
+import { classNames, getOSInfo } from '~/entrypoints/common/utils';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { getOSInfo } from '~/entrypoints/common/utils';
+import Favicon from '~/entrypoints/common/components/Favicon';
+
 import {
   StyledTabItemWrapper,
   StyledTabTitle,
   StyledTabItemTooltip,
 } from './TabListItem.styled';
-import Favicon from '~/entrypoints/common/components/Favicon';
 import TabItemEditModal from './TabItemEditModal';
 
 export type QuickSelectFunc = (tab: TabItem, selected?: boolean) => void;
@@ -40,7 +45,7 @@ type TabItemProps = TabItem & {
   tag: Pick<TagItem, 'isLocked' | 'isStarred'>;
   group: Pick<GroupItem, 'groupId' | 'isLocked' | 'isStarred'>;
   highlight?: boolean;
-  onRemove?: (tabs: TabItem[]) => void;
+  onRemove?: (tabs: TabItem[], afterOpen?: boolean) => void;
   onChange?: (data: TabItem) => void;
   onCopy?: (tabs: TabItem[]) => void;
   onQuickSelect?: QuickSelectFunc;
@@ -146,19 +151,25 @@ export default memo(function TabListItem({
     }
   }, [$fmt, tab, onRemove]);
 
+  const openSaved = useOpenSavedTabs();
   // 执行打开标签页
   const handleTabOpen = useCallback(
-    (active: boolean) => {
+    async (active: boolean, mode?: OpenMode) => {
       const settings = settingsUtils.settings;
       // 如果直接单击未按下alt键，则打开新标签页并激活(active: true)，如果按下了alt键，则后台静默打开新标签页(active: false)
-      openNewTab(tab.url, { active });
+      const result = await openSaved([tabTarget(tab, { active })], mode);
 
-      if (settings[DELETE_AFTER_RESTORE] && !group?.isLocked) {
-        onRemove?.([tab]);
+      if (
+        result.processedIds.length &&
+        settings[DELETE_AFTER_RESTORE] &&
+        !tag?.isLocked &&
+        !group?.isLocked
+      ) {
+        onRemove?.([tab], true);
       }
       setTooltipVisible(false);
     },
-    [tab, group.isLocked, onRemove],
+    [tab, tag?.isLocked, group.isLocked, onRemove, openSaved],
   );
 
   // 鼠标点击标签页
@@ -197,6 +208,7 @@ export default memo(function TabListItem({
 
   const moreItems: MenuProps['items'] = useMemo(
     () => [
+      ...openModeItems($fmt, mode => handleTabOpen(true, mode)),
       {
         key: 'edit',
         label: $fmt('common.edit'),
@@ -225,7 +237,7 @@ export default memo(function TabListItem({
         ),
       },
     ],
-    [$fmt, tag?.isLocked, group.isLocked, tab.url],
+    [$fmt, tag?.isLocked, group.isLocked, tab.url, handleTabOpen],
   );
 
   const onMoreItemClick = useCallback<Required<MenuProps>['onClick']>(

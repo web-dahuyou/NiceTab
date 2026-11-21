@@ -8,8 +8,8 @@ const ruRU: Record<LocaleKey, string> = {
   'home.treeNodeBatch.open.newWindow': 'Открыть в новом окне',
   'home.treeNodeBatch.open.incognito': 'Открыть в новом окне инкогнито',
   'home.treeNodeBatch.incognitoPermission': 'Сначала разрешите NiceTab работу в режиме инкогнито в настройках расширения',
-  'home.treeNodeBatch.failed': 'Операция не завершена. Необработанные группы сохранены. Повторите попытку.',
-  'home.treeNodeBatch.opening': 'Открытие групп вкладок…',
+  'home.treeNodeBatch.failed': 'Операция не завершена. Необработанные элементы сохранены. Повторите попытку.',
+  'home.treeNodeBatch.opening': 'Открытие вкладок…',
   'home.treeNodeBatch.helperNoTask': 'Нет задач на открытие. Эту страницу можно закрыть.',
 
   'home.tag': 'Категория',

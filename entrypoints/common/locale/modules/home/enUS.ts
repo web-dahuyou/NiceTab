@@ -8,8 +8,8 @@ const enUS: Record<LocaleKey, string> = {
   'home.treeNodeBatch.open.newWindow': 'Open in New Window',
   'home.treeNodeBatch.open.incognito': 'Open in New Incognito Window',
   'home.treeNodeBatch.incognitoPermission': 'Allow NiceTab to run in incognito windows in your extension settings first',
-  'home.treeNodeBatch.failed': 'Action incomplete. Unprocessed tab groups have been kept. Please try again.',
-  'home.treeNodeBatch.opening': 'Opening tab groups…',
+  'home.treeNodeBatch.failed': 'Action incomplete. Unprocessed items have been kept. Please try again.',
+  'home.treeNodeBatch.opening': 'Opening tabs…',
   'home.treeNodeBatch.helperNoTask': 'No pending task. You can close this page.',
 
   'home.tag': 'Tag',

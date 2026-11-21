@@ -14,6 +14,9 @@ import {
 } from '@ant-design/icons';
 import copyToClipboard from 'copy-to-clipboard';
 import { LuFolderUp, LuFolderDown } from 'react-icons/lu';
+
+import { openModeItems } from '~/entrypoints/common/components/OpenModeMenu';
+import type { OpenMode } from '~/entrypoints/common/openUtils';
 import { IconRepeat } from '~/entrypoints/common/components/icon/CustomIcon';
 import { ENUM_SETTINGS_PROPS, ENUM_COLORS } from '~/entrypoints/common/constants';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -21,6 +24,7 @@ import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
 import { type ActionOptionItem } from '~/entrypoints/common/components/ActionBtnList';
 import type { TabItem, IntlForamtMessageParams } from '~/entrypoints/types';
 import type { LocaleKeys } from '~/entrypoints/common/locale';
+
 import type { GroupActionName } from '../types';
 import { defaultGroupActions, groupActionOptions, type ActionOption } from '../constants';
 
@@ -51,7 +55,7 @@ interface UseGroupActionsProps {
   isStarred?: boolean;
   tabList?: TabItem[];
   allowGroupActions?: GroupActionName[];
-  onAction: (actionName: GroupActionName, groupId: string) => void;
+  onAction: (actionName: GroupActionName, groupId: string, mode?: OpenMode) => void;
 }
 
 interface UseGroupActionsReturn {
@@ -103,7 +107,8 @@ export default function useGroupActions({
         label: $fmt(actionMap['restore'].labelKey),
         icon: <ExportOutlined />,
         disabled: !tabList.length,
-        onClick: () => onAction('restore', groupId),
+        btnType: 'dropdown',
+        menuItems: openModeItems($fmt, mode => onAction('restore', groupId, mode)),
       },
       {
         key: 'addGroupBefore',
@@ -193,6 +198,7 @@ export default function useGroupActions({
     isLocked,
     isStarred,
     onAction,
+    tabList.length,
     handleCopyLinks,
   ]);
 

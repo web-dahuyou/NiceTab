@@ -6,8 +6,8 @@ const zhCN = {
   'home.treeNodeBatch.open.newWindow': '在新窗口打开',
   'home.treeNodeBatch.open.incognito': '在新无痕窗口打开',
   'home.treeNodeBatch.incognitoPermission': '请先在扩展管理中允许 NiceTab 在无痕窗口运行',
-  'home.treeNodeBatch.failed': '操作未完成，未处理的标签组已保留，请重试',
-  'home.treeNodeBatch.opening': '正在打开标签组…',
+  'home.treeNodeBatch.failed': '操作未完成，未处理的条目已保留，请重试',
+  'home.treeNodeBatch.opening': '正在打开标签页…',
   'home.treeNodeBatch.helperNoTask': '没有待处理的打开任务，可以直接关闭此页面。',
 
   'home.tag': '分类',
