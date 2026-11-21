@@ -1,17 +1,20 @@
 import { handleUrlWidthParams } from './url';
+import type { RuntimeMessageEventProps } from '~/entrypoints/types';
 import {
   getFavicon,
+  getOriginsWithFailedIcons,
   putFavicon,
   invalidateFavicon,
   pruneFavicons,
   MAX_DATA_URL_LENGTH,
+  FAILED_ICON_TTL,
   type FaviconRecord,
   type FaviconSource,
 } from './faviconDb';
 
 const testPageUrl = 'https://favicon-test.nicetab.com';
 
-const defaultFaviconUrl = browser.runtime.getURL('/icon/favicon-default.png');
+export const defaultFaviconUrl = browser.runtime.getURL('/icon/favicon-default.png');
 
 // ========== 状态区分 ==========
 // null = 未初始化, '' = 初始化失败, 非空 = 有效值
@@ -33,7 +36,7 @@ interface CacheEntry {
 const memoryCache = new Map<string, CacheEntry>();
 const CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 7天
 const MAX_CACHE_SIZE = 2000;
-const FAILURE_TTL = 5 * 60 * 1000;
+const FAILURE_TTL = FAILED_ICON_TTL;
 const IMAGE_TIMEOUT = 3000;
 // 传入图标、两级缓存和五个来源，限制连续显示失败后的恢复次数。
 const MAX_FAILED_URLS = 8;
@@ -42,23 +45,54 @@ function getCacheTtl(source: FaviconSource) {
   return source === 'default' ? FAILURE_TTL : CACHE_TTL;
 }
 
-// 并发请求去重
-const pendingRequests = new Map<
-  string,
-  { promise: Promise<string>; version: number; origin: string }
->();
-// 恢复请求使同站点的旧请求失效；有界保存版本，避免长驻页面无限增长。
-const requestVersions = new Map<string, number>();
-let nextRequestVersion = 0;
+// 同站点共享失败地址，不同尺寸保留各自的来源探测请求。
+interface OriginRequests {
+  failedUrls: Set<string>;
+  invalidations: Set<string>;
+  pendingWrites: number;
+  bySize: Map<number, Promise<string>>;
+}
 
-// 旧请求等待最新恢复结果，避免恢复尚未完成时提前显示默认图。
-async function getCurrentFavicon(origin: string): Promise<string> {
-  for (const pending of pendingRequests.values()) {
-    if (pending.origin === origin && pending.version === requestVersions.get(origin)) {
-      return pending.promise;
-    }
+const pendingByOrigin = new Map<string, OriginRequests>();
+
+function releaseIfIdle(origin: string, requests: OriginRequests) {
+  if (!requests.bySize.size && !requests.pendingWrites) pendingByOrigin.delete(origin);
+}
+
+function reportFailures(
+  origin: string,
+  requests: OriginRequests,
+  urls: readonly string[],
+) {
+  const batch = requests.invalidations;
+  const wasEmpty = batch.size === 0;
+  for (const url of urls) {
+    if (requests.failedUrls.has(url)) continue;
+    requests.failedUrls.add(url);
+    batch.add(url);
+    if (memoryCache.get(origin)?.url === url) memoryCache.delete(origin);
   }
-  return getFromMemoryCache(origin) || defaultFaviconUrl;
+  if (wasEmpty && batch.size) {
+    requests.pendingWrites++;
+    // 图片 error 分属不同的浏览器事件；首个报告启动固定窗口，持续报错也会定期提交。
+    setTimeout(async () => {
+      requests.invalidations = new Set();
+      try {
+        await invalidateFavicon(origin, [...batch]);
+        initialIcons.delete(origin);
+        failedOrigins = undefined;
+        await browser.runtime.sendMessage({
+          msgType: 'faviconFailuresChanged',
+          data: { origin },
+        } satisfies RuntimeMessageEventProps);
+      } catch {
+        // 持久化不可用时，读取和探测仍会跳过本轮报告的失败地址。
+      } finally {
+        requests.pendingWrites--;
+        releaseIfIdle(origin, requests);
+      }
+    }, 50);
+  }
 }
 
 // ========== 缓存操作 ==========
@@ -96,7 +130,6 @@ async function saveFaviconToStore(
   origin: string,
   faviconUrl: string,
   source: FaviconSource,
-  isCurrent: () => boolean,
 ) {
   if (!origin || origin === 'null') return;
   // data:image 的图标体积不可控，超过上限的不落盘，交给兜底图
@@ -106,23 +139,126 @@ async function saveFaviconToStore(
   try {
     await putFavicon(
       { origin, url: faviconUrl, timestamp: Date.now(), source },
-      isCurrent,
+      () => memoryCache.get(origin)?.url === faviconUrl,
     );
+    initialIcons.delete(origin);
   } catch {
     // 缓存写入失败不影响主流程
   }
 }
 
 // 从 IndexedDB 中获取 favicon（带 TTL 校验）
-async function getFaviconFromStore(origin: string): Promise<FaviconRecord | null> {
+async function getFaviconFromStore(
+  origin: string,
+  freshRecord?: FaviconRecord | null,
+): Promise<FaviconRecord | null> {
   try {
-    const record = await getFavicon(origin);
+    const record = freshRecord === undefined ? await getFavicon(origin) : freshRecord;
     if (!record) return null;
     if (Date.now() - record.timestamp > getCacheTtl(record.source)) return null;
     return record;
   } catch {
     return null;
   }
+}
+
+// 同一页面分段挂载的标签复用站点查询，包括未命中的查询。
+const initialIcons = new Map<
+  string,
+  {
+    until: number;
+    lookup: Promise<{ record: FaviconRecord; failures: Map<string, number> } | null>;
+  }
+>();
+
+let failedOrigins: Promise<Set<IDBValidKey> | null> | undefined;
+
+// 通知只携带站点；下一次使用时再共享一次读取，冷却期限以数据库为准。
+interface RemoteFailureLookup {
+  failedIcons?: FaviconRecord['failedIcons'];
+  freshRecord?: FaviconRecord | null;
+}
+const remoteFailures = new Map<string, { lookup?: Promise<RemoteFailureLookup> }>();
+
+export function onFaviconFailuresChanged(origin: string) {
+  initialIcons.delete(origin);
+  memoryCache.delete(origin);
+  const entry = {};
+  remoteFailures.set(origin, entry);
+  setTimeout(() => {
+    if (remoteFailures.get(origin) === entry) remoteFailures.delete(origin);
+  }, FAILURE_TTL);
+}
+
+function getRemoteFailures(origin: string) {
+  const entry = remoteFailures.get(origin);
+  if (entry) {
+    entry.lookup ??= getFavicon(origin).then(
+      record => {
+        const failedIcons = record?.failedIcons;
+        // 同批读取共享完整记录；之后的加载只复用冷却信息。
+        entry.lookup = Promise.resolve({ failedIcons });
+        return { failedIcons, freshRecord: record };
+      },
+      () => {
+        entry.lookup = undefined;
+        return {};
+      },
+    );
+    return entry.lookup;
+  }
+}
+
+export async function getInitialFaviconUrl(pageUrl: string, supplied: string) {
+  if (!/^https?:\/\//i.test(supplied) || !/^https?:\/\//i.test(pageUrl)) return supplied;
+  let origin: string;
+  try {
+    origin = new URL(pageUrl).origin;
+  } catch {
+    return supplied;
+  }
+  const remote = getRemoteFailures(origin);
+  if (remote) {
+    const result = await remote;
+    if (
+      result.failedIcons?.some(([url, until]) => url === supplied && until > Date.now())
+    )
+      return resolveFaviconUrl(pageUrl, origin, 32, [], supplied, result);
+    if (result.freshRecord !== undefined) return supplied;
+  }
+  failedOrigins ??= getOriginsWithFailedIcons().catch(() => {
+    failedOrigins = undefined;
+    return null;
+  });
+  const origins = await failedOrigins;
+  if (origins && !origins.has(origin)) return supplied;
+
+  let entry = initialIcons.get(origin);
+  if (!entry || entry.until <= Date.now()) {
+    const lookup = getFaviconFromStore(origin).then(record =>
+      record?.failedIcons?.length && (!record.url || record.source !== 'default')
+        ? { record, failures: new Map(record.failedIcons) }
+        : null,
+    );
+    entry = { until: Date.now() + FAILURE_TTL, lookup };
+    initialIcons.delete(origin);
+    if (initialIcons.size >= MAX_CACHE_SIZE)
+      initialIcons.delete(initialIcons.keys().next().value!);
+    initialIcons.set(origin, entry);
+  }
+  const cached = await entry.lookup;
+  if (!cached) return supplied;
+  const { record, failures } = cached;
+  const now = Date.now();
+  if ((failures.get(supplied) ?? 0) <= now) return supplied;
+  if (!record.url) return getFaviconUrl(pageUrl, 32, [], supplied);
+  if (
+    record.timestamp + CACHE_TTL <= now ||
+    (failures.get(record.url) ?? 0) > now ||
+    pendingByOrigin.get(origin)?.failedUrls.has(record.url)
+  )
+    return supplied;
+  return record.url;
 }
 
 // 首次读取前清理过期/超量记录，整个页面生命周期只执行一次
@@ -257,10 +393,9 @@ async function tryFaviconSource(
   origin: string,
   imgUrl: string,
   source: FaviconSource,
-  failedUrls: readonly string[],
-  isCurrent: () => boolean,
+  failedUrls: ReadonlySet<string>,
 ): Promise<string | null> {
-  if (!isCurrent() || failedUrls.includes(imgUrl)) return null;
+  if (failedUrls.has(imgUrl)) return null;
   let valid = false;
 
   if (source === 'ext' || source === 'bonjourr') {
@@ -277,10 +412,10 @@ async function tryFaviconSource(
     valid = await checkImageLoadable(imgUrl);
   }
 
-  if (!valid || !isCurrent()) return null;
+  if (!valid || failedUrls.has(imgUrl)) return null;
   // 先写内存缓存保证立即命中，IndexedDB 落盘异步执行，不阻塞图标返回
   saveToMemoryCache(origin, imgUrl, source);
-  saveFaviconToStore(origin, imgUrl, source, isCurrent);
+  saveFaviconToStore(origin, imgUrl, source);
   return imgUrl;
 }
 
@@ -289,8 +424,7 @@ async function fetchFavicon(
   pageUrl: string,
   origin: string,
   size: number,
-  failedUrls: readonly string[],
-  isCurrent: () => boolean,
+  failedUrls: ReadonlySet<string>,
 ): Promise<string> {
   try {
     if (!origin || origin === 'null') {
@@ -300,13 +434,7 @@ async function fetchFavicon(
 
     // 1. _favicon 扩展 API（base64 对比检测兜底图）
     const extUrl = getFaviconByExtApi(pageUrl, size);
-    const extResult = await tryFaviconSource(
-      origin,
-      extUrl,
-      'ext',
-      failedUrls,
-      isCurrent,
-    );
+    const extResult = await tryFaviconSource(origin, extUrl, 'ext', failedUrls);
     if (extResult) return extResult;
 
     // 2. gstatic（图片加载检测）
@@ -316,7 +444,6 @@ async function fetchFavicon(
       gstaticUrl,
       'gstatic',
       failedUrls,
-      isCurrent,
     );
     if (gstaticResult) return gstaticResult;
 
@@ -324,13 +451,7 @@ async function fetchFavicon(
     try {
       const domain = new URL(pageUrl).hostname;
       const ddgUrl = getDuckDuckGoUrl(domain);
-      const ddgResult = await tryFaviconSource(
-        origin,
-        ddgUrl,
-        'ddg',
-        failedUrls,
-        isCurrent,
-      );
+      const ddgResult = await tryFaviconSource(origin, ddgUrl, 'ddg', failedUrls);
       if (ddgResult) return ddgResult;
     } catch {}
 
@@ -341,41 +462,33 @@ async function fetchFavicon(
       bonjourrUrl,
       'bonjourr',
       failedUrls,
-      isCurrent,
     );
     if (bonjourrResult) return bonjourrResult;
 
     // 5. {origin}/favicon.ico（同源兜底）
     const icoUrl = getFaviconIcoUrl(pageUrl);
     if (icoUrl) {
-      const icoResult = await tryFaviconSource(
-        origin,
-        icoUrl,
-        'ico',
-        failedUrls,
-        isCurrent,
-      );
+      const icoResult = await tryFaviconSource(origin, icoUrl, 'ico', failedUrls);
       if (icoResult) return icoResult;
     }
 
     // 6. 最终兜底：返回 defaultFaviconUrl 兜底图
-    if (!isCurrent()) return getFromMemoryCache(origin) || defaultFaviconUrl;
     saveToMemoryCache(origin, defaultFaviconUrl, 'default');
-    saveFaviconToStore(origin, defaultFaviconUrl, 'default', isCurrent);
+    saveFaviconToStore(origin, defaultFaviconUrl, 'default');
     return defaultFaviconUrl;
   } catch {
-    if (!isCurrent()) return getFromMemoryCache(origin) || defaultFaviconUrl;
     saveToMemoryCache(origin, defaultFaviconUrl, 'default');
-    saveFaviconToStore(origin, defaultFaviconUrl, 'default', isCurrent);
+    saveFaviconToStore(origin, defaultFaviconUrl, 'default');
     return defaultFaviconUrl;
   }
 }
 
-// 同一 origin、尺寸和恢复条件共享完整读取流程，避免重复读取 IndexedDB。
+// 同一站点和尺寸共享读取与回退，所有尺寸完成后释放站点状态。
 export async function getFaviconUrl(
   pageUrl: string,
   size: number = 32,
   failedUrls: readonly string[] = [],
+  knownFailedUrl?: string,
 ): Promise<string> {
   let origin: string;
   try {
@@ -386,56 +499,78 @@ export async function getFaviconUrl(
     return defaultFaviconUrl;
   }
 
-  const key = JSON.stringify([origin, size, [...failedUrls].sort()]);
-  const pending = pendingRequests.get(key);
-  if (pending && pending.version === requestVersions.get(origin)) return pending.promise;
+  const remote = getRemoteFailures(origin);
+  return resolveFaviconUrl(
+    pageUrl,
+    origin,
+    size,
+    failedUrls,
+    knownFailedUrl,
+    remote && (await remote),
+  );
+}
 
-  const version =
-    failedUrls.length > 0 || !requestVersions.has(origin)
-      ? ++nextRequestVersion
-      : requestVersions.get(origin)!;
-  requestVersions.delete(origin);
-  requestVersions.set(origin, version);
-  if (requestVersions.size > MAX_CACHE_SIZE) {
-    const oldest = requestVersions.keys().next().value;
-    if (oldest !== undefined) requestVersions.delete(oldest);
+async function resolveFaviconUrl(
+  pageUrl: string,
+  origin: string,
+  size: number,
+  failedUrls: readonly string[],
+  knownFailedUrl?: string,
+  remote?: RemoteFailureLookup,
+): Promise<string> {
+  let requests = pendingByOrigin.get(origin);
+  if (!requests) {
+    requests = {
+      failedUrls: new Set(),
+      invalidations: new Set(),
+      pendingWrites: 0,
+      bySize: new Map(),
+    };
+    pendingByOrigin.set(origin, requests);
   }
-  const isCurrent = () => requestVersions.get(origin) === version;
+  // 首屏从占位记录读到的地址只需跳过，重复上报会延长原有冷却期。
+  if (knownFailedUrl) requests.failedUrls.add(knownFailedUrl);
+  reportFailures(origin, requests, failedUrls);
+  for (const [url, until] of remote?.failedIcons ?? []) {
+    if (until > Date.now()) requests.failedUrls.add(url);
+  }
+  // 上限针对单个组件的连续失败；其他组件报告不同地址仍可共享有效候选。
+  if (
+    failedUrls.length >= MAX_FAILED_URLS &&
+    new Set(failedUrls).size >= MAX_FAILED_URLS
+  ) {
+    releaseIfIdle(origin, requests);
+    return defaultFaviconUrl;
+  }
 
-  const promise = (async () => {
+  const pending = requests.bySize.get(size);
+  if (pending) return pending;
+  const active = requests;
+  // 延迟到当前调用栈结束，让同一批请求先登记失败地址和共享的 Promise。
+  const promise = Promise.resolve().then(async () => {
     try {
-      if (failedUrls.length > 0) {
-        const entry = memoryCache.get(origin);
-        if (entry && failedUrls.includes(entry.url)) memoryCache.delete(origin);
-        try {
-          await invalidateFavicon(origin, failedUrls);
-        } catch {
-          // 持久化不可用时仍通过 failedUrls 跳过失败地址，继续回退。
-        }
-        if (new Set(failedUrls).size >= MAX_FAILED_URLS) return defaultFaviconUrl;
-      }
       const memHit = getFromMemoryCache(origin);
-      if (memHit && !failedUrls.includes(memHit)) return memHit;
+      if (memHit && !active.failedUrls.has(memHit)) return memHit;
 
       await ensureStorePruned();
-      const storeHit = await getFaviconFromStore(origin);
-      if (!isCurrent()) return getCurrentFavicon(origin);
-      if (storeHit && !failedUrls.includes(storeHit.url)) {
+      const storeHit = await getFaviconFromStore(origin, remote?.freshRecord);
+      if (storeHit?.url && !active.failedUrls.has(storeHit.url)) {
         saveToMemoryCache(origin, storeHit.url, storeHit.source, storeHit.timestamp);
         return storeHit.url;
       }
 
-      const result = await fetchFavicon(pageUrl, origin, size, failedUrls, isCurrent);
-      return isCurrent() ? result : getCurrentFavicon(origin);
-    } catch {
-      if (!isCurrent()) return getCurrentFavicon(origin);
-      saveToMemoryCache(origin, defaultFaviconUrl, 'default');
-      return defaultFaviconUrl;
+      // 在图片加载和 Promise 返回之间也可能收到该候选的新失败报告。
+      let result: string;
+      do {
+        result = await fetchFavicon(pageUrl, origin, size, active.failedUrls);
+      } while (result !== defaultFaviconUrl && active.failedUrls.has(result));
+      return result;
+    } finally {
+      active.bySize.delete(size);
+      releaseIfIdle(origin, active);
     }
-  })().finally(() => {
-    if (pendingRequests.get(key)?.promise === promise) pendingRequests.delete(key);
   });
-  pendingRequests.set(key, { promise, version, origin });
+  active.bySize.set(size, promise);
   return promise;
 }
 

@@ -16,13 +16,16 @@ export interface FaviconRecord {
   url: string;
   timestamp: number;
   source: FaviconSource;
+  failedUntil?: number;
+  failedIcons?: [url: string, expiresAt: number][];
 }
 
 export const FAVICON_DB_NAME = 'nicetab';
-export const FAVICON_DB_VERSION = 1;
+export const FAVICON_DB_VERSION = 2;
 export const FAVICON_STORE_NAME = 'favicons';
 export const MAX_DATA_URL_LENGTH = 2 * 1024;
 const TIMESTAMP_INDEX = 'timestamp';
+const FAILURE_INDEX = 'failedUntil';
 
 let dbPromise: Promise<IDBDatabase> | null = null;
 
@@ -37,10 +40,13 @@ function openDB(): Promise<IDBDatabase> {
 
     request.onupgradeneeded = () => {
       const db = request.result;
-      if (!db.objectStoreNames.contains(FAVICON_STORE_NAME)) {
-        const store = db.createObjectStore(FAVICON_STORE_NAME, { keyPath: 'origin' });
-        store.createIndex(TIMESTAMP_INDEX, 'timestamp', { unique: false });
-      }
+      const store = db.objectStoreNames.contains(FAVICON_STORE_NAME)
+        ? request.transaction!.objectStore(FAVICON_STORE_NAME)
+        : db.createObjectStore(FAVICON_STORE_NAME, { keyPath: 'origin' });
+      if (!store.indexNames.contains(TIMESTAMP_INDEX))
+        store.createIndex(TIMESTAMP_INDEX, 'timestamp');
+      if (!store.indexNames.contains(FAILURE_INDEX))
+        store.createIndex(FAILURE_INDEX, 'failedUntil');
     };
 
     request.onsuccess = () => {
@@ -124,57 +130,84 @@ export function getFavicon(origin: string): Promise<FaviconRecord | null> {
   });
 }
 
-// 保存单个 favicon（带时间戳），background 和页面都调用这里
-export function putFavicon(
-  record: FaviconRecord,
-  shouldWrite: () => boolean = () => true,
-): Promise<void> {
+// 只取近期出现过失败的站点主键，健康站点无需逐一读取图标记录。
+export function getOriginsWithFailedIcons(): Promise<Set<IDBValidKey>> {
   return withRetry(async () => {
     const db = await getDB();
-    if (!shouldWrite()) return;
-    if (record.source === 'default') {
-      await new Promise<void>((resolve, reject) => {
-        const transaction = db.transaction(FAVICON_STORE_NAME, 'readwrite');
-        const store = transaction.objectStore(FAVICON_STORE_NAME);
-        const request = store.get(record.origin);
-        request.onsuccess = () => {
-          const existing = request.result as FaviconRecord | undefined;
-          // 检查与写入必须在同一事务中，避免覆盖后台刚写入的真实图标。
-          if (shouldWrite() && (!existing || existing.source === 'default')) {
-            store.put(record);
-          }
-        };
-        request.onerror = () => reject(request.error);
-        transaction.oncomplete = () => resolve();
-        transaction.onerror = () => reject(transaction.error);
-        transaction.onabort = () => reject(transaction.error);
-      });
-      return;
-    }
-    await runRequest(db, 'readwrite', store => store.put(record));
+    const origins = await runRequest(db, 'readonly', store =>
+      store.index(FAILURE_INDEX).getAllKeys(IDBKeyRange.lowerBound(Date.now(), true)),
+    );
+    return new Set(origins);
   });
 }
 
-// 核对和删除在同一事务内完成，避免误删后台刚更新的其他图标。
-export function invalidateFavicon(
+// 页面与后台共用此表；合并失败记录和更新图标必须在同一个事务里完成。
+function updateRecord(
   origin: string,
-  failedUrls: readonly string[],
+  update: (current?: FaviconRecord) => FaviconRecord | undefined,
 ): Promise<void> {
   return withRetry(async () => {
     const db = await getDB();
     await new Promise<void>((resolve, reject) => {
-      const transaction = db.transaction(FAVICON_STORE_NAME, 'readwrite');
-      const store = transaction.objectStore(FAVICON_STORE_NAME);
+      const tx = db.transaction(FAVICON_STORE_NAME, 'readwrite');
+      const store = tx.objectStore(FAVICON_STORE_NAME);
       const request = store.get(origin);
       request.onsuccess = () => {
-        const record = request.result as FaviconRecord | undefined;
-        if (record && failedUrls.includes(record.url)) store.delete(origin);
+        const next = update(request.result);
+        if (next) {
+          if (next.failedIcons?.length) {
+            next.failedUntil = Math.max(...next.failedIcons.map(([, until]) => until));
+          } else {
+            delete next.failedUntil;
+          }
+          store.put(next);
+        }
       };
-      request.onerror = () => reject(request.error);
-      transaction.oncomplete = () => resolve();
-      transaction.onerror = () => reject(transaction.error);
-      transaction.onabort = () => reject(transaction.error);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error);
     });
+  });
+}
+
+export function putFavicon(
+  record: FaviconRecord,
+  shouldWrite: () => boolean = () => true,
+): Promise<void> {
+  return updateRecord(record.origin, current => {
+    if (!shouldWrite()) return;
+    const now = Date.now();
+    const failedIcons = current?.failedIcons?.filter(([, until]) => until > now);
+    if (record.source === 'default' && current?.url && current.source !== 'default')
+      return;
+    // 浏览器再次上报仍在冷却期的坏地址时，保留当前记录。
+    if (record.source === 'browser' && failedIcons?.some(([url]) => url === record.url))
+      return;
+    return { ...record, failedIcons };
+  });
+}
+
+export const FAILED_ICON_TTL = 5 * 60 * 1000;
+const MAX_FAILED_ICONS_PER_SITE = 512;
+
+export function invalidateFavicon(
+  origin: string,
+  failedUrls: readonly string[],
+): Promise<void> {
+  return updateRecord(origin, current => {
+    const now = Date.now();
+    const failures = new Map(current?.failedIcons?.filter(([, until]) => until > now));
+    for (const url of failedUrls) {
+      if (!/^https?:\/\//i.test(url) || url.length > 2048) continue;
+      failures.delete(url);
+      failures.set(url, now + FAILED_ICON_TTL);
+    }
+    const failedIcons = [...failures].slice(-MAX_FAILED_ICONS_PER_SITE);
+    const valid = current?.url && !failedUrls.includes(current.url);
+    if (valid) return { ...current, failedIcons };
+    if (!current && !failedIcons.length) return;
+    // 回退探测可能还没结束；先保存失败记录，后续 put 在事务中合并。
+    return { origin, timestamp: now, url: '', source: 'default', failedIcons };
   });
 }
 

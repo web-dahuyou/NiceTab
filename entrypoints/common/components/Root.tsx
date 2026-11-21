@@ -31,6 +31,7 @@ import {
   initThemeStorageListener,
 } from '~/entrypoints/common/storage';
 import { updateAdminPageUrlDebounced } from '~/entrypoints/common/tabs';
+import { onFaviconFailuresChanged } from '~/entrypoints/common/utils/favicon';
 
 // 暗色主题算法：衍生token（hover/active/背景等）仍走antd dark算法，
 // 但主色钉住为精选值（antd dark算法会把主色加深约14%，在暗色背景下会发暗发闷）
@@ -122,6 +123,8 @@ export default function Root({
       handleThemeTypeChange(data.themeType);
     } else if (msgType === 'setLocale') {
       handleLocaleChange(data.locale);
+    } else if (msgType === 'faviconFailuresChanged') {
+      onFaviconFailuresChanged(data.origin);
     } else if (msgType === 'reloadAllAdminPage') {
       updateAdminPageUrlDebounced();
     } else if (msgType === 'reloadOtherAdminPage') {
@@ -154,6 +157,7 @@ export default function Root({
     });
 
     return () => {
+      browser.runtime.onMessage.removeListener(messageListener);
       settingsUnwatch();
       themeUnwatch();
     };

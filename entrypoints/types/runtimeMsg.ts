@@ -80,6 +80,7 @@ export interface RuntimeMsgMap {
   sendTabsActionStart: RuntimeMsgSendTabsActionStart;
   sendTabsActionConfirm: RuntimeMsgSendTabsActionConfirm;
   showMessage: RuntimeMsgShowMessage;
+  faviconFailuresChanged: { msgType: 'faviconFailuresChanged'; data: { origin: string } };
 }
 
 export type RuntimeMsgType = keyof RuntimeMsgMap;
