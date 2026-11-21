@@ -6,6 +6,12 @@ For the most detailed and up-to-date release notes, see [GitHub Releases](https:
 
 ---
 
+## Unreleased
+
+- Added batch operations to the left Directory Tree: select multiple tab groups to remove, open (current window, new window, or new incognito window), or move to another category
+
+---
+
 ## v3.0.7
 **Release Date:** October 31, 2026
 

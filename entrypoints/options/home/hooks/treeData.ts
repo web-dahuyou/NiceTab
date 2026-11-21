@@ -1,3 +1,4 @@
+import { requestTabGroupRemoval } from '~/entrypoints/common/storage/batchRemoval';
 import React, {
   createContext,
   useCallback,
@@ -9,7 +10,12 @@ import React, {
 import type { TreeProps } from 'antd';
 import type { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
 import { settingsUtils, stateUtils, tabListUtils } from '~/entrypoints/common/storage';
-import { openNewTab, openNewGroup } from '~/entrypoints/common/tabs';
+import {
+  createNewWindowForOpen,
+  openNewGroup,
+  openNewTab,
+  removeNewWindowBlankTabs,
+} from '~/entrypoints/common/tabs';
 import { ENUM_SETTINGS_PROPS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { getRandomId } from '~/entrypoints/common/utils';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -226,44 +232,52 @@ export function useTreeData() {
       const settings = await settingsUtils.getSettings();
       const discard = settings?.[DISCARD_WHEN_OPEN_TABS];
       const deleteAfterRestore = settings?.[DELETE_AFTER_RESTORE];
+      const restoreInNewWindow = settings?.[RESTORE_IN_NEW_WINDOW];
 
-      // let hasDeletedGroups = false;
-      let newWindow;
-      if (settings?.[RESTORE_IN_NEW_WINDOW]) {
-        newWindow = await browser.windows.create({ focused: true });
-      }
+      // 新建窗口会自带一个空白标签页，打开完成后移除
+      const { windowId, initialTabIds } = restoreInNewWindow
+        ? await createNewWindowForOpen()
+        : { windowId: undefined, initialTabIds: [] };
 
-      for (const tabGroup of (tag.children || []) as TreeDataNodeTabGroup[]) {
-        const { groupName, tabList = [], isLocked } = tabGroup?.originData || {};
+      let hasFailed = false;
+      const openedGroupIds: string[] = [];
+      try {
+        for (const tabGroup of (tag.children || []) as TreeDataNodeTabGroup[]) {
+          const { groupName, tabList = [] } = tabGroup?.originData || {};
 
-        if (!tabList.length) continue;
+          if (!tabList.length) continue;
 
-        const asGroup =
-          (groupName === UNNAMED_GROUP && settings?.[UNNAMED_GROUP_RESTORE_AS_GROUP]) ||
-          (groupName !== UNNAMED_GROUP && settings?.[NAMED_GROUP_RESTORE_AS_GROUP]);
+          const asGroup =
+            (groupName === UNNAMED_GROUP && settings?.[UNNAMED_GROUP_RESTORE_AS_GROUP]) ||
+            (groupName !== UNNAMED_GROUP && settings?.[NAMED_GROUP_RESTORE_AS_GROUP]);
 
-        const result = await openNewGroup(
-          groupName,
-          tabList.map(tab => tab.url),
-          { discard, asGroup, windowId: newWindow?.id },
-        );
+          const result = await openNewGroup(
+            groupName,
+            tabList.map(tab => tab.url),
+            { discard, asGroup, windowId },
+          );
 
-        if (newWindow?.id && !result) {
-          browser.windows.remove(newWindow.id);
-          return;
+          // 打开失败时不计数、不删除；新建窗口时停止处理，避免继续往空窗口里打开
+          if (!result) {
+            hasFailed = true;
+            if (restoreInNewWindow) break;
+            continue;
+          }
+          openedGroupIds.push(String(tabGroup.key));
         }
-
-        if (deleteAfterRestore && !isLocked) {
-          await tabListUtils.removeTabGroup(tagId, tabGroup.key);
-          // hasDeletedGroups = true;
+      } finally {
+        if (restoreInNewWindow) {
+          await removeNewWindowBlankTabs(windowId, initialTabIds);
+        }
+        if (deleteAfterRestore && openedGroupIds.length) {
+          // 一次读写批量删除已打开的标签组（锁定分类、锁定标签组会被跳过）
+          const removedIds = await requestTabGroupRemoval(openedGroupIds);
+          if (removedIds.length) refreshTreeData();
         }
       }
-
-      if (deleteAfterRestore) {
-        refreshTreeData();
-      }
+      if (hasFailed) $message.error($fmt('home.treeNodeBatch.failed'));
     },
-    [treeData],
+    [treeData, $fmt, $message],
   );
 
   // 删除标签组
@@ -353,8 +367,6 @@ export function useTreeData() {
   // 打开标签组
   const handleTabGroupRestore = useCallback(
     async (tabGroup: TreeDataNodeTabGroup) => {
-      const tagKey = tabGroup.parentKey;
-      const tag = treeData.find(tag => tag.key === tagKey) as TreeDataNodeTag;
       const settings = await settingsUtils.getSettings();
       const { groupName, tabList = [], isLocked } = tabGroup?.originData || {};
       const discard = settings?.[DISCARD_WHEN_OPEN_TABS];
@@ -363,18 +375,26 @@ export function useTreeData() {
         (groupName === UNNAMED_GROUP && settings?.[UNNAMED_GROUP_RESTORE_AS_GROUP]) ||
         (groupName !== UNNAMED_GROUP && settings?.[NAMED_GROUP_RESTORE_AS_GROUP]);
 
-      openNewGroup(
+      const opened = await openNewGroup(
         groupName,
         tabList.map(tab => tab.url),
         { discard, asGroup, newWindow: settings?.[RESTORE_IN_NEW_WINDOW] },
-      );
+      ).catch(() => false);
+      if (!opened) {
+        $message.error($fmt('home.treeNodeBatch.failed'));
+        return;
+      }
 
-      if (settings?.[DELETE_AFTER_RESTORE] && !isLocked) {
-        await tabListUtils.removeTabGroup(tag.key, tabGroup.key);
-        refreshTreeData();
+      if (
+        settings?.[DELETE_AFTER_RESTORE] &&
+        !isLocked &&
+        !tabGroup.parentData?.isLocked
+      ) {
+        const removedIds = await requestTabGroupRemoval([String(tabGroup.key)]);
+        if (removedIds.length) refreshTreeData();
       }
     },
-    [treeData],
+    [$message, $fmt],
   );
   // 打开标签页
   const handleTabsOpen = useCallback(
@@ -382,29 +402,33 @@ export function useTreeData() {
       group: Pick<GroupItem, 'groupName' | 'groupId' | 'isLocked'>,
       tabs: TabItem[],
     ) => {
+      let opened;
       if (tabs.length === 1) {
-        openNewTab(tabs[0].url, { active: true });
+        opened = await openNewTab(tabs[0].url, { active: true }).catch(() => false);
       } else {
         const groupName = group.groupName;
         const settings = await settingsUtils.getSettings();
         const discard = settings?.[DISCARD_WHEN_OPEN_TABS];
-
         const asGroup =
           (groupName === UNNAMED_GROUP && settings?.[UNNAMED_GROUP_RESTORE_AS_GROUP]) ||
           (groupName !== UNNAMED_GROUP && settings?.[NAMED_GROUP_RESTORE_AS_GROUP]);
 
-        openNewGroup(
+        opened = await openNewGroup(
           groupName,
           tabs.map(tab => tab.url),
           { discard, asGroup, newWindow: settings?.[RESTORE_IN_NEW_WINDOW] },
-        );
+        ).catch(() => false);
+      }
+      if (!opened) {
+        $message.error($fmt('home.treeNodeBatch.failed'));
+        return;
       }
       const settings = await settingsUtils.getSettings();
       if (settings[DELETE_AFTER_RESTORE] && !group?.isLocked) {
-        handleTabItemRemove?.(group.groupId, tabs);
+        await handleTabItemRemove(group.groupId, tabs);
       }
     },
-    [],
+    [$message, $fmt],
   );
   // 删除标签页
   const handleTabItemRemove = useCallback(async (groupId: React.Key, tabs: TabItem[]) => {

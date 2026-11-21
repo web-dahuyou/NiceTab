@@ -583,11 +583,12 @@ export async function openNewGroup(
   const settings = await settingsUtils.getSettings();
 
   let _urls = urls.filter(url => !!url?.trim()) as string[];
+  if (!_urls.length) return false;
   if (newWindow) {
     const windowInfo = await browser.windows.create({ focused: true, url: _urls });
 
     const tabs = await browser.tabs.query({ windowId: windowInfo.id, pinned: false });
-    if (!tabs.length) return false;
+    if (tabs.length < _urls.length) return false;
 
     tabs
       .filter(tab => !tab.active)
@@ -604,38 +605,65 @@ export async function openNewGroup(
       createProperties: { windowId: windowInfo.id },
       tabIds: tabs.map(tab => tab.id!),
     });
-    browser.tabGroups?.update(bsGroupId, { title: groupName, ...updateProperties });
+    await browser.tabGroups?.update(bsGroupId, { title: groupName, ...updateProperties });
   } else {
     const _windowId = windowId || (await browser.windows.getCurrent()).id;
     _urls = settings[OPENING_TABS_ORDER] === 'reverse' ? [..._urls].reverse() : _urls;
     if (!isGroupSupported() || !asGroup) {
       for (let url of _urls) {
-        openNewTab(url, { discard, windowId: _windowId });
+        await openNewTab(url, { discard, windowId: _windowId });
       }
-      return;
+      return true;
     }
 
-    const tabs = await Promise.all(
-      _urls.map(url => {
-        return browser.tabs.create({ windowId: _windowId, url, active: false });
-      }),
+    // 等同批创建全部结束，避免后续清理新窗口时仍有标签页尚未创建。
+    const results = await Promise.allSettled(
+      _urls.map(url => browser.tabs.create({ windowId: _windowId, url, active: false })),
     );
-    if (!tabs.length) return false;
-
-    const filteredTabs = tabs.filter(tab => !!tab.id);
-    filteredTabs.forEach(tab => {
+    const tabs = results.map(result => {
+      if (result.status === 'rejected') throw result.reason;
+      return result.value;
+    });
+    tabs.forEach(tab => {
       if (discard && tab.id) {
         waitToDiscard(tab);
       }
     });
     const bsGroupId = await browser.tabs.group!({
-      tabIds: filteredTabs.map(tab => tab.id!),
+      tabIds: tabs.map(tab => tab.id!),
       createProperties: { windowId: _windowId },
     });
-    browser.tabGroups?.update(bsGroupId, { title: groupName, ...updateProperties });
+    await browser.tabGroups?.update(bsGroupId, { title: groupName, ...updateProperties });
   }
 
   return true;
+}
+
+// 新建窗口，并记录窗口自带的初始标签页（用于打开完成后清理空白页）
+export async function createNewWindowForOpen() {
+  const windowInfo = await browser.windows.create({ focused: true });
+  const initialTabIds = (windowInfo.tabs || [])
+    .map(tab => tab.id)
+    .filter((id): id is number => id !== undefined);
+  return { windowId: windowInfo.id, initialTabIds };
+}
+
+// 只清理创建窗口时的初始页，关闭最后一个标签页时浏览器会自行关闭窗口。
+export async function removeNewWindowBlankTabs(
+  windowId: number | undefined,
+  initialTabIds: number[],
+) {
+  if (windowId === undefined || !initialTabIds.length) return;
+  try {
+    const tabs = await browser.tabs.query({ windowId });
+    const ids = tabs.flatMap(tab =>
+      tab.id !== undefined && initialTabIds.includes(tab.id) ? [tab.id] : [],
+    );
+    if (ids.length) await browser.tabs.remove(ids);
+  } catch (error) {
+    // 窗口或标签页可能已被用户关闭，忽略清理失败
+    console.warn('Unable to clean up new window tabs', error);
+  }
 }
 
 // 冻结当前标签页以外的标签页
@@ -980,6 +1008,8 @@ export default {
   sendLeftTabs,
   sendRightTabs,
   openNewTab,
+  createNewWindowForOpen,
+  removeNewWindowBlankTabs,
   discardOtherTabs,
   saveOpenedTabsAsSnapshot,
   createWindowSnapshotRecord,

@@ -42,6 +42,7 @@ export type RenderTreeNodeProps = {
 
 // 需要移动的数据
 export interface MoveDataProps {
+  groupIds?: string[];
   tagId?: string;
   groupId?: string;
   tabs?: TabItem[];

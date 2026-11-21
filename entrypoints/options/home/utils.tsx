@@ -95,13 +95,14 @@ export const getCascaderData = async (
   moveData?: MoveDataProps,
 ): Promise<CascaderOption[]> => {
   const localeMessage = await getLocaleMessages();
-  const { tagId, groupId, tabs } = moveData || {};
+  const { tagId, groupId, groupIds, tabs } = moveData || {};
   const moveType = tagId ? 'tag' : tabs && tabs?.length > 0 ? 'tab' : 'tabGroup';
   const tagDisabled = (tag: TagItem) => {
+    if (groupIds?.length) return !!tag.isLocked;
     if (moveType === 'tag') {
-      return tag.tagId === tagId;
+      return !!tag.isLocked || tag.tagId === tagId;
     } else if (moveType === 'tabGroup') {
-      return tag?.groupList.some(g => g.groupId === groupId);
+      return !!tag.isLocked || tag.groupList.some(g => g.groupId === groupId);
     } else {
       return tag?.groupList?.length === 0;
     }

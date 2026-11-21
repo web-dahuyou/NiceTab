@@ -19,6 +19,9 @@ vi.mock('wxt/storage', () => ({
     setItem: vi.fn(async (key: string, value: any) => {
       mockStorageMap.set(key, value);
     }),
+    setItems: vi.fn(async (items: { key: string; value: unknown }[]) => {
+      for (const { key, value } of items) mockStorageMap.set(key, value);
+    }),
     watch: vi.fn(() => () => {}),
   },
 }));
@@ -26,8 +29,10 @@ vi.mock('wxt/storage', () => ({
 // ========== Mock 浏览器 API 相关模块 ==========
 
 vi.mock('~/entrypoints/common/tabs', () => ({
-  openNewTab: vi.fn(),
-  openNewGroup: vi.fn(),
+  openNewTab: vi.fn().mockResolvedValue({ id: 1 }),
+  openNewGroup: vi.fn().mockResolvedValue(true),
+  createNewWindowForOpen: vi.fn().mockResolvedValue({ windowId: 1, initialTabIds: [1] }),
+  removeNewWindowBlankTabs: vi.fn(),
 }));
 
 vi.mock('~/entrypoints/common/locale', async () => {
@@ -46,8 +51,14 @@ vi.stubGlobal('navigator', { language: 'en-US' });
 
 import { tabListUtils, settingsUtils, stateUtils } from '~/entrypoints/common/storage';
 import type { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
-import { openNewTab, openNewGroup } from '~/entrypoints/common/tabs';
+import {
+  openNewTab,
+  openNewGroup,
+  removeNewWindowBlankTabs,
+} from '~/entrypoints/common/tabs';
+import * as batchRemoval from '~/entrypoints/common/storage/batchRemoval';
 import { useTreeData, HomeContext, type TreeDataHookProps } from '../treeData';
+import { GlobalContext } from '~/entrypoints/common/hooks/global';
 import type { TreeDataNodeTag, TreeDataNodeTabGroup } from '../../types';
 
 // ========== Mock 数据 ==========
@@ -79,11 +90,28 @@ function prepareMockData(): TagItem[] {
 // ========== 测试包装器 ==========
 
 function createWrapper() {
+  const $message = {
+    success: vi.fn(),
+    error: vi.fn(),
+    warning: vi.fn(),
+    info: vi.fn(),
+  };
   return function Wrapper({ children }: { children: React.ReactNode }) {
     return React.createElement(
-      MemoryRouter,
-      null,
-      React.createElement(IntlProvider, { locale: 'en-US', messages: {} }, children),
+      GlobalContext.Provider,
+      { value: { $message } as any },
+      React.createElement(
+        MemoryRouter,
+        null,
+        React.createElement(
+          IntlProvider,
+          {
+            locale: 'en-US',
+            messages: { 'home.treeNodeBatch.failed': 'Restore failed' },
+          },
+          children,
+        ),
+      ),
     );
   };
 }
@@ -124,6 +152,7 @@ describe('treeData', () => {
     // 4. 清空所有 vi.fn() mock 的调用记录
     vi.clearAllMocks();
     // 5. 加载 mock 数据到存储
+    await tabListUtils.setTagList([tabListUtils.createStagingAreaTag()]);
     const mockData = prepareMockData();
     await tabListUtils.importTags(mockData, 'overwrite');
     // 6. 确保数据就绪（含中转站）
@@ -880,9 +909,145 @@ describe('treeData', () => {
   });
 
   // ==========================================================================
+  // 在同一测试进程中执行真实的后台删除逻辑，仅替代跨窗口通信。
+  describe.each(['group', 'selection'] as const)('%s 恢复后删除', mode => {
+    beforeEach(() => {
+      const request = vi
+        .spyOn(batchRemoval, 'requestTabGroupRemoval')
+        .mockImplementation(ids => tabListUtils.removeTabGroups(ids));
+      return () => request.mockRestore();
+    });
+
+    it.each(['success', 'false', 'reject', 'locked', 'keep'] as const)(
+      '打开请求结束后按结果处理源数据：%s',
+      async outcome => {
+        await settingsUtils.setSettings({
+          ...(await settingsUtils.getSettings()),
+          deleteAfterRestore: outcome !== 'keep',
+        });
+        const { result } = renderHook(() => useTreeData(), { wrapper: createWrapper() });
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        const node = getFirstTag(result)!.children!.find(
+          child => (child as TreeDataNodeTabGroup).originData.tabList.length > 2,
+        ) as TreeDataNodeTabGroup;
+        const group = node.originData;
+        if (outcome === 'locked') {
+          await tabListUtils.updateTabGroup({
+            groupId: group.groupId,
+            data: { isLocked: true },
+          });
+        }
+        const before = structuredClone(await tabListUtils.getTagList());
+        const selected = group.tabList.slice(0, 2);
+        expect(selected).toHaveLength(2);
+        let finish!: (value: boolean) => void;
+        let fail!: (error: Error) => void;
+        vi.mocked(openNewGroup).mockImplementationOnce(
+          () =>
+            new Promise((resolve, reject) => {
+              finish = resolve;
+              fail = reject;
+            }),
+        );
+        const source = { ...group, isLocked: outcome === 'locked' };
+        await act(async () => {
+          const restoring =
+            mode === 'group'
+              ? result.current.handleTabGroupRestore({ ...node, originData: source })
+              : result.current.handleTabsOpen(source, selected);
+          await waitFor(() => expect(openNewGroup).toHaveBeenCalled());
+          expect(await tabListUtils.getTagList()).toEqual(before);
+          if (outcome === 'reject') fail(new Error('tab creation failed'));
+          else finish(outcome !== 'false');
+          await restoring;
+        });
+        const after = await tabListUtils.getTagList();
+        if (outcome !== 'success') {
+          expect(after).toEqual(before);
+        } else {
+          const remaining = after
+            .flatMap(tag => tag.groupList)
+            .find(g => g.groupId === group.groupId);
+          if (mode === 'group') expect(remaining).toBeUndefined();
+          else expect(remaining?.tabList).toEqual(group.tabList.slice(2));
+        }
+      },
+    );
+  });
+
+  it.each(['group', 'category'])(
+    '单组打开期间锁定 %s，删除时保留整个源组',
+    async lock => {
+      await settingsUtils.setSettings({
+        ...(await settingsUtils.getSettings()),
+        deleteAfterRestore: true,
+      });
+      const { result } = renderHook(() => useTreeData(), { wrapper: createWrapper() });
+      await waitFor(() => expect(result.current.loading).toBe(false));
+      const node = getFirstGroup(result)!;
+      const request = vi
+        .spyOn(batchRemoval, 'requestTabGroupRemoval')
+        .mockImplementation(ids => tabListUtils.removeTabGroups(ids));
+      try {
+        vi.mocked(openNewGroup).mockImplementationOnce(async () => {
+          if (lock === 'category') {
+            await tabListUtils.updateTag(String(node.parentKey), { isLocked: true });
+          } else {
+            await tabListUtils.updateTabGroup({
+              groupId: node.key,
+              data: { isLocked: true },
+            });
+          }
+          return true;
+        });
+        await act(async () => {
+          await result.current.handleTabGroupRestore(node);
+        });
+        expect(request).toHaveBeenCalledWith([String(node.key)]);
+        const tag = (await tabListUtils.getTagList()).find(
+          t => t.tagId === node.parentKey,
+        );
+        expect(tag?.groupList.find(g => g.groupId === node.key)?.tabList).toEqual(
+          node.originData.tabList,
+        );
+        expect(
+          tag?.isLocked || tag?.groupList.find(g => g.groupId === node.key)?.isLocked,
+        ).toBe(true);
+      } finally {
+        request.mockRestore();
+      }
+    },
+  );
+
   // handleTagRestore
   // ==========================================================================
   describe('handleTagRestore', () => {
+    it('新窗口恢复第二组失败时只提交第一组的删除', async () => {
+      await settingsUtils.setSettings({
+        ...(await settingsUtils.getSettings()),
+        deleteAfterRestore: true,
+        restoreInNewWindow: true,
+      });
+      const { result } = renderHook(() => useTreeData(), { wrapper: createWrapper() });
+      await waitFor(() => expect(result.current.loading).toBe(false));
+      const tag = getFirstTag(result)!;
+      const firstGroup = getFirstGroup(result)!;
+      const remove = vi
+        .spyOn(batchRemoval, 'requestTabGroupRemoval')
+        .mockResolvedValue([String(firstGroup.key)]);
+      try {
+        vi.mocked(openNewGroup).mockResolvedValueOnce(true).mockResolvedValueOnce(false);
+        await act(async () => {
+          await result.current.handleTagRestore(String(tag.key));
+        });
+        expect(openNewGroup).toHaveBeenCalledTimes(2);
+        expect(removeNewWindowBlankTabs).toHaveBeenCalledWith(1, [1]);
+        expect(remove.mock.calls).toEqual([[[String(firstGroup.key)]]]);
+      } finally {
+        remove.mockRestore();
+      }
+    });
+
     it('应恢复分类下所有标签组', async () => {
       const { result } = renderHook(() => useTreeData(), {
         wrapper: createWrapper(),
@@ -939,6 +1104,22 @@ describe('treeData', () => {
       });
 
       expect(openNewTab).toHaveBeenCalledWith(tab!.url, { active: true });
+    });
+
+    it('只选一页时创建失败也保留源数据', async () => {
+      await settingsUtils.setSettings({
+        ...(await settingsUtils.getSettings()),
+        deleteAfterRestore: true,
+      });
+      const { result } = renderHook(() => useTreeData(), { wrapper: createWrapper() });
+      await waitFor(() => expect(result.current.loading).toBe(false));
+      const group = getFirstGroup(result)!.originData;
+      const before = structuredClone(await tabListUtils.getTagList());
+      vi.mocked(openNewTab).mockRejectedValueOnce(new Error('tab creation failed'));
+      await act(async () => {
+        await result.current.handleTabsOpen(group, group.tabList.slice(0, 1));
+      });
+      expect(await tabListUtils.getTagList()).toEqual(before);
     });
 
     it('多个标签页应调用 openNewGroup', async () => {

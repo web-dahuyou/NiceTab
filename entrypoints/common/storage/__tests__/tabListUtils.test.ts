@@ -29,6 +29,7 @@ vi.mock('wxt/storage', () => ({
   storage: {
     getItem: vi.fn(async () => null),
     setItem: vi.fn(async () => {}),
+    setItems: vi.fn(async () => {}),
   },
 }));
 vi.mock('~/entrypoints/common/tabs', () => ({
@@ -68,10 +69,12 @@ import {
 } from '../tabListUtils';
 import TabListUtils from '../tabListUtils';
 import Store from '~/entrypoints/common/storage/instanceStore';
+import RecycleBinUtils from '../recycleBinUtils';
 import { extractInstruction } from '@atlaskit/pragmatic-drag-and-drop-hitbox/tree-item';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import type { GroupItem, TagItem, TabItem } from '~/entrypoints/types';
 import { storage } from 'wxt/storage';
+import { extContentImporter } from '~/entrypoints/common/utils/importExport';
 
 // 辅助函数
 function makeGroup(overrides: Partial<GroupItem> = {}): GroupItem {
@@ -342,6 +345,7 @@ describe('TabListUtils', () => {
     // 注意：不使用 vi.clearAllMocks()，因为它会清除 Store.settingsUtils 的 mock 实现。
     // afterEach 中的 vi.restoreAllMocks() 已经足够清理 spyOn 状态。
     utils = new TabListUtils();
+    utils.requestRepair = () => utils.removeTabGroups([]);
     getTagListSpy = vi.spyOn(utils, 'getTagList');
     setTagListSpy = vi.spyOn(utils, 'setTagList').mockResolvedValue(undefined as any);
     (Store.settingsUtils.getSettings as any).mockResolvedValue({ ...defaultSettings });
@@ -992,14 +996,16 @@ describe('TabListUtils', () => {
         }),
         makeTag({ tagId: 't2', tagName: 'T2', groupList: [] }),
       ];
-      setupTagList(list);
+      vi.mocked(storage.getItem).mockResolvedValue(list);
       const result = await utils.tabGroupMoveThrough({
         sourceGroupId: 'g1',
         targetTagId: 't2',
       });
-      expect(list[0].groupList).toHaveLength(0);
-      expect(list[1].groupList).toHaveLength(1);
-      expect(list[1].groupList[0].groupName).toBe('A');
+      expect(utils.tagList.find(tag => tag.tagId === 't1')!.groupList).toHaveLength(0);
+      expect(utils.tagList.find(tag => tag.tagId === 't2')!.groupList).toHaveLength(1);
+      expect(utils.tagList.find(tag => tag.tagId === 't2')!.groupList[0].groupName).toBe(
+        'A',
+      );
       expect(result.targetGroupId).toBe('g1');
     });
 
@@ -1018,15 +1024,17 @@ describe('TabListUtils', () => {
         }),
         makeTag({ tagId: 't2', tagName: 'T2', groupList: [] }),
       ];
-      setupTagList(list);
+      vi.mocked(storage.getItem).mockResolvedValue(list);
       await utils.tabGroupMoveThrough({
         sourceGroupId: 'g1',
         targetTagId: 't2',
         isCopy: true,
       });
-      expect(list[0].groupList).toHaveLength(1);
-      expect(list[1].groupList).toHaveLength(1);
-      expect(list[1].groupList[0].groupId).not.toBe('g1');
+      expect(utils.tagList.find(tag => tag.tagId === 't1')!.groupList).toHaveLength(1);
+      expect(utils.tagList.find(tag => tag.tagId === 't2')!.groupList).toHaveLength(1);
+      expect(
+        utils.tagList.find(tag => tag.tagId === 't2')!.groupList[0].groupId,
+      ).not.toBe('g1');
     });
 
     it('autoMerge 模式合并同名标签组', async () => {
@@ -1054,20 +1062,51 @@ describe('TabListUtils', () => {
           ],
         }),
       ];
-      setupTagList(list);
+      vi.mocked(storage.getItem).mockResolvedValue(list);
       const result = await utils.tabGroupMoveThrough({
         sourceGroupId: 'g1',
         targetTagId: 't2',
         autoMerge: true,
       });
-      expect(list[0].groupList).toHaveLength(0);
-      expect(list[1].groupList).toHaveLength(1);
-      expect(list[1].groupList[0].tabList).toHaveLength(2);
+      expect(utils.tagList.find(tag => tag.tagId === 't1')!.groupList).toHaveLength(0);
+      expect(utils.tagList.find(tag => tag.tagId === 't2')!.groupList).toHaveLength(1);
+      expect(
+        utils.tagList.find(tag => tag.tagId === 't2')!.groupList[0].tabList,
+      ).toHaveLength(2);
       expect(result.targetGroupId).toBe('g2');
     });
 
+    it.each(['top', 'bottom'] as const)(
+      '%s 插入同名组时按顺序保留星标，用目标 ID 定位',
+      async position => {
+        vi.mocked(Store.settingsUtils.getSettings).mockResolvedValue({
+          ...Store.settingsUtils.settings,
+          groupInsertPosition: position,
+        });
+        const source = makeGroup({ groupId: 'source', groupName: 'A', isStarred: true });
+        const target = makeGroup({ groupId: 'target', groupName: 'A', isStarred: false });
+        vi.mocked(storage.getItem).mockResolvedValueOnce([
+          stagingTag([source]),
+          makeTag({ tagId: 'dest', groupList: [target] }),
+        ]);
+
+        const result = await utils.tabGroupMoveThrough({
+          sourceGroupId: source.groupId,
+          targetTagId: 'dest',
+          autoMerge: true,
+        });
+
+        expect(result.targetGroupId).toBe(target.groupId);
+        expect(utils.tagList[1].groupList).toEqual([
+          { ...(position === 'top' ? source : target), groupId: result.targetGroupId },
+        ]);
+      },
+    );
+
     it('源分类不存在时不操作', async () => {
-      setupTagList([makeTag({ tagId: 't2', tagName: 'T2', groupList: [] })]);
+      vi.mocked(storage.getItem).mockResolvedValue([
+        makeTag({ tagId: 't2', tagName: 'T2', groupList: [] }),
+      ]);
       const result = await utils.tabGroupMoveThrough({
         sourceGroupId: 'nonexistent',
         targetTagId: 't2',
@@ -1076,7 +1115,7 @@ describe('TabListUtils', () => {
     });
 
     it('目标分类不存在时不操作', async () => {
-      setupTagList([
+      vi.mocked(storage.getItem).mockResolvedValue([
         makeTag({
           tagId: 't1',
           tagName: 'T1',
@@ -1106,9 +1145,11 @@ describe('TabListUtils', () => {
           ],
         }),
       ];
-      setupTagList(list);
+      vi.mocked(storage.getItem).mockResolvedValue(list);
       await utils.tabGroupMoveThrough({ sourceGroupId: 'g1', targetTagId: 't2' });
-      expect(list[1].groupList[0].isStarred).toBe(true);
+      expect(utils.tagList.find(tag => tag.tagId === 't2')!.groupList[0].isStarred).toBe(
+        true,
+      );
     });
   });
 
@@ -1132,13 +1173,13 @@ describe('TabListUtils', () => {
           groupList: [makeGroup({ groupId: 'g3', groupName: 'C' })],
         }),
       ];
-      setupTagList(list);
+      vi.mocked(storage.getItem).mockResolvedValue(list);
       const result = await utils.allTabGroupsMoveThrough({
         sourceTagId: 't1',
         targetTagId: 't2',
       });
-      expect(list[0].groupList).toHaveLength(0);
-      expect(list[1].groupList).toHaveLength(3);
+      expect(utils.tagList.find(tag => tag.tagId === 't1')!.groupList).toHaveLength(0);
+      expect(utils.tagList.find(tag => tag.tagId === 't2')!.groupList).toHaveLength(3);
       expect(result.targetTagId).toBe('t2');
     });
 
@@ -1157,14 +1198,14 @@ describe('TabListUtils', () => {
         }),
         makeTag({ tagId: 't2', tagName: 'T2', groupList: [] }),
       ];
-      setupTagList(list);
+      vi.mocked(storage.getItem).mockResolvedValue(list);
       await utils.allTabGroupsMoveThrough({
         sourceTagId: 't1',
         targetTagId: 't2',
         isCopy: true,
       });
-      expect(list[0].groupList).toHaveLength(1);
-      expect(list[1].groupList).toHaveLength(1);
+      expect(utils.tagList.find(tag => tag.tagId === 't1')!.groupList).toHaveLength(1);
+      expect(utils.tagList.find(tag => tag.tagId === 't2')!.groupList).toHaveLength(1);
     });
 
     it('autoMerge 模式合并同名标签组', async () => {
@@ -1192,23 +1233,255 @@ describe('TabListUtils', () => {
           ],
         }),
       ];
-      setupTagList(list);
+      vi.mocked(storage.getItem).mockResolvedValue(list);
       await utils.allTabGroupsMoveThrough({
         sourceTagId: 't1',
         targetTagId: 't2',
         autoMerge: true,
       });
-      expect(list[1].groupList).toHaveLength(1);
-      expect(list[1].groupList[0].tabList).toHaveLength(2);
+      expect(utils.tagList.find(tag => tag.tagId === 't2')!.groupList).toHaveLength(1);
+      expect(
+        utils.tagList.find(tag => tag.tagId === 't2')!.groupList[0].tabList,
+      ).toHaveLength(2);
     });
 
     it('源分类不存在时返回 undefined', async () => {
-      setupTagList([makeTag({ tagId: 't2', tagName: 'T2', groupList: [] })]);
+      vi.mocked(storage.getItem).mockResolvedValue([
+        makeTag({ tagId: 't2', tagName: 'T2', groupList: [] }),
+      ]);
       const result = await utils.allTabGroupsMoveThrough({
         sourceTagId: 'nonexistent',
         targetTagId: 't2',
       });
       expect(result.targetTagId).toBeUndefined();
+    });
+  });
+
+  describe('批量移动与回收', () => {
+    beforeEach(() => {
+      vi.mocked(storage.getItem).mockClear();
+      vi.mocked(storage.setItem).mockClear();
+      vi.mocked(storage.setItems).mockClear();
+    });
+
+    it.each([
+      ['top', false],
+      ['top', true],
+      ['bottom', false],
+      ['bottom', true],
+    ] as const)(
+      '%s 插入、复制=%s：锁定同名组独立保留，其余组正常合并',
+      async (position, isCopy) => {
+        vi.mocked(Store.settingsUtils.getSettings).mockResolvedValue({
+          ...Store.settingsUtils.settings,
+          groupInsertPosition: position,
+        });
+        const incoming = makeGroup({ groupId: 'incoming', groupName: 'A' });
+        const other = makeGroup({
+          groupId: 'other',
+          groupName: 'B',
+          tabList: [makeTab('new')],
+        });
+        const locked = makeGroup({
+          groupId: 'locked',
+          groupName: 'A',
+          isLocked: true,
+          tabList: [makeTab('keep')],
+        });
+        const targetGroups = [
+          makeGroup({ groupId: 'first', groupName: 'A' }),
+          locked,
+          makeGroup({ groupId: 'merged', groupName: 'B', tabList: [makeTab('old')] }),
+        ];
+        vi.mocked(storage.getItem).mockResolvedValue([
+          stagingTag([incoming]),
+          makeTag({ groupList: [other] }),
+          makeTag({ tagId: 'target', groupList: targetGroups }),
+        ]);
+
+        const result = await utils.tabGroupsMoveThrough({
+          sourceGroupIds: ['incoming', 'other'],
+          targetTagId: 'target',
+          isCopy,
+          autoMerge: true,
+        });
+
+        expect(result.processedIds).toEqual(['incoming', 'other']);
+        expect(storage.setItem).toHaveBeenCalledTimes(1);
+        expect(storage.getItem).toHaveBeenCalledTimes(1);
+        expect(utils.tagList[0].groupList).toHaveLength(isCopy ? 1 : 0);
+        const groups = utils.tagList[2].groupList;
+        expect(groups.find(group => group.groupId === 'locked')).toEqual(locked);
+        expect(groups.map(group => group.groupName)).toEqual(
+          position === 'top' ? ['A', 'B', 'A', 'A'] : ['A', 'A', 'B', 'A'],
+        );
+        const inserted = groups[position === 'top' ? 0 : 3];
+        expect(inserted.groupId === 'incoming').toBe(!isCopy);
+        expect(
+          groups.find(group => group.groupId === 'merged')?.tabList.map(tab => tab.url),
+        ).toEqual(position === 'top' ? ['new', 'old'] : ['old', 'new']);
+      },
+    );
+
+    it.each([
+      ['single', false],
+      ['single', true],
+      ['multiple', false],
+      ['multiple', true],
+      ['category', false],
+      ['category', true],
+    ] as const)('%s 整组操作保留锁定属性，复制=%s', async (mode, isCopy) => {
+      const locked = makeGroup({ isLocked: true, tabList: [makeTab('keep')] });
+      const other = makeGroup({ groupId: 'other' });
+      const blocked = makeTag({
+        tagId: 'blocked',
+        isLocked: true,
+        groupList: [makeGroup({ groupId: 'blockedGroup' })],
+      });
+      const targetLocked = makeGroup({ groupId: 'targetLocked', isLocked: true });
+      vi.mocked(storage.getItem).mockResolvedValue([
+        stagingTag([locked, other]),
+        makeTag({ groupList: [targetLocked] }),
+        blocked,
+      ]);
+      const options = { targetTagId: 'tag1', isCopy, autoMerge: true };
+      if (mode === 'single') {
+        await utils.tabGroupMoveThrough({ ...options, sourceGroupId: locked.groupId });
+      } else if (mode === 'category') {
+        await utils.allTabGroupsMoveThrough({ ...options, sourceTagId: '0' });
+      } else {
+        const result = await utils.tabGroupsMoveThrough({
+          ...options,
+          sourceGroupIds: [locked.groupId, 'other', 'blockedGroup'],
+        });
+        expect(result.processedIds).toEqual([locked.groupId, 'other']);
+      }
+      const [source, target, blockedAfter] = utils.tagList;
+      expect(source.groupList).toEqual(
+        isCopy ? [locked, other] : mode === 'single' ? [other] : [],
+      );
+      expect(blockedAfter).toEqual(blocked);
+      expect(target.groupList).toContainEqual(targetLocked);
+      expect(target.groupList).toHaveLength(mode === 'single' ? 2 : 3);
+      const inserted = target.groupList.find(
+        g => g.isLocked && g.groupId !== 'targetLocked',
+      )!;
+      expect(inserted).toMatchObject({ isLocked: true, tabList: [{ url: 'keep' }] });
+      expect(inserted.groupId === locked.groupId).toBe(!isCopy);
+      expect(inserted.tabList[0].tabId === locked.tabList[0].tabId).toBe(!isCopy);
+      expect(storage.setItem).toHaveBeenCalledTimes(1);
+    });
+
+    it.each([false, true])('分类锁定时跳过整组操作且不写入，复制=%s', async isCopy => {
+      const source = stagingTag([makeGroup()]);
+      const locked = makeTag({
+        isLocked: true,
+        groupList: [makeGroup({ groupId: 'blocked' })],
+      });
+      vi.mocked(storage.getItem).mockResolvedValue([source, locked]);
+      for (const [sourceTagId, targetTagId] of [
+        ['0', 'tag1'],
+        ['tag1', '0'],
+      ]) {
+        const result = await utils.allTabGroupsMoveThrough({
+          sourceTagId,
+          targetTagId,
+          isCopy,
+        });
+        expect(result.targetTagId).toBeUndefined();
+      }
+      expect(utils.tagList).toEqual([source, locked]);
+      expect(storage.setItem).not.toHaveBeenCalled();
+    });
+
+    it('批量移动同时修复旧列表的中转站位置，只写一次', async () => {
+      const source = makeTag({ groupList: [makeGroup()] });
+      vi.mocked(storage.getItem).mockResolvedValueOnce([source, stagingTag()]);
+      await utils.tabGroupMoveThrough({ sourceGroupId: 'g1', targetTagId: '0' });
+      expect(utils.tagList.map(tag => tag.tagId)).toEqual(['0', 'tag1']);
+      expect(utils.tagList[0].groupList.map(group => group.groupId)).toEqual(['g1']);
+      expect(storage.setItem).toHaveBeenCalledTimes(1);
+      expect(storage.setItem).toHaveBeenCalledWith(utils.storageKey, utils.tagList);
+    });
+
+    it.each(['move', 'delete'])(
+      '批量操作 %s 全部跳过时也保存缺失的中转站',
+      async action => {
+        setTagListSpy.mockRestore();
+        const source = makeTag();
+        vi.mocked(storage.getItem).mockResolvedValue([source]);
+        if (action === 'move') {
+          await utils.tabGroupMoveThrough({ sourceGroupId: 'missing', targetTagId: '0' });
+        } else {
+          await utils.removeTabGroups([]);
+        }
+        expect(utils.tagList.map(tag => tag.tagId)).toEqual(['0', 'tag1']);
+        expect(storage.setItem).toHaveBeenCalledTimes(1);
+        expect(storage.setItem).toHaveBeenCalledWith(utils.storageKey, utils.tagList);
+      },
+    );
+
+    it('直接保存分类也会把原中转站及其中的标签组移到首位', async () => {
+      setTagListSpy.mockRestore();
+      const staging = stagingTag([makeGroup()]);
+      const tag = makeTag();
+      await utils.setTagList([tag, staging]);
+      expect(storage.setItem).toHaveBeenCalledWith(utils.storageKey, [staging, tag]);
+    });
+
+    it('复制写入失败后保留原列表，重试只生成一份副本', async () => {
+      const source = [stagingTag([makeGroup()]), makeTag()];
+      vi.mocked(storage.getItem).mockResolvedValue(source);
+      vi.mocked(storage.setItem).mockRejectedValueOnce(new Error('write failed'));
+      const options = { sourceGroupId: 'g1', targetTagId: 'tag1', isCopy: true };
+      await expect(utils.tabGroupMoveThrough(options)).rejects.toThrow('write failed');
+      expect(utils.tagList[1].groupList).toEqual([]);
+      await utils.tabGroupMoveThrough(options);
+      expect(utils.tagList[1].groupList).toHaveLength(1);
+      expect(utils.tagList[0].groupList).toEqual(source[0].groupList);
+    });
+
+    it('批量删除失败后主列表和回收站均可重试，一次写入两个键', async () => {
+      const group = makeGroup({ tabList: [makeTab('new')] });
+      const locked = makeGroup({ groupId: 'locked', isLocked: true });
+      const source = [stagingTag([group, locked, makeGroup({ groupId: 'empty' })])];
+      const oldBin = [stagingTag([makeGroup({ tabList: [makeTab('old')] })])];
+      const ids = ['g1', 'locked', 'empty'];
+      getTagListSpy.mockRestore();
+      vi.spyOn(RecycleBinUtils.prototype, 'checkAndClear').mockResolvedValue();
+      const originalBin = Store.recycleBinUtils;
+      const bin = new RecycleBinUtils();
+      Store.recycleBinUtils = bin;
+      try {
+        vi.mocked(storage.getItem)
+          .mockResolvedValueOnce(source)
+          .mockResolvedValueOnce(oldBin);
+        vi.mocked(storage.setItems).mockRejectedValueOnce(new Error('write failed'));
+        await expect(utils.removeTabGroups(ids)).rejects.toThrow('write failed');
+        expect(utils.tagList[0].groupList.map(item => item.groupId)).toEqual(ids);
+        expect(utils.countInfo.groupCount).toBe(3);
+        expect(bin.tagList[0].groupList[0].tabList).toEqual([makeTab('old')]);
+        expect(bin.countInfo.tabCount).toBe(1);
+
+        vi.mocked(storage.getItem)
+          .mockResolvedValueOnce(source)
+          .mockResolvedValueOnce(oldBin);
+        await expect(utils.removeTabGroups(ids)).resolves.toEqual(['g1', 'empty']);
+        expect(utils.tagList[0].groupList).toEqual([locked]);
+        expect(bin.tagList[0].groupList).toHaveLength(1);
+        expect(bin.tagList[0].groupList[0].tabList).toEqual([
+          makeTab('new'),
+          makeTab('old'),
+        ]);
+        expect(storage.setItems).toHaveBeenCalledTimes(2);
+        expect(storage.setItems).toHaveBeenLastCalledWith([
+          { key: utils.storageKey, value: utils.tagList },
+          { key: bin.storageKey, value: bin.tagList },
+        ]);
+        expect(storage.setItem).not.toHaveBeenCalled();
+      } finally {
+        Store.recycleBinUtils = originalBin;
+      }
     });
   });
 
@@ -3212,8 +3485,99 @@ describe('TabListUtils', () => {
       setTagListSpy = vi.spyOn(utils, 'setTagList');
     });
 
+    it('覆盖导入省略 groupList 的 NiceTab 分类后可以直接读取', async () => {
+      const imported = extContentImporter.niceTab('[{"tagName":"Empty"}]');
+      vi.mocked(storage.getItem).mockResolvedValueOnce([stagingTag()]);
+      await utils.importTags(imported, 'overwrite');
+      expect(utils.tagList[1]).toMatchObject({ tagName: 'Empty', groupList: [] });
+      expect(storage.setItem).toHaveBeenCalledTimes(1);
+      vi.mocked(storage.getItem).mockResolvedValueOnce(utils.tagList);
+      expect((await utils.getTagList())[1].groupList).toEqual([]);
+      expect(storage.setItem).toHaveBeenCalledTimes(1);
+    });
+
+    it('旧数据补齐空数组并置顶中转站，再次读取不重复写入', async () => {
+      const legacy = JSON.parse(
+        '[{"tagId":"empty","tagName":"Empty"},{"tagId":"mixed","groupList":[{"groupId":"noTabs"}]}]',
+      );
+      const staging = stagingTag([makeGroup()]);
+      vi.mocked(storage.getItem).mockResolvedValue([...legacy, staging]);
+      const list = await utils.getTagList();
+      expect(list.map(tag => tag.tagId)).toEqual(['0', 'empty', 'mixed']);
+      expect(list[0]).toBe(staging);
+      expect(list[1].groupList).toEqual([]);
+      expect(list[2].groupList[0].tabList).toEqual([]);
+      expect(storage.setItem).toHaveBeenCalledWith(utils.storageKey, list);
+      vi.mocked(storage.getItem).mockResolvedValueOnce(list);
+      expect(await utils.getTagList()).toBe(list);
+      expect(storage.setItem).toHaveBeenCalledTimes(1);
+    });
+
+    it('管理页的旧读取晚于删除返回时，已删除的组只留在回收站', async () => {
+      const group = makeGroup({ tabList: [makeTab('https://example.org')] });
+      const legacy = [stagingTag([group]), ...JSON.parse('[{"tagId":"empty"}]')];
+      const background = new TabListUtils();
+      vi.spyOn(RecycleBinUtils.prototype, 'checkAndClear').mockResolvedValue();
+      const bin = new RecycleBinUtils();
+      const originalBin = Store.recycleBinUtils;
+      Store.recycleBinUtils = bin;
+      const stored = new Map<string, TagItem[]>([[utils.storageKey, legacy]]);
+      let release!: (snapshot: TagItem[]) => void;
+      vi.mocked(storage.getItem)
+        .mockImplementation(async key => stored.get(key))
+        .mockReturnValueOnce(
+          new Promise(resolve => {
+            release = resolve;
+          }),
+        );
+      vi.mocked(storage.setItems)
+        .mockClear()
+        .mockImplementation(async items => {
+          for (const item of items) {
+            if ('key' in item) stored.set(item.key, item.value);
+          }
+        });
+      vi.mocked(storage.setItem).mockImplementation(async (key, value) => {
+        stored.set(key, value as TagItem[]);
+      });
+      try {
+        const reading = utils.getTagList();
+        expect(await background.removeTabGroups(['g1'])).toEqual(['g1']);
+        release(legacy);
+        const current = await reading;
+        expect(stored.get(utils.storageKey)?.map(tag => tag.groupList)).toEqual([[], []]);
+        expect(current).toEqual(stored.get(utils.storageKey));
+        expect(
+          stored.get(bin.storageKey)?.flatMap(tag => tag.groupList.map(g => g.groupId)),
+        ).toEqual([group.groupId]);
+        expect(storage.setItems).toHaveBeenCalledTimes(1);
+        expect(storage.setItem).not.toHaveBeenCalled();
+      } finally {
+        Store.recycleBinUtils = originalBin;
+        vi.mocked(storage.setItems).mockReset();
+      }
+    });
+
+    it('旧数据修复与有效组的批量移动合并写入', async () => {
+      const legacy = JSON.parse(
+        '[{"tagId":"empty"},{"tagId":"dest","groupList":[{"groupId":"noTabs"}]}]',
+      );
+      vi.mocked(storage.getItem).mockResolvedValueOnce([
+        stagingTag([makeGroup()]),
+        ...legacy,
+      ]);
+      const result = await utils.tabGroupsMoveThrough({
+        sourceGroupIds: ['g1'],
+        targetTagId: 'dest',
+      });
+      expect(result.processedIds).toEqual(['g1']);
+      expect(utils.tagList[1].groupList).toEqual([]);
+      expect(utils.tagList[2].groupList.map(group => group.tabList)).toEqual([[], []]);
+      expect(storage.setItem).toHaveBeenCalledTimes(1);
+    });
+
     it('存储为空时创建中转站并存入 storage', async () => {
-      vi.mocked(storage.getItem).mockResolvedValueOnce(null);
+      vi.mocked(storage.getItem).mockResolvedValue(null);
       const result = await utils.getTagList();
       expect(result).toHaveLength(1);
       expect(result[0].static).toBe(true);
@@ -3223,7 +3587,7 @@ describe('TabListUtils', () => {
 
     it('存储中无中转站时自动补到首位', async () => {
       const tag1 = makeTag({ tagId: 't1', tagName: 'T1' });
-      vi.mocked(storage.getItem).mockResolvedValueOnce([tag1] as any);
+      vi.mocked(storage.getItem).mockResolvedValue([tag1]);
       const result = await utils.getTagList();
       expect(result).toHaveLength(2);
       expect(result[0].static).toBe(true);
@@ -3258,7 +3622,7 @@ describe('TabListUtils', () => {
         createTime: '',
         groupList: [],
       };
-      vi.mocked(storage.getItem).mockResolvedValueOnce([tag1, staging] as any);
+      vi.mocked(storage.getItem).mockResolvedValue([tag1, staging]);
       const result = await utils.getTagList();
       expect(result).toHaveLength(2);
       expect(result[0].tagId).toBe('0');
@@ -3268,7 +3632,7 @@ describe('TabListUtils', () => {
 
     it('返回值与 this.tagList 一致', async () => {
       const tag1 = makeTag({ tagId: 't1', tagName: 'T1' });
-      vi.mocked(storage.getItem).mockResolvedValueOnce([tag1] as any);
+      vi.mocked(storage.getItem).mockResolvedValue([tag1]);
       const result = await utils.getTagList();
       expect(result).toBe((utils as any).tagList);
     });
@@ -3279,7 +3643,7 @@ describe('TabListUtils', () => {
         tagName: 'T1',
         groupList: [makeGroup({ tabList: [makeTab('https://a.com')] })],
       });
-      vi.mocked(storage.getItem).mockResolvedValueOnce([tag1] as any);
+      vi.mocked(storage.getItem).mockResolvedValue([tag1]);
       await utils.getTagList();
       expect(utils.countInfo.tabCount).toBeGreaterThanOrEqual(1);
     });

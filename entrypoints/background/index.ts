@@ -11,6 +11,7 @@ import {
   settingsUtils,
   stateUtils,
   snapshotUtils,
+  tabListUtils,
 } from '~/entrypoints/common/storage';
 import { autoSyncAlarm, autoSaveOpenedTabsAlarm } from '~/entrypoints/common/alarms';
 import {
@@ -20,6 +21,7 @@ import {
   ENUM_ACTION_NAME,
   BROWSER_ACTION_API_NAME,
 } from '~/entrypoints/common/constants';
+import { initBatchRemoval } from './batchRemoval';
 import type { RuntimeMessageEventProps } from '~/entrypoints/types';
 import {
   initPopup,
@@ -38,6 +40,11 @@ const {
 
 export default defineBackground(() => {
   // console.log('Hello background!', { id: browser.runtime.id });
+  if (!browser.extension.inIncognitoContext) {
+    tabListUtils.requestRepair = initBatchRemoval(ids =>
+      tabListUtils.removeTabGroups(ids),
+    );
+  }
   initTabsUpdateListener();
   // 初始化新标签页重定向监听
   initNewTabRedirectListener();

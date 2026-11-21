@@ -183,6 +183,7 @@ export default function Root({
             Tree: {
               motion: false,
               algorithm: true,
+              colorBgContainer: themeTypeConfig.bgColor || '#fff',
             },
           },
         }}
