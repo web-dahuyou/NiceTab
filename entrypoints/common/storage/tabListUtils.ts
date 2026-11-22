@@ -670,6 +670,82 @@ export default class TabListUtils {
     await this.setTagList(tagList);
   }
 
+  // 多选标签组拖拽（支持跨分类与分类内精确落点）
+  async onTabGroupsDrop({
+    sourceGroupIds,
+    targetTagId,
+    destination,
+  }: {
+    sourceGroupIds: Key[];
+    targetTagId: Key;
+    destination: { groupId: Key; after: boolean } | { atEnd: boolean };
+  }): Promise<{ processedIds: string[] }> {
+    const tagList = await this.getTagList();
+    const selected = new Set(sourceGroupIds.map(String));
+    const targetTagIndex = tagList.findIndex(
+      tag => String(tag.tagId) === String(targetTagId),
+    );
+    const targetTag = tagList[targetTagIndex];
+    // 锁定分类不能作为拖拽目标，也不能拖出其中的标签组
+    if (!targetTag || targetTag.isLocked || !selected.size) {
+      return { processedIds: [] };
+    }
+
+    // 用完整分类中的标签组 ID 定位，避免搜索或筛选改变落点下标
+    let targetIndex: number;
+    if ('groupId' in destination) {
+      const groupIndex = targetTag.groupList.findIndex(
+        group => String(group.groupId) === String(destination.groupId),
+      );
+      if (groupIndex === -1) return { processedIds: [] };
+      targetIndex = destination.after ? groupIndex + 1 : groupIndex;
+    } else {
+      targetIndex = destination.atEnd ? targetTag.groupList.length : 0;
+    }
+
+    // 目标分类内位于落点前的勾选项，移除后需要修正插入位置
+    const removedBeforeTarget = targetTag.groupList
+      .slice(0, targetIndex)
+      .filter(group => selected.has(String(group.groupId))).length;
+
+    const groups: GroupItem[] = [];
+    const nextList = tagList.map(tag => {
+      // 锁定分类中暂存的标签组不参与拖拽
+      if (tag.isLocked) return tag;
+      const remaining = tag.groupList.filter(group => {
+        if (!selected.has(String(group.groupId))) return true;
+        groups.push(group);
+        return false;
+      });
+      return remaining.length === tag.groupList.length
+        ? tag
+        : { ...tag, groupList: remaining };
+    });
+
+    if (!groups.length) return { processedIds: [] };
+
+    const nextTarget = nextList[targetTagIndex];
+    const insertIndex = targetIndex - removedBeforeTarget;
+    const groupList = [...nextTarget.groupList];
+    groups.forEach((group, offset) => {
+      const index = Math.min(insertIndex + offset, groupList.length);
+      const prevGroup = groupList[index - 1];
+      const nextGroup = groupList[index];
+      const moved = { ...group };
+      // 与单个拖拽保持一致：按落点相邻标签组的星标状态修正
+      if (nextGroup?.isStarred) {
+        moved.isStarred = true;
+      } else if (index > 0 && !prevGroup?.isStarred) {
+        moved.isStarred = false;
+      }
+      groupList.splice(index, 0, moved);
+    });
+    nextList[targetTagIndex] = { ...nextTarget, groupList };
+
+    await this.setTagList(nextList);
+    return { processedIds: groups.map(group => group.groupId) };
+  }
+
   // 标签组上移、下移
   async tabGroupMove(direction: 'up' | 'down', tagId: Key, groupId: Key) {
     const tagList = await this.getTagList();

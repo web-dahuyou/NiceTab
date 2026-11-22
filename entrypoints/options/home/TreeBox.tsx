@@ -1,12 +1,21 @@
 import { useState, memo, useCallback, useRef, useLayoutEffect } from 'react';
-import { Tree, Space, Typography, Button, Checkbox, Input, Empty, Spin } from 'antd';
-import type { TreeDataNode } from 'antd';
+import {
+  Tree,
+  Space,
+  Typography,
+  Button,
+  Checkbox,
+  Input,
+  Empty,
+  Spin,
+  theme,
+} from 'antd';
+import type { TreeDataNode, TreeProps } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import type { TagItem, GroupItem } from '~/entrypoints/types';
 import type { TreeDataNodeUnion, MoveToCallbackProps } from './types';
-import { HomeContext, type TreeDataHookProps } from './hooks/treeData';
-import { eventEmitter as homeEventEmitter } from './hooks/homeCustomEvent';
+import { HomeContext } from './hooks/treeData';
 import RenderTreeNode from './components/RenderTreeNode';
 import TreeBatchActions from './components/TreeBatchActions';
 import {
@@ -19,6 +28,7 @@ import { getTreeData, checkAllowDrop } from './utils';
 
 function TreeBox() {
   const { $fmt } = useIntlUtls();
+  const { token } = theme.useToken();
   const { treeDataHook } = useContext(HomeContext);
   const {
     loading,
@@ -31,6 +41,7 @@ function TreeBox() {
     handleSelect,
     onSelect,
     onTreeNodeAction,
+    handleTreeNodeDrop,
     toggleExpand,
     refreshTreeData,
     handleTagCreate,
@@ -47,6 +58,8 @@ function TreeBox() {
 
   const listRef = useRef<HTMLDivElement>(null);
   const treeRef = useRef<any>(null);
+  // 多选拖拽时记录的标签组 id
+  const multiDragGroupIdsRef = useRef<string[]>([]);
 
   const [checkedGroupIds, setCheckedGroupIds] = useState<string[]>([]);
   const [batchBusy, setBatchBusy] = useState(false);
@@ -183,6 +196,82 @@ function TreeBox() {
     return { icon: false, nodeDraggable: isNodeDraggable };
   }, [isNodeDraggable]);
 
+  const allowTreeDrop: NonNullable<TreeProps<TreeDataNodeUnion>['allowDrop']> =
+    useCallback(info => {
+      if (multiDragGroupIdsRef.current.length) {
+        const { dropNode } = info;
+        const targetTag =
+          dropNode.type === 'tag' ? dropNode.originData : dropNode.parentData;
+        if (targetTag?.isLocked) return false;
+      }
+      return checkAllowDrop?.(info) ?? false;
+    }, []);
+
+  // 拖拽开始时记录批量拖拽的标签组
+  const handleTreeDragStart = useCallback<
+    NonNullable<TreeProps<TreeDataNodeUnion>['onDragStart']>
+  >(
+    ({ node, event }) => {
+      const groupIds =
+        node.type === 'tabGroup' &&
+        checkedGroupIds.length > 1 &&
+        checkedGroupIds.includes(String(node.key))
+          ? visibleGroups
+              .filter(
+                group =>
+                  !group.parentData?.isLocked &&
+                  checkedGroupIds.includes(String(group.key)),
+              )
+              .map(group => String(group.key))
+          : [];
+      multiDragGroupIdsRef.current = groupIds;
+
+      // 拖拽效果设为 move，隐藏鼠标旁的加号图标
+      event.dataTransfer.effectAllowed = 'move';
+
+      if (!groupIds.length) return;
+
+      // 透明边框让浮层与光标保持间距
+      const preview = document.createElement('div');
+      Object.assign(preview.style, {
+        position: 'fixed',
+        top: '0',
+        left: '0',
+        borderLeft: '16px solid transparent',
+        borderTop: '8px solid transparent',
+        pointerEvents: 'none',
+        zIndex: '2147483647',
+      });
+      const bubble = document.createElement('div');
+      Object.assign(bubble.style, {
+        padding: '6px 12px',
+        borderRadius: '6px',
+        background: token.colorPrimary,
+        color: '#fff',
+        fontSize: '12px',
+        lineHeight: '1.5',
+        whiteSpace: 'nowrap',
+      });
+      bubble.textContent = $fmt({
+        id: 'common.selectedGroupCount',
+        values: { count: groupIds.length },
+      });
+      preview.appendChild(bubble);
+      document.body.appendChild(preview);
+      event.dataTransfer.setDragImage(preview, 0, 0);
+      setTimeout(() => preview.remove(), 0);
+    },
+    [$fmt, checkedGroupIds, token.colorPrimary, visibleGroups],
+  );
+  const handleTreeDragOver = useCallback<
+    NonNullable<TreeProps<TreeDataNodeUnion>['onDragOver']>
+  >(({ event }) => {
+    event.dataTransfer.dropEffect = 'move';
+  }, []);
+  const handleTreeDragEnd = useCallback(() => {
+    multiDragGroupIdsRef.current = [];
+  }, []);
+
   const titleRender = useCallback(
     (node: TreeDataNodeUnion) => (
       <RenderTreeNode node={node} onAction={handleTreeNodeAction} />
@@ -227,14 +316,16 @@ function TreeBox() {
   );
 
   // treeNode 拖拽
-  const handleTreeNodeDrop: TreeDataHookProps['handleTreeNodeDrop'] = useCallback(
-    (...params) => {
-      homeEventEmitter.emit('home:treeDataHook', {
-        action: 'handleTreeNodeDrop',
-        params,
-      });
+  const onTreeDrop = useCallback<NonNullable<TreeProps<TreeDataNodeUnion>['onDrop']>>(
+    async info => {
+      const selectedGroupIds = multiDragGroupIdsRef.current;
+      multiDragGroupIdsRef.current = [];
+      const processedIds = await handleTreeNodeDrop(info, { selectedGroupIds });
+      if (processedIds?.length) {
+        setCheckedGroupIds(ids => ids.filter(id => !processedIds.includes(id)));
+      }
     },
-    [],
+    [handleTreeNodeDrop],
   );
 
   const setTreeSearchValue = useCallback(
@@ -311,7 +402,7 @@ function TreeBox() {
               virtual={true}
               height={treeBoxHeight}
               draggable={draggableConfig}
-              allowDrop={checkAllowDrop}
+              allowDrop={allowTreeDrop}
               blockNode
               switcherIcon={<DownOutlined />}
               autoExpandParent
@@ -322,7 +413,10 @@ function TreeBox() {
               titleRender={titleRender}
               onExpand={setExpandedKeys}
               onSelect={onSelect}
-              onDrop={handleTreeNodeDrop}
+              onDragStart={handleTreeDragStart}
+              onDragOver={handleTreeDragOver}
+              onDragEnd={handleTreeDragEnd}
+              onDrop={onTreeDrop}
               onRightClick={onRightClick}
             />
           ) : (

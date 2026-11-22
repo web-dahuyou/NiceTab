@@ -104,6 +104,11 @@ const enUS: Record<LocaleKey, string> = {
   'common.bottom': 'Bottom',
   'common.text': 'Text',
   'common.icon': 'Icon',
+  'common.selectedGroupCount': `{count, plural,
+    =0 {No Groups}
+    one {# Group}
+    other {# Groups}
+  } Selected`,
   'common.selectedTabCount': `{count, plural,
     =0 {No Tabs}
     one {# Tab}

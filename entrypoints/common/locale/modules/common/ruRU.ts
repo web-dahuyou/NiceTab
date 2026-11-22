@@ -104,6 +104,13 @@ const ruRU: Record<LocaleKey, string> = {
   'common.bottom': 'Внизу',
   'common.text': 'Текст',
   'common.icon': 'Значок',
+  'common.selectedGroupCount': `{count, plural,
+    =0 {Группы не выбраны}
+    one {Выбрана # группа}
+    few {Выбраны # группы}
+    many {Выбрано # групп}
+    other {Выбрано # группы}
+  }`,
   'common.selectedTabCount': `{count, plural,
     =0 {Вкладки не выбраны}
     one {Выбрана # вкладка}

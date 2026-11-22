@@ -30,6 +30,10 @@ const {
   RESTORE_IN_NEW_WINDOW,
 } = ENUM_SETTINGS_PROPS;
 
+type TreeNodeDropInfo = Parameters<
+  NonNullable<TreeProps<TreeDataNodeUnion>['onDrop']>
+>[0];
+
 export type TreeDataHookProps = ReturnType<typeof useTreeData>;
 interface HomeContextProps {
   treeDataHook: TreeDataHookProps;
@@ -389,11 +393,10 @@ export function useTreeData() {
   );
 
   // 拖拽
-  const handleTreeNodeDrop: TreeProps<TreeDataNodeUnion>['onDrop'] = async ({
-    dragNode,
-    dropPosition,
-    node,
-  }) => {
+  const handleTreeNodeDrop = async (
+    { dragNode, dropPosition, node }: TreeNodeDropInfo,
+    options?: { selectedGroupIds?: string[] },
+  ) => {
     // console.log('onDrop-dragNode', dragNode)
     // console.log('onDrop-dropPosition', dropPosition)
     // console.log('onDrop-info-node', node)
@@ -405,7 +408,24 @@ export function useTreeData() {
     // position = 1 时表示，拖放到目标 node 的同级之后
     // position = -1 时表示，拖放到一级node节点最前面
     let dropIndex = position === 0 ? dropPosition + 1 : position === 1 ? dropPosition : 0;
-    if (dragNode.type === 'tabGroup' && node.type === 'tabGroup') {
+
+    // 多选标签组批量拖拽
+    let processedIds: string[] | undefined;
+    const selectedGroupIds = options?.selectedGroupIds || [];
+    const isMultiGroupDrop =
+      dragNode.type === 'tabGroup' && selectedGroupIds.includes(String(dragNode.key));
+    if (isMultiGroupDrop) {
+      const result = await tabListUtils.onTabGroupsDrop({
+        sourceGroupIds: selectedGroupIds,
+        targetTagId: node.type === 'tag' ? node.key : node.parentKey,
+        destination:
+          node.type === 'tag'
+            ? { atEnd: position !== 0 }
+            : { groupId: node.key, after: position >= 0 },
+      });
+      processedIds = result.processedIds;
+      if (!processedIds.length) return;
+    } else if (dragNode.type === 'tabGroup' && node.type === 'tabGroup') {
       await tabListUtils.onTabGroupDrop(
         dragNode.parentKey,
         node.parentKey,
@@ -444,6 +464,7 @@ export function useTreeData() {
       }
       handleSelect(treeData, [node.key], { node });
     });
+    return processedIds;
   };
 
   const handleTabsSort = async ({

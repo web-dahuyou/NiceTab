@@ -103,6 +103,7 @@ const zhTW: Record<LocaleKey, string> = {
   "common.bottom": "底部",
   "common.text": "文字",
   "common.icon": "圖示",
+  "common.selectedGroupCount": "已選擇{count}個分頁群組",
   "common.selectedTabCount": "已選擇{count}個分頁",
   "common.minute": "分鐘",
   "common.hour": "小時",
