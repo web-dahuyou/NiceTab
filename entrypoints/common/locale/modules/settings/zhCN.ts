@@ -7,6 +7,7 @@ const zhCN = {
   'settings.block.otherActions': '其他操作配置',
   'settings.block.display': '展示配置',
   'settings.block.newtab': '新标签页配置',
+  'settings.block.snapshot': '快照设置',
   'settings.block.autoSync': '自动同步配置',
   'settings.block.sync': '同步配置',
   'settings.confirmTipContent': '您有未保存的更改，确定离开？',
@@ -21,8 +22,6 @@ const zhCN = {
   'settings.autoPinAdminTab': '是否固定NiceTab管理后台{mark}',
   'settings.autoPinAdminTab.yes': '自动固定NiceTab管理后台（推荐）',
   'settings.autoPinAdminTab.no': '不自动固定NiceTab管理后台',
-  'settings.restoreSnapshotAfterBrowserLaunch': '启动浏览器时是否自动恢复之前打开的标签页？',
-  'settings.autoCreateSnapshotInterval': '自动创建快照的时间间隔（分钟）：',
 
   /* 发送标签页配置 */
   'settings.showSendTargetModal': '发送标签页时-是否展示指定目录选择框：',
@@ -108,6 +107,14 @@ const zhCN = {
   'settings.pageWidthType.fixed': '固定宽度',
   'settings.pageWidthType.responsive': '自适应宽度',
   'settings.showTabTitleTooltip': '标签页hover时是否展示tooltip：',
+
+  /* 快照配置 */
+  'settings.restoreSnapshotAfterBrowserLaunch': '启动浏览器时是否自动恢复之前打开的标签页？',
+  'settings.scheduledSnapshotsEnabled': '启用定时快照',
+  'settings.scheduledSnapshotInterval': '采集间隔（分钟）',
+  'settings.scheduledSnapshotLimit': '最多可保留的定时快照数量（每个窗口对应一个快照）',
+  'settings.scheduledSnapshotLimit.tooltip': '超出设定数量时，将从定时快照列表末尾移除快照。',
+  'settings.snapshotTrimConfirm': '保存后将移除列表末尾的 {count} 条定时快照，是否继续？',
 
   /* 同步配置 */
   'settings.remoteSyncWithSettings': '同步列表数据时，偏好设置是否一起同步：',

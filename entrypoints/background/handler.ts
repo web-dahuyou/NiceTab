@@ -1,7 +1,12 @@
 import { Tabs } from 'wxt/browser';
 import { debounce } from 'lodash-es';
 import tabUtils from '~/entrypoints/common/tabs';
-import { themeUtils, settingsUtils, stateUtils } from '~/entrypoints/common/storage';
+import {
+  themeUtils,
+  settingsUtils,
+  stateUtils,
+  snapshotUtils,
+} from '~/entrypoints/common/storage';
 
 import { putFavicon, MAX_DATA_URL_LENGTH } from '~/entrypoints/common/utils/faviconDb';
 import {
@@ -13,8 +18,12 @@ import {
   BROWSER_ACTION_API_NAME,
 } from '~/entrypoints/common/constants';
 
-const { SHOW_OPENED_TAB_COUNT, POPUP_MODULE_DISPLAYS, NEW_TAB_DISPLAY } =
-  ENUM_SETTINGS_PROPS;
+const {
+  SHOW_OPENED_TAB_COUNT,
+  POPUP_MODULE_DISPLAYS,
+  NEW_TAB_DISPLAY,
+  RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH,
+} = ENUM_SETTINGS_PROPS;
 
 // 初始化 popup 交互
 export async function initPopup() {
@@ -165,6 +174,26 @@ async function setFaviconOnUpdated(
 }
 /* ----------- 设置favicon end ------------- */
 
+/* ----------- 自动快照恢复和创建 start ------------- */
+// 浏览器启动时归档自动快照，并按设置恢复。
+export async function handleSnapshotStartup() {
+  snapshotUtils.restoringOnStartup = true;
+  try {
+    await stateUtils.setStateByModule('global', { snapshotStatus: 'off' });
+    const settings = await settingsUtils.getSettings();
+    const autoSnapshot = await snapshotUtils.promoteAutoBuffer();
+
+    if (settings[RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH] && autoSnapshot) {
+      await tabUtils.restoreOpenedTabsSnapshot('autoSave', autoSnapshot);
+    }
+  } catch (error) {
+    console.warn('Failed to restore snapshot on startup', error);
+  } finally {
+    snapshotUtils.restoringOnStartup = false;
+    await stateUtils.setStateByModule('global', { snapshotStatus: 'on' });
+  }
+}
+
 // 页面更新时自动创建快照（模块级单例，保证 removeListener 能移除旧监听）
 const autoCreateSnapshot = debounce(async () => {
   const globalState = await stateUtils.getState('global');
@@ -172,6 +201,7 @@ const autoCreateSnapshot = debounce(async () => {
     tabUtils.saveOpenedTabsAsSnapshot();
   }
 }, 1000);
+/* ----------- 自动快照恢复和创建 end ------------- */
 
 // 初始化监听 tabs 更新（与settings设置项无关）
 export async function initTabsUpdateListener() {

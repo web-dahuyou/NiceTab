@@ -1,7 +1,7 @@
 import type { MessageArgsProps } from 'antd';
 import type { ThemeProps, ThemeTypes, ThemeColors, LanguageTypes } from './global';
 import type { SyncRemoteType, SyncStatus } from './sync';
-import type { SendTargetProps } from './tabList';
+import type { ScheduledSnapshot, SendTargetProps, SnapshotRecord } from './tabList';
 
 // 页面上下文类型
 export type PageContextType =
@@ -37,6 +37,36 @@ export interface RuntimeMsgOpenAdminRoutePage {
   msgType: 'openAdminRoutePage';
   data: { path: string; query?: Record<string, any> };
 }
+export interface SnapshotRestoreResult {
+  status: 'success' | 'partial' | 'failed';
+}
+
+export type SnapshotLimitResult =
+  | { status: 'saved' }
+  | { status: 'confirm'; recordIds: string[] }
+  | { status: 'failed' };
+
+interface SnapshotPortMap {
+  restore: {
+    request: {
+      id: string;
+      source: SnapshotRecord['source'] | ScheduledSnapshot['source'];
+      mode: 'newWindow' | 'replaceCurrent';
+    };
+    result: SnapshotRestoreResult;
+  };
+  setLimit: {
+    request: { limit: number; confirmedIds?: string[] };
+    result: SnapshotLimitResult;
+  };
+}
+
+export type SnapshotPortAction = keyof SnapshotPortMap;
+export type SnapshotPortRequest<T extends SnapshotPortAction = SnapshotPortAction> = {
+  [Action in T]: { action: Action } & SnapshotPortMap[Action]['request'];
+}[T];
+export type SnapshotPortResult<T extends SnapshotPortAction> =
+  SnapshotPortMap[T]['result'];
 export interface RuntimeMsgReloadAllAdminPage {
   msgType: 'reloadAllAdminPage';
   data: {};

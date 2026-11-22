@@ -1,10 +1,3 @@
-import {
-  OPEN_SAVED_TABS_PORT,
-  openTabs,
-  tabTarget,
-  type SearchOpenRequest,
-  type OpenResult,
-} from '~/entrypoints/common/openUtils';
 import contextMenusRegister, {
   strategyHandler,
   handleSendTabsAction,
@@ -36,13 +29,14 @@ import {
   initTabEventListener,
   initTabsUpdateListener,
   initNewTabRedirectListener,
+  handleSnapshotStartup,
   setBadge,
 } from './handler';
+import { initPortMessageListener } from './portMessage';
 
 const {
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
   OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED,
-  RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH,
   POPUP_MODULE_DISPLAYS,
 } = ENUM_SETTINGS_PROPS;
 
@@ -53,39 +47,7 @@ export default defineBackground(() => {
       tabListUtils.removeTabGroups(ids),
     );
   }
-  browser.runtime.onConnect.addListener(port => {
-    if (port.name !== OPEN_SAVED_TABS_PORT) return;
-    port.onMessage.addListener(async message => {
-      const request = message as SearchOpenRequest;
-      let result: OpenResult = { processedIds: [], failed: true };
-      try {
-        // 网页内搜索只传保存条目的 ID，由后台读取 URL，并使用发起操作的窗口。
-        const sourceWindowId = port.sender?.tab?.windowId;
-        if (sourceWindowId === undefined) throw new Error('Missing source window');
-        const tags = await tabListUtils.getTagList();
-        const saved = new Map(
-          tags.flatMap(tag =>
-            tag.groupList.flatMap(group =>
-              group.tabList.map(tab => [tab.tabId, tab] as const),
-            ),
-          ),
-        );
-        const targets = request.tabs.flatMap(({ id, active, discard }) => {
-          const tab = saved.get(id);
-          return tab ? [tabTarget(tab, { active, discard })] : [];
-        });
-        result = await openTabs(targets, request.mode, sourceWindowId, true);
-        if (targets.length !== request.tabs.length) result.failed = true;
-      } catch (error) {
-        console.warn('Unable to open search results', error);
-      }
-      try {
-        port.postMessage(result);
-      } catch (error) {
-        console.warn('Search page disconnected', error);
-      }
-    });
-  });
+  initPortMessageListener();
   initTabsUpdateListener();
   // 初始化新标签页重定向监听
   initNewTabRedirectListener();
@@ -98,6 +60,7 @@ export default defineBackground(() => {
     initPopup();
     initNewTabRedirectListener();
     autoSyncAlarm.checkReset(settings, oldSettings);
+    autoSaveOpenedTabsAlarm.checkReset(settings, oldSettings);
   });
 
   initTabListStorageListener(async () => {
@@ -116,14 +79,8 @@ export default defineBackground(() => {
 
   // 创建自动同步闹钟
   autoSyncAlarm.create();
-  // // 创建自动保存已打开标签页的闹钟
-  // autoSaveOpenedTabsAlarm.create();
-  // 清空自动保存快照的闹钟（不使用闹钟，采用tabs.onUpdated事件监听）
-  autoSaveOpenedTabsAlarm.clearAlarm();
-  // setTimeout(() => {
-  //   // 创建自动保存已打开标签页的闹钟
-  //   autoSaveOpenedTabsAlarm.create();
-  // }, 300);
+  // 按当前配置维护定时快照的采集闹钟
+  autoSaveOpenedTabsAlarm.create();
 
   // 左键点击图标 (如果有 popup 是不会触发的，可以执行 browser[BROWSER_ACTION_API_NAME].setPopup({ popup: '' }) 来监听事件)
   // Fired when an action icon is clicked. This event will not fire if the action has a popup.
@@ -160,24 +117,8 @@ export default defineBackground(() => {
   });
   browser.runtime.onStartup.addListener(async () => {
     console.log('browser.runtime.onStartup');
-    autoSaveOpenedTabsAlarm.clearAlarm();
 
-    await stateUtils.setStateByModule('global', { snapshotStatus: 'off' });
-    try {
-      const settings = await settingsUtils.getSettings();
-      const restoreSnapshotAfterBrowserLaunch =
-        settings[RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH];
-      const autoSnapshot = await snapshotUtils.promoteAutoBuffer();
-
-      if (restoreSnapshotAfterBrowserLaunch && autoSnapshot) {
-        await tabUtils.restoreOpenedTabsSnapshot('autoSave', autoSnapshot);
-      }
-    } catch (error) {
-      console.warn('Failed to restore snapshot on startup', error);
-    } finally {
-      await stateUtils.setStateByModule('global', { snapshotStatus: 'on' });
-    }
-
+    await handleSnapshotStartup();
     startup();
   });
   browser.windows.onCreated.addListener(async () => {
@@ -188,6 +129,10 @@ export default defineBackground(() => {
     }
   });
 
+  // 每次切换都要记录聚焦时间，由快照写入队列串行处理。
+  browser.windows.onFocusChanged.addListener(windowId => {
+    snapshotUtils.focusScheduledWindow(windowId);
+  });
   browser.windows.onRemoved.addListener(async windowId => {
     // console.log('browser.windows.onRemoved--windowId', windowId);
     stateUtils.clearSelectedKeysOfInvalidWindows();
@@ -200,7 +145,6 @@ export default defineBackground(() => {
   // 监听浏览器关闭事件
   browser.runtime.onSuspend.addListener(async () => {
     console.log('browser.runtime.onSuspend');
-    // autoSaveOpenedTabsAlarm.clearAlarm();
   });
 
   browser.runtime.onMessage.addListener(async (msg: unknown) => {

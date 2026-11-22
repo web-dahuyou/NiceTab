@@ -268,7 +268,9 @@ Opening saved tabs/groups uses `tabs.ts` for window selection, URL handling, gro
 
 ### Snapshots and startup recovery
 
-`entrypoints/common/storage/snapshotUtils.ts` manages versioned snapshots, manual history, legacy migration, and automatic-buffer promotion. `entrypoints/background/handler.ts` captures browser tab/group events with debounce. Current automatic capture is event-driven; the background clears the legacy auto-save alarm.
+`entrypoints/common/storage/snapshotUtils.ts` manages versioned snapshots, manual history, legacy migration, and automatic-buffer promotion. `entrypoints/background/handler.ts` captures browser tab/group events with debounce. Real-time buffer capture is event-driven; the auto-save alarm captures scheduled window history.
+
+Scheduled history uses `local:scheduledSnapshots`, separately from manual and latest automatic snapshots. The background serializes capture, focus ordering and retention writes. Deduplication uses browser-session identity and window ID. The options page requests restoration through a runtime message; the background performs it and keeps per-operation state in memory, clearing it in `finally`. Closing, reloading or navigating the options page does not interrupt restoration. Scheduled capture skips those windows until restoration finishes; while a new target window is being created, capture waits for its identity.
 
 On startup, the background turns `snapshotStatus` off, promotes the prior automatic buffer, optionally restores it, and turns capture back on in `finally`. This prevents restore events from immediately overwriting the recovery source. Do not treat snapshots as merely a copy of the saved category tree: they represent open browser windows/tabs.
 

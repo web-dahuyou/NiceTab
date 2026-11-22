@@ -9,7 +9,7 @@ browser.alarms.onAlarm.addListener((alarm: Alarms.Alarm) => {
   if (alarm.name === AUTO_SYNC_ALARM_KEY) {
     onAutoSyncAlarm(alarm);
   } else if (alarm.name === AUTO_SAVE_OPENED_TABS_ALARM_KEY) {
-    onAutoSaveOpenedTabsAlarm(alarm);
+    return onAutoSaveOpenedTabsAlarm();
   }
 });
 

@@ -8,7 +8,11 @@ For the most detailed and up-to-date release notes, see [GitHub Releases](https:
 
 ## Unreleased
 
+- Added scheduled snapshots.
+- You can now open categories, tab groups, and tabs in the current window, a new window, or a new incognito window. These options are also available for global search results, items in the Recycle Bin, and items on the new tab page.
+- Added domain sorting within tab groups, sorting by base domain and then subdomain to keep tabs from the same domain together
 - Added batch operations to the left Directory Tree: select multiple tab groups to remove, open (current window, new window, or new incognito window), or move to another category
+- Optimized favicon retrieval and caching logic
 
 ---
 

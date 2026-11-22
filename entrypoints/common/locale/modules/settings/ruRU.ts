@@ -9,6 +9,7 @@ const ruRU: Record<LocaleKey, string> = {
   'settings.block.otherActions': 'Другие действия',
   'settings.block.display': 'Отображение',
   'settings.block.newtab': 'Новая вкладка',
+  'settings.block.snapshot': 'Настройки снимков',
   'settings.block.autoSync': 'Автосинхронизация',
   'settings.block.sync': 'Синхронизация',
   'settings.confirmTipContent':
@@ -26,10 +27,6 @@ const ruRU: Record<LocaleKey, string> = {
   'settings.autoPinAdminTab': 'Закреплять панель NiceTab?',
   'settings.autoPinAdminTab.yes': 'Закреплять автоматически (рекомендуется)',
   'settings.autoPinAdminTab.no': 'Не закреплять',
-  'settings.restoreSnapshotAfterBrowserLaunch':
-    'Восстанавливать ранее открытые вкладки при запуске браузера?',
-  'settings.autoCreateSnapshotInterval':
-    'Интервал автоматического создания снимка (минуты):',
 
   'settings.showSendTargetModal':
     'Показывать окно выбора папки при отправке вкладок?',
@@ -153,6 +150,15 @@ const ruRU: Record<LocaleKey, string> = {
   'settings.pageWidthType.responsive': 'Адаптивная',
   'settings.showTabTitleTooltip':
     'Показывать подсказку при наведении на вкладку?',
+
+  /* 快照配置 */
+  'settings.restoreSnapshotAfterBrowserLaunch':
+    'Восстанавливать ранее открытые вкладки при запуске браузера?',
+  'settings.scheduledSnapshotsEnabled': 'Включить снимки по расписанию',
+  'settings.scheduledSnapshotInterval': 'Интервал между снимками (минуты)',
+  'settings.scheduledSnapshotLimit': 'Максимум снимков по расписанию (каждый снимок относится к одному окну)',
+  'settings.scheduledSnapshotLimit.tooltip': 'При превышении лимита снимки удаляются из конца списка снимков по расписанию.',
+  'settings.snapshotTrimConfirm': 'После сохранения из конца списка будут удалены снимки по расписанию ({count}). Продолжить?',
 
   'settings.remoteSyncWithSettings':
     'Синхронизировать настройки вместе со списком вкладок?',

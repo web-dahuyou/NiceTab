@@ -17,11 +17,15 @@ import {
   DEFAULT_EXCLUDE_DOMAINS,
   defaultContextmenuConfigList,
   DEFAULT_SEARCH_ENGINES,
+  defaultScheduledSnapshotInterval,
+  defaultScheduledSnapshotLimit,
+  scheduledSnapshotIntervalRange,
+  scheduledSnapshotLimitRange,
   defaultAutoSyncType,
   defaultAutoSyncTimeUnit,
   defaultAutoSyncRelation,
   defaultTimeRange,
-} from '../constants';
+} from '~/entrypoints/common/constants';
 import { defaultGroupActions } from '~/entrypoints/options/home/constants';
 
 const {
@@ -30,8 +34,6 @@ const {
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
   OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED,
   AUTO_PIN_ADMIN_TAB,
-  RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH,
-  AUTO_CREATE_SNAPSHOT_INTERVAL,
   /* 发送标签页配置 */
   SHOW_SEND_TARGET_MODAL,
   ALLOW_SEND_PINNED_TABS,
@@ -75,6 +77,11 @@ const {
   SHOW_TAB_TITLE_TOOLTIP,
   NEW_TAB_DISPLAY,
   SEARCH_ENGINES,
+  /* 快照配置 */
+  RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH,
+  SCHEDULED_SNAPSHOTS_ENABLED,
+  SCHEDULED_SNAPSHOT_INTERVAL,
+  SCHEDULED_SNAPSHOT_LIMIT,
   /* 同步配置 */
   REMOTE_SYNC_WITH_SETTINGS,
   AUTO_SYNC,
@@ -84,6 +91,14 @@ const {
   AUTO_SYNC_TYPE,
 } = ENUM_SETTINGS_PROPS;
 
+function normalizeSnapshotInterval(value?: number) {
+  if (value === undefined || !Number.isSafeInteger(value) || value <= 0) {
+    return defaultScheduledSnapshotInterval;
+  }
+  const { min, max, step } = scheduledSnapshotIntervalRange;
+  return Math.min(max, Math.max(min, Math.round(value / step) * step));
+}
+
 // 设置工具类
 export default class SettingsUtils {
   initialSettings = {
@@ -92,8 +107,6 @@ export default class SettingsUtils {
     [OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH]: true, // 启动浏览器时是否自动打开管理后台
     [OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED]: false, // 新开window窗口时是否自动打开管理后台
     [AUTO_PIN_ADMIN_TAB]: true, // 是否固定管理后台
-    [RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH]: false, // 启动浏览器时是否恢复快照
-    [AUTO_CREATE_SNAPSHOT_INTERVAL]: 1, // 自动创建快照时间间隔
     /* 发送标签页配置 */
     [SHOW_SEND_TARGET_MODAL]: false, // 发送标签页时是否显示目标选择弹窗
     [ALLOW_SEND_PINNED_TABS]: false, // 是否发送固定标签页
@@ -138,7 +151,11 @@ export default class SettingsUtils {
     /* 新标签页配置 */
     [NEW_TAB_DISPLAY]: 'default' as NewTabDisplayTypes, // 新标签页显示方式
     [SEARCH_ENGINES]: DEFAULT_SEARCH_ENGINES as SearchEngine[], // 搜索引擎配置
-
+    /* 快照配置 */
+    [RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH]: false, // 启动浏览器时是否恢复快照
+    [SCHEDULED_SNAPSHOTS_ENABLED]: false, // 启用定时快照
+    [SCHEDULED_SNAPSHOT_INTERVAL]: defaultScheduledSnapshotInterval, // 定时快照采集间隔（分钟）
+    [SCHEDULED_SNAPSHOT_LIMIT]: defaultScheduledSnapshotLimit, // 所有窗口合计保留的定时快照数量
     /* 同步配置 */
     [REMOTE_SYNC_WITH_SETTINGS]: true, // 远程同步时，偏好设置是否一起同步
     [AUTO_SYNC]: false, // 是否开启自动同步
@@ -148,24 +165,70 @@ export default class SettingsUtils {
     [AUTO_SYNC_TYPE]: defaultAutoSyncType, // 自动同步方式
   };
   storageKey: `local:${string}` = 'local:settings';
+  readonly scheduledSnapshotLimitKey = 'local:scheduledSnapshotLimit';
   settings: SettingsProps = this.initialSettings;
 
-  async setSettings(settings: SettingsProps) {
-    this.settings = { ...this.initialSettings, ...settings };
-    return await storage.setItem(this.storageKey, this.settings);
+  private getGeneralSettings(settings: SettingsProps) {
+    const { [SCHEDULED_SNAPSHOT_LIMIT]: _limit, ...generalSettings } = {
+      ...this.initialSettings,
+      ...settings,
+    };
+    return {
+      ...generalSettings,
+      [SCHEDULED_SNAPSHOTS_ENABLED]: settings[SCHEDULED_SNAPSHOTS_ENABLED] === true,
+      [SCHEDULED_SNAPSHOT_INTERVAL]: normalizeSnapshotInterval(
+        settings[SCHEDULED_SNAPSHOT_INTERVAL],
+      ),
+    };
   }
+
+  async setSettings(settings: SettingsProps) {
+    const previous = await storage.getItem<SettingsProps>(this.storageKey);
+    const legacyLimit = previous?.[SCHEDULED_SNAPSHOT_LIMIT];
+    // 独立上限尚未保存时，保留已有旧值供回退。普通设置写入忽略来值中的上限。
+    const keepLegacyLimit =
+      legacyLimit !== undefined &&
+      (await storage.getItem<number>(this.scheduledSnapshotLimitKey)) == null;
+    this.settings = this.getGeneralSettings(settings);
+    return await storage.setItem(
+      this.storageKey,
+      keepLegacyLimit
+        ? { ...this.settings, [SCHEDULED_SNAPSHOT_LIMIT]: legacyLimit }
+        : this.settings,
+    );
+  }
+
   async getSettings() {
     const settings = await storage.getItem<SettingsProps>(this.storageKey);
     const _savedBefore = !!settings;
     const language = resolveLanguage(settings?.language || navigator?.language);
     this.settings = {
-      ...this.initialSettings,
-      ...settings,
+      ...this.getGeneralSettings(settings || {}),
       language,
     };
     if (!_savedBefore || settings?.language !== language) {
       this.setSettings(this.settings);
     }
     return this.settings;
+  }
+
+  async getLegacyScheduledSnapshotLimit() {
+    const settings = await storage.getItem<SettingsProps>(this.storageKey);
+    return this.getScheduledSnapshotOptions(settings || {}).limit;
+  }
+
+  // 兼容旧设置及导入的无效数值。
+  getScheduledSnapshotOptions(settings: SettingsProps) {
+    const limit = settings[SCHEDULED_SNAPSHOT_LIMIT];
+    return {
+      interval: normalizeSnapshotInterval(settings[SCHEDULED_SNAPSHOT_INTERVAL]),
+      limit:
+        limit !== undefined && Number.isSafeInteger(limit)
+          ? Math.min(
+              scheduledSnapshotLimitRange.max,
+              Math.max(scheduledSnapshotLimitRange.min, limit),
+            )
+          : defaultScheduledSnapshotLimit,
+    };
   }
 }

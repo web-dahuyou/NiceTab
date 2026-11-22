@@ -3,6 +3,7 @@ import type { SnapshotLocaleKey } from './zhCN';
 const ruRU: Record<SnapshotLocaleKey, string> = {
   'snapshots.title': 'Снимки',
   'snapshots.manual': 'Ручные снимки',
+  'snapshots.scheduled': 'Снимки по расписанию',
   'snapshots.auto': 'Последний автоматический снимок',
   'snapshots.create': 'Снимок текущего окна',
   'snapshots.empty': 'Нет снимков',
@@ -30,8 +31,10 @@ const ruRU: Record<SnapshotLocaleKey, string> = {
   'snapshots.restoreNewWindow': 'Восстановить в новом окне',
   'snapshots.restoreCurrentWindow': 'Заменить текущее окно',
   'snapshots.restoreCurrentConfirm': 'Вкладки в текущем окне будут заменены этой снимком. Продолжить?',
+  'snapshots.restorePartial': 'Снимок восстановлен частично. Проверьте вкладки и группы.',
   'snapshots.deleteConfirm': 'Вы уверены, что хотите удалить этот снимок?',
   'snapshots.pinned': 'Закреплённая',
+  'snapshots.windowId': 'ID окна: {id}',
   'snapshots.created': 'Снимок создан',
 };
 

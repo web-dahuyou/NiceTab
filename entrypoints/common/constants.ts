@@ -209,8 +209,6 @@ export enum ENUM_SETTINGS_PROPS {
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH = 'openAdminTabAfterBrowserLaunch', // 启动浏览器时是否自动打开管理后台
   OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED = 'openAdminTabAfterWindowCreated', // 新开window窗口时是否自动打开管理后台
   AUTO_PIN_ADMIN_TAB = 'autoPinAdminTab', // 是否固定管理后台
-  RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH = 'restoreSnapshotAfterBrowserLaunch', // 启动浏览器时是否恢复快照
-  AUTO_CREATE_SNAPSHOT_INTERVAL = 'autoCreateSnapshotInterval', // 自动创建快照时间间隔
   /* 发送标签页配置 */
   SHOW_SEND_TARGET_MODAL = 'showSendTargetModal', // 发送标签页时是否显示目标选择弹窗
   ALLOW_SEND_PINNED_TABS = 'allowSendPinnedTabs', // 是否发送固定标签页
@@ -255,6 +253,11 @@ export enum ENUM_SETTINGS_PROPS {
   /* 新标签页配置 */
   NEW_TAB_DISPLAY = 'newTabDisplay', // 新标签页显示方式
   SEARCH_ENGINES = 'searchEngines', // 搜索引擎配置
+  /* 快照配置 */
+  RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH = 'restoreSnapshotAfterBrowserLaunch', // 启动浏览器时是否恢复快照
+  SCHEDULED_SNAPSHOTS_ENABLED = 'scheduledSnapshotsEnabled', // 启用定时快照
+  SCHEDULED_SNAPSHOT_INTERVAL = 'scheduledSnapshotInterval', // 定时快照采集间隔（分钟）
+  SCHEDULED_SNAPSHOT_LIMIT = 'scheduledSnapshotLimit', // 所有窗口合计保留的定时快照数量
   /* 同步配置 */
   REMOTE_SYNC_WITH_SETTINGS = 'remoteSyncWithSettings', // 远程同步时，偏好设置是否一起同步
   AUTO_SYNC = 'autoSync', // 是否开启自动同步
@@ -353,6 +356,12 @@ export const DEFAULT_EXCLUDE_DOMAINS = [
   import.meta.env.FIREFOX ? '^about:.+$' : 'about:newtab',
 ];
 
+// 定时快照默认配置
+export const defaultScheduledSnapshotInterval = 10;
+export const defaultScheduledSnapshotLimit = 30;
+export const scheduledSnapshotIntervalRange = { min: 5, max: 60, step: 5 };
+export const scheduledSnapshotLimitRange = { min: 1, max: 200 };
+
 // 同步方式枚举
 export const syncTypeMap: Record<string, SyncType> = {
   AUTO_PULL_MERGE: 'auto-pull-merge',
@@ -381,6 +390,7 @@ export const syncExcludedSettingsProps = [
   ENUM_SETTINGS_PROPS.AUTO_SYNC_INTERVAL,
   ENUM_SETTINGS_PROPS.AUTO_SYNC_TIME_RANGES,
   ENUM_SETTINGS_PROPS.AUTO_SYNC_TYPE,
+  ENUM_SETTINGS_PROPS.SCHEDULED_SNAPSHOT_LIMIT,
 ];
 
 // 页面上下文类型枚举

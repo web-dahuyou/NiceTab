@@ -170,8 +170,6 @@ export type SettingsProps = {
   openAdminTabAfterBrowserLaunch?: boolean; // 启动浏览器时是否自动打开管理后台
   openAdminTabAfterWindowCreated?: boolean; // 新开window窗口时是否自动打开管理后台
   autoPinAdminTab?: boolean; // 是否固定管理后台
-  restoreSnapshotAfterBrowserLaunch?: boolean; // 启动浏览器时是否恢复快照
-  autoCreateSnapshotInterval?: number; // 自动创建快照间隔
   /* 发送标签页配置 */
   showSendTargetModal?: boolean; // 发送标签页时是否显示目标分类选择弹窗
   allowSendPinnedTabs?: boolean; // 是否发送固定标签页
@@ -216,6 +214,11 @@ export type SettingsProps = {
   /* 新标签页配置 */
   newTabDisplay?: NewTabDisplayTypes; // 新标签页显示方式
   searchEngines?: SearchEngine[]; // 搜索引擎配置
+  /* 快照配置 */
+  restoreSnapshotAfterBrowserLaunch?: boolean; // 启动浏览器时是否恢复快照
+  scheduledSnapshotsEnabled?: boolean; // 启用定时快照
+  scheduledSnapshotInterval?: number; // 定时快照采集间隔（分钟）
+  scheduledSnapshotLimit?: number; // 所有窗口合计保留的定时快照数量
   /* 同步配置 */
   remoteSyncWithSettings?: boolean; // 偏好设置是否与列表一起同步
   autoSync?: boolean; // 是否开启自动同步

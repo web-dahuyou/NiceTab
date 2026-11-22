@@ -3,6 +3,7 @@ import type { SnapshotLocaleKey } from './zhCN';
 const enUS: Record<SnapshotLocaleKey, string> = {
   'snapshots.title': 'Snapshots',
   'snapshots.manual': 'Manual Snapshots',
+  'snapshots.scheduled': 'Scheduled Snapshots',
   'snapshots.auto': 'Latest Automatic Snapshot',
   'snapshots.create': 'Snapshot Current Window',
   'snapshots.empty': 'No snapshots',
@@ -18,8 +19,10 @@ const enUS: Record<SnapshotLocaleKey, string> = {
   'snapshots.restoreNewWindow': 'Restore in New Window',
   'snapshots.restoreCurrentWindow': 'Replace Current Window',
   'snapshots.restoreCurrentConfirm': 'The existing tabs in the current window will be overwritten by this snapshot. Continue?',
+  'snapshots.restorePartial': 'The snapshot was partially restored. Check your tabs and groups.',
   'snapshots.deleteConfirm': 'Are you sure you want to remove this snapshot?',
   'snapshots.pinned': 'Pinned',
+  'snapshots.windowId': 'Window ID: {id}',
   'snapshots.created': 'Snapshot created',
 };
 

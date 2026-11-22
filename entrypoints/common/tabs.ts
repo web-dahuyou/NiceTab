@@ -7,6 +7,8 @@ import type {
   SendTargetProps,
   SendTabMsgEventProps,
   SnapshotRecord,
+  SnapshotRestoreResult,
+  ScheduledSnapshotWindow,
   WindowSnapshotGroup,
   WindowSnapshotItem,
   WindowSnapshotTab,
@@ -41,6 +43,7 @@ const {
   EXCLUDE_DOMAINS_FOR_SENDING,
   RESTORE_IN_NEW_WINDOW,
   OPENING_TABS_ORDER,
+  SCHEDULED_SNAPSHOTS_ENABLED,
 } = ENUM_SETTINGS_PROPS;
 
 // const matchUrls: string[] = ['https://*/*', 'http://*/*', 'chrome://*/*', 'file://*/*'];
@@ -701,24 +704,9 @@ function transformSnapshotTab(tab: Tabs.Tab): WindowSnapshotTab {
   };
 }
 
-export async function createWindowSnapshotRecord(
-  source: SnapshotRecord['source'],
-  windowId?: number,
-) {
-  const targetWindow = windowId
-    ? await browser.windows.get(windowId)
-    : await browser.windows.getCurrent();
-  if (!targetWindow.id) return;
-
-  let tabs = await browser.tabs.query({ windowId: targetWindow.id });
-  // 自动快照保存所有窗口的标签页
-  if (source === 'auto') {
-    tabs = await browser.tabs.query({});
-  }
-
+async function createWindowSnapshotItems(tabs: Tabs.Tab[]) {
   const adminUrl = browser.runtime.getURL('/options.html');
   const filteredTabs = tabs.filter(tab => tab.id && !tab.url?.startsWith(adminUrl));
-  if (!filteredTabs.length) return;
 
   const items: WindowSnapshotItem[] = [];
   const savedGroupIds = new Set<number>();
@@ -757,6 +745,27 @@ export async function createWindowSnapshotRecord(
     items.push(group);
   }
 
+  return items;
+}
+
+export async function createWindowSnapshotRecord(
+  source: SnapshotRecord['source'],
+  windowId?: number,
+) {
+  const targetWindow = windowId
+    ? await browser.windows.get(windowId)
+    : await browser.windows.getCurrent();
+  if (!targetWindow.id) return;
+
+  let tabs = await browser.tabs.query({ windowId: targetWindow.id });
+  // 自动快照保存所有窗口的标签页
+  if (source === 'auto') {
+    tabs = await browser.tabs.query({});
+  }
+
+  const items = await createWindowSnapshotItems(tabs);
+  if (!items.length) return;
+
   const now = newCreateTime();
   return {
     id: getRandomId(16),
@@ -789,51 +798,93 @@ function getSnapshotTabs(items: WindowSnapshotItem[]) {
   return items.flatMap(item => (item.type === 'group' ? item.tabs : [item]));
 }
 
-export async function restoreSnapshotRecord(
-  record: SnapshotRecord,
-  mode: 'newWindow' | 'replaceCurrent' = 'newWindow',
-) {
-  // const globalState = await stateUtils.getState('global');
-  // await stateUtils.setStateByModule('global', { snapshotStatus: 'off' });
+// 按普通窗口分别采集，保留窗口边界供定时快照恢复。
+export async function saveScheduledWindowSnapshots() {
+  const settings = await settingsUtils.getSettings();
+  if (!settings[SCHEDULED_SNAPSHOTS_ENABLED] || snapshotUtils.restoringOnStartup) return;
 
-  let created = 0;
+  const restoring = snapshotUtils.beginScheduledCapture();
   try {
-    const originalWindow = await browser.windows.getCurrent({ populate: true });
+    if (restoring.has(null)) return;
+    const windows = await browser.windows.getAll({
+      populate: true,
+      windowTypes: ['normal'],
+    });
+    const openWindowIds: number[] = [];
+    const snapshots: ScheduledSnapshotWindow[] = [];
+    for (const win of windows) {
+      if (win.id === undefined || win.incognito) continue;
+      openWindowIds.push(win.id);
+      if (restoring.has(win.id)) continue;
+      const items = await createWindowSnapshotItems(win.tabs || []);
+      if (!items.length) continue;
+      snapshots.push({ windowId: win.id, focused: win.focused, items });
+    }
+
+    if (restoring.has(null)) return;
+    await snapshotUtils.saveScheduled(
+      snapshots.filter(item => !restoring.has(item.windowId)),
+      openWindowIds,
+    );
+  } finally {
+    snapshotUtils.endScheduledCapture();
+  }
+}
+
+export async function restoreSnapshotRecord(
+  record: Pick<SnapshotRecord, 'items'>,
+  mode: 'newWindow' | 'replaceCurrent' = 'newWindow',
+  sourceTab?: Pick<Tabs.Tab, 'id' | 'windowId'>,
+): Promise<SnapshotRestoreResult> {
+  const createdTabs = new Map<string, Tabs.Tab>();
+  let restoreKey: symbol | undefined;
+  try {
+    const snapshotTabs = getSnapshotTabs(record.items);
+    if (!snapshotTabs.length) return { status: 'failed' };
+    let windowId: number | null = null;
+    if (mode === 'replaceCurrent') {
+      windowId = sourceTab?.windowId ?? (await browser.windows.getCurrent()).id ?? null;
+      if (windowId === null) throw new Error('Unable to resolve target window');
+      if (snapshotUtils.isRestoringWindow(windowId)) return { status: 'failed' };
+    }
+    restoreKey = snapshotUtils.beginRestore(windowId);
     const targetWindow =
-      mode === 'newWindow'
+      windowId === null
         ? await browser.windows.create({ focused: true })
-        : originalWindow;
-    if (!targetWindow.id) throw new Error('Unable to resolve target window');
+        : await browser.windows.get(windowId, { populate: true });
+    if (targetWindow.id === undefined) throw new Error('Unable to resolve target window');
+    snapshotUtils.updateRestore(restoreKey, targetWindow.id);
 
     const originalTabIds = (targetWindow.tabs || [])
       .map(tab => tab.id)
       .filter((id): id is number => id !== undefined);
-    const createdTabs = new Map<string, Tabs.Tab>();
-    const snapshotTabs = getSnapshotTabs(record.items);
-
-    const tabs = await Promise.all(
+    const results = await Promise.allSettled(
       snapshotTabs.map(item => {
-        return openNewTab(item.url, {
+        const options = {
           windowId: targetWindow.id,
           active: false,
-          discard: false,
           pinned: item.pinned,
-        });
+        };
+        if (import.meta.env.FIREFOX && item.url === 'about:newtab') {
+          return browser.tabs.create(options);
+        }
+        return openNewTab(item.url, options);
       }),
     );
-    tabs.forEach((tab, index) => {
-      if (tab?.id) {
-        createdTabs.set(snapshotTabs[index].id, tab);
-        created++;
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled' && result.value?.id !== undefined) {
+        createdTabs.set(snapshotTabs[index].id, result.value);
       }
     });
 
-    if (!created) {
-      if (mode === 'newWindow' && targetWindow.id) {
-        await browser.windows.remove(targetWindow.id);
-      }
-      return;
+    const allTabsCreated = createdTabs.size === snapshotTabs.length;
+    let partial = !allTabsCreated;
+    const failure = results.find(result => result.status === 'rejected');
+    if (failure) console.error('Error restoring snapshot', failure.reason);
+    if (mode === 'newWindow') {
+      await removeNewWindowBlankTabs(targetWindow.id, originalTabIds);
     }
+    if (!createdTabs.size) return { status: 'failed' };
 
     if (isGroupSupported() && browser.tabGroups?.update) {
       for (const item of record.items) {
@@ -856,44 +907,52 @@ export async function restoreSnapshotRecord(
             collapsed: item.collapsed,
           });
         } catch (error) {
+          partial = true;
           console.warn('Unable to restore tab group', error);
         }
       }
     }
 
-    const { tab: adminTab } = await getAdminTabInfo(targetWindow.id);
-    const removableIds = originalTabIds.filter(id => id !== adminTab?.id);
-    if (removableIds.length) {
-      try {
-        await browser.tabs.remove(removableIds);
-      } catch (error) {
-        console.warn('Unable to remove tabs', error);
+    if (mode === 'replaceCurrent' && allTabsCreated) {
+      const { tab: adminTab } = await getAdminTabInfo(targetWindow.id);
+      const removableIds = originalTabIds.filter(
+        id => id !== adminTab?.id && id !== sourceTab?.id,
+      );
+      if (removableIds.length) {
+        try {
+          await browser.tabs.remove(removableIds);
+        } catch (error) {
+          partial = true;
+          console.warn('Unable to remove tabs', error);
+        }
       }
     }
 
-    const activeSnapshotTab = snapshotTabs.find(tab => tab.active) || snapshotTabs[0];
+    const activeSnapshotTab = snapshotTabs.find(
+      tab => tab.active && createdTabs.has(tab.id),
+    );
+    const activeTab = activeSnapshotTab
+      ? createdTabs.get(activeSnapshotTab.id)
+      : createdTabs.values().next().value;
 
-    const activeTabId = activeSnapshotTab
-      ? createdTabs.get(activeSnapshotTab.id)?.id
-      : undefined;
-
-    if (activeTabId) {
+    if (activeTab?.id !== undefined) {
       try {
-        await browser.tabs.update(activeTabId, { active: true });
+        await browser.tabs.update(activeTab.id, { active: true });
       } catch (error) {
+        partial = true;
         console.warn('Unable to activate tab', error);
       }
     }
 
-    tabs
-      .filter(tab => tab?.id && tab.id !== activeTabId && !tab.pinned)
-      .forEach(tab => waitToDiscard(tab!));
+    for (const tab of createdTabs.values()) {
+      if (tab !== activeTab && !tab.pinned) waitToDiscard(tab);
+    }
+    return { status: partial ? 'partial' : 'success' };
   } catch (error) {
     console.error('Error restoring snapshot', error);
+    return { status: createdTabs.size ? 'partial' : 'failed' };
   } finally {
-    // await stateUtils.setStateByModule('global', {
-    //   snapshotStatus: globalState.snapshotStatus || 'on',
-    // });
+    if (restoreKey) snapshotUtils.endRestore(restoreKey);
   }
 }
 
@@ -901,10 +960,10 @@ export async function restoreSnapshotRecord(
 export const restoreOpenedTabsSnapshot = async (
   type: 'autoSave' | 'manualSave' = 'autoSave',
   recordOverride?: SnapshotRecord,
-) => {
+): Promise<SnapshotRestoreResult> => {
   const store = await snapshotUtils.getStore();
   const record = recordOverride || (type === 'autoSave' ? store.auto : store.manual[0]);
-  if (!record) return { created: 0, failed: 0 };
+  if (!record) return { status: 'failed' };
   return await restoreSnapshotRecord(
     record,
     type === 'autoSave' ? 'replaceCurrent' : 'newWindow',
@@ -1024,6 +1083,7 @@ export default {
   discardOtherTabs,
   saveOpenedTabsAsSnapshot,
   createWindowSnapshotRecord,
+  saveScheduledWindowSnapshots,
   restoreSnapshotRecord,
   restoreOpenedTabsSnapshot,
   setPageTitle,

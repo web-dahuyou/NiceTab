@@ -1,6 +1,6 @@
 import type { Storage } from 'wxt/browser';
 
-import type { SettingsProps, TagItem } from '~/entrypoints/types';
+import type { SettingsProps, TagItem, ScheduledSnapshot } from '~/entrypoints/types';
 
 import Store from './instanceStore';
 import SettingsUtils from './settingsUtils';
@@ -128,6 +128,15 @@ export function initStateStorageListener(callback: () => void) {
 export function initSnapshotStorageListener(callback: () => void) {
   return storage.watch(snapshotUtils.storageKey, () => {
     callback();
+  });
+}
+
+// 监听定时快照历史变化
+export function initScheduledSnapshotStorageListener(
+  callback: (records: ScheduledSnapshot[]) => void,
+) {
+  return storage.watch<ScheduledSnapshot[]>(snapshotUtils.scheduledKey, records => {
+    callback(records || []);
   });
 }
 
