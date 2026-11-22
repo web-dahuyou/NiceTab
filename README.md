@@ -47,6 +47,7 @@ Comprehensive user guide | <a href="./GUIDE.md">NiceTab User Guide</a>
 - Supports sending native browser tab groups into NiceTab, and re-open them as native tab groups in your browser.
 - Supports browser command shortcuts (open the NiceTab-Admin-Page, send all tabs, send the current tab, etc.).
 - Preferences support.
+- Supports snapshot management (manual, scheduled, and automatic snapshots).
 - Offers **import** in multiple formats, with local file saving supported. Currently supports for `NiceTab`, `OneTab`, `Toby`, `SessionBuddy` and `KepTab`. More formats can be added later as needed.
 - Supports custom **Newtab page**.
 - **Remote sync**.

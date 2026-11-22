@@ -9,6 +9,7 @@ const enUS: Record<LocaleKey, string> = {
   'settings.block.otherActions': 'Other Actions',
   'settings.block.display': 'Displays',
   'settings.block.newtab': 'Newtab Page',
+  'settings.block.snapshot': 'Snapshot Settings',
   'settings.block.autoSync': 'Auto Sync',
   'settings.block.sync': 'Sync',
   'settings.confirmTipContent': 'You have unsaved changes. Are you sure you want to leave?',
@@ -23,8 +24,6 @@ const enUS: Record<LocaleKey, string> = {
   'settings.autoPinAdminTab': 'Pin NiceTab Admin Page?',
   'settings.autoPinAdminTab.yes': 'Automatically pin (recommended)',
   'settings.autoPinAdminTab.no': 'Do not',
-  'settings.restoreSnapshotAfterBrowserLaunch': 'Restore previously opened tabs after launching the browser?',
-  'settings.autoCreateSnapshotInterval': 'Auto-Create-Snapshot interval (Minutes):',
 
   /* 发送标签页配置 */
   'settings.showSendTargetModal': 'Show "Send To" modal when sending tabs?',
@@ -110,6 +109,14 @@ const enUS: Record<LocaleKey, string> = {
   'settings.pageWidthType.fixed': 'Fixed',
   'settings.pageWidthType.responsive': 'Responsive',
   'settings.showTabTitleTooltip': 'Show a tooltip when hovering over a tab?',
+
+  /* 快照配置 */
+  'settings.restoreSnapshotAfterBrowserLaunch': 'Restore previously opened tabs after launching the browser?',
+  'settings.scheduledSnapshotsEnabled': 'Enable scheduled snapshots',
+  'settings.scheduledSnapshotInterval': 'Capture interval (minutes)',
+  'settings.scheduledSnapshotLimit': 'Maximum scheduled snapshots to keep (one window per snapshot)',
+  'settings.scheduledSnapshotLimit.tooltip': 'When the limit is exceeded, snapshots are removed from the end of the scheduled snapshots list.',
+  'settings.snapshotTrimConfirm': 'Saving will remove {count, plural, one {# scheduled snapshot} other {# scheduled snapshots}} from the end of the list. Continue?',
 
   /* 自动同步配置 */
   'settings.remoteSyncWithSettings': 'Sync preferences along with list data?',

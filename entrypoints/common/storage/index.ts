@@ -1,4 +1,6 @@
-import type { SettingsProps, TagItem } from '~/entrypoints/types';
+import type { Storage } from 'wxt/browser';
+
+import type { SettingsProps, TagItem, ScheduledSnapshot } from '~/entrypoints/types';
 
 import Store from './instanceStore';
 import SettingsUtils from './settingsUtils';
@@ -10,6 +12,7 @@ import SyncWebDAVUtils from './syncWebDAVUtils';
 import StateUtils from './stateUtils';
 import NewTabUtils from './newTabUtils';
 import SnapshotUtils from './snapshotUtils';
+import IncognitoUtils, { INCOGNITO_REMOVE_GROUPS_PREFIX } from './incognitoUtils';
 
 Store.settingsUtils = new SettingsUtils();
 Store.themeUtils = new ThemeUtils();
@@ -20,6 +23,7 @@ Store.syncWebDAVUtils = new SyncWebDAVUtils();
 Store.stateUtils = new StateUtils();
 Store.newTabUtils = new NewTabUtils();
 Store.snapshotUtils = new SnapshotUtils();
+Store.incognitoUtils = new IncognitoUtils();
 
 export const settingsUtils = Store.settingsUtils;
 export const themeUtils = Store.themeUtils;
@@ -30,6 +34,7 @@ export const syncWebDAVUtils = Store.syncWebDAVUtils;
 export const stateUtils = Store.stateUtils;
 export const newTabUtils = Store.newTabUtils;
 export const snapshotUtils = Store.snapshotUtils;
+export const incognitoUtils = Store.incognitoUtils;
 
 // 监听settings storage变化
 export function initSettingsStorageListener(
@@ -51,6 +56,22 @@ export function initTabListStorageListener(callback: (tabList: TagItem[]) => voi
   return storage.watch<TagItem[]>(tabListUtils.storageKey, tabList => {
     callback(tabList || []);
   });
+}
+
+// 无痕删除请求使用独立的动态键，按前缀订阅 local 存储的变化。
+export function initIncognitoRemovalStorageListener(
+  callback: (id: string, groupIds: unknown) => Promise<void>,
+) {
+  const onChanged = async (changes: Record<string, Storage.StorageChange>) => {
+    for (const [key, { newValue }] of Object.entries(changes)) {
+      if (!key.startsWith(INCOGNITO_REMOVE_GROUPS_PREFIX)) continue;
+      if (!newValue || typeof newValue !== 'object' || !('groupIds' in newValue))
+        continue;
+      await callback(key.slice(INCOGNITO_REMOVE_GROUPS_PREFIX.length), newValue.groupIds);
+    }
+  };
+  browser.storage.local.onChanged.addListener(onChanged);
+  return () => browser.storage.local.onChanged.removeListener(onChanged);
 }
 
 // 监听回收站 storage变化
@@ -107,6 +128,15 @@ export function initStateStorageListener(callback: () => void) {
 export function initSnapshotStorageListener(callback: () => void) {
   return storage.watch(snapshotUtils.storageKey, () => {
     callback();
+  });
+}
+
+// 监听定时快照历史变化
+export function initScheduledSnapshotStorageListener(
+  callback: (records: ScheduledSnapshot[]) => void,
+) {
+  return storage.watch<ScheduledSnapshot[]>(snapshotUtils.scheduledKey, records => {
+    callback(records || []);
   });
 }
 

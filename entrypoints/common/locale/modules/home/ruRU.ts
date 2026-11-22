@@ -1,6 +1,17 @@
 import { LocaleKey } from './zhCN';
 
 const ruRU: Record<LocaleKey, string> = {
+  'home.treeNodeBatch.selectAll': 'Выбрать все',
+  'home.treeNodeBatch.lockedTip': 'Удаление: доступно — {editable}, заблокировано — {count}',
+  'home.treeNodeBatch.removeConfirm': 'Удалить {count} групп?{locked, plural, =0 {} one { Будет пропущена # заблокированная группа.} few { Будут пропущены # заблокированные группы.} many { Будут пропущены # заблокированных групп.} other { Будет пропущено # заблокированной группы.}}',
+  'home.treeNodeBatch.open.current': 'Открыть в текущем окне',
+  'home.treeNodeBatch.open.newWindow': 'Открыть в новом окне',
+  'home.treeNodeBatch.open.incognito': 'Открыть в новом окне инкогнито',
+  'home.treeNodeBatch.incognitoPermission': 'Сначала разрешите NiceTab работу в режиме инкогнито в настройках расширения',
+  'home.treeNodeBatch.failed': 'Операция не завершена. Необработанные элементы сохранены. Повторите попытку.',
+  'home.treeNodeBatch.opening': 'Открытие вкладок…',
+  'home.treeNodeBatch.helperNoTask': 'Нет задач на открытие. Эту страницу можно закрыть.',
+
   'home.tag': 'Категория',
   'home.tabGroup': 'Группа вкладок',
   'home.tab': 'Вкладка',
@@ -50,6 +61,7 @@ const ruRU: Record<LocaleKey, string> = {
   'home.tabGroup.addGroupAfter': 'Создать группу ниже',
   'home.tabGroup.tabsSortAsc': 'По названию (А→Я)',
   'home.tabGroup.tabsSortDesc': 'По названию (Я→А)',
+  'home.tabGroup.tabsSortByDomain': 'По домену',
 
   'home.tabGroup.count': `{count, plural,
     =0 {Нет групп}
@@ -140,6 +152,7 @@ const ruRU: Record<LocaleKey, string> = {
     '1. Если включено, при переносе вкладок дубликаты с тем же URL в целевой группе будут удалены.',
   'home.moveTo.mergeTip.2':
     '2. Если включено, при переносе группы она будет объединена с одноимённой группой в целевой категории.',
+  'home.moveTo.mergeTip.3': '3. Если в целевой категории есть заблокированная группа с таким же именем, перемещаемая или копируемая группа добавляется отдельно.',
   'home.tip.tooManyTabs':
     'Число вкладок превышает заданный порог, включена виртуальная прокрутка.',
   'home.tip.addScope':

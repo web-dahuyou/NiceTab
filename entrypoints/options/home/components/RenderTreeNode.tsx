@@ -2,15 +2,21 @@ import React, { useMemo, useRef, useCallback, memo } from 'react';
 import { theme, Dropdown } from 'antd';
 import { CloseOutlined, MenuOutlined, MoreOutlined } from '@ant-design/icons';
 import { omit } from 'lodash-es';
+
+import type { OpenMode } from '~/entrypoints/common/openUtils';
+import {
+  toMenuItems,
+  type ActionOptionItem,
+} from '~/entrypoints/common/components/ActionBtnList';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { ENUM_COLORS, UNNAMED_TAG, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import EditInput from '~/entrypoints/options/components/EditInput';
 import DropComponent from '~/entrypoints/common/components/DropComponent';
+
 import { dndKeys, defaultGroupActions, defaultTagActions } from '../constants';
 import type { RenderTreeNodeProps, TagActionName, GroupActionName } from '../types';
 import useGroupActions from '../hooks/groupActions';
-import { type ActionOptionItem } from '~/entrypoints/common/components/ActionBtnList';
 import useTagActions from '../hooks/tagActions';
 import { StyledTreeNodeItem } from '../Home.styled';
 import { type TreeDataHookProps } from '../hooks/treeData';
@@ -48,8 +54,8 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
   );
 
   const onGroupAction = useCallback(
-    (actionName: GroupActionName, groupId: string) => {
-      onAction?.({ actionType: 'tabGroup', node, actionName, data: { groupId } });
+    (actionName: GroupActionName, groupId: string, mode?: OpenMode) => {
+      onAction?.({ actionType: 'tabGroup', node, actionName, mode, data: { groupId } });
     },
     [node, onAction],
   );
@@ -66,14 +72,15 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
   });
 
   const groupMenuItems = useMemo(() => {
-    const items = groupActions.outerList?.map(item =>
-      omit(item, ['hoverColor']),
-    ) as ActionOptionItem[];
-    const innerList = groupActions.innerList?.map(item =>
-      omit(item, ['hoverColor']),
-    ) as ActionOptionItem[];
+    const items = [
+      ...groupActions.outerList,
+      ...groupActions.innerList.filter(item => item.btnType === 'dropdown'),
+    ].map(item => omit(item, ['hoverColor'])) as ActionOptionItem[];
+    const innerList = groupActions.innerList
+      .filter(item => item.btnType !== 'dropdown')
+      .map(item => omit(item, ['hoverColor'])) as ActionOptionItem[];
 
-    if (groupActions.innerList.length > 0) {
+    if (innerList.length) {
       items.push({
         key: 'more',
         label: $fmt('common.more'),
@@ -81,16 +88,16 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
         children: innerList,
       });
     }
-    return items;
-  }, [groupActions]);
+    return toMenuItems(items);
+  }, [groupActions, $fmt]);
 
   // 分类操作相关
   const onTagAction = useCallback(
-    (actionName: TagActionName, tagId: string) => {
+    (actionName: TagActionName, tagId: string, mode?: OpenMode) => {
       if (actionName === 'create') {
-        onAction?.({ actionType: 'tabGroup', node, actionName, data: { tagId } });
+        onAction?.({ actionType: 'tabGroup', node, actionName, mode, data: { tagId } });
       } else {
-        onAction?.({ actionType: 'tag', node, actionName, data: { tagId } });
+        onAction?.({ actionType: 'tag', node, actionName, mode, data: { tagId } });
       }
     },
     [node, onAction],
@@ -224,7 +231,7 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
           <span className="tree-node-icon-group">
             {node.type === 'tag' && (
               <Dropdown
-                menu={{ items: tagMenuItems }}
+                menu={{ items: tagMenuItems, triggerSubMenuAction: 'click' }}
                 arrow
                 trigger={['click']}
                 destroyPopupOnHide
@@ -242,7 +249,7 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
 
             {node.type === 'tabGroup' && (
               <Dropdown
-                menu={{ items: groupMenuItems }}
+                menu={{ items: groupMenuItems, triggerSubMenuAction: 'click' }}
                 arrow
                 trigger={['click']}
                 destroyPopupOnHide

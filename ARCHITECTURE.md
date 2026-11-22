@@ -13,11 +13,12 @@ The extension follows WXT's entrypoint-based architecture with these key directo
 - **entrypoints/options/**: Main dashboard UI with sub-pages for List, Settings, Import/Export, Sync, and Recycle Bin
 - **entrypoints/content/**: Content scripts for webpage context menu integration
 - **entrypoints/common/**: Shared utilities, storage management, hooks, and constants
+- **entrypoints/nice-newtab/**: Custom new-tab UI; background redirects browser new-tab URLs according to settings
 - **entrypoints/types/**: TypeScript type definitions for the entire extension
 
 ### Data Management
 
-The extension uses Chrome's storage API with structured utilities in `entrypoints/common/storage/`:
+The extension uses WXT's storage wrapper over browser storage, with structured utilities in `entrypoints/common/storage/`:
 
 - **tabListUtils**: Manages tab list data (categories, groups, tabs)
 - **settingsUtils**: Manages user preferences and settings
@@ -26,8 +27,10 @@ The extension uses Chrome's storage API with structured utilities in `entrypoint
 - **recycleBinUtils**: Manages deleted items for recovery
 - **themeUtils**: Manages theme/color preferences
 - **stateUtils**: Manages application state
+- **snapshotUtils**: Manages versioned snapshots and migration
+- **newTabUtils**: Reads the saved tab list for the custom new-tab page
 
-All storage utilities follow a singleton pattern via `instanceStore.ts` and provide reactive storage listeners.
+`storage/index.ts` creates utility instances and exports storage listeners. `instanceStore.ts` provides access within each JS context; these instances are not shared memory across background, popup, and pages.
 
 ### Key Data Models
 
@@ -49,7 +52,7 @@ Uses `react-intl` for i18n:
 ### UI Framework
 
 - **React 18** with TypeScript
-- **Ant Design 5.29.3** for UI components
+- **Ant Design 5** for UI components
 - **styled-components** for custom styling
 - **react-router-dom** for options page navigation
 - **pragmatic-drag-and-drop** (Atlassian) for drag-and-drop functionality
@@ -93,6 +96,7 @@ The options page (`entrypoints/options/`) contains:
 - **importExport/**: Import/export functionality
 - **sync/**: Remote sync configuration (Gists/WebDAV)
 - **recycleBin/**: Deleted items recovery
+- **snapshots/**: Manual snapshot history and latest automatic snapshot
 
 ### Important Hooks
 
@@ -105,11 +109,11 @@ The options page (`entrypoints/options/`) contains:
 
 ### File Export Requirement
 
-**Critical**: Every `.js`, `.ts`, `.tsx` file must have an `export default` statement. Files without this will cause errors when running the local service.
+WXT script entrypoints require the appropriate default-exported entrypoint definition. Ordinary shared modules and HTML-loaded scripts do not universally require a default export. See the examples and conventions in [CONTRIBUTING](CONTRIBUTING.md).
 
 ### Import Path Alias
 
-The project uses the `~` alias for imports from the entrypoints directory:
+The `~` alias points to the project root; use it for cross-module imports:
 ```ts
 import { something } from '~/entrypoints/common/utils';
 ```
@@ -145,7 +149,7 @@ Run `pnpm run compile` before committing to check TypeScript types.
 
 ### Commit Message Convention
 
-Follow Angular commit message guidelines:
+Follow the existing Fork → `origin/dev` feature branch → push to your fork → PR to upstream `dev` workflow in [CONTRIBUTING](CONTRIBUTING.md). Commit titles use an English type and Chinese description; common types are:
 - `feat:` for new features
 - `fix:` for bug fixes
 - `docs:` for documentation
@@ -164,7 +168,7 @@ Firefox has restricted permissions for privileged URLs:
 - `tabGroups` permission is optional (requires user grant)
 - `commands` and `favicon` permissions not available
 
-Code checks `isFirefox` flag from `wxt.config.ts` for conditional logic.
+`isFirefox` in `wxt.config.ts` controls build configuration. Runtime modules use `import.meta.env.FIREFOX` and capability checks in `entrypoints/common/utils/support.ts`; Firefox grouping also requires the optional permission.
 
 ### Content Security Policy
 
@@ -172,15 +176,16 @@ Different CSP configurations for Firefox and Chrome in `wxt.config.ts` due to Fi
 
 ## Testing and Quality
 
-No automated test suite currently exists. Quality is ensured through:
+The project has Vitest tests integrated with WXT through `WxtVitest()`. Quality checks include:
 - TypeScript type checking (`pnpm run compile`)
-- ESLint linting (`pnpm run lint`)
+- ESLint checking without automatic edits (`pnpm lint:no-fix`); `pnpm lint` applies fixes
+- Existing Vitest tests (`pnpm test`, or a targeted test file)
 - Manual testing across browsers
 
 ## Remote Sync Implementation
 
 Sync functionality supports multiple backends:
-- **GitHub Gists**: Requires personal access token with `gists` scope
+- **GitHub Gists**: Requires a personal access token with permission to access Gists
 - **Gitee Gists**: Alternative for users in regions with GitHub access issues
 - **WebDAV**: Supports multiple WebDAV accounts
 
@@ -191,7 +196,7 @@ Sync strategy: Merge-based (doesn't sync deletions by default). Users must manua
 - Uses **react-virtuoso** for virtual scrolling in large tab lists
 - **lodash-es** for utility functions (ES modules for better bundling)
 - Debounced event handlers to prevent excessive API calls
-- Storage listeners use efficient diffing
+- Storage listeners notify registered consumers; each consumer determines what to refresh
 
 ## Extension Manifest
 
@@ -200,3 +205,88 @@ WXT auto-generates manifest.json from `wxt.config.ts`. Key manifest features:
 - Keyboard shortcuts defined in `commands` section
 - Homepage URL links to GitHub repository
 - Browser-specific settings for Firefox gecko compatibility
+
+
+## Domain model and invariants
+
+`entrypoints/types/tabList.ts` defines the saved hierarchy:
+
+```text
+TagItem (category, tagId)
+└── groupList: GroupItem[] (saved group, groupId)
+    └── tabList: TabItem[] (saved tab, tabId)
+```
+
+Saved string IDs are distinct from runtime browser tab/group IDs. Browser groups describe currently open tabs; NiceTab groups persist independently of them.
+
+- The staging area is a special category (`static`, normally `tagId: '0'`). `getTagList()` ensures it exists at the front of the list.
+- Starred groups precede unstarred groups within a category. Insertion and movement may adjust `isStarred` according to the destination position.
+- Category and group locks affect destructive/reordering operations. Check both UI guards and storage methods; locking is not a universal read-only flag for every operation.
+- Copying, moving, merging, and restoring have different ID, deduplication, and source-removal rules. Preserve those distinctions, including partial failures.
+- Recycle-bin data retains the hierarchy. `RecycleBinUtils` extends `TabListUtils`, so changes to base behavior may affect both stores.
+
+See the `.claude/skills/nicetab-dev/references/checklist.md` before changing these operations.
+
+## Persistence and state
+
+`entrypoints/common/storage/index.ts` creates utility instances and exports `init*StorageListener` helpers. `entrypoints/common/storage/instanceStore.ts` provides access between utility classes within one context. Data is persisted through WXT's storage wrapper; current domain stores use the `local:` namespace, not automatic browser cloud sync.
+
+| Owner                              | Data boundary                                                                |
+| ---------------------------------- | ---------------------------------------------------------------------------- |
+| `tabListUtils` / `newTabUtils`     | Saved hierarchy in `local:tabList`; new-tab UI reads the same list           |
+| `settingsUtils`                    | Preferences and defaults in `local:settings`                                 |
+| `themeUtils` / `stateUtils`        | Theme in `local:theme`; UI/global state in `local:state`                     |
+| `recycleUtils` (`RecycleBinUtils`) | Deleted hierarchy in `local:recycleBin`, plus cleanup state                  |
+| `snapshotUtils`                    | Versioned `local:snapshots`; automatic capture buffer also uses global state |
+| `syncUtils`                        | Gist configuration, result history, and status                               |
+| `syncWebDAVUtils`                  | WebDAV configuration; its historical key is `local:syncWevDAVConfig`         |
+
+Do not rename persisted keys to correct spelling without a migration. Utility objects can hold cached data; a write or a `storage.watch` callback does not automatically update every React tree. `entrypoints/common/utils/faviconDb.ts` separately maintains an IndexedDB cache for icons and failed fetches.
+
+## Main workflows
+
+### Send browser tabs to NiceTab
+
+1. Popup actions, context menus, or commands enter `entrypoints/common/contextMenus.ts` and the background action flow.
+2. If enabled, destination selection is shown through `SendTargetActionHolder`; confirmation resumes the send action.
+3. `entrypoints/common/tabs.ts` and `entrypoints/common/storage/tabListUtils.ts` select/filter browser tabs, preserve supported native grouping, and write the saved hierarchy.
+4. Settings govern closing sent tabs, opening the dashboard, and feedback. Existing message/refresh paths update affected views.
+
+### Edit or restore saved items
+
+Home action menus, tree operations, drag-and-drop, and batch actions converge on `entrypoints/options/home/hooks/treeData.ts` and storage utilities. Local `refreshTreeData()` uses the utility's current list; `init()` reads persisted data. Other contexts need a reload/read path, not just a local render call.
+
+Opening saved tabs/groups uses `tabs.ts` for window selection, URL handling, grouping, and discard behavior. Removal after opening depends on settings and the applicable success/lock rules.
+
+### Import, export, and remote sync
+
+`entrypoints/common/utils/importExport.ts` parses and formats supported external data; `tabListUtils.importTags()` applies append, merge, or overwrite semantics. UI lives in `entrypoints/options/importExport`.
+
+`entrypoints/common/storage/syncUtils.ts` handles GitHub/Gitee Gists; `entrypoints/common/storage/syncWebDAVUtils.ts` handles WebDAV. Both expose manual/automatic pull and push with merge or force modes. Merge retains content rather than propagating deletions; force replaces the destination data. Settings inclusion depends on configuration. Remote backup and error handling belong to the respective implementations, not a universal transaction guarantee.
+
+`entrypoints/common/alarms/autoSyncAlarm.ts` schedules automatic sync. Tokens and endpoints are user configuration, not repository defaults.
+
+### Snapshots and startup recovery
+
+`entrypoints/common/storage/snapshotUtils.ts` manages versioned snapshots, manual history, legacy migration, and automatic-buffer promotion. `entrypoints/background/handler.ts` captures browser tab/group events with debounce. Real-time buffer capture is event-driven; the auto-save alarm captures scheduled window history.
+
+Scheduled history uses `local:scheduledSnapshots`, separately from manual and latest automatic snapshots. The background serializes capture, focus ordering and retention writes. Deduplication uses browser-session identity and window ID. The options page requests restoration through a runtime message; the background performs it and keeps per-operation state in memory, clearing it in `finally`. Closing, reloading or navigating the options page does not interrupt restoration. Scheduled capture skips those windows until restoration finishes; while a new target window is being created, capture waits for its identity.
+
+On startup, the background turns `snapshotStatus` off, promotes the prior automatic buffer, optionally restores it, and turns capture back on in `finally`. This prevents restore events from immediately overwriting the recovery source. Do not treat snapshots as merely a copy of the saved category tree: they represent open browser windows/tabs.
+
+## Communication and rendering
+
+```text
+Component / browser event
+    → domain utility → persistent storage
+    → local state refresh, registered storage listener, or runtime notification
+    → recipient reads data / performs action → UI update
+```
+
+- React Context and mitt events stay within one JS context. Shared mitt lives in `entrypoints/common/hooks/global.ts`; Home has `entrypoints/options/home/hooks/homeCustomEvent.ts`.
+- `storage.watch` communicates persisted changes only to registered listeners.
+- `entrypoints/common/utils/runtimeMsg.ts` sends typed messages between extension contexts; `entrypoints/types/runtimeMsg.ts` defines the protocol. The helper always sends to background and does not aggregate processing acknowledgements.
+- `sendTabMessage` in `tabs.ts` targets content scripts in selected tabs. Restricted pages may lack receivers.
+- `entrypoints/common/components/Root.tsx` provides shared theme/locale/context and handles UI messages. Dashboard reload messages use the existing URL/update mechanism.
+
+Detailed sender/receiver and cleanup guidance is in the `.claude/skills/nicetab-dev/references/messages.md`.

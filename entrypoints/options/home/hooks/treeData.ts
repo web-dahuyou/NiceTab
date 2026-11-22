@@ -1,23 +1,19 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-  useMemo,
-} from 'react';
+import React, { createContext, useCallback, useEffect, useState, useMemo } from 'react';
 import type { TreeProps } from 'antd';
+
+import { requestTabGroupRemoval } from '~/entrypoints/common/storage/batchRemoval';
 import type { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
 import { settingsUtils, stateUtils, tabListUtils } from '~/entrypoints/common/storage';
-import { openNewTab, openNewGroup } from '~/entrypoints/common/tabs';
+import { groupTarget, tabTarget, type OpenMode } from '~/entrypoints/common/openUtils';
+import { useOpenSavedTabs } from '~/entrypoints/common/components/OpenModeMenu';
 import { ENUM_SETTINGS_PROPS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { getRandomId } from '~/entrypoints/common/utils';
-import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import useUrlParams from '~/entrypoints/common/hooks/urlParams';
 import {
   initialSelectionBoxData,
   type SelectionBoxDataProps,
 } from '~/entrypoints/common/hooks/selectionBox';
+
 import {
   TreeDataNodeTabGroup,
   TreeDataNodeTag,
@@ -29,13 +25,14 @@ import { getTreeData } from '../utils';
 
 const {
   DELETE_AFTER_RESTORE,
-  DISCARD_WHEN_OPEN_TABS,
-  UNNAMED_GROUP_RESTORE_AS_GROUP,
-  NAMED_GROUP_RESTORE_AS_GROUP,
   AUTO_EXPAND_HOME_TREE,
   TAB_INSERT_POSITION,
   RESTORE_IN_NEW_WINDOW,
 } = ENUM_SETTINGS_PROPS;
+
+type TreeNodeDropInfo = Parameters<
+  NonNullable<TreeProps<TreeDataNodeUnion>['onDrop']>
+>[0];
 
 export type TreeDataHookProps = ReturnType<typeof useTreeData>;
 interface HomeContextProps {
@@ -60,6 +57,7 @@ export const HomeContext = createContext<HomeContextProps>({
 });
 
 export function useTreeData() {
+  const openSaved = useOpenSavedTabs();
   const [loading, setLoading] = useState<boolean>(true);
   const [countInfo, setCountInfo] = useState<CountInfo>();
   const [tagList, setTagList] = useState<TagItem[]>([]);
@@ -71,8 +69,6 @@ export function useTreeData() {
   const [refreshKey, setRefreshKey] = useState<string>(getRandomId());
   const [highlightTabId, setHighlightTabId] = useState<string | undefined>();
 
-  const { $fmt } = useIntlUtls();
-  const { $message } = useContext(GlobalContext);
   const { urlParams, setSearchParams } = useUrlParams();
 
   const selectedTag: TreeDataNodeTag = useMemo(() => {
@@ -217,53 +213,33 @@ export function useTreeData() {
     },
     [],
   );
-  // 打开分类下所有的标签组
-  const handleTagRestore = useCallback(
-    async (tagId: React.Key) => {
-      const tag = treeData.find(t => t.key === tagId) as TreeDataNodeTag;
-      if (!tag) return;
-
+  const restoreGroups = useCallback(
+    async (groups: GroupItem[], mode?: OpenMode, category = false) => {
       const settings = await settingsUtils.getSettings();
-      const discard = settings?.[DISCARD_WHEN_OPEN_TABS];
-      const deleteAfterRestore = settings?.[DELETE_AFTER_RESTORE];
-
-      // let hasDeletedGroups = false;
-      let newWindow;
-      if (settings?.[RESTORE_IN_NEW_WINDOW]) {
-        newWindow = await browser.windows.create({ focused: true });
-      }
-
-      for (const tabGroup of (tag.children || []) as TreeDataNodeTabGroup[]) {
-        const { groupName, tabList = [], isLocked } = tabGroup?.originData || {};
-
-        if (!tabList.length) continue;
-
-        const asGroup =
-          (groupName === UNNAMED_GROUP && settings?.[UNNAMED_GROUP_RESTORE_AS_GROUP]) ||
-          (groupName !== UNNAMED_GROUP && settings?.[NAMED_GROUP_RESTORE_AS_GROUP]);
-
-        const result = await openNewGroup(
-          groupName,
-          tabList.map(tab => tab.url),
-          { discard, asGroup, windowId: newWindow?.id },
-        );
-
-        if (newWindow?.id && !result) {
-          browser.windows.remove(newWindow.id);
-          return;
-        }
-
-        if (deleteAfterRestore && !isLocked) {
-          await tabListUtils.removeTabGroup(tagId, tabGroup.key);
-          // hasDeletedGroups = true;
-        }
-      }
-
-      if (deleteAfterRestore) {
-        refreshTreeData();
+      const destination =
+        mode ?? (settings[RESTORE_IN_NEW_WINDOW] ? 'newWindow' : 'current');
+      const targets = groups
+        .filter(group => group.tabList.length)
+        .map(group => groupTarget(group));
+      const { processedIds } = await openSaved(
+        targets,
+        destination,
+        category && destination === 'current',
+      );
+      if (settings[DELETE_AFTER_RESTORE] && processedIds.length) {
+        const removedIds = await requestTabGroupRemoval(processedIds);
+        if (removedIds.length) refreshTreeData();
       }
     },
-    [treeData],
+    [openSaved],
+  );
+
+  const handleTagRestore = useCallback(
+    async (tagId: React.Key, mode?: OpenMode) => {
+      const tag = treeData.find(node => node.key === tagId);
+      if (tag) await restoreGroups(tag.originData.groupList, mode, true);
+    },
+    [treeData, restoreGroups],
   );
 
   // 删除标签组
@@ -350,67 +326,51 @@ export function useTreeData() {
     await tabListUtils.cloneGroup(groupId);
     refreshTreeData();
   }, []);
-  // 打开标签组
   const handleTabGroupRestore = useCallback(
-    async (tabGroup: TreeDataNodeTabGroup) => {
-      const tagKey = tabGroup.parentKey;
-      const tag = treeData.find(tag => tag.key === tagKey) as TreeDataNodeTag;
-      const settings = await settingsUtils.getSettings();
-      const { groupName, tabList = [], isLocked } = tabGroup?.originData || {};
-      const discard = settings?.[DISCARD_WHEN_OPEN_TABS];
-
-      const asGroup =
-        (groupName === UNNAMED_GROUP && settings?.[UNNAMED_GROUP_RESTORE_AS_GROUP]) ||
-        (groupName !== UNNAMED_GROUP && settings?.[NAMED_GROUP_RESTORE_AS_GROUP]);
-
-      openNewGroup(
-        groupName,
-        tabList.map(tab => tab.url),
-        { discard, asGroup, newWindow: settings?.[RESTORE_IN_NEW_WINDOW] },
-      );
-
-      if (settings?.[DELETE_AFTER_RESTORE] && !isLocked) {
-        await tabListUtils.removeTabGroup(tag.key, tabGroup.key);
-        refreshTreeData();
-      }
+    async (tabGroup: TreeDataNodeTabGroup, mode?: OpenMode) => {
+      await restoreGroups([tabGroup.originData], mode);
     },
-    [treeData],
+    [restoreGroups],
   );
-  // 打开标签页
+
   const handleTabsOpen = useCallback(
     async (
       group: Pick<GroupItem, 'groupName' | 'groupId' | 'isLocked'>,
       tabs: TabItem[],
+      mode?: OpenMode,
     ) => {
-      if (tabs.length === 1) {
-        openNewTab(tabs[0].url, { active: true });
-      } else {
-        const groupName = group.groupName;
-        const settings = await settingsUtils.getSettings();
-        const discard = settings?.[DISCARD_WHEN_OPEN_TABS];
-
-        const asGroup =
-          (groupName === UNNAMED_GROUP && settings?.[UNNAMED_GROUP_RESTORE_AS_GROUP]) ||
-          (groupName !== UNNAMED_GROUP && settings?.[NAMED_GROUP_RESTORE_AS_GROUP]);
-
-        openNewGroup(
-          groupName,
-          tabs.map(tab => tab.url),
-          { discard, asGroup, newWindow: settings?.[RESTORE_IN_NEW_WINDOW] },
-        );
-      }
       const settings = await settingsUtils.getSettings();
-      if (settings[DELETE_AFTER_RESTORE] && !group?.isLocked) {
-        handleTabItemRemove?.(group.groupId, tabs);
+      const single = tabs.length === 1;
+      const target = single
+        ? tabTarget(tabs[0], { active: true })
+        : groupTarget({ ...group, tabList: tabs }, true);
+      const destination =
+        mode ?? (!single && settings[RESTORE_IN_NEW_WINDOW] ? 'newWindow' : 'current');
+      const result = await openSaved([target], destination);
+      if (
+        result.processedIds.length &&
+        settings[DELETE_AFTER_RESTORE] &&
+        !group.isLocked
+      ) {
+        const opened = new Set(result.processedIds);
+        await tabListUtils.removeTabs(
+          group.groupId,
+          tabs.filter(tab => opened.has(tab.tabId)),
+          { skipLocked: true },
+        );
+        await refreshTreeData();
       }
+    },
+    [openSaved],
+  );
+  // 删除标签页
+  const handleTabItemRemove = useCallback(
+    async (groupId: React.Key, tabs: TabItem[], afterOpen = false) => {
+      await tabListUtils.removeTabs(groupId, tabs, afterOpen && { skipLocked: true });
+      await refreshTreeData();
     },
     [],
   );
-  // 删除标签页
-  const handleTabItemRemove = useCallback(async (groupId: React.Key, tabs: TabItem[]) => {
-    await tabListUtils.removeTabs(groupId, tabs);
-    await refreshTreeData();
-  }, []);
   // 修改标签页
   const handleTabItemChange = useCallback(
     async (tabGroup: { parentKey?: React.Key; key: React.Key }, tabData: TabItem) => {
@@ -433,11 +393,10 @@ export function useTreeData() {
   );
 
   // 拖拽
-  const handleTreeNodeDrop: TreeProps<TreeDataNodeUnion>['onDrop'] = async ({
-    dragNode,
-    dropPosition,
-    node,
-  }) => {
+  const handleTreeNodeDrop = async (
+    { dragNode, dropPosition, node }: TreeNodeDropInfo,
+    options?: { selectedGroupIds?: string[] },
+  ) => {
     // console.log('onDrop-dragNode', dragNode)
     // console.log('onDrop-dropPosition', dropPosition)
     // console.log('onDrop-info-node', node)
@@ -449,7 +408,24 @@ export function useTreeData() {
     // position = 1 时表示，拖放到目标 node 的同级之后
     // position = -1 时表示，拖放到一级node节点最前面
     let dropIndex = position === 0 ? dropPosition + 1 : position === 1 ? dropPosition : 0;
-    if (dragNode.type === 'tabGroup' && node.type === 'tabGroup') {
+
+    // 多选标签组批量拖拽
+    let processedIds: string[] | undefined;
+    const selectedGroupIds = options?.selectedGroupIds || [];
+    const isMultiGroupDrop =
+      dragNode.type === 'tabGroup' && selectedGroupIds.includes(String(dragNode.key));
+    if (isMultiGroupDrop) {
+      const result = await tabListUtils.onTabGroupsDrop({
+        sourceGroupIds: selectedGroupIds,
+        targetTagId: node.type === 'tag' ? node.key : node.parentKey,
+        destination:
+          node.type === 'tag'
+            ? { atEnd: position !== 0 }
+            : { groupId: node.key, after: position >= 0 },
+      });
+      processedIds = result.processedIds;
+      if (!processedIds.length) return;
+    } else if (dragNode.type === 'tabGroup' && node.type === 'tabGroup') {
       await tabListUtils.onTabGroupDrop(
         dragNode.parentKey,
         node.parentKey,
@@ -488,31 +464,38 @@ export function useTreeData() {
       }
       handleSelect(treeData, [node.key], { node });
     });
+    return processedIds;
   };
 
   const handleTabsSort = async ({
     tagId,
     groupId,
     sortType,
+    sortBy = 'name',
   }: {
     tagId: string;
     groupId: string;
     sortType: string;
+    sortBy?: 'name' | 'domain';
   }) => {
-    await tabListUtils.tabsSortbyName(sortType, groupId, tagId);
+    if (sortBy === 'domain') {
+      await tabListUtils.tabsSortbyDomain(groupId, tagId);
+    } else {
+      await tabListUtils.tabsSortbyName(sortType, groupId, tagId);
+    }
     refreshTreeData();
   };
 
   // treeNode 节点操作
   const onTreeNodeAction = useCallback(
-    ({ actionType, node, actionName, data }: RenderTreeNodeActionProps) => {
+    ({ actionType, node, actionName, data, mode }: RenderTreeNodeActionProps) => {
       const handlerMap = {
         tag: {
           create: () => handleTagCreate(),
           remove: () => handleTagRemove(node.key, selectedTagKey),
           rename: () => handleTagChange(node.key, (data as Partial<TagItem>) || {}),
           change: () => handleTagChange(node.key, (data as Partial<TagItem>) || {}),
-          restore: () => handleTagRestore(node.key),
+          restore: () => handleTagRestore(node.key, mode),
           lock: () =>
             handleTagChange(node.key, {
               isLocked: !(node as TreeDataNodeTag).originData?.isLocked,
@@ -531,7 +514,7 @@ export function useTreeData() {
               node as TreeDataNodeTabGroup,
               (data as Partial<GroupItem>) || {},
             ),
-          restore: () => handleTabGroupRestore(node as TreeDataNodeTabGroup),
+          restore: () => handleTabGroupRestore(node as TreeDataNodeTabGroup, mode),
           lock: () =>
             handleTabGroupChange(node as TreeDataNodeTabGroup, {
               isLocked: !(node as TreeDataNodeTabGroup).originData?.isLocked,
@@ -552,6 +535,13 @@ export function useTreeData() {
               tagId: (node as TreeDataNodeTabGroup).parentKey,
               groupId: node.key as string,
               sortType: 'ascending',
+            }),
+          tabsSortByDomain: () =>
+            handleTabsSort({
+              tagId: (node as TreeDataNodeTabGroup).parentKey,
+              groupId: node.key as string,
+              sortType: 'ascending',
+              sortBy: 'domain',
             }),
           tabsSortDesc: () =>
             handleTabsSort({
@@ -583,8 +573,6 @@ export function useTreeData() {
       handleTabGroupCopy,
       handleTabGroupDedup,
       handleTabsSort,
-      $fmt,
-      $message,
     ],
   );
 

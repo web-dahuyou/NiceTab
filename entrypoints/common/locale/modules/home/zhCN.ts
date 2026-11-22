@@ -1,4 +1,15 @@
 const zhCN = {
+  'home.treeNodeBatch.selectAll': '全选',
+  'home.treeNodeBatch.lockedTip': '删除：{editable}个可操作，{count}个已锁定',
+  'home.treeNodeBatch.removeConfirm': '确定删除 {count} 个标签组吗？{locked, plural, =0 {} other {将跳过 # 个锁定标签组。}}',
+  'home.treeNodeBatch.open.current': '在当前窗口打开',
+  'home.treeNodeBatch.open.newWindow': '在新窗口打开',
+  'home.treeNodeBatch.open.incognito': '在新无痕窗口打开',
+  'home.treeNodeBatch.incognitoPermission': '请先在扩展管理中允许 NiceTab 在无痕窗口运行',
+  'home.treeNodeBatch.failed': '操作未完成，未处理的条目已保留，请重试',
+  'home.treeNodeBatch.opening': '正在打开标签页…',
+  'home.treeNodeBatch.helperNoTask': '没有待处理的打开任务，可以直接关闭此页面。',
+
   'home.tag': '分类',
   'home.tabGroup': '标签组',
   'home.tab': '标签页',
@@ -48,6 +59,7 @@ const zhCN = {
   'home.tabGroup.addGroupAfter': '在下方新建标签组',
   'home.tabGroup.tabsSortAsc': '标签名称升序',
   'home.tabGroup.tabsSortDesc': '标签名称降序',
+  'home.tabGroup.tabsSortByDomain': '按域名排序',
 
   'home.tabGroup.count': '{count}个标签组',
   'home.tabGroup.name': '标签组名称',
@@ -111,6 +123,7 @@ const zhCN = {
   'home.moveTo.mergeLabel': '是否合并重复项',
   'home.moveTo.mergeTip.1': '1、勾选后，如果移动标签页，则与目标分组中相同 url 的标签页合并（去重）。',
   'home.moveTo.mergeTip.2': '2、勾选后，如果移动标签组，则与目标分类中同名的标签组合并，标签页去重。',
+  'home.moveTo.mergeTip.3': '3、目标分类中有锁定的同名标签组时，移入或复制的标签组会独立插入。',
   'home.tip.tooManyTabs': '当前分类中标签页数量超过预定值, 已开启虚拟滚动。',
   'home.tip.addScope': '下一个版本将添加快捷键等功能，需要新增授权，新版本发布后可能会自动停用，如需继续使用请手动启用。',
   'home.tip.multiSelection': 'Shift多选：第一步，Shift + Click A (高亮显示A) 。第二步，Shift + Click B (A到B全被选中)。Shift多选操作也适用于页面中间的标签页列表。',

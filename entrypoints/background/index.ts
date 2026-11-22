@@ -11,6 +11,7 @@ import {
   settingsUtils,
   stateUtils,
   snapshotUtils,
+  tabListUtils,
 } from '~/entrypoints/common/storage';
 import { autoSyncAlarm, autoSaveOpenedTabsAlarm } from '~/entrypoints/common/alarms';
 import {
@@ -21,23 +22,32 @@ import {
   BROWSER_ACTION_API_NAME,
 } from '~/entrypoints/common/constants';
 import type { RuntimeMessageEventProps } from '~/entrypoints/types';
+
+import { initBatchRemoval } from './batchRemoval';
 import {
   initPopup,
   initTabEventListener,
   initTabsUpdateListener,
   initNewTabRedirectListener,
+  handleSnapshotStartup,
   setBadge,
 } from './handler';
+import { initPortMessageListener } from './portMessage';
 
 const {
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
   OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED,
-  RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH,
   POPUP_MODULE_DISPLAYS,
 } = ENUM_SETTINGS_PROPS;
 
 export default defineBackground(() => {
   // console.log('Hello background!', { id: browser.runtime.id });
+  if (!browser.extension.inIncognitoContext) {
+    tabListUtils.requestRepair = initBatchRemoval(ids =>
+      tabListUtils.removeTabGroups(ids),
+    );
+  }
+  initPortMessageListener();
   initTabsUpdateListener();
   // 初始化新标签页重定向监听
   initNewTabRedirectListener();
@@ -50,6 +60,7 @@ export default defineBackground(() => {
     initPopup();
     initNewTabRedirectListener();
     autoSyncAlarm.checkReset(settings, oldSettings);
+    autoSaveOpenedTabsAlarm.checkReset(settings, oldSettings);
   });
 
   initTabListStorageListener(async () => {
@@ -68,14 +79,8 @@ export default defineBackground(() => {
 
   // 创建自动同步闹钟
   autoSyncAlarm.create();
-  // // 创建自动保存已打开标签页的闹钟
-  // autoSaveOpenedTabsAlarm.create();
-  // 清空自动保存快照的闹钟（不使用闹钟，采用tabs.onUpdated事件监听）
-  autoSaveOpenedTabsAlarm.clearAlarm();
-  // setTimeout(() => {
-  //   // 创建自动保存已打开标签页的闹钟
-  //   autoSaveOpenedTabsAlarm.create();
-  // }, 300);
+  // 按当前配置维护定时快照的采集闹钟
+  autoSaveOpenedTabsAlarm.create();
 
   // 左键点击图标 (如果有 popup 是不会触发的，可以执行 browser[BROWSER_ACTION_API_NAME].setPopup({ popup: '' }) 来监听事件)
   // Fired when an action icon is clicked. This event will not fire if the action has a popup.
@@ -112,24 +117,8 @@ export default defineBackground(() => {
   });
   browser.runtime.onStartup.addListener(async () => {
     console.log('browser.runtime.onStartup');
-    autoSaveOpenedTabsAlarm.clearAlarm();
 
-    await stateUtils.setStateByModule('global', { snapshotStatus: 'off' });
-    try {
-      const settings = await settingsUtils.getSettings();
-      const restoreSnapshotAfterBrowserLaunch =
-        settings[RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH];
-      const autoSnapshot = await snapshotUtils.promoteAutoBuffer();
-
-      if (restoreSnapshotAfterBrowserLaunch && autoSnapshot) {
-        await tabUtils.restoreOpenedTabsSnapshot('autoSave', autoSnapshot);
-      }
-    } catch (error) {
-      console.warn('Failed to restore snapshot on startup', error);
-    } finally {
-      await stateUtils.setStateByModule('global', { snapshotStatus: 'on' });
-    }
-
+    await handleSnapshotStartup();
     startup();
   });
   browser.windows.onCreated.addListener(async () => {
@@ -140,6 +129,10 @@ export default defineBackground(() => {
     }
   });
 
+  // 每次切换都要记录聚焦时间，由快照写入队列串行处理。
+  browser.windows.onFocusChanged.addListener(windowId => {
+    snapshotUtils.focusScheduledWindow(windowId);
+  });
   browser.windows.onRemoved.addListener(async windowId => {
     // console.log('browser.windows.onRemoved--windowId', windowId);
     stateUtils.clearSelectedKeysOfInvalidWindows();
@@ -152,7 +145,6 @@ export default defineBackground(() => {
   // 监听浏览器关闭事件
   browser.runtime.onSuspend.addListener(async () => {
     console.log('browser.runtime.onSuspend');
-    // autoSaveOpenedTabsAlarm.clearAlarm();
   });
 
   browser.runtime.onMessage.addListener(async (msg: unknown) => {

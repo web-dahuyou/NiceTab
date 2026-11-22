@@ -2,7 +2,7 @@
   "name": "nice-tab",
   "description": "开源的标签页管理器，OneTab、Toby、SessionBuddy 等扩展的升级替代品，功能丰富易用 | A nice, convenient, powerful tab manager (open source)",
   "private": true,
-  "version": "3.0.7",
+  "version": "3.0.8",
   "type": "module",
   "engines": {
     "node": ">=18.20.0"
@@ -51,6 +51,7 @@
     "react-router-dom": "^6.23.0",
     "react-virtuoso": "^4.10.4",
     "styled-components": "^6.1.8",
+    "tldts": "^7.5.2",
     "validator": "^13.15.35",
     "vite-plugin-svgr": "^4.3.0",
     "webdav": "^5.7.1"
@@ -77,6 +78,7 @@
     "github-slugger": "^2.0.0",
     "happy-dom": "^20.14.5",
     "marked": "^16.2.1",
+    "pnpm": "7.33.7",
     "prettier": "^3.6.2",
     "typescript": "^5.5.4",
     "vitest": "^1.6.1",

@@ -1,8 +1,16 @@
-import { describe, it, expect, vi } from 'vitest';
+import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest';
+import { storage } from 'wxt/storage';
+import { fakeBrowser } from 'wxt/testing';
 
 // Mock 所有依赖模块（必须在 import 之前）
 vi.mock('~/entrypoints/common/storage/instanceStore', () => ({
-  default: class Store {},
+  default: {
+    settingsUtils: {
+      getSettings: vi.fn(),
+      getLegacyScheduledSnapshotLimit: vi.fn(),
+      scheduledSnapshotLimitKey: 'local:scheduledSnapshotLimit',
+    },
+  },
 }));
 vi.mock('~/entrypoints/common/storage/index', () => ({
   tabListUtils: {},
@@ -10,7 +18,7 @@ vi.mock('~/entrypoints/common/storage/index', () => ({
   stateUtils: {},
 }));
 
-import {
+import SnapshotUtils, {
   isSnapshotRecord,
   normalizeAutoBuffer,
   convertLegacyItems,
@@ -24,7 +32,9 @@ import type {
   SnapshotGroupItem,
   SnapshotTabItem,
   SnapshotRecord,
+  ScheduledSnapshotWindow,
 } from '~/entrypoints/types';
+import Store from '../instanceStore';
 
 // ==========================================================================
 // 常量
@@ -245,5 +255,131 @@ describe('normalizeAutoBuffer', () => {
 
   it('undefined 返回 undefined', () => {
     expect(normalizeAutoBuffer(undefined)).toBeUndefined();
+  });
+});
+
+describe('定时快照历史', () => {
+  let snapshots: SnapshotUtils;
+
+  const capture = (
+    windowId: number,
+    url: string,
+    title = url,
+  ): ScheduledSnapshotWindow => ({
+    windowId,
+    focused: false,
+    items: [{ type: 'tab', id: title, url, title, pinned: false, active: true }],
+  });
+
+  beforeEach(() => {
+    fakeBrowser.reset();
+    snapshots = new SnapshotUtils();
+    vi.mocked(Store.settingsUtils.getSettings).mockResolvedValue({
+      scheduledSnapshotsEnabled: true,
+    });
+    vi.mocked(Store.settingsUtils.getLegacyScheduledSnapshotLimit).mockResolvedValue(2);
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-22T00:00:00Z'));
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
+
+  it('同会话同窗口的内容去重并更新元数据，内容变化或新会话保留新记录', async () => {
+    await snapshots.setScheduledLimit(5);
+    const url = 'https://example.test';
+    await snapshots.saveScheduled([capture(7, url, 'Original')], [7]);
+    const [original] = await snapshots.getScheduled();
+    const initialUpdatedAt = original.updatedAt;
+
+    vi.setSystemTime(Date.now() + 60000);
+    await snapshots.saveScheduled([capture(7, url, 'Updated')], [7]);
+    const [updated, extra] = await snapshots.getScheduled();
+    expect(extra).toBeUndefined();
+    expect(updated).toMatchObject({ id: original.id, createdAt: original.createdAt });
+    expect(updated.updatedAt).not.toBe(initialUpdatedAt);
+    expect(updated.items[0]).toMatchObject({ id: 'Original', title: 'Updated' });
+
+    await snapshots.saveScheduled([capture(7, url + '/next')], [7]);
+    await browser.storage.session.clear();
+    await snapshots.saveScheduled([capture(7, url + '/next')], [7]);
+    const records = await snapshots.getScheduled();
+    expect(records).toHaveLength(3);
+    expect(new Set(records.map(record => record.sessionKey)).size).toBe(2);
+  });
+
+  it('裁剪后仍记住打开窗口的内容，剩余容量增加后补存', async () => {
+    await snapshots.setScheduledLimit(1);
+    const first = { ...capture(1, 'https://first.test'), focused: true };
+    const second = capture(2, 'https://second.test');
+    await snapshots.saveScheduled([first, second], [1, 2]);
+    const [kept] = await snapshots.getScheduled();
+    expect(kept.windowId).toBe(1);
+
+    vi.setSystemTime(Date.now() + 60000);
+    await snapshots.saveScheduled([first, second], [1, 2]);
+    expect((await snapshots.getScheduled()).map(record => record.id)).toEqual([kept.id]);
+
+    await snapshots.setScheduledLimit(2);
+    await snapshots.saveScheduled([first, second], [1, 2]);
+    expect(
+      (await snapshots.getScheduled()).map(record => record.windowId).sort(),
+    ).toEqual([1, 2]);
+  });
+
+  it('按焦点调整保留顺序，删除对象变化后需要重新确认', async () => {
+    const first = { ...capture(1, 'https://first.test'), focused: true };
+    await snapshots.saveScheduled([first, capture(2, 'https://second.test')], [1, 2]);
+    const [oldFirst, oldSecond] = await snapshots.getScheduled();
+    await expect(snapshots.setScheduledLimit(1)).resolves.toEqual({
+      status: 'confirm',
+      recordIds: [oldSecond.id],
+    });
+    expect(
+      await storage.getItem(Store.settingsUtils.scheduledSnapshotLimitKey),
+    ).toBeNull();
+
+    vi.setSystemTime(Date.now() + 60000);
+    await snapshots.focusScheduledWindow(2);
+    await expect(snapshots.setScheduledLimit(1, [oldSecond.id])).resolves.toEqual({
+      status: 'confirm',
+      recordIds: [oldFirst.id],
+    });
+    expect((await snapshots.getScheduled()).map(record => record.id)).toEqual([
+      oldSecond.id,
+      oldFirst.id,
+    ]);
+
+    await expect(snapshots.setScheduledLimit(1, [oldFirst.id])).resolves.toEqual({
+      status: 'saved',
+    });
+    expect((await snapshots.getScheduled()).map(record => record.id)).toEqual([
+      oldSecond.id,
+    ]);
+    expect(await snapshots.getScheduledLimit()).toBe(1);
+  });
+
+  it('采集和保留上限变更按顺序提交，前次失败后队列可继续执行', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    let finish!: () => void;
+    const pending = new Promise<void>(resolve => {
+      finish = resolve;
+    });
+    const failing = snapshots.runScheduledUpdate(async () => {
+      await pending;
+      throw new Error('capture failed');
+    });
+    const saving = snapshots.setScheduledLimit(4);
+    expect(
+      await storage.getItem(Store.settingsUtils.scheduledSnapshotLimitKey),
+    ).toBeNull();
+    finish();
+
+    await failing;
+    await expect(saving).resolves.toEqual({ status: 'saved' });
+    expect(await snapshots.getScheduledLimit()).toBe(4);
+    expect(warn).toHaveBeenCalledWith('Scheduled snapshots:', expect.any(Error));
   });
 });

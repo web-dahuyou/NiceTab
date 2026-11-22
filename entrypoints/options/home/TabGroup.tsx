@@ -10,6 +10,8 @@ import {
   CopyOutlined,
 } from '@ant-design/icons';
 import copyToClipboard from 'copy-to-clipboard';
+
+import { openModeItems } from '~/entrypoints/common/components/OpenModeMenu';
 import { IconRepeat } from '~/entrypoints/common/components/icon/CustomIcon';
 import { GroupItem, TabItem, ActionBtnStyle } from '~/entrypoints/types';
 import {
@@ -26,13 +28,15 @@ import DndComponent, {
   type DraggableStateItem,
 } from '~/entrypoints/common/components/DndComponent';
 import DropComponent from '~/entrypoints/common/components/DropComponent';
-
-import { HomeContext } from './hooks/treeData';
-import { eventEmitter } from './hooks/homeCustomEvent';
-import EditInput from '../components/EditInput';
+import type { OpenMode } from '~/entrypoints/common/openUtils';
 import ActionBtnList, {
   type ActionOptionItem,
 } from '~/entrypoints/common/components/ActionBtnList';
+
+import EditInput from '../components/EditInput';
+
+import { HomeContext } from './hooks/treeData';
+import { eventEmitter } from './hooks/homeCustomEvent';
 import TabListItem, { type QuickSelectFunc } from './TabListItem';
 import {
   StyledGroupWrapper,
@@ -61,11 +65,8 @@ import useMultiSelection from './hooks/multiSelection';
 import useGroupActions from './hooks/groupActions.tsx';
 
 const dndKey = dndKeys.tabItem;
-const {
-  CONFIRM_BEFORE_DELETING_TABS,
-  CONFIRM_BEFORE_DELETING_GROUPS,
-  DELETE_AFTER_RESTORE,
-} = ENUM_SETTINGS_PROPS;
+const { CONFIRM_BEFORE_DELETING_TABS, CONFIRM_BEFORE_DELETING_GROUPS } =
+  ENUM_SETTINGS_PROPS;
 
 type TabGroupProps = GroupItem & {
   tagId?: string;
@@ -79,7 +80,7 @@ type TabGroupProps = GroupItem & {
   onChange?: (data: Partial<GroupItem>) => void;
   onRemove?: () => void;
   onCreate?: (tagId: string, groupId: string, pos: 'before' | 'after') => void;
-  onRestore?: () => void;
+  onRestore?: (mode?: OpenMode) => void;
   onStarredChange?: (isStarred: boolean) => void;
   onDedup?: () => void;
   onCopy?: (groupId: string) => void;
@@ -141,6 +142,7 @@ function TabGroup({
   useEffect(() => {
     const tabIds = tabList.map(item => item.tabId);
     setSelectedTabIds(ids => ids.filter(id => tabIds.includes(id)));
+    setQuickSelectedTabIds(ids => ids.filter(id => tabIds.includes(id)));
   }, [tabList]);
 
   const tag = useMemo(() => {
@@ -270,24 +272,21 @@ function TabGroup({
     }
   }, [selectedTabs]);
 
-  const handleTabsOpen = useCallback(() => {
-    eventEmitter.emit('home:treeDataHook', {
-      action: 'handleTabsOpen',
-      params: [group, selectedTabs],
-    });
-
-    const settings = settingsUtils.settings;
-    if (settings[DELETE_AFTER_RESTORE] && !group?.isLocked) {
-      setSelectedTabIds([]);
-      setQuickSelectedTabIds([]);
-    }
-  }, [group, selectedTabs]);
+  const handleTabsOpen = useCallback(
+    (mode?: OpenMode) => {
+      eventEmitter.emit('home:treeDataHook', {
+        action: 'handleTabsOpen',
+        params: [group, selectedTabs, mode],
+      });
+    },
+    [group, selectedTabs],
+  );
 
   const handleTabRemove = useCallback(
-    (tabs: TabItem[]) => {
+    (tabs: TabItem[], afterOpen?: boolean) => {
       eventEmitter.emit('home:treeDataHook', {
         action: 'handleTabItemRemove',
-        params: [group.groupId, tabs],
+        params: [group.groupId, tabs, afterOpen],
         callback: () => {
           setSelectedTabIds(selectedTabIds =>
             selectedTabIds.filter(id => !tabs.some(tab => tab.tabId === id)),
@@ -364,15 +363,18 @@ function TabGroup({
     [draggingTabItem, selectedTabIds, setSelectedTabIds],
   );
 
-  const handleTabsSort = useCallback((sortType: string) => {
-    eventEmitter.emit('home:treeDataHook', {
-      action: 'handleTabsSort',
-      params: [{ tagId: tagId!, groupId: group.groupId, sortType }],
-    });
-  }, []);
+  const handleTabsSort = useCallback(
+    (sortType: string, sortBy: 'name' | 'domain' = 'name') => {
+      eventEmitter.emit('home:treeDataHook', {
+        action: 'handleTabsSort',
+        params: [{ tagId: tagId!, groupId, sortType, sortBy }],
+      });
+    },
+    [tagId, groupId],
+  );
 
   const handleGroupAction = useCallback(
-    (actionName: GroupActionName, actionGroupId: string) => {
+    (actionName: GroupActionName, actionGroupId: string, mode?: OpenMode) => {
       if (actionName === 'remove') {
         const settings = settingsUtils.settings || {};
         if (settings[CONFIRM_BEFORE_DELETING_GROUPS]) {
@@ -381,7 +383,7 @@ function TabGroup({
           onRemove?.();
         }
       } else if (actionName === 'restore') {
-        onRestore?.();
+        onRestore?.(mode);
       } else if (actionName === 'addGroupBefore') {
         onCreate?.(tagId!, actionGroupId, 'before');
       } else if (actionName === 'addGroupAfter') {
@@ -400,6 +402,8 @@ function TabGroup({
         handleTabsSort('ascending');
       } else if (actionName === 'tabsSortDesc') {
         handleTabsSort('descending');
+      } else if (actionName === 'tabsSortByDomain') {
+        handleTabsSort('ascending', 'domain');
       }
     },
     [
@@ -451,7 +455,8 @@ function TabGroup({
         key: 'open',
         label: $fmt(actionMap['open'].labelKey),
         icon: <ExportOutlined />,
-        onClick: handleTabsOpen,
+        btnType: 'dropdown' as const,
+        menuItems: openModeItems($fmt, handleTabsOpen),
       },
       {
         key: 'moveTo',

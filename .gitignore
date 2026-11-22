@@ -27,8 +27,10 @@ public/docs/*
 *.njsproj
 *.sln
 *.sw?
-.claude
-CLAUDE.md
+# .claude
+# CLAUDE.md
+# .agents
+# AGENTS.md
 docs
 
 # Test coverage

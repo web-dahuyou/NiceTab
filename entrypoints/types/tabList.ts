@@ -170,6 +170,19 @@ export interface SnapshotRecord {
   items: WindowSnapshotItem[];
 }
 
+export interface ScheduledSnapshotWindow {
+  windowId: number;
+  focused: boolean;
+  items: WindowSnapshotItem[];
+}
+
+export interface ScheduledSnapshot extends Omit<SnapshotRecord, 'source'> {
+  source: 'scheduled';
+  sessionKey: string;
+  windowId: number;
+  lastFocusedAt?: number;
+}
+
 export interface SnapshotStore {
   version: number;
   manual: SnapshotRecord[];

@@ -6,7 +6,7 @@ import { isEqual, debounce } from 'lodash-es';
 import { useBlocker } from 'react-router-dom';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import type { SettingsProps, TimeRange } from '~/entrypoints/types';
-import { settingsUtils } from '~/entrypoints/common/storage';
+import { settingsUtils, snapshotUtils } from '~/entrypoints/common/storage';
 import {
   ENUM_SETTINGS_PROPS,
   defaultLanguage,
@@ -19,6 +19,7 @@ import {
 } from '~/entrypoints/common/hooks/global';
 import useUrlParams from '~/entrypoints/common/hooks/urlParams';
 import { sendRuntimeMessage, classNames } from '~/entrypoints/common/utils';
+import { requestSnapshotAction } from '~/entrypoints/common/utils/runtimeMsg';
 import { reloadOtherAdminPage } from '~/entrypoints/common/tabs';
 // import StickyFooter from '~/entrypoints/common/components/StickyFooter';
 
@@ -32,6 +33,7 @@ import FormModuleGlobalSearch from './FormModuleGlobalSearch';
 import FormModuleOtherActions from './FormModuleOtherActions';
 import FormModuleDisplay from './FormModuleDisplay';
 import FormModuleNewtab from './FormModuleNewtab';
+import FormModuleSnapshot from './FormModuleSnapshot';
 import FormModuleSync from './FormModuleSync';
 import {
   StyledSidebarWrapper,
@@ -39,7 +41,7 @@ import {
   // StyledFooterWrapper,
 } from './Settings.styled';
 
-const { LANGUAGE, AUTO_SYNC_TIME_RANGES } = ENUM_SETTINGS_PROPS;
+const { LANGUAGE, SCHEDULED_SNAPSHOT_LIMIT, AUTO_SYNC_TIME_RANGES } = ENUM_SETTINGS_PROPS;
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -48,6 +50,14 @@ function handleTimeRanges(timeRanges?: TimeRange[]): TimeRange[] {
     range?.[0] || defaultTimeRange[0],
     range?.[1] || defaultTimeRange[1],
   ]);
+}
+
+async function getFormSettings() {
+  const [settings, limit] = await Promise.all([
+    settingsUtils.getSettings(),
+    snapshotUtils.getScheduledLimit(),
+  ]);
+  return { ...settings, [SCHEDULED_SNAPSHOT_LIMIT]: limit };
 }
 
 export default function Settings() {
@@ -66,6 +76,7 @@ export default function Settings() {
   };
 
   const [form] = Form.useForm();
+  const [modal, modalContext] = Modal.useModal();
 
   const [currModule, setCurrModule] = useState<string>('common');
   const blockModuleOptions: MenuItem[] = useMemo(() => {
@@ -99,6 +110,10 @@ export default function Settings() {
         label: $fmt('settings.block.newtab'),
       },
       {
+        key: 'snapshot',
+        label: $fmt('settings.block.snapshot'),
+      },
+      {
         key: 'sync',
         label: $fmt('settings.block.sync'),
       },
@@ -130,31 +145,72 @@ export default function Settings() {
 
   const handleFinish: FormProps<SettingsProps>['onFinish'] = async values => {
     const settings = await settingsUtils.getSettings();
+    const { [SCHEDULED_SNAPSHOT_LIMIT]: limit, ...generalValues } = values;
     const newSettings = {
-      ...settingsUtils.initialSettings,
       ...settings,
-      ...values,
+      ...generalValues,
       [AUTO_SYNC_TIME_RANGES]: handleTimeRanges(values[AUTO_SYNC_TIME_RANGES]),
     };
+    if (
+      !browser.extension.inIncognitoContext &&
+      typeof limit === 'number' &&
+      initialFormValues &&
+      limit !== initialFormValues[SCHEDULED_SNAPSHOT_LIMIT]
+    ) {
+      try {
+        let result = await requestSnapshotAction({ action: 'setLimit', limit });
+        while (result.status === 'confirm') {
+          const confirmedIds = result.recordIds;
+          const confirmed = await modal.confirm({
+            title: $fmt('common.confirmReminder'),
+            content: $fmt({
+              id: 'settings.snapshotTrimConfirm',
+              values: { count: confirmedIds.length },
+            }),
+          });
+          // 取消裁剪时继续保存其他设置，随后读回本机上限。
+          if (!confirmed) break;
+          result = await requestSnapshotAction({
+            action: 'setLimit',
+            limit,
+            confirmedIds,
+          });
+        }
+        if (result.status === 'failed') throw new Error('Unable to save snapshot limit');
+      } catch (error) {
+        console.warn('Unable to save snapshot limit', error);
+        messageApi.error(
+          $fmt({ id: 'common.actionFailed', values: { action: $fmt('common.save') } }),
+        );
+        return;
+      }
+    }
     console.log('Save Success: newSettings', newSettings);
-    form.setFieldsValue(newSettings);
 
     await settingsUtils.setSettings(newSettings);
-    NiceGlobalContext.setSettings(newSettings);
-    sendRuntimeMessage({ msgType: 'setLocale', data: { locale: newSettings.language } });
+    const savedSettings = settingsUtils.settings;
+    const savedFormValues = {
+      ...savedSettings,
+      [SCHEDULED_SNAPSHOT_LIMIT]: await snapshotUtils.getScheduledLimit(),
+    };
+    const {
+      language = defaultLanguage,
+      themeType = settingsUtils.initialSettings.themeType,
+    } = savedSettings;
+    form.setFieldsValue(savedFormValues);
+    NiceGlobalContext.setSettings(savedSettings);
+    sendRuntimeMessage({ msgType: 'setLocale', data: { locale: language } });
     sendRuntimeMessage({
       msgType: 'setThemeType',
-      data: { themeType: newSettings.themeType },
+      data: { themeType },
     });
     reloadOtherAdminPage();
 
-    const customMessages = getCustomLocaleMessages(
-      newSettings.language || defaultLanguage,
-    );
+    const customMessages = getCustomLocaleMessages(language);
     messageApi.success(customMessages['common.saveSuccess']);
     setInitialFormValues(values => ({
       ...values,
-      ...newSettings,
+      ...savedFormValues,
     }));
     setHasChanged(false);
   };
@@ -184,14 +240,14 @@ export default function Settings() {
 
   const { urlParams } = useUrlParams();
   useEffect(() => {
-    settingsUtils.getSettings().then(settings => {
+    getFormSettings().then(settings => {
       setInitialFormValues(settings);
       form?.setFieldsValue(settings);
       NiceGlobalContext.setSettings(settings);
     });
   }, [urlParams, NiceGlobalContext.themeType]);
   useEffect(() => {
-    settingsUtils.getSettings().then(settings => {
+    getFormSettings().then(settings => {
       setInitialFormValues(settings);
       form?.setFieldsValue(settings);
     });
@@ -205,6 +261,7 @@ export default function Settings() {
   return (
     <>
       {msgContextHolder}
+      {modalContext}
       <Modal
         title={$fmt('common.confirmReminder')}
         centered
@@ -289,6 +346,13 @@ export default function Settings() {
 
             {/* ******************* 新标签页相关设置 ******************* */}
             <FormModuleNewtab hidden={currModule !== 'newtab'} form={form} />
+
+            {/* ******************* 快照设置 ******************* */}
+            <FormModuleSnapshot
+              hidden={currModule !== 'snapshot'}
+              form={form}
+              savedLimit={initialFormValues?.[SCHEDULED_SNAPSHOT_LIMIT]}
+            />
 
             {/* ******************* 远程同步相关设置 ******************* */}
             <FormModuleSync hidden={currModule !== 'sync'} form={form} />

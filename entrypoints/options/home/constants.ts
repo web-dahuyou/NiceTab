@@ -21,6 +21,7 @@ export const defaultGroupActions: GroupActionName[] = [
   'clone',
   'tabsSortAsc',
   'tabsSortDesc',
+  'tabsSortByDomain',
 ];
 
 export const defaultTagActions: TagActionName[] = [
@@ -138,6 +139,10 @@ export const groupActionOptions: ActionOption[] = [
   {
     actionName: 'tabsSortDesc',
     labelKey: 'home.tabGroup.tabsSortDesc',
+  },
+  {
+    actionName: 'tabsSortByDomain',
+    labelKey: 'home.tabGroup.tabsSortByDomain',
   },
 ];
 

@@ -6,6 +6,17 @@ For the most detailed and up-to-date release notes, see [GitHub Releases](https:
 
 ---
 
+## v3.0.8
+**Release Date:** November 23, 2026
+
+- Added scheduled snapshots.
+- You can now open categories, tab groups, and tabs in the current window, a new window, or a new incognito window. These options are also available for global search results, items in the Recycle Bin, and items on the new tab page.
+- Added domain sorting within tab groups, sorting by base domain and then subdomain to keep tabs from the same domain together
+- The left directory tree now supports selecting multiple tab groups. You can drag them together, remove them, move them to another category, or open them in the current window, a new window, or a new incognito window.
+- Optimized favicon retrieval and caching logic
+
+---
+
 ## v3.0.7
 **Release Date:** October 31, 2026
 

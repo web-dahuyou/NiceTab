@@ -7,6 +7,7 @@ import SyncWebDAVUtils from './syncWebDAVUtils';
 import StateUtils from './stateUtils';
 import NewTabUtils from './newTabUtils';
 import SnapshotUtils from './snapshotUtils';
+import IncognitoUtils from './incognitoUtils';
 
 let _settingsUtils: SettingsUtils;
 let _themeUtils: ThemeUtils;
@@ -17,6 +18,7 @@ let _syncWebDAVUtils: SyncWebDAVUtils;
 let _stateUtils: StateUtils;
 let _newTabUtils: NewTabUtils;
 let _snapshotUtils: SnapshotUtils;
+let _incognitoUtils: IncognitoUtils;
 
 export default class Store {
   static get settingsUtils() {
@@ -46,6 +48,9 @@ export default class Store {
   static get snapshotUtils() {
     return _snapshotUtils;
   }
+  static get incognitoUtils() {
+    return _incognitoUtils;
+  }
 
   static set settingsUtils(utils: SettingsUtils) {
     _settingsUtils = utils;
@@ -73,5 +78,8 @@ export default class Store {
   }
   static set snapshotUtils(utils: SnapshotUtils) {
     _snapshotUtils = utils;
+  }
+  static set incognitoUtils(utils: IncognitoUtils) {
+    _incognitoUtils = utils;
   }
 }

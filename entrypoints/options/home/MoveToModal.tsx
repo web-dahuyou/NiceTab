@@ -1,10 +1,11 @@
-import { useContext, useMemo, useState, useEffect } from 'react';
+import { useContext, useMemo, useState, useEffect, useRef } from 'react';
 import { theme, Checkbox, Modal, Cascader, Typography, Flex, Space, Tooltip } from 'antd';
 import type { CheckboxProps } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
-import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { tabListUtils } from '~/entrypoints/common/storage';
+import { reloadOtherAdminPage } from '~/entrypoints/common/tabs';
 import { StyledEllipsis } from '~/entrypoints/common/style/Common.styled';
 import type { TagItem } from '~/entrypoints/types';
 import type { MoveDataProps, MoveTargetProps, CascaderOption } from './types';
@@ -51,6 +52,7 @@ interface MoveToModalProps {
   onOk?: ({ targetTagId, targetGroupId }: MoveTargetProps) => void;
   onCancel?: () => void;
   moveData?: MoveDataProps;
+  onProcessed?: (ids: string[]) => void;
 }
 export default function MoveToModal({
   visible = false,
@@ -58,25 +60,29 @@ export default function MoveToModal({
   onCancel,
   listData,
   moveData,
+  onProcessed,
 }: MoveToModalProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
+  const { $message } = useContext(GlobalContext);
   const { treeDataHook } = useContext(HomeContext);
   const [options, setOptions] = useState<CascaderOption[]>([]); // 级联数据
   const [targetValue, setTargetValue] = useState<string[]>([]); // 选中的目标值
   const [targetOptions, setTargetOptions] = useState<CascaderOption[]>([]); // 选中的目标选项
+  const [moving, setMoving] = useState(false);
+  const movingRef = useRef(false);
   const [isCopy, setIsCopy] = useState<boolean>(false); // 是否拷贝
   const [autoMerge, setAutoMerge] = useState<boolean>(false); // 是否自动合并
 
   // 校验级联数据
   const validInfo: { valid: boolean; type: 'tag' | 'tabGroup' } = useMemo(() => {
     if (!moveData) return { valid: false, type: 'tag' };
-    const { tagId, groupId, tabs } = moveData || {};
+    const { tagId, groupId, groupIds, tabs } = moveData || {};
     if (!targetOptions?.length) {
       return { valid: false, type: 'tag' };
     }
 
-    if (!tagId && !groupId) {
+    if (!tagId && !groupId && !groupIds?.length) {
       return { valid: false, type: 'tag' };
     }
 
@@ -117,43 +123,66 @@ export default function MoveToModal({
     if (!validInfo.valid) return;
     if (!targetOptions?.length) return;
 
-    const { tagId, groupId, tabs = [] } = moveData;
+    if (movingRef.current) return;
+    movingRef.current = true;
+    setMoving(true);
+    try {
+      const { tagId, groupId, groupIds, tabs = [] } = moveData;
 
-    if (tagId) {
-      await tabListUtils.allTabGroupsMoveThrough({
-        sourceTagId: tagId,
-        targetTagId: targetOptions[0].value,
-        isCopy,
-        autoMerge,
-      });
+      if (groupIds?.length) {
+        const targetTagId = targetOptions[0].value;
+        const { processedIds } = await tabListUtils.tabGroupsMoveThrough({
+          sourceGroupIds: groupIds,
+          targetTagId,
+          isCopy,
+          autoMerge,
+        });
+        onProcessed?.(processedIds);
+        onOk?.({ targetTagId });
+        if (processedIds.length) await reloadOtherAdminPage();
+      } else if (tagId) {
+        await tabListUtils.allTabGroupsMoveThrough({
+          sourceTagId: tagId,
+          targetTagId: targetOptions[0].value,
+          isCopy,
+          autoMerge,
+        });
 
-      onOk?.({ targetTagId: targetOptions[0].value });
-    } else if (validInfo.type === 'tag' && groupId) {
-      const { targetGroupId } = await tabListUtils.tabGroupMoveThrough({
-        sourceGroupId: groupId,
-        targetTagId: targetOptions[0].value,
-        isCopy,
-        autoMerge,
-      });
+        onOk?.({ targetTagId: targetOptions[0].value });
+      } else if (validInfo.type === 'tag' && groupId) {
+        const { targetGroupId } = await tabListUtils.tabGroupMoveThrough({
+          sourceGroupId: groupId,
+          targetTagId: targetOptions[0].value,
+          isCopy,
+          autoMerge,
+        });
 
-      onOk?.({ targetTagId: targetOptions[0].value, targetGroupId });
-    } else if (validInfo.type === 'tabGroup' && groupId) {
-      const targetTagId = targetOptions[0].value;
-      const targetGroupId = targetOptions[1].value;
-      await tabListUtils.tabMoveThrough({
-        sourceGroupId: groupId,
-        targetTagId,
-        targetGroupId,
-        tabs,
-        isCopy,
-        autoMerge,
-      });
+        onOk?.({ targetTagId: targetOptions[0].value, targetGroupId });
+      } else if (validInfo.type === 'tabGroup' && groupId) {
+        const targetTagId = targetOptions[0].value;
+        const targetGroupId = targetOptions[1].value;
+        await tabListUtils.tabMoveThrough({
+          sourceGroupId: groupId,
+          targetTagId,
+          targetGroupId,
+          tabs,
+          isCopy,
+          autoMerge,
+        });
 
-      onOk?.({ targetTagId, targetGroupId });
+        onOk?.({ targetTagId, targetGroupId });
+      }
+
+      setTargetValue([]);
+      setTargetOptions([]);
+    } catch (error) {
+      console.error('Move tab groups failed', error);
+      $message.error($fmt('home.treeNodeBatch.failed'));
+    } finally {
+      movingRef.current = false;
+      setMoving(false);
+      if (moveData?.groupIds?.length) treeDataHook?.refreshTreeData();
     }
-
-    setTargetValue([]);
-    setTargetOptions([]);
   };
 
   const initData = async () => {
@@ -177,11 +206,16 @@ export default function MoveToModal({
       centered
       open={visible}
       onOk={handleMoveTo}
-      onCancel={onCancel}
+      confirmLoading={moving}
+      cancelButtonProps={{ disabled: moving }}
+      closable={!moving}
+      maskClosable={!moving}
+      keyboard={!moving}
+      onCancel={moving ? undefined : onCancel}
     >
       <Flex vertical gap="middle">
         <Space>
-          <Checkbox checked={isCopy} onChange={onCopyCheckboxChange}>
+          <Checkbox disabled={moving} checked={isCopy} onChange={onCopyCheckboxChange}>
             {$fmt('home.moveTo.copyLabel')}
           </Checkbox>
           <Tooltip
@@ -190,7 +224,7 @@ export default function MoveToModal({
           >
             <QuestionCircleOutlined />
           </Tooltip>
-          <Checkbox checked={autoMerge} onChange={onCheckboxChange}>
+          <Checkbox disabled={moving} checked={autoMerge} onChange={onCheckboxChange}>
             {$fmt('home.moveTo.mergeLabel')}
           </Checkbox>
           <Tooltip
@@ -199,6 +233,7 @@ export default function MoveToModal({
               <Flex vertical>
                 <Typography.Text>{$fmt('home.moveTo.mergeTip.1')}</Typography.Text>
                 <Typography.Text>{$fmt('home.moveTo.mergeTip.2')}</Typography.Text>
+                <Typography.Text>{$fmt('home.moveTo.mergeTip.3')}</Typography.Text>
               </Flex>
             }
           >

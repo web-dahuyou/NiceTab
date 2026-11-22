@@ -9,13 +9,20 @@ import {
   SortAscendingOutlined,
   SortDescendingOutlined,
 } from '@ant-design/icons';
+
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { type ActionOptionItem } from '~/entrypoints/common/components/ActionBtnList';
+import {
+  toMenuItems,
+  type ActionOptionItem,
+} from '~/entrypoints/common/components/ActionBtnList';
+import { openModeItems } from '~/entrypoints/common/components/OpenModeMenu';
+import type { OpenMode } from '~/entrypoints/common/openUtils';
 import {
   IconTimeAscending,
   IconTimeDescending,
 } from '~/entrypoints/common/components/icon/CustomIcon';
 import type { GroupItem } from '~/entrypoints/types';
+
 import type { TagActionName } from '../types';
 import { tagActionOptions, type ActionOption } from '../constants';
 
@@ -25,7 +32,7 @@ interface UseTagActionsProps {
   isLocked?: boolean;
   groupList?: GroupItem[];
   allowTagActions?: TagActionName[];
-  onAction: (actionName: TagActionName, tagId: string) => void;
+  onAction: (actionName: TagActionName, tagId: string, mode?: OpenMode) => void;
 }
 
 interface UseTagActionsReturn {
@@ -79,7 +86,8 @@ export default function useTagActions({
         label: $fmt('home.tag.open'),
         icon: <ExportOutlined />,
         disabled: !groupList.length,
-        onClick: () => onAction('restore', tagId),
+        btnType: 'dropdown',
+        menuItems: openModeItems($fmt, mode => onAction('restore', tagId, mode)),
       },
       {
         key: 'moveTo',
@@ -130,10 +138,12 @@ export default function useTagActions({
       },
     ];
 
-    return btns.filter(item => {
-      return allowTagActions.includes(item.key as TagActionName);
-    });
-  }, [$fmt, allowTagActions, isLocked, tagId, onAction]);
+    return toMenuItems(
+      btns.filter(item => {
+        return allowTagActions.includes(item.key as TagActionName);
+      }),
+    );
+  }, [groupList.length, $fmt, allowTagActions, isLocked, tagId, onAction]);
 
   return { tagMenuItems };
 }

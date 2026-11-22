@@ -1,14 +1,23 @@
 import { useState, memo, useCallback, useRef, useLayoutEffect } from 'react';
-import { debounce } from 'lodash-es';
-import { Tree, Space, Typography, Button, Checkbox, Input, Empty, Spin } from 'antd';
-import type { TreeDataNode } from 'antd';
+import {
+  Tree,
+  Space,
+  Typography,
+  Button,
+  Checkbox,
+  Input,
+  Empty,
+  Spin,
+  theme,
+} from 'antd';
+import type { TreeDataNode, TreeProps } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import type { TagItem, GroupItem } from '~/entrypoints/types';
 import type { TreeDataNodeUnion, MoveToCallbackProps } from './types';
-import { HomeContext, type TreeDataHookProps } from './hooks/treeData';
-import { eventEmitter as homeEventEmitter } from './hooks/homeCustomEvent';
+import { HomeContext } from './hooks/treeData';
 import RenderTreeNode from './components/RenderTreeNode';
+import TreeBatchActions from './components/TreeBatchActions';
 import {
   useTreeNodeAction,
   RemoveActionModal,
@@ -19,6 +28,7 @@ import { getTreeData, checkAllowDrop } from './utils';
 
 function TreeBox() {
   const { $fmt } = useIntlUtls();
+  const { token } = theme.useToken();
   const { treeDataHook } = useContext(HomeContext);
   const {
     loading,
@@ -31,6 +41,7 @@ function TreeBox() {
     handleSelect,
     onSelect,
     onTreeNodeAction,
+    handleTreeNodeDrop,
     toggleExpand,
     refreshTreeData,
     handleTagCreate,
@@ -47,7 +58,11 @@ function TreeBox() {
 
   const listRef = useRef<HTMLDivElement>(null);
   const treeRef = useRef<any>(null);
+  // 多选拖拽时记录的标签组 id
+  const multiDragGroupIdsRef = useRef<string[]>([]);
 
+  const [checkedGroupIds, setCheckedGroupIds] = useState<string[]>([]);
+  const [batchBusy, setBatchBusy] = useState(false);
   const [filterList, setFilterList] = useState<string[]>([]);
   const [searchText, setSearchText] = useState<string>('');
   const [searchValue, setSearchValue] = useState<string>('');
@@ -63,6 +78,7 @@ function TreeBox() {
   const setSearchTextValue = useCallback((value: string) => {
     setSearchText(value);
     setSearchValue(value);
+    setCheckedGroupIds([]);
   }, []);
 
   const onSearch = useCallback(
@@ -78,6 +94,7 @@ function TreeBox() {
 
   const onFilterChange = useCallback((values: string[]) => {
     setFilterList(values);
+    setCheckedGroupIds([]);
   }, []);
 
   const onSearchTextChange = useCallback(
@@ -121,6 +138,39 @@ function TreeBox() {
     return getTreeData(searchTagList);
   }, [tagList, treeData, filterList, searchValue]);
 
+  const visibleGroups = useMemo(
+    () => searchTreeData.flatMap(tag => tag.children || []),
+    [searchTreeData],
+  );
+  const checkedKeys = useMemo(() => {
+    const groups = visibleGroups.filter(group =>
+      checkedGroupIds.includes(String(group.key)),
+    );
+    const tags = searchTreeData.filter(
+      tag =>
+        tag.children?.length &&
+        tag.children.every(group => checkedGroupIds.includes(String(group.key))),
+    );
+    return [...groups, ...tags].map(node => node.key);
+  }, [searchTreeData, visibleGroups, checkedGroupIds]);
+  const selectedGroupIds = visibleGroups
+    .filter(group => checkedGroupIds.includes(String(group.key)))
+    .map(group => String(group.key));
+
+  useEffect(() => {
+    setCheckedGroupIds(ids =>
+      ids.filter(id => visibleGroups.some(group => String(group.key) === id)),
+    );
+  }, [visibleGroups]);
+
+  useLayoutEffect(() => {
+    const element = listRef.current;
+    if (!element) return;
+    const observer = new ResizeObserver(() => setTreeBoxHeight(element.clientHeight));
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
   // 判断节点是否可拖拽
   const isNodeDraggable = useCallback(
     (node: TreeDataNode) => {
@@ -145,6 +195,82 @@ function TreeBox() {
   const draggableConfig = useMemo(() => {
     return { icon: false, nodeDraggable: isNodeDraggable };
   }, [isNodeDraggable]);
+
+  const allowTreeDrop: NonNullable<TreeProps<TreeDataNodeUnion>['allowDrop']> =
+    useCallback(info => {
+      if (multiDragGroupIdsRef.current.length) {
+        const { dropNode } = info;
+        const targetTag =
+          dropNode.type === 'tag' ? dropNode.originData : dropNode.parentData;
+        if (targetTag?.isLocked) return false;
+      }
+      return checkAllowDrop?.(info) ?? false;
+    }, []);
+
+  // 拖拽开始时记录批量拖拽的标签组
+  const handleTreeDragStart = useCallback<
+    NonNullable<TreeProps<TreeDataNodeUnion>['onDragStart']>
+  >(
+    ({ node, event }) => {
+      const groupIds =
+        node.type === 'tabGroup' &&
+        checkedGroupIds.length > 1 &&
+        checkedGroupIds.includes(String(node.key))
+          ? visibleGroups
+              .filter(
+                group =>
+                  !group.parentData?.isLocked &&
+                  checkedGroupIds.includes(String(group.key)),
+              )
+              .map(group => String(group.key))
+          : [];
+      multiDragGroupIdsRef.current = groupIds;
+
+      // 拖拽效果设为 move，隐藏鼠标旁的加号图标
+      event.dataTransfer.effectAllowed = 'move';
+
+      if (!groupIds.length) return;
+
+      // 透明边框让浮层与光标保持间距
+      const preview = document.createElement('div');
+      Object.assign(preview.style, {
+        position: 'fixed',
+        top: '0',
+        left: '0',
+        borderLeft: '16px solid transparent',
+        borderTop: '8px solid transparent',
+        pointerEvents: 'none',
+        zIndex: '2147483647',
+      });
+      const bubble = document.createElement('div');
+      Object.assign(bubble.style, {
+        padding: '6px 12px',
+        borderRadius: '6px',
+        background: token.colorPrimary,
+        color: '#fff',
+        fontSize: '12px',
+        lineHeight: '1.5',
+        whiteSpace: 'nowrap',
+      });
+      bubble.textContent = $fmt({
+        id: 'common.selectedGroupCount',
+        values: { count: groupIds.length },
+      });
+      preview.appendChild(bubble);
+      document.body.appendChild(preview);
+      event.dataTransfer.setDragImage(preview, 0, 0);
+      setTimeout(() => preview.remove(), 0);
+    },
+    [$fmt, checkedGroupIds, token.colorPrimary, visibleGroups],
+  );
+  const handleTreeDragOver = useCallback<
+    NonNullable<TreeProps<TreeDataNodeUnion>['onDragOver']>
+  >(({ event }) => {
+    event.dataTransfer.dropEffect = 'move';
+  }, []);
+  const handleTreeDragEnd = useCallback(() => {
+    multiDragGroupIdsRef.current = [];
+  }, []);
 
   const titleRender = useCallback(
     (node: TreeDataNodeUnion) => (
@@ -190,28 +316,17 @@ function TreeBox() {
   );
 
   // treeNode 拖拽
-  const handleTreeNodeDrop: TreeDataHookProps['handleTreeNodeDrop'] = useCallback(
-    (...params) => {
-      homeEventEmitter.emit('home:treeDataHook', {
-        action: 'handleTreeNodeDrop',
-        params,
-      });
+  const onTreeDrop = useCallback<NonNullable<TreeProps<TreeDataNodeUnion>['onDrop']>>(
+    async info => {
+      const selectedGroupIds = multiDragGroupIdsRef.current;
+      multiDragGroupIdsRef.current = [];
+      const processedIds = await handleTreeNodeDrop(info, { selectedGroupIds });
+      if (processedIds?.length) {
+        setCheckedGroupIds(ids => ids.filter(id => !processedIds.includes(id)));
+      }
     },
-    [],
+    [handleTreeNodeDrop],
   );
-
-  const debounceResize = useMemo(
-    () =>
-      debounce(() => {
-        const listHeight = listRef.current?.offsetHeight || 400;
-        setTreeBoxHeight(listHeight);
-      }, 300),
-    [],
-  );
-
-  const handleResize = useCallback(() => {
-    debounceResize();
-  }, [debounceResize]);
 
   const setTreeSearchValue = useCallback(
     ({ value, callback }: { value: string; callback?: () => void }) => {
@@ -224,21 +339,17 @@ function TreeBox() {
   );
 
   useEffect(() => {
-    const listHeight = listRef.current?.offsetHeight || 400;
-    setTreeBoxHeight(listHeight);
     eventEmitter.on('home:set-tree-searchValue', setTreeSearchValue);
     eventEmitter.on('home:set-editing-status', setIsediting);
-    window.addEventListener('resize', handleResize);
     return () => {
       eventEmitter.off('home:set-tree-searchValue', setTreeSearchValue);
       eventEmitter.off('home:set-editing-status', setIsediting);
-      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
   return (
     <>
-      <Space size={8} direction="vertical">
+      <Space size={8} direction="vertical" style={{ flexShrink: 0 }}>
         <Space size={12}>
           <Typography.Text>{$fmt('common.filter')}:</Typography.Text>
           <Checkbox.Group
@@ -261,15 +372,37 @@ function TreeBox() {
           onSearch={onSearch}
         />
       </Space>
+      <TreeBatchActions
+        groupIds={selectedGroupIds}
+        total={visibleGroups.length}
+        onSelectAll={checked =>
+          setCheckedGroupIds(checked ? visibleGroups.map(group => String(group.key)) : [])
+        }
+        onProcessed={ids =>
+          setCheckedGroupIds(current => current.filter(id => !ids.includes(id)))
+        }
+        onBusyChange={setBatchBusy}
+      />
       <div ref={listRef} className="sidebar-tree-wrapper">
         <Spin spinning={loading} size="large">
           {searchTreeData?.length > 0 ? (
             <Tree
               ref={treeRef}
+              checkable
+              checkedKeys={checkedKeys}
+              onCheck={keys => {
+                if (batchBusy) return;
+                const checked = Array.isArray(keys) ? keys : keys.checked;
+                setCheckedGroupIds(
+                  visibleGroups
+                    .filter(group => checked.includes(group.key))
+                    .map(group => String(group.key)),
+                );
+              }}
               virtual={true}
               height={treeBoxHeight}
               draggable={draggableConfig}
-              allowDrop={checkAllowDrop}
+              allowDrop={allowTreeDrop}
               blockNode
               switcherIcon={<DownOutlined />}
               autoExpandParent
@@ -280,7 +413,10 @@ function TreeBox() {
               titleRender={titleRender}
               onExpand={setExpandedKeys}
               onSelect={onSelect}
-              onDrop={handleTreeNodeDrop}
+              onDragStart={handleTreeDragStart}
+              onDragOver={handleTreeDragOver}
+              onDragEnd={handleTreeDragEnd}
+              onDrop={onTreeDrop}
               onRightClick={onRightClick}
             />
           ) : (

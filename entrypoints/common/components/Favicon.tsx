@@ -1,9 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { LoadingOutlined } from '@ant-design/icons';
 import { classNames } from '~/entrypoints/common/utils/common';
-import { getFaviconUrl } from '~/entrypoints/common/utils/favicon';
-import faviconDefaultImage from '/icon/favicon-default.png';
+import {
+  defaultFaviconUrl,
+  getFaviconUrl,
+  getInitialFaviconUrl,
+} from '~/entrypoints/common/utils/favicon';
 
 const StyledFaviconBox = styled.div<{ $size?: number }>`
   flex: 0 0 ${props => props.$size}px;
@@ -32,42 +35,75 @@ export default function Favicon({
   size?: number;
 }) {
   const [loading, setLoading] = useState(true);
-  const [renderUrl, setRenderUrl] = useState('');
+  const [image, setImage] = useState({ url: '', requestId: 0 });
+  const requestIdRef = useRef(0);
+  const failedUrlsRef = useRef(new Set<string>());
 
   const onLoad = () => {
-    setLoading(false);
+    if (image.requestId === requestIdRef.current) setLoading(false);
   };
 
-  const onError = () => {
+  const onError = async () => {
     // console.log(`onError--${pageUrl}`);
-    setRenderUrl(faviconDefaultImage);
-    setLoading(false);
-  };
-
-  const init = async () => {
-    setLoading(true);
-
-    if (!pageUrl?.trim?.()) {
-      setRenderUrl(faviconDefaultImage);
+    const requestId = image.requestId;
+    if (requestId !== requestIdRef.current) return;
+    if (image.url === defaultFaviconUrl) {
       setLoading(false);
       return;
     }
-    const url = favIconUrl || (await getFaviconUrl(pageUrl));
-    setRenderUrl(url);
-    // src 未变化时不会触发 load 事件，需直接结束 loading
-    if (url === renderUrl) setLoading(false);
+    // 同一地址的重复 error 不启动并行恢复；后续候选失败时继续回退。
+    if (failedUrlsRef.current.has(image.url)) return;
+    const knownFailedUrl =
+      favIconUrl && failedUrlsRef.current.has(favIconUrl) ? favIconUrl : undefined;
+    failedUrlsRef.current.add(image.url);
+    setLoading(true);
+    const url = await getFaviconUrl(
+      pageUrl,
+      32,
+      [...failedUrlsRef.current],
+      knownFailedUrl,
+    );
+    if (requestId !== requestIdRef.current) return;
+    if (failedUrlsRef.current.has(url)) {
+      setImage({ url: defaultFaviconUrl, requestId });
+      setLoading(false);
+      return;
+    }
+    setImage({ url, requestId });
   };
 
   useEffect(() => {
-    init();
+    const requestId = ++requestIdRef.current;
+    failedUrlsRef.current = new Set();
+    setLoading(true);
+    setImage({ url: '', requestId });
+
+    const init = async () => {
+      if (!pageUrl?.trim?.()) {
+        setImage({ url: defaultFaviconUrl, requestId });
+        setLoading(false);
+        return;
+      }
+      const url = favIconUrl
+        ? await getInitialFaviconUrl(pageUrl, favIconUrl)
+        : await getFaviconUrl(pageUrl);
+      if (requestId !== requestIdRef.current) return;
+      if (favIconUrl && url !== favIconUrl) failedUrlsRef.current.add(favIconUrl);
+      setImage({ url, requestId });
+    };
+    void init();
+    return () => {
+      requestIdRef.current += 1;
+    };
   }, [pageUrl, favIconUrl]);
 
   return (
     <StyledFaviconBox className="favicon-box" $size={size}>
-      {renderUrl && (
+      {image.url && (
         <StyledFavicon
+          key={`${image.requestId}:${image.url}`}
           className={classNames('img-favicon', loading && 'loading')}
-          src={renderUrl}
+          src={image.url}
           onLoad={onLoad}
           onError={onError}
         />

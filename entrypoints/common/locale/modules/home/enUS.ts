@@ -1,6 +1,17 @@
 import { LocaleKey } from './zhCN';
 
 const enUS: Record<LocaleKey, string> = {
+  'home.treeNodeBatch.selectAll': 'Select All',
+  'home.treeNodeBatch.lockedTip': 'Remove: {editable} available, {count} locked',
+  'home.treeNodeBatch.removeConfirm': 'Remove {count} tab groups?{locked, plural, =0 {} one { # locked tab group will be skipped.} other { # locked tab groups will be skipped.}}',
+  'home.treeNodeBatch.open.current': 'Open in Current Window',
+  'home.treeNodeBatch.open.newWindow': 'Open in New Window',
+  'home.treeNodeBatch.open.incognito': 'Open in New Incognito Window',
+  'home.treeNodeBatch.incognitoPermission': 'Allow NiceTab to run in incognito windows in your extension settings first',
+  'home.treeNodeBatch.failed': 'Action incomplete. Unprocessed items have been kept. Please try again.',
+  'home.treeNodeBatch.opening': 'Opening tabs…',
+  'home.treeNodeBatch.helperNoTask': 'No pending task. You can close this page.',
+
   'home.tag': 'Tag',
   'home.tabGroup': 'Tab Group',
   'home.tab': 'Tab',
@@ -50,6 +61,7 @@ const enUS: Record<LocaleKey, string> = {
   'home.tabGroup.addGroupAfter': 'Create Group After',
   'home.tabGroup.tabsSortAsc': 'Title Ascending',
   'home.tabGroup.tabsSortDesc': 'Title Descending',
+  'home.tabGroup.tabsSortByDomain': 'Sort by Domain',
 
   'home.tabGroup.count': `{count, plural,
     =0 {No Groups}
@@ -128,6 +140,7 @@ const enUS: Record<LocaleKey, string> = {
     '1. If this option is checked, when moving tabs, tabs with the same URL in the target group will be de-duplicated.',
   'home.moveTo.mergeTip.2':
     '2. If this option is checked, when moving a tab group, it will be merged into the group with the same name in the target category (tag).',
+  'home.moveTo.mergeTip.3': '3. If the destination contains a locked tab group with the same name, the incoming group is added separately.',
   'home.tip.tooManyTabs':
     'The number of tabs exceeds the set value, enabling virtual scrolling.',
   'home.tip.addScope':

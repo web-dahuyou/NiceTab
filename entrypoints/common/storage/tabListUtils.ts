@@ -2,11 +2,13 @@ import { Key } from 'react';
 import { Tabs } from 'wxt/browser';
 // import { storage } from 'wxt/storage';
 import dayjs from 'dayjs';
+import { getDomain } from 'tldts';
 import {
   // attachInstruction,
   extractInstruction,
   type Instruction,
 } from '@atlaskit/pragmatic-drag-and-drop-hitbox/tree-item';
+
 import type {
   SendTargetProps,
   TagItem,
@@ -20,6 +22,7 @@ import type {
 } from '~/entrypoints/types';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import type { DragData } from '~/entrypoints/common/components/DndComponent';
+
 import { ENUM_SETTINGS_PROPS, UNNAMED_TAG, UNNAMED_GROUP } from '../constants';
 import {
   isGroupSupported,
@@ -31,7 +34,9 @@ import {
   getMergedList,
 } from '../utils';
 import { openNewTab } from '../tabs';
+
 import Store from './instanceStore';
+import { requestTabListRepair } from './batchRemoval';
 
 const {
   OPENING_TABS_ORDER,
@@ -186,6 +191,50 @@ export function getCloneGroup(group: GroupItem) {
   };
 }
 
+// 按插入位置和星标排序，返回实际插入或合并后的首个目标组 ID。
+function insertMovedGroups(
+  targetList: GroupItem[],
+  groups: GroupItem[],
+  insertPosition: InsertPositions,
+  autoMerge: boolean,
+) {
+  const ordered =
+    insertPosition === 'top' ? [...groups, ...targetList] : [...targetList, ...groups];
+  let groupList = ordered;
+  let targetGroupId = groups[0].groupId;
+  if (autoMerge) {
+    // 仅合并本次操作涉及的名称；目标中有锁定同名组时，每个组都独立保留。
+    const mergeNames = new Set(groups.map(group => group.groupName));
+    const targetByName = new Map<string, GroupItem>();
+    for (const group of targetList) {
+      if (group.isLocked) mergeNames.delete(group.groupName);
+      if (!targetByName.has(group.groupName)) targetByName.set(group.groupName, group);
+    }
+    const merged = new Map<string, GroupItem>();
+    groupList = [];
+    for (const group of ordered) {
+      if (!mergeNames.has(group.groupName)) {
+        groupList.push(group);
+        continue;
+      }
+      const existing = merged.get(group.groupName);
+      if (existing) {
+        existing.tabList = getUniqueList([...existing.tabList, ...group.tabList], 'url');
+      } else {
+        const item = {
+          ...group,
+          groupId: targetByName.get(group.groupName)?.groupId ?? group.groupId,
+        };
+        merged.set(group.groupName, item);
+        groupList.push(item);
+      }
+    }
+    targetGroupId = merged.get(groups[0].groupName)?.groupId || groups[0].groupId;
+  }
+
+  return { groupList: sortbyStarred(groupList), targetGroupId };
+}
+
 // tab列表工具类 (tag: 分类， tabGroup: 标签组， tab: 标签页)
 export default class TabListUtils {
   tagList: TagItem[] = [];
@@ -195,6 +244,8 @@ export default class TabListUtils {
     tabCount: 0,
   };
   storageKey: `local:${string}` = 'local:tabList';
+
+  requestRepair = requestTabListRepair;
 
   // 特殊的分类：中转站
   createStagingAreaTag(): TagItem {
@@ -228,27 +279,44 @@ export default class TabListUtils {
       }
     }, []);
   }
-  async getTagList() {
-    let tagList = await storage.getItem<TagItem[]>(this.storageKey);
-    const staticIndex = tagList?.findIndex(tag => tag.static) ?? -1;
-    // 必须保证中转站排在第一位
-    if (!tagList?.length || staticIndex == -1) {
-      tagList = [this.createStagingAreaTag(), ...(tagList || [])];
-      await this.setTagList(tagList);
-    } else if (staticIndex > 0) {
-      const staticTag = tagList.splice(staticIndex, 1);
-      tagList = [staticTag[0], ...tagList];
-      await this.setTagList(tagList);
+  protected normalizeTagList(list: TagItem[]) {
+    // 旧版或导入的数据可以省略空列表。正常数据保留原引用，避免读取触发写入。
+    if (list.some(tag => !tag.groupList || tag.groupList.some(group => !group.tabList))) {
+      list = list.map(tag => {
+        if (!tag.groupList) return { ...tag, groupList: [] };
+        if (tag.groupList.every(group => group.tabList)) return tag;
+        return {
+          ...tag,
+          groupList: tag.groupList.map(group =>
+            group.tabList ? group : { ...group, tabList: [] },
+          ),
+        };
+      });
     }
-
-    this.tagList = tagList;
-    this.setCountInfo();
-    return this.tagList;
+    const index = list.findIndex(tag => tag.static);
+    if (index === 0) return list;
+    if (index < 0) return [this.createStagingAreaTag(), ...list];
+    return [list[index], ...list.slice(0, index), ...list.slice(index + 1)];
   }
-  async setTagList(list?: TagItem[]) {
-    this.tagList = list?.length ? list : [this.createStagingAreaTag()];
+  private async readTagList() {
+    const stored = (await storage.getItem<TagItem[]>(this.storageKey)) || [];
+    const tagList = this.normalizeTagList(stored);
+    this.updateTagListCache(tagList);
+    return { tagList, needsRepair: tagList !== stored };
+  }
+  async getTagList() {
+    const { tagList, needsRepair } = await this.readTagList();
+    if (!needsRepair) return tagList;
+    await this.requestRepair();
+    return (await this.readTagList()).tagList;
+  }
+  async setTagList(list: TagItem[] = []) {
+    this.updateTagListCache(this.normalizeTagList(list));
+    return storage.setItem(this.storageKey, this.tagList);
+  }
+  protected updateTagListCache(list: TagItem[]) {
+    this.tagList = list;
     this.setCountInfo();
-    storage.setItem(this.storageKey, this.tagList);
   }
   setCountInfo() {
     let tagCount = 0,
@@ -422,6 +490,57 @@ export default class TabListUtils {
     }
     await this.setTagList(tagList);
   }
+  // 批量删除标签组：一次读取、一次写入，避免逐个读写导致的数据覆盖
+  // 返回实际删除的标签组 id（锁定分类、锁定标签组会被跳过）
+  async removeTabGroups(groupIds: Key[]) {
+    const idSet = new Set((groupIds || []).map(id => String(id)));
+
+    const { tagList, needsRepair } = await this.readTagList();
+    const nextList = [...tagList];
+    const removedIds: string[] = [];
+    const recycleTags: TagItem[] = [];
+
+    for (const [index, tag] of tagList.entries()) {
+      if (tag.isLocked) continue;
+      const removedGroups = tag.groupList.filter(
+        group => idSet.has(String(group.groupId)) && !group.isLocked,
+      );
+      if (!removedGroups.length) continue;
+
+      const removedGroupIds = new Set(removedGroups.map(group => group.groupId));
+      nextList[index] = {
+        ...tag,
+        groupList: tag.groupList.filter(group => !removedGroupIds.has(group.groupId)),
+      };
+      removedIds.push(...removedGroups.map(group => group.groupId));
+
+      if (this.constructor === TabListUtils) {
+        const recycledGroups = removedGroups.filter(group => group?.tabList?.length > 0);
+        if (recycledGroups.length) {
+          recycleTags.push({ ...tag, groupList: recycledGroups });
+        }
+      }
+    }
+
+    if (!removedIds.length) {
+      if (needsRepair) await this.setTagList(tagList);
+      return removedIds;
+    }
+
+    if (recycleTags.length) {
+      const bin = Store.recycleBinUtils;
+      const recycledList = await bin.getListWithAddedTags(recycleTags);
+      await storage.setItems([
+        { key: this.storageKey, value: nextList },
+        { key: bin.storageKey, value: recycledList },
+      ]);
+      bin.updateTagListCache(recycledList);
+    } else {
+      await storage.setItem(this.storageKey, nextList);
+    }
+    this.updateTagListCache(nextList);
+    return removedIds;
+  }
   // 复制标签组
   async cloneGroup(groupId: string) {
     const settings = await Store.settingsUtils.getSettings();
@@ -551,6 +670,82 @@ export default class TabListUtils {
     await this.setTagList(tagList);
   }
 
+  // 多选标签组拖拽（支持跨分类与分类内精确落点）
+  async onTabGroupsDrop({
+    sourceGroupIds,
+    targetTagId,
+    destination,
+  }: {
+    sourceGroupIds: Key[];
+    targetTagId: Key;
+    destination: { groupId: Key; after: boolean } | { atEnd: boolean };
+  }): Promise<{ processedIds: string[] }> {
+    const tagList = await this.getTagList();
+    const selected = new Set(sourceGroupIds.map(String));
+    const targetTagIndex = tagList.findIndex(
+      tag => String(tag.tagId) === String(targetTagId),
+    );
+    const targetTag = tagList[targetTagIndex];
+    // 锁定分类不能作为拖拽目标，也不能拖出其中的标签组
+    if (!targetTag || targetTag.isLocked || !selected.size) {
+      return { processedIds: [] };
+    }
+
+    // 用完整分类中的标签组 ID 定位，避免搜索或筛选改变落点下标
+    let targetIndex: number;
+    if ('groupId' in destination) {
+      const groupIndex = targetTag.groupList.findIndex(
+        group => String(group.groupId) === String(destination.groupId),
+      );
+      if (groupIndex === -1) return { processedIds: [] };
+      targetIndex = destination.after ? groupIndex + 1 : groupIndex;
+    } else {
+      targetIndex = destination.atEnd ? targetTag.groupList.length : 0;
+    }
+
+    // 目标分类内位于落点前的勾选项，移除后需要修正插入位置
+    const removedBeforeTarget = targetTag.groupList
+      .slice(0, targetIndex)
+      .filter(group => selected.has(String(group.groupId))).length;
+
+    const groups: GroupItem[] = [];
+    const nextList = tagList.map(tag => {
+      // 锁定分类中暂存的标签组不参与拖拽
+      if (tag.isLocked) return tag;
+      const remaining = tag.groupList.filter(group => {
+        if (!selected.has(String(group.groupId))) return true;
+        groups.push(group);
+        return false;
+      });
+      return remaining.length === tag.groupList.length
+        ? tag
+        : { ...tag, groupList: remaining };
+    });
+
+    if (!groups.length) return { processedIds: [] };
+
+    const nextTarget = nextList[targetTagIndex];
+    const insertIndex = targetIndex - removedBeforeTarget;
+    const groupList = [...nextTarget.groupList];
+    groups.forEach((group, offset) => {
+      const index = Math.min(insertIndex + offset, groupList.length);
+      const prevGroup = groupList[index - 1];
+      const nextGroup = groupList[index];
+      const moved = { ...group };
+      // 与单个拖拽保持一致：按落点相邻标签组的星标状态修正
+      if (nextGroup?.isStarred) {
+        moved.isStarred = true;
+      } else if (index > 0 && !prevGroup?.isStarred) {
+        moved.isStarred = false;
+      }
+      groupList.splice(index, 0, moved);
+    });
+    nextList[targetTagIndex] = { ...nextTarget, groupList };
+
+    await this.setTagList(nextList);
+    return { processedIds: groups.map(group => group.groupId) };
+  }
+
   // 标签组上移、下移
   async tabGroupMove(direction: 'up' | 'down', tagId: Key, groupId: Key) {
     const tagList = await this.getTagList();
@@ -598,154 +793,87 @@ export default class TabListUtils {
 
     await this.setTagList(tagList);
   }
-  // 标签组移动到（穿越）
-  async tabGroupMoveThrough({
-    sourceGroupId,
+  // 单组、多选和整分类共用一次列表读取与写入。
+  async tabGroupsMoveThrough({
+    sourceGroupIds,
+    sourceTagId,
     targetTagId,
     isCopy = false,
     autoMerge = false,
+  }: (
+    | { sourceGroupIds: Key[]; sourceTagId?: never }
+    | { sourceTagId: Key; sourceGroupIds?: never }
+  ) & {
+    targetTagId: Key;
+    isCopy?: boolean;
+    autoMerge?: boolean;
+  }) {
+    const { tagList, needsRepair } = await this.readTagList();
+    const target = tagList.find(tag => tag.tagId === targetTagId);
+    const processedIds: string[] = [];
+    const skipped = { processedIds, targetGroupId: undefined };
+
+    const selected = sourceGroupIds && new Set(sourceGroupIds);
+    const groups: GroupItem[] = [];
+    const nextList = tagList.map(tag => {
+      if (!target || target.isLocked || tag.isLocked || (!isCopy && tag === target))
+        return tag;
+      if (!selected && tag.tagId !== sourceTagId) return tag;
+
+      const remaining = tag.groupList.filter(group => {
+        if (selected && !selected.has(group.groupId)) return true;
+        processedIds.push(group.groupId);
+        groups.push(isCopy ? getCloneGroup(group) : group);
+        return isCopy;
+      });
+      return isCopy ? tag : { ...tag, groupList: remaining };
+    });
+    if (!target || !groups.length) {
+      if (needsRepair) {
+        await this.requestRepair();
+        await this.readTagList();
+      }
+      return skipped;
+    }
+
+    const settings = await Store.settingsUtils.getSettings();
+    const insertPosition = settings?.[GROUP_INSERT_POSITION] || 'top';
+    const { groupList, targetGroupId: firstGroupId } = insertMovedGroups(
+      target.groupList,
+      groups,
+      insertPosition,
+      autoMerge,
+    );
+    nextList[tagList.indexOf(target)] = { ...target, groupList };
+    await storage.setItem(this.storageKey, nextList);
+    this.updateTagListCache(nextList);
+    return { processedIds, targetGroupId: firstGroupId };
+  }
+
+  async tabGroupMoveThrough({
+    sourceGroupId,
+    ...options
   }: {
     sourceGroupId: Key;
     targetTagId: Key;
     isCopy?: boolean;
     autoMerge?: boolean;
   }) {
-    const tagList = await this.getTagList();
-    let isSourceFound = false,
-      isTargetFound = false,
-      sourceTagIndex = 0,
-      sourceGroupIndex = 0,
-      targetTagIndex = 0,
-      sourceGroup = null;
-    for (let tIndex = 0; tIndex < tagList.length; tIndex++) {
-      const tag = tagList[tIndex];
-      if (tag.tagId === targetTagId) {
-        isTargetFound = true;
-        targetTagIndex = tIndex;
-      }
-      for (let gIndex = 0; gIndex < tag?.groupList?.length; gIndex++) {
-        const group = tag?.groupList?.[gIndex];
-        if (group.groupId === sourceGroupId) {
-          isSourceFound = true;
-          sourceTagIndex = tIndex;
-          sourceGroupIndex = gIndex;
-          sourceGroup = group;
-          break;
-        }
-      }
-
-      if (isSourceFound && isTargetFound) break;
-    }
-
-    if (isSourceFound && isTargetFound && sourceGroup) {
-      const sourceTag = tagList?.[sourceTagIndex];
-      if (!isCopy) {
-        sourceTag?.groupList?.splice(sourceGroupIndex, 1);
-      }
-
-      const targetTag = tagList?.[targetTagIndex];
-      const sameNameGroupIndex = targetTag?.groupList?.findIndex(
-        g => g.groupName === sourceGroup?.groupName,
-      );
-
-      const settings = await Store.settingsUtils.getSettings();
-      const insertPosition = settings?.[GROUP_INSERT_POSITION] || 'top';
-      const targetGroup = isCopy ? getCloneGroup(sourceGroup) : { ...sourceGroup };
-
-      // 如果开启自动合并，则同名标签组会自动合并
-      if (autoMerge && ~sameNameGroupIndex) {
-        const targetSameNameGroup = targetTag?.groupList[sameNameGroupIndex];
-
-        targetTag.groupList = mergeGroupsAndTabs({
-          targetList: targetTag.groupList || [],
-          insertList: [targetGroup],
-          // exceptValue: UNNAMED_GROUP,
-          insertPosition,
-        });
-        await this.setTagList(tagList);
-        return { targetGroupId: targetSameNameGroup.groupId };
-      } else {
-        targetTag.groupList = this.groupListSortbyStarred({
-          list: targetTag?.groupList,
-          insertList: [targetGroup],
-          insertPosition,
-        });
-
-        await this.setTagList(tagList);
-        return { targetGroupId: targetGroup.groupId };
-      }
-    }
-
-    await this.setTagList(tagList);
-    return { targetGroupId: undefined };
+    const { targetGroupId } = await this.tabGroupsMoveThrough({
+      ...options,
+      sourceGroupIds: [sourceGroupId],
+    });
+    return { targetGroupId };
   }
-  // 当前分类中所有标签组移动到（穿越）
-  async allTabGroupsMoveThrough({
-    sourceTagId,
-    targetTagId,
-    isCopy = false,
-    autoMerge = false,
-  }: {
+
+  async allTabGroupsMoveThrough(options: {
     sourceTagId: Key;
     targetTagId: Key;
     isCopy?: boolean;
     autoMerge?: boolean;
   }) {
-    const tagList = await this.getTagList();
-    let isSourceFound = false,
-      isTargetFound = false,
-      sourceTagIndex = 0,
-      targetTagIndex = 0;
-    for (let tIndex = 0; tIndex < tagList.length; tIndex++) {
-      const tag = tagList[tIndex];
-      if (tag.tagId === targetTagId) {
-        isTargetFound = true;
-        targetTagIndex = tIndex;
-      }
-      if (tag.tagId === sourceTagId) {
-        isSourceFound = true;
-        sourceTagIndex = tIndex;
-      }
-
-      if (isSourceFound && isTargetFound) break;
-    }
-
-    if (isSourceFound && isTargetFound) {
-      const sourceTag = tagList?.[sourceTagIndex];
-      let allSourceGroups: GroupItem[] = [];
-      if (isCopy) {
-        allSourceGroups = sourceTag.groupList?.map(group => getCloneGroup(group));
-      } else {
-        allSourceGroups = sourceTag.groupList?.splice(0);
-      }
-      const targetTag = tagList?.[targetTagIndex];
-
-      const settings = await Store.settingsUtils.getSettings();
-      const insertPosition = settings?.[GROUP_INSERT_POSITION] || 'top';
-      // 如果开启自动合并，则同名标签组会自动合并
-      if (autoMerge) {
-        targetTag.groupList = mergeGroupsAndTabs({
-          targetList: targetTag.groupList || [],
-          insertList: allSourceGroups,
-          // exceptValue: UNNAMED_GROUP,
-          insertPosition,
-        });
-
-        await this.setTagList(tagList);
-      } else {
-        targetTag.groupList = this.groupListSortbyStarred({
-          list: targetTag?.groupList,
-          insertList: allSourceGroups,
-          insertPosition,
-        });
-        await this.setTagList(tagList);
-      }
-
-      return { targetTagId: targetTag.tagId };
-    }
-
-    await this.setTagList(tagList);
-    return { targetTagId: undefined };
+    const { processedIds } = await this.tabGroupsMoveThrough(options);
+    return { targetTagId: processedIds.length ? options.targetTagId : undefined };
   }
   // 标签组按名称排序
   async groupListSortbyName(sortType: string, tagId: Key) {
@@ -1051,7 +1179,11 @@ export default class TabListUtils {
     }
   }
   // 删除标签页: filterFlag 是否过滤空分类、标签组 (列表页保留空分类、标签组；回收站中不保留)
-  async removeTabs(groupId: Key, tabs: TabItem[], filterFlag = false) {
+  async removeTabs(
+    groupId: Key,
+    tabs: TabItem[],
+    options: boolean | { skipLocked: true } = false,
+  ) {
     const tagList = await this.getTagList();
     const tabIds = tabs.map(tab => tab.tabId);
     let tag = undefined,
@@ -1063,6 +1195,12 @@ export default class TabListUtils {
       for (let i = 0; i < t.groupList?.length; i++) {
         const g = t.groupList[i];
         if (g.groupId === groupId) {
+          if (
+            typeof options === 'object' &&
+            options.skipLocked &&
+            (t.isLocked || g.isLocked)
+          )
+            return;
           tag = t;
           group = g;
           g.tabList = g.tabList?.filter(tab => !tabIds.includes(tab.tabId));
@@ -1079,7 +1217,7 @@ export default class TabListUtils {
       }
     }
 
-    await this.setTagList(filterFlag ? this.getFilteredTagList(tagList) : tagList);
+    await this.setTagList(options === true ? this.getFilteredTagList(tagList) : tagList);
 
     if (this.constructor === TabListUtils) {
       if (!tag || !group) return;
@@ -1547,6 +1685,39 @@ export default class TabListUtils {
         }
       }
     }
+
+    await this.setTagList(tagList);
+  }
+
+  // 标签页先按主域名、再按子域名升序排序，同域名保留原顺序，无域名的链接排在末尾
+  async tabsSortbyDomain(groupId: Key, tagId: Key) {
+    const tagList = await this.getTagList();
+    const tag = tagList.find(item => item.tagId === tagId);
+    const group = tag?.groupList?.find(item => item.groupId === groupId);
+    if (!group || tag?.isLocked || group.isLocked) return;
+
+    group.tabList = group.tabList
+      ?.map(tab => {
+        let domain = '';
+        try {
+          domain = new URL(tab.url || '').hostname.toLowerCase();
+        } catch {
+          // 无效 URL 与无域名的链接统一排在末尾
+        }
+        const baseDomain = domain ? getDomain(domain) || domain : '';
+        const subdomain =
+          domain === baseDomain ? '' : domain.slice(0, -(baseDomain.length + 1));
+        return { tab, domain, baseDomain, subdomain };
+      })
+      .sort((a, b) => {
+        if (!a.domain) return b.domain ? 1 : 0;
+        if (!b.domain) return -1;
+        return (
+          a.baseDomain.localeCompare(b.baseDomain) ||
+          a.subdomain.localeCompare(b.subdomain)
+        );
+      })
+      .map(item => item.tab);
 
     await this.setTagList(tagList);
   }

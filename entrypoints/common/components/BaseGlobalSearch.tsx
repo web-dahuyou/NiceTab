@@ -1,4 +1,11 @@
-import { useState, useCallback, useRef, forwardRef, useImperativeHandle } from 'react';
+import {
+  createContext,
+  useState,
+  useCallback,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
 import {
   theme,
   Select,
@@ -20,11 +27,13 @@ import {
   ExportOutlined,
 } from '@ant-design/icons';
 import { debounce, groupBy } from 'lodash-es';
+
+import { tabTarget, type OpenMode } from '~/entrypoints/common/openUtils';
 import { pick, sendRuntimeMessage } from '~/entrypoints/common/utils';
 import { ENUM_COLORS, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls, eventEmitter } from '~/entrypoints/common/hooks/global';
-import { settingsUtils } from '~/entrypoints/common/storage';
-import { openNewTab, updateAdminPageUrlDebounced } from '~/entrypoints/common/tabs';
+import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
+import { updateAdminPageUrlDebounced } from '~/entrypoints/common/tabs';
 import { ContentGlobalContext } from '~/entrypoints/content/context';
 import {
   StyledEllipsis,
@@ -37,9 +46,10 @@ import type {
   TabItem,
   SendTabMsgEventProps,
 } from '~/entrypoints/types';
-import { tabListUtils } from '../storage';
-import ActionIconBtn from './ActionIconBtn.tsx';
 import { eventEmitter as homeEventEmitter } from '~/entrypoints/options/home/hooks/homeCustomEvent';
+
+import { OpenModeMenu, useOpenSavedTabs } from './OpenModeMenu';
+import ActionIconBtn from './ActionIconBtn.tsx';
 
 const { GLOBAL_SEARCH_DELETE_AFTER_OPEN, DISCARD_WHEN_OPEN_TABS, OPENING_TABS_ORDER } =
   ENUM_SETTINGS_PROPS;
@@ -119,6 +129,8 @@ export const StyledListItem = styled.div`
   }
 `;
 
+const SearchModalContext = createContext(false);
+
 export function SearchListItem({
   option,
   actionMode = 'goto',
@@ -137,14 +149,12 @@ export function SearchListItem({
     return selectedTabIds.includes(option.tabId);
   }, [selectedTabIds, option.tabId]);
 
-  const handleTabOpen = useCallback(
-    (e: React.MouseEvent<HTMLElement>) => {
-      e.stopPropagation();
-      onAction?.('open', option);
-    },
-    [onAction, option],
-  );
-
+  const inSearchModal = useContext(SearchModalContext);
+  const openSaved = useOpenSavedTabs();
+  const open = async (mode?: OpenMode) => {
+    const result = await openSaved([tabTarget(option, { active: true })], mode);
+    if (result.processedIds.length) onAction?.('open', option);
+  };
   return (
     <StyledListItem
       className="search-list-item"
@@ -184,17 +194,38 @@ export function SearchListItem({
             // onClick={() => onAction?.('tab', option)}
           >
             <span className="text">{option.title}</span>
-            <StyledActionIconBtn
-              as="a"
-              className="icon-open"
-              title={$fmt('common.open')}
-              $hoverColor={token.colorPrimary}
-              href={option.url}
-              target="_blank"
-              onClick={handleTabOpen}
-            >
-              <ExportOutlined />
-            </StyledActionIconBtn>
+            {!inSearchModal && (
+              <StyledActionIconBtn
+                as="a"
+                className="icon-open"
+                title={$fmt('common.open')}
+                $hoverColor={token.colorPrimary}
+                href={option.url}
+                target="_blank"
+                onClick={e => {
+                  e.stopPropagation();
+                  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)
+                    onAction?.('open', option);
+                  else {
+                    e.preventDefault();
+                    open();
+                  }
+                }}
+              >
+                <ExportOutlined />
+              </StyledActionIconBtn>
+            )}
+            <OpenModeMenu onOpen={open}>
+              {inSearchModal && (
+                <StyledActionIconBtn
+                  className="icon-open"
+                  title={$fmt('common.open')}
+                  $hoverColor={token.colorPrimary}
+                >
+                  <ExportOutlined />
+                </StyledActionIconBtn>
+              )}
+            </OpenModeMenu>
           </div>
         </div>
         <div className="tab-url" title={option.url}>
@@ -275,7 +306,8 @@ export function useSearchAction({
             ) {
               result.push({
                 ...pick(tag, ['tagId', 'tagName', 'static']),
-                ...pick(group, ['groupId', 'groupName', 'isLocked']),
+                ...pick(group, ['groupId', 'groupName']),
+                isLocked: tag.isLocked || group.isLocked,
                 ...pick(tab, ['tabId', 'title', 'url']),
               });
             }
@@ -481,6 +513,8 @@ export const GlobalSearchBox = forwardRef(
     ref,
   ) => {
     const { $fmt } = useIntlUtls();
+    const openSaved = useOpenSavedTabs();
+    const inSearchModal = useContext(SearchModalContext);
     const selectRef = useRef<RefSelectProps>(null);
     const searchListRef = useRef<HTMLDivElement>(null);
     const [selectSwitch, setSelectSwitch] = useState(false);
@@ -500,7 +534,7 @@ export const GlobalSearchBox = forwardRef(
     });
 
     const handleBatchAction = useCallback(
-      async (batchActionType: BatchActionType) => {
+      async (batchActionType: BatchActionType, mode?: OpenMode) => {
         if (batchActionType === 'remove') {
           const groupByList = groupBy(selectedItems, 'groupId');
           for (const [groupId, items] of Object.entries(groupByList)) {
@@ -519,26 +553,30 @@ export const GlobalSearchBox = forwardRef(
           const discard = settings?.[DISCARD_WHEN_OPEN_TABS];
           const openTabsOrder = settings?.[OPENING_TABS_ORDER];
           const groupByList = groupBy(selectedItems, 'groupId');
-          for (const [groupId, items] of Object.entries(groupByList)) {
-            const _items = openTabsOrder === 'reverse' ? [...items].reverse() : items;
-            _items.forEach(item => {
-              item.url && openNewTab(item.url, { discard });
-            });
-
-            if (autoDelete && !items[0]?.isLocked) {
-              await tabListUtils.removeTabs(
-                groupId,
-                items.map(item => pick(item, ['tabId', 'title', 'url'])),
+          const targets = Object.values(groupByList).flatMap(items =>
+            (openTabsOrder === 'reverse' ? [...items].reverse() : items).map(item =>
+              tabTarget(item, { discard }),
+            ),
+          );
+          const result = await openSaved(targets, mode, true);
+          const opened = new Set(result.processedIds);
+          if (autoDelete && opened.size) {
+            for (const [groupId, items] of Object.entries(groupByList)) {
+              const removable = items.filter(
+                item => !item.isLocked && opened.has(item.tabId),
               );
-              setSelectedItems([]);
-              await refreshData();
+              if (removable.length)
+                await tabListUtils.removeTabs(groupId, removable, { skipLocked: true });
             }
+            await refreshData();
+            setSelectedItems(selectedItems.filter(item => !opened.has(item.tabId)));
           }
+          if (result.failed) return;
         }
 
         onBatchAction?.(batchActionType);
       },
-      [selectedItems, setSelectedItems, refreshData, onBatchAction],
+      [selectedItems, setSelectedItems, refreshData, onBatchAction, openSaved],
     );
 
     useImperativeHandle(ref, () => ({
@@ -588,15 +626,29 @@ export const GlobalSearchBox = forwardRef(
                   >
                     <DeleteOutlined />
                   </ActionIconBtn>
-                  <ActionIconBtn
-                    className="action-btn btn-open"
-                    label={$fmt('common.open')}
-                    btnStyle="icon"
-                    size={16}
-                    onClick={() => handleBatchAction('open')}
-                  >
-                    <ExportOutlined />
-                  </ActionIconBtn>
+                  {!inSearchModal && (
+                    <ActionIconBtn
+                      className="action-btn btn-open"
+                      label={$fmt('common.open')}
+                      btnStyle="icon"
+                      size={16}
+                      onClick={() => handleBatchAction('open')}
+                    >
+                      <ExportOutlined />
+                    </ActionIconBtn>
+                  )}
+                  <OpenModeMenu onOpen={mode => handleBatchAction('open', mode)}>
+                    {inSearchModal && (
+                      <ActionIconBtn
+                        className="action-btn btn-open"
+                        label={$fmt('common.open')}
+                        btnStyle="icon"
+                        size={16}
+                      >
+                        <ExportOutlined />
+                      </ActionIconBtn>
+                    )}
+                  </OpenModeMenu>
                 </Space>
               )}
             </>
@@ -673,7 +725,9 @@ export const GlobalSearchPanel = forwardRef(
         if (type === 'open') {
           const settings = await settingsUtils.getSettings();
           if (!isLocked && settings?.[GLOBAL_SEARCH_DELETE_AFTER_OPEN]) {
-            await tabListUtils.removeTabs(groupId!, [{ tabId: tabId!, title, url }]);
+            await tabListUtils.removeTabs(groupId!, [{ tabId: tabId!, title, url }], {
+              skipLocked: true,
+            });
             if (pageContext === 'optionsPage') {
               updateAdminPageUrlDebounced();
             } else {
@@ -832,16 +886,18 @@ export const GlobalSearchPanel = forwardRef(
         onCancel={handleClose}
       >
         <StyledGlobalSearchBox className="global-search-panel" height={listHeight + 90}>
-          <GlobalSearchBox
-            ref={searchBoxRef}
-            tagList={tagList}
-            inputWidth="100%"
-            listWidth={true}
-            listHeight={listHeight || 450}
-            open
-            onAction={handleAction}
-            onBatchAction={handleBatchAction}
-          ></GlobalSearchBox>
+          <SearchModalContext.Provider value={true}>
+            <GlobalSearchBox
+              ref={searchBoxRef}
+              tagList={tagList}
+              inputWidth="100%"
+              listWidth={true}
+              listHeight={listHeight || 450}
+              open
+              onAction={handleAction}
+              onBatchAction={handleBatchAction}
+            ></GlobalSearchBox>
+          </SearchModalContext.Provider>
         </StyledGlobalSearchBox>
       </Modal>
     );

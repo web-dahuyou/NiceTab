@@ -1,6 +1,17 @@
 import { LocaleKey } from './zhCN';
 
 const zhTW: Record<LocaleKey, string> = {
+  'home.treeNodeBatch.selectAll': '全選',
+  'home.treeNodeBatch.lockedTip': '刪除：{editable}個可操作，{count}個已鎖定',
+  'home.treeNodeBatch.removeConfirm': '確定刪除 {count} 個標籤群組嗎？{locked, plural, =0 {} other {將略過 # 個鎖定標籤群組。}}',
+  'home.treeNodeBatch.open.current': '在目前視窗開啟',
+  'home.treeNodeBatch.open.newWindow': '在新視窗開啟',
+  'home.treeNodeBatch.open.incognito': '在新無痕視窗開啟',
+  'home.treeNodeBatch.incognitoPermission': '請先在擴充功能管理中允許 NiceTab 在無痕視窗執行',
+  'home.treeNodeBatch.failed': '操作未完成，未處理的項目已保留，請重試',
+  'home.treeNodeBatch.opening': '正在開啟分頁…',
+  'home.treeNodeBatch.helperNoTask': '沒有待處理的開啟任務，可以直接關閉此頁面。',
+
   "home.tag": "分類",
   "home.tabGroup": "標籤組",
   "home.tab": "分頁",
@@ -50,6 +61,7 @@ const zhTW: Record<LocaleKey, string> = {
   "home.tabGroup.addGroupAfter": "在下方新建標籤組",
   "home.tabGroup.tabsSortAsc": "標籤名稱遞增",
   "home.tabGroup.tabsSortDesc": "標籤名稱遞減",
+  "home.tabGroup.tabsSortByDomain": "按網域排序",
   "home.tabGroup.count": "{count}個分頁群組",
   "home.tabGroup.name": "標籤組名稱",
   "home.tabGroup.createTime": "創建時間",
@@ -110,6 +122,7 @@ const zhTW: Record<LocaleKey, string> = {
   "home.moveTo.mergeLabel": "是否合併重複項",
   "home.moveTo.mergeTip.1": "1、勾選後，如果移動分頁，則與目標分組中相同 url 的分頁合併（去除重複）。",
   "home.moveTo.mergeTip.2": "2、勾选后，如果移動分頁群組，則與目標分類中同名的分頁群組合併，分頁去除重複。",
+  "home.moveTo.mergeTip.3": "3、目標分類中有鎖定的同名分頁群組時，移入或複製的分頁群組會獨立插入。",
   "home.tip.tooManyTabs": "目前分類中分頁数量超過預定值, 已開啟虚拟滚動。",
   "home.tip.addScope": "下一個版本將添加快速鍵等功能，需要新增授權，新版本發布後可能會自動停用，如需繼續使用請手動起用。",
   'home.tip.multiSelection': 'Shift多選：第一步，Shift + Click A (高亮顯示A) 。第二步，Shift + Click B (A到B全被選中)。Shift多選操作也適用於頁面中間的標籤頁列表',

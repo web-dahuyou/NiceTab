@@ -1,5 +1,6 @@
 // import { storage } from 'wxt/storage';
 import dayjs from 'dayjs';
+
 import type { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
 
 import Store from './instanceStore';
@@ -21,28 +22,28 @@ export default class RecycleBinUtils extends TabListUtils {
     this.checkAndClear();
   }
 
-  async getTagList() {
-    const tagList = await storage.getItem<TagItem[]>(this.storageKey);
-    this.tagList = tagList || [];
-    this.setCountInfo();
-    return this.tagList;
-  }
-  async setTagList(list?: TagItem[]) {
-    this.tagList = list || [];
-    this.setCountInfo();
-    storage.setItem(this.storageKey, this.tagList);
+  // 回收站只保存实际回收的分类，可以为空。
+  protected normalizeTagList(list: TagItem[]) {
+    return list;
   }
 
   // 批量添加分类
   async addTags(tags: TagItem[]) {
     if (!tags?.length) return [];
-    let tagList = await this.getTagList();
+    await this.setTagList(await this.getListWithAddedTags(tags));
+  }
+  async getListWithAddedTags(tags: TagItem[]) {
+    const storedList = await this.getTagList();
+    let tagList = storedList.map(tag => ({
+      ...tag,
+      groupList: (tag.groupList ?? []).map(group => ({ ...group })),
+    }));
     for (let index = tags.length - 1; index >= 0; index--) {
       const tag = tags[index];
       tagList = this.addTabGroupsBasic(tagList, tag, tag.groupList);
     }
 
-    await this.setTagList(tagList);
+    return tagList;
   }
   // 还原分类
   async recoverTag(tag: TagItem) {

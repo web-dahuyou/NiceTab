@@ -59,7 +59,11 @@ function GroupItem({ group }: { group: WindowSnapshotGroup }) {
   );
 }
 
-export default function SnapshotDetails({ record }: { record: SnapshotRecord }) {
+export default function SnapshotDetails({
+  record,
+}: {
+  record: Pick<SnapshotRecord, 'items'>;
+}) {
   return (
     <div className="snapshot-details">
       {record.items.map(item => {

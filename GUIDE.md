@@ -57,6 +57,7 @@ Current menu items:
 - **Send Other Tabs**: Send other tabs (excluding the currently highlighted/active tab) to the NiceTab Admin Page.
 - **Send Left Tabs**: Send left-side tabs to the NiceTab Admin Page.
 - **Send Right Tabs**: Send right-side tabs to the NiceTab Admin Page.
+- Choose **Create Snapshot** to save the current window. See [Window Snapshots](#window-snapshots).
 - **Start Sync**: Manually execute synchronization operation.
 - **Hibernate Other Tabs**: Hibernate tabs other than the current tab.
 
@@ -88,12 +89,13 @@ Left-click the extension icon to open the `Popup Panel`. It includes the followi
 
 ### Management Dashboard
 
-The NiceTab Admin Page (also called Management Dashboard) includes **List**, **Preferences**, **Import/Export**, **Remote Sync**, and **Recycle Bin** pages.
+The NiceTab management dashboard includes **List**, **Preferences**, **Snapshots**, **Import/Export**, **Remote Sync**, and **Recycle Bin**.
 
 **Page Introduction**:
 - **List**: Manages all tabs sent to NiceTab using the **hierarchical structure of Category > Tab Group > Tab**. In addition to basic CRUD operations, it also supports **Sorting**, **Moving**, **Locking**, **Starring**, **Copying**, **Deduplication**, **Opening**, **Renaming**, **QR Code**, and many other rich features, as well as some batch operations.
 - **Preferences**: For better experience and adapting to different user habits.
-- **Import/Export**: Supports import/export tab list and preferences (export to local disk, and import from local to NiceTab extension).
+- Use [Snapshots](#window-snapshots) to view and restore manual snapshots, scheduled snapshots, and the latest automatic snapshot.
+- Use **Import/Export** to save the tab list, preferences, and remote sync configuration to local files or import them from those files.
 - **Remote Sync**: Supports synchronizing tab list and preferences to remote storage (GitHub Gists, Gitee Gists, WebDAV), supports automatic synchronization (see [Management Dashboard - Remote Sync](#management-dashboard---remote-sync) for details).
 - **Recycle Bin**: Tabs removed from the list are moved to the Recycle Bin, facilitating recovery when remove by accident (the Recycle Bin is automatically cleared daily. If accidentally removed, please recover on the same day).
 
@@ -127,13 +129,21 @@ The List page uses a `Category > Tab Group > Tab` hierarchical structure for tab
 
 The left Directory Tree functions like a file explorer, managing Categories (first level) and Tab Groups (second level). It supports search, expand/collapse, drag-and-drop reordering, locking, and cross-category moving.
 - **Staging Area**: A special category, fixed at the first position and cannot be deleted. Sent tabs are automatically added to the Staging Area. You can operate tab groups and tabs in the Staging Area as needed (edit, move, delete, etc.).
-- The categories support expanding/collapsing, deleting and locking; **the locked categories switch to read-only mode, preventing accidental operations**.
+- You can create, expand, collapse, and delete categories. Lock a category to protect it from accidental deletion or moves.
 - The categories support creating tab groups, one-click moving of tab groups from a category to other categories.
-- Categories/Tab Groups support renaming, deleting, and can be dragged and dropped across categories.
+- You can rename and delete categories and tab groups. Drag a tab group to move it to another category.
 - Clicking a category or tab group selects the corresponding category or tab group, while the **Stored Tab List** displays all tab groups under that category and the tab list within those tab groups.
 - Selected categories/tab groups support shortcut operations for moving up/down (these shortcuts only apply to the directory tree and are not yet customizable).
   - Move Up: macOS (⌥ + ⇧ + ↑) Windows (Alt + Shift + ↑)
   - Move Down: macOS (⌥ + ⇧ + ↓) Windows (Alt + Shift + ↓)
+
+#### Batch actions for tab groups
+
+1. Check the boxes next to the tab groups. Checking a category selects its groups in the current results. **Select All** applies to the current search and filters. Changing the search or filters clears the selection.
+2. Use the toolbar above the tree to open, delete, or move the selected groups. When opening them, [choose a window](#opening-tabs). For **Move To**, choose a destination category. Use **Copy Selected Items?** to keep the originals, or **Merge Duplicate Items?** to merge groups with the same name.
+3. With several groups checked, drag one of them to move them together. Drop them within the same category to reorder them, or move them to another category. Drop above or below a group to choose where to insert them.
+
+Locked categories are excluded as sources and destinations for batch moves. Batch deletion skips locked categories and locked groups. You can still open locked items.
 
 ### Stored Tab List
 
@@ -144,7 +154,7 @@ The **Stored Tab List** presents by group. Tab groups here support renaming, del
 **Tab Group Operations**:
 - **Rename**: Click the edit icon to rename (group name has character length limit).
 - **Remove**: Click the "Remove" button of the tab group to remove it.
-- **Open Group**: Click the "Open Group" button to open all tabs in this tab group in the browser (can be configured to automatically remove from list after opening tabs).
+- Click **Open Group** and [choose a window](#opening-tabs) to open the group's tabs. You can also enable removal from the list after opening in Preferences.
 - **Create Group Before**: Create a new tab group before this tab group.
 - **Create Group After**: Create a new tab group after this tab group.
 - **Lock**: Click the "Lock" button to lock the tab group. Locked tab groups cannot be removed, and tabs in locked groups cannot be removed, dragged, moved, or multi-selected.
@@ -155,9 +165,10 @@ The **Stored Tab List** presents by group. Tab groups here support renaming, del
 - **Deduplicate**: Click the "Deduplicate" button to remove duplicate tabs with the same URL in this tab group.
 - **Title Ascending**: Click the "Title Ascending" button to sort tabs in this tab group by tab name in ascending order.
 - **Title Descending**: Click the "Title Descending" button to sort tabs in this tab group by tab name in descending order.
+- **Sort by Domain** sorts in ascending order by base domain, then subdomain. Tabs with the same domain keep their original order. Links without a domain go last.
 
 **Tab List**:
-- A tab supports removing, editing, copying, showing QR code, etc.
+- You can remove, edit, or copy a tab, or display its QR code. Use the tab's more menu to choose where to open it.
 - Tabs within a tab group support multi-selection and drag-and-drop reordering.
 - **Supports click-and-drag selection for quick multi-selection of tabs**.
 - **Supports quick batch selection of all tabs between two tabs**: Hold Shift key and click one tab to highlight it, then hold Shift key and click another tab to batch select.
@@ -181,6 +192,7 @@ Preferences are divided into the following configuration modules:
 - **Other Action**: Interaction configuration related to tther actions
 - **Displays**: Display configuration related to user interface
 - **New Tab**: Custom the browser's newtab page
+- [Snapshot Settings](#snapshot-settings) controls startup restore and scheduled captures.
 - **Sync**: Configuration related to auto-sync
 - **Global Search**: Interaction configuration related to global search
 
@@ -197,7 +209,6 @@ General configuration items are easy to understand.
 | Open NiceTab Admin Page after launching the browser? | Literal meaning | Automatically open | ★★ |
 | Open the NiceTab Admin Page when a new window is created? | Literal meaning | No | ★★ |
 | Pin NiceTab Admin Page? | If pinned, the NiceTab Admin Page will be pinned to the left side of the browser window for easy access; of course, you can also choose not to pin to browser, and access via **Popup Panel**, **Right-click Menu**, etc. | Yes | ★★ |
-| Restore previously opened tabs after launching the browser? | Literal meaning | No | ★★★★ |
 
 ### Sending Tabs
 
@@ -217,18 +228,20 @@ The configuration items of this module significantly affect the interactive beha
 
 ### Opening Tabs
 
-The configuration items of this module control the interactive behavior when opening tabs from tab list in the management dashboard.
+Choose **Open in Current Window**, **Open in New Window**, or **Open in New Incognito Window** from a category or group menu in the directory tree, an open button in the saved list, or a tab's more menu. The same choices are available for batch opening from the tree or saved list, global search results, the Recycle Bin, and tab cards on the custom new tab page.
+
+The window you choose takes precedence over the default setting. Clicking a tab in the saved list still follows your foreground and background opening preferences. To open an incognito window, first allow NiceTab to run in incognito in your browser's extension settings.
 
 | Item | Description | Default Value | Key Index |
 | --- | --- | --- | --- |
-| Open tab group in a new window? | When opening a tab group from Nicetab, whether to open in a new browser window. | No | ★★ |
-| Remove tabs from the NiceTab list after opening tabs or tab group? | When opening tabs/tab group from the list to the browser, whether to automatically remove from the list (if using the NiceTab as a bookmark manager, it is recommended "No"; if just as a temporary tool, you can set to "Yes"). | No | ★★★★★ |
+| Open tab group in a new window? | Sets the default window for opening a group when you leave the destination unspecified. | No | ★★ |
+| Remove tabs from the NiceTab list after opening tabs or tab group? | Removes the groups or individual tabs that opened successfully, depending on what you opened. Items that fail to open or are protected by a category or group lock stay in the list. Leave this off if you use NiceTab to keep bookmarks. | No | ★★★★★ |
 | Auto-hibernate when opening multiple tabs? | When opening tabs/tab group from the list to the browser, whether to auto hibernate. | No | ★★★★ |
 | Modifier key for opening a tab silently (in background) | When needing to silently open tabs from the list (not automatically activating to the newly opened tab, staying on the management dashboard page), hold this modifier key while left-clicking the tab. You can hold the modifier key and click multiple tabs consecutively to open them; the page won't switch away and interrupt your flow (you can also achieve this with middle-click). | Alt(⌥) | ★★★ |
 | Modifier key for opening a tab in the foreground | By default, clicking a tab in the list opens in the foreground, i.e., the page switches to that tab. | None | ★★★ |
 | The order when opening multiple tabs | By default, tabs are opened from left to right. Some users have set their browsers to open tabs on the right side of the current page. In this case, you can set to "Reverse" to enable tabs to open in the normal order. | Default | ★★ |
-| Restore the unnamed group as a browser tab group? | When opening an unnamed tab group to the browser, whether to open as a native browser tab group. | Yes | ★★ |
-| Restore the named group as a browser tab group? | When opening a named tab group to the browser, whether to open as a native browser tab group. | Yes | ★★ |
+| Restore the unnamed group as a browser tab group? | Create a native browser tab group when opening an unnamed group. | No in Firefox, Yes in other browsers | ★★ |
+| Restore the named group as a browser tab group? | Create a native browser tab group when opening a named group. | No in Firefox, Yes in other browsers | ★★ |
 
 **Notes**:
 - By default, tabs open in foreground. If you want to open tabs silently (background) by default, set "Modifier key for opening a tab silently" to `None` (i.e., no shortcut needed), and set "Modifier key for opening a tab in the foreground" to `Alt(⌥)` or other modifier keys (supports `Alt(⌥)`, `Command(⌘)`, `Shift(⇧)`).
@@ -246,11 +259,11 @@ Customize overwrite webpage titles; you can uninstall previously installed webpa
 
 ### Global Search
 
-Global search currently has few configuration items.
+You can [choose a window](#opening-tabs) for a single search result or for several selected results.
 
 | Item | Description | Default Value | Key Index |
 | --- | --- | --- | --- |
-| Remove tabs from the NiceTab list after opening them? | When opening a tab from the global search list to the browser, whether to automatically remove from the list. Configuration effect same as previous `Opening Tabs`, added separately for global search scenario. | No | ★★ |
+| Remove tabs from the NiceTab list after opening them? | This setting is separate from the saved list setting. When enabled, it removes only results that opened successfully and are outside locked categories or groups. | No | ★★ |
 
 ### Other Actions
 
@@ -289,6 +302,19 @@ The configuration items of this module are mainly for customizing the browser's 
 | Newtab Display | You can customize the browser's newtab page with `NiceTab Admin Page` or `NiceTab Newtab Page`. Set to "Default" will revert to the browser's native newtab page. | Default | ★★★★ |
 
 
+### Snapshot Settings
+
+In **Preferences**, select **Snapshot Settings**.
+
+| Item | Description | Default Value | Key Index |
+| --- | --- | --- | --- |
+| Restore previously opened tabs after launching the browser? | Restores the latest automatic snapshot in the current window on startup. | No | ★★★★ |
+| Enable scheduled snapshots | Captures each regular window at the configured interval. | No | ★★★ |
+| Capture interval (minutes) | Set from 5 to 60 minutes in 5-minute increments. | 10 minutes | ★★★ |
+| Maximum scheduled snapshots to keep | Set from 1 to 200 snapshots in total across all windows. Records beyond the limit are removed from the end of the scheduled snapshots list. | 30 snapshots | ★★★ |
+
+When lowering the limit would remove existing records, NiceTab asks for confirmation before saving that limit. Canceling keeps the previous limit and saves your other settings.
+
 ### Auto Sync
 
 The configuration items of this module are mainly related to auto sync.
@@ -305,20 +331,19 @@ The configuration items of this module are mainly related to auto sync.
 
 ## Window Snapshots
 
-Clicking "Create Snapshot" in the "Operation" menu of the navigation bar allows you to save the complete working environment of the **current window** with one click. A snapshot contains the tab order, pinned state, activated tabs after restoration, as well as the name, color, and collapsed state of the native tab groups.
+The **Snapshots** page in the management dashboard shows three types of window snapshots. A snapshot records tab order, pinned state, the active tab, and, where the browser supports native tab groups, their names, colors, and collapsed state.
 
-The "Snapshot" page has been added to the management dashboard:
+- **Manual Snapshots** save the current window. Click **Snapshot Current Window** on the Snapshots page, or choose **Create Snapshot** from the **Actions** menu in the navigation bar or the extension's context menu. In browsers that support [extension shortcuts](#bind-shortcuts), you can also bind a shortcut. Manual snapshots are named by time and can be renamed or deleted. NiceTab keeps up to 50 and drops the oldest when you create another at the limit.
+- **Scheduled Snapshots** are enabled in [Snapshot Settings](#snapshot-settings). NiceTab captures each regular window separately at the configured interval and skips incognito windows. Within a browser session, windows whose contents are unchanged generally produce no new record. Existing records remain available after you turn scheduled captures off.
+- **Latest Automatic Snapshot** comes from the recovery buffer updated as tabs and groups change. The buffer collects tabs from all windows into one record. On the next browser launch, NiceTab saves the buffer as the latest automatic snapshot. If startup restore is enabled, NiceTab restores those tabs in the current window.
 
-- Snapshots are named based on their creation time and support renaming and deletion. Clicking the "View" button allows you to view the tab groups and tabs within a snapshot.
-- To restore a snapshot, you can choose "Restore in New Window" to preserve the current window state, or select "Replace Current Window", which will overwrite the current window with the snapshot content.
-- A maximum of 50 manual snapshots can be retained. When the limit is reached, you can confirm the deletion of the oldest snapshot and continue to create new ones.
-- Changes to tabs and tab groups are written into a crash-recovery buffer in real time. The next time the browser starts, NiceTab saves this buffer as an automatic snapshot and determines whether to automatically recover based on the setting of "Restore previously opened tabs after launching the browser?".
+Click **View** to inspect the tabs and groups in a snapshot. **Restore in New Window** keeps the current window. **Replace Current Window** asks for confirmation and removes the original tabs only after every tab in the snapshot has opened. It keeps the management page open. If restore reports a failure, check the open tabs and groups first because some items may already have been restored.
 
-Snapshots are not included in Gist/WebDAV synchronization.
+Snapshots are stored locally and are excluded from Gist and WebDAV sync.
 
 ## Management Dashboard - Import/Export
 
-Includes import/export of tab list and preferences.
+This page imports and exports the tab list, preferences, and remote sync configuration.
 
 ### Import Tab Data from Other Extensions
 
@@ -354,6 +379,14 @@ You can export tab list and preferences to local file.
 NiceTab supports remote synchronization, which is more convenient than exporting to the local file. Although no remote data loss or other abnormal situations have occurred so far, it's still recommended to export data to local file for backup periodically (even if the backup files may not be needed).
 
 v2.7.7 version supports saving NiceTab data as HTML bookmark file; exported bookmark file can be imported to browser.
+
+### Import/Export Remote Sync Config
+
+On the **Import/Export** page, find **Import/Export Remote Sync Config**. Choose **Export to Local File** to save your GitHub and Gitee Gist and WebDAV configuration as JSON. To restore it, choose **Import from File** and select that file.
+
+An imported Gist configuration with an access token replaces the existing configuration for that provider. WebDAV configurations are merged by name. Imported configurations replace existing ones with the same name, while the other existing configurations are kept.
+
+The exported file may contain access tokens and WebDAV passwords. Store it securely and avoid sharing it publicly.
 
 ## Management Dashboard - Remote Sync
 

@@ -152,4 +152,45 @@ describe('SettingsUtils', () => {
       expect(mockStorage.get('local:settings')).toBeDefined();
     });
   });
+
+  describe('定时快照设置', () => {
+    it.each([
+      [0, 10],
+      [12.5, 10],
+      [2, 5],
+      [17, 15],
+      [100, 60],
+    ])('将输入间隔 %s 规范为 %s 分钟', async (raw, interval) => {
+      await settingsUtils.setSettings({
+        scheduledSnapshotsEnabled: true,
+        scheduledSnapshotInterval: raw,
+      });
+      expect(await settingsUtils.getSettings()).toMatchObject({
+        scheduledSnapshotsEnabled: true,
+        scheduledSnapshotInterval: interval,
+      });
+    });
+
+    it('普通设置写入保留旧上限供迁移，独立上限保存后不再写入旧字段', async () => {
+      mockStorage.set(settingsUtils.storageKey, { scheduledSnapshotLimit: 12 });
+      await settingsUtils.setSettings({
+        scheduledSnapshotsEnabled: true,
+        scheduledSnapshotLimit: 50,
+      });
+      expect(await settingsUtils.getLegacyScheduledSnapshotLimit()).toBe(12);
+      expect(await settingsUtils.getSettings()).not.toHaveProperty(
+        'scheduledSnapshotLimit',
+      );
+
+      mockStorage.set(settingsUtils.scheduledSnapshotLimitKey, 20);
+      await settingsUtils.setSettings({
+        scheduledSnapshotsEnabled: false,
+        scheduledSnapshotLimit: 60,
+      });
+      expect(mockStorage.get(settingsUtils.storageKey)).not.toHaveProperty(
+        'scheduledSnapshotLimit',
+      );
+      expect(mockStorage.get(settingsUtils.scheduledSnapshotLimitKey)).toBe(20);
+    });
+  });
 });

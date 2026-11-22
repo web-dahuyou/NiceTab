@@ -101,6 +101,7 @@ const zhCN = {
   'common.bottom': '底部',
   'common.text': '文本',
   'common.icon': '图标',
+  'common.selectedGroupCount': `已选择{count}个标签组`,
   'common.selectedTabCount': `已选择{count}个标签页`,
   'common.minute': '分钟',
   'common.hour': '小时',

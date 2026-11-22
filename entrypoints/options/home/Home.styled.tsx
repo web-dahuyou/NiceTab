@@ -41,6 +41,8 @@ export const StyledSidebarWrapper = styled(SidebarLayout)<{
     .sidebar-tree-wrapper {
       flex: 1;
       height: 0;
+      min-height: 0;
+      overflow: hidden;
       .no-data {
         padding: 16px 0;
         button {

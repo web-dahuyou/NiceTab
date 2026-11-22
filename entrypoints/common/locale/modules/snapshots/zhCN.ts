@@ -1,6 +1,7 @@
 const zhCN = {
   'snapshots.title': '快照',
   'snapshots.manual': '手动快照',
+  'snapshots.scheduled': '定时快照',
   'snapshots.auto': '最新自动快照',
   'snapshots.create': '创建当前窗口快照',
   'snapshots.empty': '暂无快照',
@@ -10,8 +11,10 @@ const zhCN = {
   'snapshots.restoreNewWindow': '在新窗口还原',
   'snapshots.restoreCurrentWindow': '替换当前窗口',
   'snapshots.restoreCurrentConfirm': '当前窗口中的标签页将被该快照覆盖，是否继续？',
+  'snapshots.restorePartial': '快照仅部分恢复，请检查标签页和分组。',
   'snapshots.deleteConfirm': '您确定删除这个快照吗？',
   'snapshots.pinned': '已固定',
+  'snapshots.windowId': '窗口 ID：{id}',
   'snapshots.created': '快照已创建',
 };
 

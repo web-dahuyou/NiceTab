@@ -2,13 +2,19 @@ import { useEffect, useRef, useState, useMemo, memo } from 'react';
 import { theme, Skeleton, Modal, Space, Divider, Checkbox } from 'antd';
 import type { CheckboxProps } from 'antd';
 import { LockOutlined, StarOutlined, CloseOutlined } from '@ant-design/icons';
+
+import { tabTarget, type OpenMode } from '~/entrypoints/common/openUtils';
+import {
+  OpenModeMenu,
+  useOpenSavedTabs,
+} from '~/entrypoints/common/components/OpenModeMenu';
 import { GroupItem, TabItem } from '~/entrypoints/types';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
-import { openNewTab } from '~/entrypoints/common/tabs';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 
 import EditInput from '../components/EditInput';
+
 import TabListItem from './TabListItem';
 import {
   StyledGroupWrapper,
@@ -77,7 +83,7 @@ function TabGroup({
   // 已选择的tabItem数组
   const selectedTabs = useMemo(() => {
     return tabList.filter(tab => selectedTabIds.includes(tab.tabId));
-  }, [selectedTabIds]);
+  }, [selectedTabIds, tabList]);
   // 是否全选
   const isAllChecked = useMemo(() => {
     return tabList.length > 0 && selectedTabIds.length === tabList.length;
@@ -107,15 +113,13 @@ function TabGroup({
     onRecover?.();
   };
 
-  const handleTabsOpen = useCallback(() => {
-    if (selectedTabs.length === 1) {
-      openNewTab(selectedTabs[0].url, { active: true });
-    } else {
-      for (let tab of selectedTabs) {
-        openNewTab(tab.url);
-      }
-    }
-  }, [selectedTabs]);
+  const openSaved = useOpenSavedTabs();
+  const handleTabsOpen = (mode?: OpenMode) =>
+    openSaved(
+      selectedTabs.map(tab => tabTarget(tab, { active: selectedTabs.length === 1 })),
+      mode,
+      true,
+    );
 
   const handleTabRemove = useCallback((tabs: TabItem[]) => {
     setSelectedTabIds(selectedTabIds =>
@@ -234,9 +238,9 @@ function TabGroup({
                 }
               >
                 {allowTabActions.includes('open') && (
-                  <span className="action-btn" onClick={handleTabsOpen}>
-                    {$fmt('common.open')}
-                  </span>
+                  <OpenModeMenu onOpen={handleTabsOpen}>
+                    <span className="action-btn">{$fmt('common.open')}</span>
+                  </OpenModeMenu>
                 )}
                 {allowTabActions.includes('remove') && (
                   <span
