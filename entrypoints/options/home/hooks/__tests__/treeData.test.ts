@@ -59,7 +59,11 @@ import {
 import * as batchRemoval from '~/entrypoints/common/storage/batchRemoval';
 import { useTreeData, HomeContext, type TreeDataHookProps } from '../treeData';
 import { GlobalContext } from '~/entrypoints/common/hooks/global';
-import type { TreeDataNodeTag, TreeDataNodeTabGroup } from '../../types';
+import type {
+  TreeDataNodeTag,
+  TreeDataNodeTabGroup,
+  TreeDataNodeUnion,
+} from '../../types';
 
 // ========== Mock 数据 ==========
 
@@ -157,6 +161,77 @@ describe('treeData', () => {
     await tabListUtils.importTags(mockData, 'overwrite');
     // 6. 确保数据就绪（含中转站）
     await tabListUtils.getTagList();
+  });
+
+  it('筛选后的组间落点用目标 ID 保存，并将当前选择切换到目标分类', async () => {
+    const group = (groupId: string) => ({
+      groupId,
+      groupName: groupId,
+      createTime: '2024-01-01',
+      tabList: [{ tabId: groupId, url: `https://${groupId}.test` }],
+    });
+    await tabListUtils.setTagList([
+      tabListUtils.createStagingAreaTag(),
+      {
+        tagId: 'source',
+        tagName: 'Source',
+        createTime: '2024-01-01',
+        groupList: [group('a'), group('b')],
+      },
+      {
+        tagId: 'destination',
+        tagName: 'Destination',
+        createTime: '2024-01-01',
+        groupList: [group('hidden'), group('anchor'), group('tail')],
+      },
+    ]);
+    const { result } = renderHook(() => useTreeData(), { wrapper: createWrapper() });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    const source = getFirstGroup(result, 'source')!;
+    const targetGroups: TreeDataNodeTabGroup[] | undefined = result.current.treeData.find(
+      tag => tag.key === 'destination',
+    )?.children;
+    const anchor = targetGroups?.find(node => node.key === 'anchor');
+    expect(anchor).toBeDefined();
+    type Drop = Parameters<TreeDataHookProps['handleTreeNodeDrop']>[0];
+    const nodeAt = (node: TreeDataNodeUnion, pos: string): Drop['node'] => ({
+      ...node,
+      pos,
+      expanded: false,
+      selected: false,
+      checked: false,
+      loaded: false,
+      loading: false,
+      halfChecked: false,
+      dragOver: false,
+      dragOverGapTop: false,
+      dragOverGapBottom: false,
+      active: false,
+    });
+
+    await act(async () => {
+      await expect(
+        result.current.handleTreeNodeDrop(
+          {
+            dragNode: nodeAt(source, '0-0-0'),
+            node: nodeAt(anchor!, '0-1-0'),
+            event: {} as Drop['event'],
+            dropPosition: 1,
+            dropToGap: true,
+            dragNodesKeys: ['a'],
+          },
+          { selectedGroupIds: ['a', 'b'] },
+        ),
+      ).resolves.toEqual(['a', 'b']);
+    });
+
+    expect(
+      (await tabListUtils.getTagList())
+        .find(tag => tag.tagId === 'destination')
+        ?.groupList.map(item => item.groupId),
+    ).toEqual(['hidden', 'anchor', 'a', 'b', 'tail']);
+    expect(result.current.selectedTagKey).toBe('destination');
+    expect(result.current.selectedKeys).toEqual(['a']);
   });
 
   // ==========================================================================

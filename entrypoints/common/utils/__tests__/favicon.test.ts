@@ -1,6 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { RuntimeMessageEventProps } from '~/entrypoints/types';
-import { getFavicon, getOriginsWithFailedIcons, invalidateFavicon } from '../faviconDb';
+import {
+  FAILED_ICON_TTL,
+  getFavicon,
+  getOriginsWithFailedIcons,
+  invalidateFavicon,
+  putFavicon,
+} from '../faviconDb';
 import {
   getFaviconUrl,
   getGstaticURL,
@@ -134,6 +140,44 @@ describe('并发获取 favicon', () => {
     vi.mocked(getFavicon).mockImplementation(async origin => record(origin));
     const urls = await Promise.all(origins.map(origin => getFaviconUrl(origin)));
     expect(urls.filter((url, i) => url !== record(origins[i]).url)).toEqual([]);
+  });
+
+  it('同站同尺寸的冷启动请求共享一次探测，随后直接命中内存', async () => {
+    const origin = 'https://cold-site.test';
+    const expected = getGstaticURL(origin);
+    const probe = vi.fn(async (url: string) => url === expected);
+    vi.mocked(getFavicon).mockResolvedValue(null);
+    stubImages(probe);
+
+    expect(
+      await Promise.all([
+        getFaviconUrl(origin + '/first'),
+        getFaviconUrl(origin + '/second'),
+        getFaviconUrl(origin + '/third'),
+      ]),
+    ).toEqual([expected, expected, expected]);
+    expect(await getFaviconUrl(origin + '/later')).toBe(expected);
+    expect(getFavicon).toHaveBeenCalledTimes(1);
+    expect(probe.mock.calls.filter(([url]) => url === expected)).toHaveLength(1);
+    expect(putFavicon).toHaveBeenCalledTimes(1);
+  });
+
+  it('默认图只在短期内复用，过期后重新探测并恢复站点图标', async () => {
+    const origin = 'https://expired-default.test';
+    const fallback = browser.runtime.getURL('/icon/favicon-default.png');
+    vi.mocked(getFavicon).mockResolvedValue({
+      ...record(origin, fallback),
+      source: 'default',
+    });
+    const expected = getGstaticURL(origin);
+    const probe = vi.fn(async (url: string) => url === expected);
+    stubImages(probe);
+
+    expect(await getFaviconUrl(origin)).toBe(fallback);
+    expect(probe).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(FAILED_ICON_TTL + 1);
+    expect(await getFaviconUrl(origin)).toBe(expected);
+    expect(probe).toHaveBeenCalledWith(expected);
   });
 
   it('240 个健康站点共用一次索引查询，直接展示各自图标', async () => {

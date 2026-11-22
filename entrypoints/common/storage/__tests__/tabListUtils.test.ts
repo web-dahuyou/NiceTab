@@ -1900,6 +1900,43 @@ describe('TabListUtils', () => {
   });
 
   // ==========================================================================
+  describe('tabsSortbyDomain', () => {
+    it('按可注册域名和子域名排序，同域名及无主机名的标签页保留原顺序', async () => {
+      const urls = [
+        'https://z.example.co.uk',
+        'file:///tmp/z',
+        'https://a.other.co.uk',
+        'https://B.example.co.uk/second',
+        'not a URL',
+        'https://example.co.uk',
+        'https://b.example.co.uk/first',
+        'https://localhost',
+      ];
+      setupTagList([stagingTag([makeGroup({ tabList: urls.map(url => makeTab(url)) })])]);
+
+      await utils.tabsSortbyDomain('g1', '0');
+
+      const [saved] = setTagListSpy.mock.calls[0];
+      expect(saved?.[0].groupList[0].tabList.map(tab => tab.url)).toEqual(
+        [5, 3, 6, 0, 7, 2, 1, 4].map(index => urls[index]),
+      );
+    });
+
+    it.each(['分类', '标签组'])('锁定%s时保留原有顺序', async locked => {
+      const tabList = ['https://z.test', 'https://a.test'].map(url => makeTab(url));
+      const tag = makeTag({
+        isLocked: locked === '分类',
+        groupList: [makeGroup({ isLocked: locked === '标签组', tabList })],
+      });
+      setupTagList([stagingTag([]), tag]);
+
+      await utils.tabsSortbyDomain('g1', tag.tagId);
+
+      expect(tag.groupList[0].tabList).toEqual(tabList);
+      expect(setTagListSpy).not.toHaveBeenCalled();
+    });
+  });
+
   // tabsSortbyName
   // ==========================================================================
   describe('tabsSortbyName', () => {
@@ -2584,6 +2621,102 @@ describe('TabListUtils', () => {
   // ==========================================================================
   // onTabGroupDrop - 同分类内和跨分类
   // ==========================================================================
+  describe('onTabGroupsDrop', () => {
+    const group = (groupId: string, isStarred = false) =>
+      makeGroup({ groupId, isStarred, tabList: [makeTab(`https://${groupId}.test`)] });
+
+    it('跨分类按目标 ID 定位，保留来源顺序，只写一次并跳过锁定来源', async () => {
+      const source = makeTag({
+        tagId: 'source',
+        groupList: [group('first'), group('second')],
+      });
+      const locked = makeTag({
+        tagId: 'locked',
+        isLocked: true,
+        groupList: [group('skipped')],
+      });
+      const target = makeTag({
+        tagId: 'target',
+        groupList: [group('hidden', true), group('anchor', true), group('tail')],
+      });
+      setupTagList([stagingTag([]), source, locked, target]);
+
+      await expect(
+        utils.onTabGroupsDrop({
+          sourceGroupIds: ['second', 'skipped', 'first', 'second'],
+          targetTagId: target.tagId,
+          destination: { groupId: 'anchor', after: false },
+        }),
+      ).resolves.toEqual({ processedIds: ['first', 'second'] });
+
+      expect(setTagListSpy).toHaveBeenCalledTimes(1);
+      const [saved] = setTagListSpy.mock.calls[0];
+      expect(saved?.map(tag => tag.groupList.map(item => item.groupId))).toEqual([
+        [],
+        [],
+        ['skipped'],
+        ['hidden', 'first', 'second', 'anchor', 'tail'],
+      ]);
+      expect(saved?.[3].groupList.slice(1, 3)).toEqual(
+        source.groupList.map(item => ({ ...item, isStarred: true })),
+      );
+    });
+
+    it.each([
+      {
+        destination: { groupId: 'anchor', after: true },
+        expected: ['anchor', 'a', 'b', 'tail'],
+      },
+      { destination: { atEnd: true }, expected: ['anchor', 'tail', 'a', 'b'] },
+      { destination: { atEnd: false }, expected: ['a', 'b', 'anchor', 'tail'] },
+    ])(
+      '同分类移动后按完整列表修正落点 $destination',
+      async ({ destination, expected }) => {
+        setupTagList([
+          stagingTag([group('a', true), group('anchor'), group('b'), group('tail')]),
+        ]);
+
+        await expect(
+          utils.onTabGroupsDrop({
+            sourceGroupIds: ['b', 'a'],
+            targetTagId: '0',
+            destination,
+          }),
+        ).resolves.toEqual({ processedIds: ['a', 'b'] });
+
+        const [saved] = setTagListSpy.mock.calls[0];
+        const groups = saved?.[0].groupList;
+        expect(groups?.map(item => item.groupId)).toEqual(expected);
+        expect(groups?.find(item => item.groupId === 'a')?.isStarred).toBe(
+          expected[0] === 'a',
+        );
+      },
+    );
+
+    it('目标分类锁定或落点已被删除时不提交', async () => {
+      setupTagList([
+        stagingTag([group('a')]),
+        makeTag({ tagId: 'locked', isLocked: true }),
+      ]);
+
+      await expect(
+        utils.onTabGroupsDrop({
+          sourceGroupIds: ['a'],
+          targetTagId: 'locked',
+          destination: { atEnd: true },
+        }),
+      ).resolves.toEqual({ processedIds: [] });
+      await expect(
+        utils.onTabGroupsDrop({
+          sourceGroupIds: ['a'],
+          targetTagId: '0',
+          destination: { groupId: 'removed', after: true },
+        }),
+      ).resolves.toEqual({ processedIds: [] });
+      expect(setTagListSpy).not.toHaveBeenCalled();
+    });
+  });
+
   describe('onTabGroupDrop', () => {
     it('同分类内标签组上移', async () => {
       const list = [
