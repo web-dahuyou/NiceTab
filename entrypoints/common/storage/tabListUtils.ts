@@ -1603,71 +1603,139 @@ export default class TabListUtils {
     tabs: TabItem[];
     isCopy?: boolean;
     autoMerge?: boolean;
-  }) {
+  }): Promise<boolean> {
+    const settings = await Store.settingsUtils.getSettings();
     const tagList = await this.getTagList();
-    const tabIds = tabs.map(tab => tab.tabId);
-    let isSourceFound = false,
-      isTargetFound = false,
-      sourceTagIndex = 0,
-      sourceGroupIndex = 0,
-      targetTagIndex = 0,
-      targetGroupIndex = 0;
-    for (let tIndex = 0; tIndex < tagList.length; tIndex++) {
-      const tag = tagList[tIndex];
-      if (tag.tagId === targetTagId) {
-        targetTagIndex = tIndex;
+    const targetTag = tagList.find(tag => tag.tagId === targetTagId);
+    const targetGroup = targetTag?.groupList.find(
+      group => group.groupId === targetGroupId,
+    );
+    if (!targetGroup || sourceGroupId === targetGroupId) return false;
+
+    for (const sourceTag of tagList) {
+      const sourceGroupIndex = sourceTag.groupList.findIndex(
+        group => group.groupId === sourceGroupId,
+      );
+      if (sourceGroupIndex < 0) continue;
+      const sourceGroup = sourceTag.groupList[sourceGroupIndex];
+
+      const insertPosition = settings?.[TAB_INSERT_POSITION] || 'bottom';
+      const moveTabList = isCopy
+        ? tabs.map(tab => ({ ...tab, tabId: getRandomId() }))
+        : tabs;
+      const newTabList =
+        insertPosition === 'bottom'
+          ? [...targetGroup.tabList, ...moveTabList]
+          : [...moveTabList, ...targetGroup.tabList];
+      targetGroup.tabList = autoMerge ? getUniqueList(newTabList, 'url') : newTabList;
+
+      if (!isCopy) {
+        const tabIds = new Set(tabs.map(tab => tab.tabId));
+        sourceGroup.tabList = sourceGroup.tabList?.filter(tab => !tabIds.has(tab.tabId));
+      }
+      if (
+        settings?.[DELETE_UNLOCKED_EMPTY_GROUP] &&
+        !sourceGroup.tabList?.length &&
+        !sourceGroup.isLocked
+      ) {
+        sourceTag.groupList.splice(sourceGroupIndex, 1);
       }
 
-      for (let gIndex = 0; gIndex < tag.groupList.length; gIndex++) {
-        const group = tag.groupList[gIndex];
-        if (group.groupId === sourceGroupId) {
-          isSourceFound = true;
-          sourceTagIndex = tIndex;
-          sourceGroupIndex = gIndex;
-          if (!isCopy) {
-            group.tabList = group.tabList?.filter(tab => !tabIds.includes(tab.tabId));
-          }
-        } else if (group.groupId === targetGroupId) {
-          isTargetFound = true;
-          targetGroupIndex = gIndex;
-        }
-      }
-
-      if (isSourceFound && isTargetFound) break;
+      await this.setTagList(tagList);
+      return true;
     }
 
-    if (isSourceFound && isTargetFound) {
-      const tag = tagList[targetTagIndex];
-      const group = tag.groupList[targetGroupIndex];
-      if (group) {
-        const settings = await Store.settingsUtils.getSettings();
-        const insertPosition = settings?.[TAB_INSERT_POSITION] || 'bottom';
-        const moveTabList = isCopy
-          ? tabs.map(tab => ({ ...tab, tabId: getRandomId() }))
-          : tabs;
-        let newTabList =
-          insertPosition === 'bottom'
-            ? [...group.tabList].concat(moveTabList)
-            : [...moveTabList].concat(group.tabList);
-        // 如果开启自动合并，则标签页去重
-        if (autoMerge) {
-          newTabList = getUniqueList(newTabList, 'url');
-        }
-        group.tabList = newTabList;
-      }
+    return false;
+  }
+  // 批量移动标签页（可来自多个标签组）到指定标签组
+  // 返回实际移动的标签页 id，锁定分类、锁定标签组中的标签页会被跳过
+  async tabsMoveThrough({
+    tabs,
+    targetTagId,
+    targetGroupId,
+    isCopy = false,
+    autoMerge = false,
+  }: {
+    tabs: Array<TabItem & { groupId: Key }>;
+    targetTagId: string;
+    targetGroupId: string;
+    isCopy?: boolean;
+    autoMerge?: boolean;
+  }): Promise<{
+    targetTagId?: string;
+    targetGroupId?: string;
+    processedTabIds: string[];
+  }> {
+    const skipped = { processedTabIds: [] as string[] };
+    const tagList = await this.getTagList();
+    const targetTag = tagList.find(tag => tag.tagId === targetTagId);
+    const targetGroup = targetTag?.groupList.find(
+      group => group.groupId === targetGroupId,
+    );
+    if (!targetTag || targetTag.isLocked || !targetGroup || targetGroup.isLocked) {
+      return skipped;
+    }
+    if (!tabs?.length) return skipped;
 
-      // 如果source标签组内没有标签，则删除标签组
-      const settings = Store.settingsUtils?.settings;
-      if (settings?.[DELETE_UNLOCKED_EMPTY_GROUP]) {
-        const sourceTag = tagList?.[sourceTagIndex];
-        const sourceGroup = sourceTag?.groupList?.[sourceGroupIndex];
-        if (!sourceGroup?.tabList?.length && !sourceGroup?.isLocked) {
-          sourceTag?.groupList?.splice(sourceGroupIndex, 1);
+    const sourceGroupIds = new Set(tabs.map(tab => String(tab.groupId)));
+    const tabIdSet = new Set(tabs.map(tab => String(tab.tabId)));
+    const movedTabs: TabItem[] = [];
+
+    // 从来源标签组中取出标签页（锁定的分类、标签组跳过）
+    for (const tag of tagList) {
+      if (tag.isLocked) continue;
+      for (const group of tag.groupList) {
+        if (group.isLocked || !sourceGroupIds.has(String(group.groupId))) continue;
+        if (isCopy) {
+          movedTabs.push(
+            ...(group.tabList || []).filter(tab => tabIdSet.has(String(tab.tabId))),
+          );
+        } else {
+          const remaining: TabItem[] = [];
+          for (const tab of group.tabList || []) {
+            if (tabIdSet.has(String(tab.tabId))) {
+              movedTabs.push(tab);
+            } else {
+              remaining.push(tab);
+            }
+          }
+          group.tabList = remaining;
         }
+      }
+    }
+    if (!movedTabs.length) return skipped;
+
+    const settings = await Store.settingsUtils.getSettings();
+    const insertPosition = settings?.[TAB_INSERT_POSITION] || 'bottom';
+    const moveTabList = isCopy
+      ? movedTabs.map(tab => ({ ...tab, tabId: getRandomId() }))
+      : movedTabs;
+    const newTabList =
+      insertPosition === 'bottom'
+        ? [...(targetGroup.tabList || []), ...moveTabList]
+        : [...moveTabList, ...(targetGroup.tabList || [])];
+    targetGroup.tabList = autoMerge ? getUniqueList(newTabList, 'url') : newTabList;
+
+    // 来源标签组为空时，按设置删除（目标标签组本身会重新写入标签页）
+    if (!isCopy && Store.settingsUtils?.settings?.[DELETE_UNLOCKED_EMPTY_GROUP]) {
+      for (const tag of tagList) {
+        if (tag.isLocked) continue;
+        tag.groupList = tag.groupList.filter(
+          group =>
+            group.groupId === targetGroupId ||
+            !sourceGroupIds.has(String(group.groupId)) ||
+            group.isLocked ||
+            !!group.tabList?.length,
+        );
       }
     }
 
     await this.setTagList(tagList);
+    return {
+      targetTagId,
+      targetGroupId,
+      processedTabIds: movedTabs.map(tab => tab.tabId),
+    };
   }
   // 标签页按名称排序
   async tabsSortbyName(sortType: string, groupId: Key, tagId: Key) {

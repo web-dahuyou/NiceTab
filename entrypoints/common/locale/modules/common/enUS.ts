@@ -116,6 +116,7 @@ const enUS: Record<LocaleKey, string> = {
   } Selected`,
   'common.minute': 'Minutes',
   'common.hour': 'Hours',
+  'common.operationFailed': 'Operation Failed',
   'common.requestFailed': 'Request Failed',
   'common.timeout': 'Request Timeout',
   'common.aborted': 'Request Aborted',

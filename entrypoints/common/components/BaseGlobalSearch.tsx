@@ -25,6 +25,7 @@ import {
   ProductOutlined,
   DeleteOutlined,
   ExportOutlined,
+  SendOutlined,
 } from '@ant-design/icons';
 import { debounce, groupBy } from 'lodash-es';
 
@@ -47,6 +48,7 @@ import type {
   SendTabMsgEventProps,
 } from '~/entrypoints/types';
 import { eventEmitter as homeEventEmitter } from '~/entrypoints/options/home/hooks/homeCustomEvent';
+import MoveToModal from '~/entrypoints/options/home/MoveToModal';
 
 import { OpenModeMenu, useOpenSavedTabs } from './OpenModeMenu';
 import ActionIconBtn from './ActionIconBtn.tsx';
@@ -58,8 +60,21 @@ export type SearchListItemProps = Pick<TagItem, 'tagId' | 'tagName' | 'static'> 
   Pick<GroupItem, 'groupId' | 'groupName' | 'isLocked'> &
   Pick<TabItem, 'tabId' | 'title' | 'url'>;
 
+function toSearchListItem(
+  tag: TagItem,
+  group: GroupItem,
+  tab: TabItem,
+): SearchListItemProps {
+  return {
+    ...pick(tag, ['tagId', 'tagName', 'static']),
+    ...pick(group, ['groupId', 'groupName']),
+    isLocked: tag.isLocked || group.isLocked,
+    ...pick(tab, ['tabId', 'title', 'url']),
+  };
+}
+
 export type ActionMode = 'goto' | 'select';
-export type BatchActionType = 'remove' | 'open';
+export type BatchActionType = 'remove' | 'open' | 'moveTo';
 
 export type ActionCallbackFn = (
   type: 'tag' | 'tabGroup' | 'tab' | 'open' | 'select',
@@ -248,7 +263,7 @@ export function useSearchAction({
   const [tagList, setTagList] = useState<TagItem[]>([]);
   const [value, setValue] = useState<string>('');
   const [searchValue, setSearchValue] = useState<string>('');
-  const [filterList, setFilterList] = useState<SearchListItemProps[]>([]);
+  const [searchText, setSearchText] = useState('');
   const [selectedItems, setSelectedItems] = useState<SearchListItemProps[]>([]);
 
   const selectedTabIds = useMemo(() => {
@@ -278,6 +293,24 @@ export function useSearchAction({
     [handleSelectChange, onAction],
   );
 
+  const filterList = useMemo(() => {
+    const result: SearchListItemProps[] = [];
+    for (const tag of tagList) {
+      for (const group of tag?.groupList || []) {
+        for (const tab of group?.tabList || []) {
+          if (
+            !searchText ||
+            tab?.title?.toLowerCase().includes(searchText) ||
+            tab?.url?.toLowerCase().includes(searchText)
+          ) {
+            result.push(toSearchListItem(tag, group, tab));
+          }
+        }
+      }
+    }
+    return result;
+  }, [tagList, searchText]);
+
   const options = useMemo(() => {
     return filterList.map(item => ({
       ...item,
@@ -291,42 +324,14 @@ export function useSearchAction({
         />
       ),
     }));
-  }, [filterList, selectedTabIds, actionMode, onAction]);
-
-  const getFilterList = useCallback(
-    (searchText: string) => {
-      const result: SearchListItemProps[] = [];
-      for (const tag of tagList) {
-        for (const group of tag?.groupList || []) {
-          for (const tab of group?.tabList || []) {
-            if (
-              !searchText ||
-              tab?.title?.toLowerCase().includes(searchText) ||
-              tab?.url?.toLowerCase().includes(searchText)
-            ) {
-              result.push({
-                ...pick(tag, ['tagId', 'tagName', 'static']),
-                ...pick(group, ['groupId', 'groupName']),
-                isLocked: tag.isLocked || group.isLocked,
-                ...pick(tab, ['tabId', 'title', 'url']),
-              });
-            }
-          }
-        }
-      }
-      return result;
-    },
-    [tagList],
-  );
+  }, [filterList, selectedTabIds, actionMode, handleAction]);
 
   const debounceSearch = useMemo(
     () =>
       debounce((value: string) => {
-        const text = value?.trim()?.toLowerCase() || '';
-        const filterList = getFilterList(text);
-        setFilterList(filterList || []);
+        setSearchText(value?.trim()?.toLowerCase() || '');
       }, 600),
-    [getFilterList],
+    [],
   );
 
   const handleSearch = useCallback(
@@ -367,20 +372,33 @@ export function useSearchAction({
   );
 
   useEffect(() => {
-    const _filterList = getFilterList('');
-    setFilterList(_filterList || []);
-  }, [getFilterList]);
+    return () => debounceSearch.cancel();
+  }, [debounceSearch]);
 
-  const refreshData = useCallback(async () => {
-    const _list = await tabListUtils.getTagList();
-    setTagList(_list || []);
-    setSelectedItems([]);
+  const updateTagList = useCallback((nextTagList: TagItem[]) => {
+    setTagList(nextTagList);
+    setSelectedItems(items => {
+      if (!items.length) return items;
+      return items.flatMap(item => {
+        const tag = nextTagList.find(tag => tag.tagId === item.tagId);
+        const group = tag?.groupList?.find(group => group.groupId === item.groupId);
+        const tab = group?.tabList?.find(tab => tab.tabId === item.tabId);
+        return tag && group && tab ? [toSearchListItem(tag, group, tab)] : [];
+      });
+    });
   }, []);
 
+  const refreshData = useCallback(async () => {
+    updateTagList(await tabListUtils.getTagList());
+  }, [updateTagList]);
+
   const initData = useCallback(async () => {
-    const _list = list?.length ? list : await tabListUtils.getTagList();
-    setTagList(_list || []);
-  }, [list]);
+    if (list?.length) {
+      updateTagList(list);
+    } else {
+      await refreshData();
+    }
+  }, [list, refreshData, updateTagList]);
 
   useEffect(() => {
     initData();
@@ -485,6 +503,7 @@ const StyledBatchActionHeader = styled.div`
 export interface GlobalSearchBoxHandle {
   focus: () => void;
   refreshData: () => void;
+  moveToOpen: boolean;
 }
 
 export const GlobalSearchBox = forwardRef(
@@ -499,6 +518,7 @@ export const GlobalSearchBox = forwardRef(
       placement = 'bottomLeft',
       onAction,
       onBatchAction,
+      onDestinationCreated,
     }: {
       tagList?: TagItem[];
       inputWidth?: number | string;
@@ -509,6 +529,7 @@ export const GlobalSearchBox = forwardRef(
       open?: boolean;
       onAction?: ActionCallbackFn;
       onBatchAction?: BatchActionCallbackFn;
+      onDestinationCreated?: () => void;
     },
     ref,
   ) => {
@@ -518,6 +539,8 @@ export const GlobalSearchBox = forwardRef(
     const selectRef = useRef<RefSelectProps>(null);
     const searchListRef = useRef<HTMLDivElement>(null);
     const [selectSwitch, setSelectSwitch] = useState(false);
+    // 批量移动到标签组弹窗
+    const [moveToTabs, setMoveToTabs] = useState<SearchListItemProps[] | null>(null);
 
     const {
       options,
@@ -569,7 +592,7 @@ export const GlobalSearchBox = forwardRef(
                 await tabListUtils.removeTabs(groupId, removable, { skipLocked: true });
             }
             await refreshData();
-            setSelectedItems(selectedItems.filter(item => !opened.has(item.tabId)));
+            setSelectedItems(items => items.filter(item => !opened.has(item.tabId)));
           }
           if (result.failed) return;
         }
@@ -579,7 +602,33 @@ export const GlobalSearchBox = forwardRef(
       [selectedItems, setSelectedItems, refreshData, onBatchAction, openSaved],
     );
 
+    // 可移动的标签页（锁定分类、锁定标签组中的标签页不参与）
+    const movableItems = useMemo(
+      () => selectedItems.filter(item => !item.isLocked),
+      [selectedItems],
+    );
+
+    const handleOpenMoveTo = useCallback(() => {
+      if (!movableItems.length) return;
+      setMoveToTabs(movableItems);
+    }, [movableItems]);
+
+    const handleMoveToProcessed = useCallback(
+      (ids: string[]) => {
+        const processedIds = new Set(ids);
+        setSelectedItems(items => items.filter(item => !processedIds.has(item.tabId)));
+      },
+      [setSelectedItems],
+    );
+
+    const handleMoveToOk = useCallback(() => {
+      setMoveToTabs(null);
+      refreshData();
+      onBatchAction?.('moveTo');
+    }, [refreshData, onBatchAction]);
+
     useImperativeHandle(ref, () => ({
+      moveToOpen: !!moveToTabs,
       focus: () => {
         selectRef.current?.focus();
       },
@@ -589,10 +638,12 @@ export const GlobalSearchBox = forwardRef(
     }));
 
     useEffect(() => {
-      setTimeout(() => {
+      if (moveToTabs) return;
+      const timer = setTimeout(() => {
         selectRef.current?.focus();
       }, 500);
-    }, []);
+      return () => clearTimeout(timer);
+    }, [moveToTabs]);
 
     return (
       <>
@@ -649,6 +700,16 @@ export const GlobalSearchBox = forwardRef(
                       </ActionIconBtn>
                     )}
                   </OpenModeMenu>
+                  <ActionIconBtn
+                    className="action-btn btn-move-to"
+                    label={$fmt('common.moveTo')}
+                    btnStyle="icon"
+                    size={16}
+                    disabled={!movableItems.length}
+                    onClick={handleOpenMoveTo}
+                  >
+                    <SendOutlined />
+                  </ActionIconBtn>
                 </Space>
               )}
             </>
@@ -675,6 +736,23 @@ export const GlobalSearchBox = forwardRef(
             style={{ width: inputWidth }}
           ></Select>
         </StyledSearchList>
+        {moveToTabs && (
+          <MoveToModal
+            visible
+            moveData={{
+              selectedTabs: moveToTabs.map(item => ({
+                tabId: item.tabId,
+                title: item.title,
+                url: item.url,
+                groupId: item.groupId,
+              })),
+            }}
+            onOk={handleMoveToOk}
+            onProcessed={handleMoveToProcessed}
+            onCancel={() => setMoveToTabs(null)}
+            onDestinationCreated={onDestinationCreated}
+          />
+        )}
       </>
     );
   },
@@ -763,30 +841,35 @@ export const GlobalSearchPanel = forwardRef(
       [onAction],
     );
 
-    const handleBatchAction: BatchActionCallbackFn = useCallback(
-      async type => {
-        if (pageContext === 'optionsPage') {
-          homeEventEmitter.emit('home:treeDataHook', {
-            action: 'init',
-            params: [],
-          });
-        } else {
-          sendRuntimeMessage({
-            msgType: 'reloadAllAdminPage',
-            data: {},
-            targetPageContexts: ['optionsPage'],
-          });
-        }
+    const refreshAdminPage = useCallback(() => {
+      if (pageContext === 'optionsPage') {
+        homeEventEmitter.emit('home:treeDataHook', {
+          action: 'init',
+          params: [],
+        });
+      } else {
+        sendRuntimeMessage({
+          msgType: 'reloadAllAdminPage',
+          data: {},
+          targetPageContexts: ['optionsPage'],
+        });
+      }
+    }, [pageContext]);
 
+    const handleBatchAction: BatchActionCallbackFn = useCallback(
+      type => {
+        refreshAdminPage();
         if (type === 'open') {
           setVisible(false);
         }
       },
-      [pageContext],
+      [refreshAdminPage],
     );
 
     const handleClose = useCallback(() => {
+      if (searchBoxRef.current?.moveToOpen) return false;
       setVisible(false);
+      return true;
     }, []);
 
     const debounceResize = useMemo(
@@ -804,9 +887,8 @@ export const GlobalSearchPanel = forwardRef(
     // 按ESC键关闭搜索面板
     const handleKeyDown = useCallback(
       (event: KeyboardEvent) => {
-        if (event.key === 'Escape' && visible) {
+        if (event.key === 'Escape' && visible && handleClose()) {
           event.stopPropagation(); // 阻止事件冒泡
-          handleClose();
         }
       },
       [visible, handleClose],
@@ -896,6 +978,7 @@ export const GlobalSearchPanel = forwardRef(
               open
               onAction={handleAction}
               onBatchAction={handleBatchAction}
+              onDestinationCreated={refreshAdminPage}
             ></GlobalSearchBox>
           </SearchModalContext.Provider>
         </StyledGlobalSearchBox>

@@ -49,6 +49,8 @@ export interface MoveDataProps {
   tagId?: string;
   groupId?: string;
   tabs?: TabItem[];
+  // 全局搜索多选的标签页，可来自不同标签组，需携带来源 groupId
+  selectedTabs?: Array<TabItem & { groupId: string }>;
 }
 
 // 移动后的目标数据

@@ -107,6 +107,7 @@ const zhTW: Record<LocaleKey, string> = {
   "common.selectedTabCount": "已選擇{count}個分頁",
   "common.minute": "分鐘",
   "common.hour": "小時",
+  "common.operationFailed": "操作失敗",
   "common.requestFailed": "請求失敗",
   "common.timeout": "請求逾時",
   "common.aborted": "請求取消",

@@ -35,12 +35,18 @@ export default function SearchList() {
     [selectedKeyChange],
   );
 
+  // 批量操作后刷新目录树
+  const onBatchAction = useCallback(() => {
+    treeDataHook?.refreshTreeData?.();
+  }, [treeDataHook]);
+
   return (
     <GlobalSearchBox
       tagList={tagList}
       listHeight={500}
       placement="topRight"
       onAction={onAction}
+      onBatchAction={onBatchAction}
     />
   );
 }

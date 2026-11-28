@@ -95,16 +95,23 @@ export const getCascaderData = async (
   moveData?: MoveDataProps,
 ): Promise<CascaderOption[]> => {
   const localeMessage = await getLocaleMessages();
-  const { tagId, groupId, groupIds, tabs } = moveData || {};
-  const moveType = tagId ? 'tag' : tabs && tabs?.length > 0 ? 'tab' : 'tabGroup';
+  const { tagId, groupId, groupIds, tabs, selectedTabs } = moveData || {};
+  // 全局搜索多选的标签页可来自多个标签组
+  const isBatchTabs = !!selectedTabs?.length && !tagId && !groupId && !groupIds?.length;
+  const moveType = tagId
+    ? 'tag'
+    : tabs?.length || selectedTabs?.length
+      ? 'tab'
+      : 'tabGroup';
   const tagDisabled = (tag: TagItem) => {
+    if (isBatchTabs) return !!tag.isLocked;
     if (groupIds?.length) return !!tag.isLocked;
     if (moveType === 'tag') {
       return !!tag.isLocked || tag.tagId === tagId;
     } else if (moveType === 'tabGroup') {
       return !!tag.isLocked || tag.groupList.some(g => g.groupId === groupId);
     } else {
-      return tag?.groupList?.length === 0;
+      return !!tag.isLocked && !tag.groupList?.length;
     }
   };
 
@@ -132,7 +139,10 @@ export const getCascaderData = async (
             <span className="label-name">{group.groupName}</span>
           </div>
         ),
-        disabled: moveType !== 'tab' || group.groupId === groupId,
+        disabled:
+          moveType !== 'tab' ||
+          group.groupId === groupId ||
+          (isBatchTabs && !!group.isLocked),
         parentKey: tag.tagId,
         isLeaf: true,
         originData: { ...group },

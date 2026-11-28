@@ -120,6 +120,7 @@ const ruRU: Record<LocaleKey, string> = {
   }`,
   'common.minute': 'минуты',
   'common.hour': 'часы',
+  'common.operationFailed': 'Не удалось выполнить операцию',
   'common.requestFailed': 'Ошибка запроса',
   'common.timeout': 'Превышено время ожидания',
   'common.aborted': 'Запрос отменён',

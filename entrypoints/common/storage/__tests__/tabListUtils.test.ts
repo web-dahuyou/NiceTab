@@ -1763,6 +1763,38 @@ describe('TabListUtils', () => {
   // tabMoveThrough
   // ==========================================================================
   describe('tabMoveThrough', () => {
+    it.each(['deleted', 'moved'])(
+      '目标组已失效（%s）时保留源标签页且不写入',
+      async targetStatus => {
+        const selected = makeTab('https://selected.test');
+        const existing = makeTab('https://existing.test');
+        const source = makeGroup({ groupId: 'source', tabList: [selected] });
+        const replacement = makeGroup({ groupId: 'replacement', tabList: [existing] });
+        const target = makeGroup({ groupId: 'target-group' });
+        setupTagList([
+          stagingTag([source]),
+          makeTag({ tagId: 'target-tag', groupList: [replacement] }),
+          makeTag({
+            tagId: 'other-tag',
+            groupList: targetStatus === 'moved' ? [target] : [],
+          }),
+        ]);
+
+        const moved = await utils.tabMoveThrough({
+          sourceGroupId: source.groupId,
+          targetTagId: 'target-tag',
+          targetGroupId: target.groupId,
+          tabs: [selected],
+        });
+
+        expect(source.tabList).toEqual([selected]);
+        expect(replacement.tabList).toEqual([existing]);
+        expect(target.tabList).toEqual([]);
+        expect(setTagListSpy).not.toHaveBeenCalled();
+        expect(moved).toBe(false);
+      },
+    );
+
     it('移动标签页到另一个标签组', async () => {
       const list = [
         makeTag({
@@ -1897,6 +1929,110 @@ describe('TabListUtils', () => {
       });
       expect(list[0].groupList).toHaveLength(0);
     });
+  });
+
+  describe('tabsMoveThrough', () => {
+    it('跨组移动时保留未选择和锁定的标签页，并按设置清理已移空的源组', async () => {
+      const first = makeTab('https://first.test');
+      const second = makeTab('https://second.test');
+      const unselected = makeTab('https://unselected.test');
+      const locked = makeTab('https://locked.test');
+      const existing = makeTab('https://existing.test');
+      const source = stagingTag([
+        makeGroup({ groupId: 'first', tabList: [first] }),
+        makeGroup({ groupId: 'second', tabList: [second, unselected] }),
+        makeGroup({ groupId: 'locked', tabList: [locked], isLocked: true }),
+      ]);
+      const target = makeGroup({ groupId: 'target-group', tabList: [existing] });
+      const list = [source, makeTag({ tagId: 'target', groupList: [target] })];
+      const settings = { ...defaultSettings, deleteUnlockedEmptyGroup: true };
+      Store.settingsUtils.settings = settings;
+      vi.mocked(Store.settingsUtils.getSettings).mockResolvedValue(settings);
+      setupTagList(list);
+
+      const result = await utils.tabsMoveThrough({
+        tabs: [
+          { ...first, groupId: 'first' },
+          { ...second, groupId: 'second' },
+          { ...locked, groupId: 'locked' },
+        ],
+        targetTagId: 'target',
+        targetGroupId: 'target-group',
+      });
+
+      expect(result.processedTabIds).toEqual([first.tabId, second.tabId]);
+      expect(source.groupList.map(({ groupId, tabList }) => [groupId, tabList])).toEqual([
+        ['second', [unselected]],
+        ['locked', [locked]],
+      ]);
+      expect(target.tabList).toEqual([existing, first, second]);
+      expect(setTagListSpy).toHaveBeenCalledTimes(1);
+      expect(setTagListSpy).toHaveBeenCalledWith(list);
+    });
+
+    it('复制时保留源条目，为复制项生成新 ID 并按 URL 去重', async () => {
+      const tab = makeTab('https://duplicate.test');
+      const duplicate = { ...tab, tabId: 'existing-duplicate' };
+      const existing = makeTab('https://existing.test');
+      const source = makeGroup({ groupId: 'source-group', tabList: [tab] });
+      const target = makeGroup({
+        groupId: 'target-group',
+        tabList: [duplicate, existing],
+      });
+      setupTagList([
+        stagingTag([source]),
+        makeTag({ tagId: 'target', groupList: [target] }),
+      ]);
+      vi.mocked(Store.settingsUtils.getSettings).mockResolvedValue({
+        ...defaultSettings,
+        tabInsertPosition: 'top',
+      });
+
+      const result = await utils.tabsMoveThrough({
+        tabs: [{ ...tab, groupId: 'source-group' }],
+        targetTagId: 'target',
+        targetGroupId: 'target-group',
+        isCopy: true,
+        autoMerge: true,
+      });
+
+      expect(result.processedTabIds).toEqual([tab.tabId]);
+      expect(source.tabList).toEqual([tab]);
+      expect(target.tabList.map(item => item.url)).toEqual([tab.url, existing.url]);
+      expect(target.tabList[0].tabId).not.toBe(tab.tabId);
+      expect(target.tabList[0].tabId).not.toBe(duplicate.tabId);
+      expect(target.tabList[1]).toEqual(existing);
+    });
+
+    it.each(['missing', 'lockedTag', 'lockedGroup'])(
+      '目标不可用（%s）时保留源条目且不写入',
+      async targetStatus => {
+        const tab = makeTab('https://source.test');
+        const source = makeGroup({ groupId: 'source-group', tabList: [tab] });
+        const target = makeGroup({
+          groupId: 'target-group',
+          isLocked: targetStatus === 'lockedGroup',
+        });
+        setupTagList([
+          stagingTag([source]),
+          makeTag({
+            tagId: 'target',
+            isLocked: targetStatus === 'lockedTag',
+            groupList: targetStatus === 'missing' ? [] : [target],
+          }),
+        ]);
+
+        await expect(
+          utils.tabsMoveThrough({
+            tabs: [{ ...tab, groupId: 'source-group' }],
+            targetTagId: 'target',
+            targetGroupId: 'target-group',
+          }),
+        ).resolves.toEqual({ processedTabIds: [] });
+        expect(source.tabList).toEqual([tab]);
+        expect(setTagListSpy).not.toHaveBeenCalled();
+      },
+    );
   });
 
   // ==========================================================================
